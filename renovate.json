@@ -4,6 +4,26 @@
         "config:best-practices"
     ],
     "timezone": "America/Detroit",
+    "lockFileMaintenance": {
+        "enabled": true,
+        "schedule": [
+            "* * 1-7,15-21 * 6"
+        ]
+    },
+    "customManagers": [
+        {
+            "description": "dbt packages via GitHub releases; depName hardcoded per package (name uses _, repo uses -).",
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^etl/dbt/packages\\.yml$/"
+            ],
+            "matchStrings": [
+                "package:\\s+dbt-labs/dbt_utils\\s+version:\\s+[\"']?(?<currentValue>[^\"'\\s]+)"
+            ],
+            "depNameTemplate": "dbt-labs/dbt-utils",
+            "datasourceTemplate": "github-releases"
+        }
+    ],
     "packageRules": [
         {
             "description": "Run dependency updates on the first and third Saturday every month.",
@@ -37,62 +57,46 @@
             "minimumReleaseAge": "30 days"
         },
         {
-            "description": "Pin non-catalog app dependency ranges.",
+            "description": "Pin web app dependency ranges to exact versions.",
             "matchManagers": [
                 "npm"
             ],
             "matchFileNames": [
-                "apps/api/package.json",
-                "apps/web/package.json"
+                "web/package.json"
             ],
-            "matchCurrentValue": "!/^catalog:/",
             "rangeStrategy": "pin"
         },
         {
-            "description": "Group non-major pnpm catalog updates.",
+            "description": "Keep etl pyproject ranges intact; update uv.lock within the declared caps.",
             "matchManagers": [
-                "npm"
+                "pep621"
             ],
             "matchFileNames": [
-                "pnpm-workspace.yaml"
+                "etl/pyproject.toml"
             ],
-            "matchDepTypes": [
-                "/^pnpm\\.catalog(\\.|$)/"
+            "rangeStrategy": "update-lockfile"
+        },
+        {
+            "description": "Group non-major Go module updates.",
+            "matchManagers": [
+                "gomod"
             ],
             "matchUpdateTypes": [
                 "patch",
                 "minor"
             ],
-            "groupName": "catalog dependencies",
-            "groupSlug": "catalog-dependencies",
+            "groupName": "go dependencies",
+            "groupSlug": "go-dependencies",
             "groupSingleUpdates": true
         },
         {
-            "description": "Group non-catalog API dependency updates.",
+            "description": "Group non-major web dependency updates.",
             "matchManagers": [
                 "npm"
             ],
             "matchFileNames": [
-                "apps/api/package.json"
+                "web/package.json"
             ],
-            "matchCurrentValue": "!/^catalog:/",
-            "matchUpdateTypes": [
-                "patch",
-                "minor"
-            ],
-            "groupName": "api dependencies",
-            "groupSlug": "api-dependencies",
-            "groupSingleUpdates": true
-        },
-        {
-            "description": "Group non-catalog web dependency updates.",
-            "matchManagers": [
-                "npm"
-            ],
-            "matchFileNames": [
-                "apps/web/package.json"
-            ],
-            "matchCurrentValue": "!/^catalog:/",
             "matchUpdateTypes": [
                 "patch",
                 "minor"
@@ -102,42 +106,39 @@
             "groupSingleUpdates": true
         },
         {
-            "description": "Group common workspace dependency updates.",
+            "description": "Group non-major etl Python dependency updates.",
             "matchManagers": [
-                "npm"
+                "pep621"
             ],
             "matchFileNames": [
-                "package.json",
-                "packages/*/package.json"
-            ],
-            "matchCurrentValue": "!/^catalog:/",
-            "matchUpdateTypes": [
-                "patch",
-                "minor"
-            ],
-            "groupName": "common dependencies",
-            "groupSlug": "common-dependencies",
-            "groupSingleUpdates": true
-        },
-        {
-            "description": "Group non-major Python dependency updates",
-            "matchManagers": [
-                "pep651"
-            ],
-            "matchFileNames": [
-                "pyproject.toml"
+                "etl/pyproject.toml"
             ],
             "matchUpdateTypes": [
                 "patch",
                 "minor"
             ],
-            "groupName": "python dependencies",
-            "groupSlug": "python-dependencies",
+            "groupName": "etl python dependencies",
+            "groupSlug": "etl-python-dependencies",
             "groupSingleUpdates": true
         },
         {
-            "description": "Pin Python to 3.13, since dbt doesn't work with 3.14 yet",
-            "matchDepNames": ["python"],
+            "description": "Group non-major dbt package updates.",
+            "matchDepNames": [
+                "dbt-labs/dbt-utils"
+            ],
+            "matchUpdateTypes": [
+                "patch",
+                "minor"
+            ],
+            "groupName": "dbt packages",
+            "groupSlug": "dbt-packages",
+            "groupSingleUpdates": true
+        },
+        {
+            "description": "Pin Python to 3.13, since dbt doesn't work with 3.14 yet.",
+            "matchDepNames": [
+                "python"
+            ],
             "allowedVersions": "<3.14.0"
         }
     ]
