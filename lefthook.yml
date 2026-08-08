@@ -6,6 +6,7 @@ pre-push:
       run: task lint
 
     web-lint:
+      glob: "web/**"
       root: "web/"
       run: pnpm run lint
 
