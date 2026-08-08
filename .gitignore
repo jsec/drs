@@ -16,15 +16,17 @@ node_modules
 # Testing
 coverage
 
-# Turbo
-.turbo
+# Go
+/bin/
+/tmp/
+/api
 
 # Python/dbt
-db/.venv/
-db/dbt/.user.yml
-db/dbt/dbt_packages/
-db/dbt/logs/
-db/dbt/target/
+etl/.venv/
+etl/dbt/.user.yml
+etl/dbt/dbt_packages/
+etl/dbt/logs/
+etl/dbt/target/
 __pycache__
 
 # Build Outputs

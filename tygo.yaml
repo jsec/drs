@@ -1,0 +1,7 @@
+packages:
+  - path: github.com/jsec/drs/internal/seasons
+    output_path: web/src/lib/api/seasons.gen.ts
+    preserve_comments: default
+  - path: github.com/jsec/drs/internal/constructors
+    output_path: web/src/lib/api/constructors.gen.ts
+    preserve_comments: default

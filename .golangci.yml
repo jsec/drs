@@ -1,0 +1,21 @@
+version: "2"
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - bodyclose
+    - misspell
+  exclusions:
+    rules:
+      - path: (\.sql\.go|db\.go|models\.go|querier\.go)$
+        linters:
+          - all
+
+formatters:
+  enable:
+    - gofmt
+    - goimports

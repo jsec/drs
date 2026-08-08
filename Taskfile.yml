@@ -1,0 +1,126 @@
+version: "3"
+
+dotenv: [".env"]
+
+vars:
+  API_PKG: ./cmd/api
+
+tasks:
+  build:
+    cmds:
+      - go build -o bin/api {{.API_PKG}}
+
+  default:
+    cmds:
+      - task --list-all
+    silent: true
+
+  dev:
+    cmds:
+      - air
+
+  etl:build:
+    dir: etl
+    cmds:
+      - uv run python -m scripts.build
+
+  etl:check:
+    cmds:
+      - task: etl:lint
+      - task: etl:format-check
+      - task: etl:typecheck
+
+  etl:dbt-debug:
+    dir: etl
+    cmds:
+      - uv run dbt debug --project-dir ./dbt --profiles-dir ./dbt
+
+  etl:dbt-deps:
+    dir: etl
+    cmds:
+      - uv run dbt deps --project-dir ./dbt --profiles-dir ./dbt
+
+  etl:dbt-parse:
+    dir: etl
+    cmds:
+      - uv run dbt parse --project-dir ./dbt --profiles-dir ./dbt
+
+  etl:format:
+    dir: etl
+    cmds:
+      - uv run ruff format .
+      - uv run sqlfmt dbt/models dbt/macros dbt/tests
+
+  etl:format-check:
+    dir: etl
+    cmds:
+      - uv run ruff format --check .
+      - uv run sqlfmt --check dbt/models dbt/macros dbt/tests
+
+  etl:lint:
+    dir: etl
+    cmds:
+      - uv run ruff check .
+
+  etl:load:
+    dir: etl
+    cmds:
+      - uv run python -m scripts.load
+
+  etl:migrate:
+    dir: etl
+    cmds:
+      - goose -table app_goose_db_version -dir ./migrations postgres "$DATABASE_URL" up
+
+  etl:migrate-down:
+    dir: etl
+    cmds:
+      - goose -table app_goose_db_version -dir ./migrations postgres "$DATABASE_URL" down
+
+  etl:migrate-status:
+    dir: etl
+    cmds:
+      - goose -table app_goose_db_version -dir ./migrations postgres "$DATABASE_URL" status
+
+  etl:refresh:
+    cmds:
+      - task: etl:load
+      - task: etl:build
+
+  etl:typecheck:
+    dir: etl
+    cmds:
+      - uv run pyrefly check .
+
+  gen:
+    cmds:
+      - task: gen:sqlc
+      - task: gen:tygo
+
+  gen:sqlc:
+    dir: internal/database
+    cmds:
+      - sqlc generate
+
+  gen:tygo:
+    cmds:
+      - tygo generate
+
+  lint:
+    cmds:
+      - golangci-lint run
+
+  run:
+    cmds:
+      - go run {{.API_PKG}}
+
+  schema:
+    cmds:
+      - >-
+        pg_dump "$DATABASE_URL" -n effone --schema-only --no-owner --no-privileges
+        | grep -vE '^\\'
+        > internal/database/schema.sql
+
+  test:
+    cmds:
+      - go test ./...

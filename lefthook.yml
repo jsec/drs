@@ -1,8 +1,14 @@
-prepare-commit-msg:
+pre-push:
+  parallel: true
   commands:
-    commitizen:
-      interactive: true
-      run: pnpm cz --hook
-      env:
-        LEFTHOOK: 0
+    go-lint:
+      glob: "*.go"
+      run: task lint
 
+    web-lint:
+      root: "web/"
+      run: pnpm run lint
+
+    etl-check:
+      glob: "etl/**"
+      run: task etl:check
