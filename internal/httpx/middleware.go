@@ -8,6 +8,12 @@ import (
 
 type Middleware func(http.Handler) http.Handler
 
+func Timeout(d time.Duration) Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.TimeoutHandler(next, d, "request timed out")
+	}
+}
+
 func Chain(h http.Handler, mw ...Middleware) http.Handler {
 	for i := len(mw) - 1; i >= 0; i-- {
 		h = mw[i](h)

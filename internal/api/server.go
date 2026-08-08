@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/jsec/drs/internal/constructors"
 	"github.com/jsec/drs/internal/database"
@@ -15,5 +16,5 @@ func NewHandler(queries *database.Queries) http.Handler {
 	seasons.NewHandler(seasons.NewService(queries)).Routes(mux)
 	constructors.NewHandler(constructors.NewService(queries)).Routes(mux)
 
-	return httpx.Chain(mux, httpx.Logging, httpx.Recover)
+	return httpx.Chain(mux, httpx.Logging, httpx.Timeout(5*time.Second), httpx.Recover)
 }
