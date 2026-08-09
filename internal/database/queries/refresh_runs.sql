@@ -18,5 +18,6 @@ SET
     status = 'failed',
     finished_at = now(),
     duration_ms = extract(EPOCH FROM (now() - started_at)) * 1000,
-    row_counts = '{}'::jsonb
+    row_counts = '{}'::jsonb,
+    error_message = $2
 WHERE refresh_id = $1;

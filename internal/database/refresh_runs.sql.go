@@ -35,12 +35,18 @@ SET
     status = 'failed',
     finished_at = now(),
     duration_ms = extract(EPOCH FROM (now() - started_at)) * 1000,
-    row_counts = '{}'::jsonb
+    row_counts = '{}'::jsonb,
+    error_message = $2
 WHERE refresh_id = $1
 `
 
-func (q *Queries) MarkRefreshFailed(ctx context.Context, refreshID int64) error {
-	_, err := q.db.Exec(ctx, markRefreshFailed, refreshID)
+type MarkRefreshFailedParams struct {
+	RefreshID    int64
+	ErrorMessage pgtype.Text
+}
+
+func (q *Queries) MarkRefreshFailed(ctx context.Context, arg MarkRefreshFailedParams) error {
+	_, err := q.db.Exec(ctx, markRefreshFailed, arg.RefreshID, arg.ErrorMessage)
 	return err
 }
 

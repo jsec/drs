@@ -51,7 +51,11 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 
 	defer func() {
 		if err != nil {
-			if markErr := queries.MarkRefreshFailed(ctx, refreshID); markErr != nil {
+			markErr := queries.MarkRefreshFailed(ctx, database.MarkRefreshFailedParams{
+				RefreshID:    refreshID,
+				ErrorMessage: pgtype.Text{String: err.Error(), Valid: true},
+			})
+			if markErr != nil {
 				logger.Error("could not mark refresh record as failed", "err", markErr)
 			}
 		}
