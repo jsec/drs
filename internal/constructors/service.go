@@ -12,8 +12,8 @@ type Service struct {
 	queries *database.Queries
 }
 
-func NewService(q *database.Queries) *Service {
-	return &Service{queries: q}
+func NewService(queries *database.Queries) *Service {
+	return &Service{queries: queries}
 }
 
 func (s *Service) List(ctx context.Context) ([]ConstructorResponse, error) {

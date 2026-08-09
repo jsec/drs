@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -10,11 +11,11 @@ import (
 	"github.com/jsec/drs/internal/seasons"
 )
 
-func NewHandler(queries *database.Queries) http.Handler {
+func NewHandler(log *slog.Logger, queries *database.Queries) http.Handler {
 	mux := http.NewServeMux()
 
-	seasons.NewHandler(seasons.NewService(queries)).Routes(mux)
-	constructors.NewHandler(constructors.NewService(queries)).Routes(mux)
+	seasons.NewHandler(log, seasons.NewService(queries)).Routes(mux)
+	constructors.NewHandler(log, constructors.NewService(queries)).Routes(mux)
 
-	return httpx.Chain(mux, httpx.Logging, httpx.Timeout(5*time.Second), httpx.Recover)
+	return httpx.Chain(mux, httpx.Logging(log), httpx.Timeout(5*time.Second), httpx.Recover(log))
 }

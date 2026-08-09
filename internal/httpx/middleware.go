@@ -31,35 +31,39 @@ func (s *statusRecorder) WriteHeader(code int) {
 	s.ResponseWriter.WriteHeader(code)
 }
 
-func Logging(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		rec := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
+func Logging(log *slog.Logger) Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
+			rec := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
 
-		next.ServeHTTP(rec, r)
+			next.ServeHTTP(rec, r)
 
-		slog.Info("request",
-			"method", r.Method,
-			"path", r.URL.Path,
-			"status", rec.status,
-			"duration", time.Since(start).String(),
-		)
-	})
+			log.Info("request",
+				"method", r.Method,
+				"path", r.URL.Path,
+				"status", rec.status,
+				"duration", time.Since(start).String(),
+			)
+		})
+	}
 }
 
-func Recover(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			if rec := recover(); rec != nil {
-				slog.Error("panic recovered",
-					"method", r.Method,
-					"path", r.URL.Path,
-					"panic", rec,
-				)
-				writeError(w, http.StatusInternalServerError, "internal server error")
-			}
-		}()
+func Recover(log *slog.Logger) Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			defer func() {
+				if rec := recover(); rec != nil {
+					log.Error("panic recovered",
+						"method", r.Method,
+						"path", r.URL.Path,
+						"panic", rec,
+					)
+					writeError(w, http.StatusInternalServerError, "internal server error")
+				}
+			}()
 
-		next.ServeHTTP(w, r)
-	})
+			next.ServeHTTP(w, r)
+		})
+	}
 }

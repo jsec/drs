@@ -15,15 +15,15 @@ import (
 )
 
 func main() {
-	if err := run(); err != nil {
-		slog.Error("server exited with error", "err", err)
+	log := setupLogger()
+
+	if err := run(log); err != nil {
+		log.Error("server exited with error", "err", err)
 		os.Exit(1)
 	}
 }
 
-func run() error {
-	setupLogger()
-
+func run(log *slog.Logger) error {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
 		return errors.New("DATABASE_URL is required")
@@ -45,14 +45,14 @@ func run() error {
 
 	srv := &http.Server{
 		Addr:              ":" + port,
-		Handler:           api.NewHandler(database.New(pool)),
+		Handler:           api.NewHandler(log, database.New(pool)),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	errChan := make(chan error, 1)
 
 	go func() {
-		slog.Info("server listening", "addr", srv.Addr)
+		log.Info("server listening", "addr", srv.Addr)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			errChan <- err
 		}
@@ -62,7 +62,7 @@ func run() error {
 	case err := <-errChan:
 		return err
 	case <-ctx.Done():
-		slog.Info("shutdown signal received")
+		log.Info("shutdown signal received")
 	}
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -71,7 +71,7 @@ func run() error {
 	return srv.Shutdown(shutdownCtx)
 }
 
-func setupLogger() {
+func setupLogger() *slog.Logger {
 	var h slog.Handler
 
 	switch os.Getenv("APP_ENV") {
@@ -81,5 +81,5 @@ func setupLogger() {
 		h = slog.NewJSONHandler(os.Stdout, nil)
 	}
 
-	slog.SetDefault(slog.New(h))
+	return slog.New(h)
 }

@@ -11,22 +11,31 @@ type Error struct {
 	Message string
 }
 
+type HandlerFunc func(http.ResponseWriter, *http.Request) error
+
+type handler struct {
+	log *slog.Logger
+	fn  HandlerFunc
+}
+
 func (e *Error) Error() string { return e.Message }
 
 func NewError(status int, message string) *Error {
 	return &Error{Status: status, Message: message}
 }
 
-type HandlerFunc func(http.ResponseWriter, *http.Request) error
+func Handle(log *slog.Logger, fn HandlerFunc) http.Handler {
+	return handler{log: log, fn: fn}
+}
 
-func (h HandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if err := h(w, r); err != nil {
+func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if err := h.fn(w, r); err != nil {
 		if apiErr, ok := errors.AsType[*Error](err); ok {
 			writeError(w, apiErr.Status, apiErr.Message)
 			return
 		}
 
-		slog.Error("unhandled handler error",
+		h.log.Error("unhandled handler error",
 			"method", r.Method,
 			"path", r.URL.Path,
 			"err", err,
