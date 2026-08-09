@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"context"
@@ -6,43 +6,16 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/jsec/drs/internal/database"
 )
 
-func main() {
-	logger := setupLogger()
-
-	if err := run(logger); err != nil {
-		logger.Error("server exited with error", "err", err)
-		os.Exit(1)
-	}
-}
-
-func run(logger *slog.Logger) error {
-	dsn := os.Getenv("DATABASE_URL")
-	if dsn == "" {
-		return errors.New("DATABASE_URL is required")
-	}
-
+func Serve(ctx context.Context, logger *slog.Logger, db *database.Queries) error {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
 	}
-
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
-
-	pool, err := database.NewPool(ctx, dsn)
-	if err != nil {
-		return err
-	}
-	defer pool.Close()
-
-	db := database.New(pool)
 
 	srv := &http.Server{
 		Addr:              ":" + port,
@@ -73,17 +46,4 @@ func run(logger *slog.Logger) error {
 	defer cancel()
 
 	return srv.Shutdown(shutdownCtx)
-}
-
-func setupLogger() *slog.Logger {
-	var h slog.Handler
-
-	switch os.Getenv("APP_ENV") {
-	case "", "dev":
-		h = slog.NewTextHandler(os.Stdout, nil)
-	default:
-		h = slog.NewJSONHandler(os.Stdout, nil)
-	}
-
-	return slog.New(h)
 }

@@ -3,12 +3,12 @@ version: "3"
 dotenv: [".env"]
 
 vars:
-  API_PKG: ./cmd/api
+  APP_PKG: ./cmd/drs
 
 tasks:
   build:
     cmds:
-      - go build -o bin/api {{.API_PKG}}
+      - go build -o bin/drs {{.APP_PKG}}
 
   default:
     cmds:
@@ -112,7 +112,7 @@ tasks:
 
   run:
     cmds:
-      - go run {{.API_PKG}}
+      - go run {{.APP_PKG}} serve
 
   schema:
     cmds:

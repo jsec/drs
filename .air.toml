@@ -2,8 +2,8 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-  cmd = "go build -o ./tmp/api ./cmd/api"
-  bin = "./tmp/api"
+  cmd = "go build -o ./tmp/drs ./cmd/drs"
+  bin = "./tmp/drs serve"
   include_ext = ["go"]
   exclude_dir = ["tmp", "bin", "web", "etl"]
   exclude_regex = ["_test.go", ".*\\.gen\\.go", ".*\\.sql\\.go"]
