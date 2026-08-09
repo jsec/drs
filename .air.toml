@@ -2,12 +2,13 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-  cmd = "go build -o ./tmp/drs ./cmd/drs"
-  bin = "./tmp/drs serve"
-  include_ext = ["go"]
-  exclude_dir = ["tmp", "bin", "web", "etl"]
-  exclude_regex = ["_test.go", ".*\\.gen\\.go", ".*\\.sql\\.go"]
-  stop_on_error = true
+cmd = "go build -o ./tmp/drs ./cmd/drs"
+entrypoint = "./tmp/drs"
+args_bin = ["serve"]
+include_ext = ["go"]
+exclude_dir = ["tmp", "bin", "web", "etl"]
+exclude_regex = ["_test.go", ".*\\.gen\\.go", ".*\\.sql\\.go"]
+stop_on_error = true
 
 [misc]
-  clean_on_exit = true
+clean_on_exit = true
