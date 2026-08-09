@@ -3,6 +3,7 @@ package httpx
 import (
 	"log/slog"
 	"net/http"
+	"slices"
 	"time"
 )
 
@@ -15,9 +16,10 @@ func Timeout(d time.Duration) Middleware {
 }
 
 func Chain(h http.Handler, mw ...Middleware) http.Handler {
-	for i := len(mw) - 1; i >= 0; i-- {
-		h = mw[i](h)
+	for _, m := range slices.Backward(mw) {
+		h = m(h)
 	}
+
 	return h
 }
 
@@ -35,7 +37,11 @@ func Logging(logger *slog.Logger) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
-			rec := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
+
+			rec := &statusRecorder{
+				ResponseWriter: w,
+				status:         http.StatusOK,
+			}
 
 			next.ServeHTTP(rec, r)
 
