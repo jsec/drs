@@ -1,4 +1,4 @@
-package httpx
+package api
 
 import (
 	"errors"
@@ -11,20 +11,16 @@ type Error struct {
 	Message string
 }
 
-type HandlerFunc func(http.ResponseWriter, *http.Request) error
+type handlerFunc func(http.ResponseWriter, *http.Request) error
 
 type handler struct {
 	logger *slog.Logger
-	fn     HandlerFunc
+	fn     handlerFunc
 }
 
 func (e *Error) Error() string { return e.Message }
 
-func NewError(status int, message string) *Error {
-	return &Error{Status: status, Message: message}
-}
-
-func Handle(logger *slog.Logger, fn HandlerFunc) http.Handler {
+func handle(logger *slog.Logger, fn handlerFunc) http.Handler {
 	return handler{logger: logger, fn: fn}
 }
 
@@ -40,6 +36,7 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			"path", r.URL.Path,
 			"err", err,
 		)
+
 		writeError(w, http.StatusInternalServerError, "internal server error")
 	}
 }

@@ -1,4 +1,4 @@
-package httpx
+package api
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func WriteJSON(logger *slog.Logger, w http.ResponseWriter, status int, v any) error {
+func respondJSON(logger *slog.Logger, w http.ResponseWriter, status int, v any) error {
 	buf, err := json.Marshal(v)
 	if err != nil {
 		return err

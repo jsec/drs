@@ -1,4 +1,4 @@
-package httpx
+package api
 
 import (
 	"log/slog"
@@ -8,20 +8,6 @@ import (
 )
 
 type Middleware func(http.Handler) http.Handler
-
-func Timeout(d time.Duration) Middleware {
-	return func(next http.Handler) http.Handler {
-		return http.TimeoutHandler(next, d, "request timed out")
-	}
-}
-
-func Chain(h http.Handler, mw ...Middleware) http.Handler {
-	for _, m := range slices.Backward(mw) {
-		h = m(h)
-	}
-
-	return h
-}
 
 type statusRecorder struct {
 	http.ResponseWriter
@@ -33,7 +19,21 @@ func (s *statusRecorder) WriteHeader(code int) {
 	s.ResponseWriter.WriteHeader(code)
 }
 
-func Logging(logger *slog.Logger) Middleware {
+func timeoutMiddleware(d time.Duration) Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.TimeoutHandler(next, d, "request timed out")
+	}
+}
+
+func chainMiddleware(h http.Handler, mw ...Middleware) http.Handler {
+	for _, m := range slices.Backward(mw) {
+		h = m(h)
+	}
+
+	return h
+}
+
+func loggingMiddleware(logger *slog.Logger) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
@@ -55,7 +55,7 @@ func Logging(logger *slog.Logger) Middleware {
 	}
 }
 
-func Recover(logger *slog.Logger) Middleware {
+func recoverMiddleware(logger *slog.Logger) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			defer func() {
