@@ -9,8 +9,11 @@ import (
 )
 
 type Querier interface {
+	CreateRefreshRun(ctx context.Context, arg CreateRefreshRunParams) (int64, error)
 	ListConstructors(ctx context.Context) ([]ListConstructorsRow, error)
 	ListSeasons(ctx context.Context) ([]ListSeasonsRow, error)
+	MarkRefreshFailed(ctx context.Context, refreshID int64) error
+	MarkRefreshSucceeded(ctx context.Context, arg MarkRefreshSucceededParams) error
 }
 
 var _ Querier = (*Queries)(nil)
