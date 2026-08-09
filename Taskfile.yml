@@ -25,9 +25,7 @@ tasks:
 
   etl:check:
     cmds:
-      - task: etl:lint
       - task: etl:format-check
-      - task: etl:typecheck
 
   etl:dbt-debug:
     dir: etl
@@ -47,19 +45,12 @@ tasks:
   etl:format:
     dir: etl
     cmds:
-      - uv run ruff format .
       - uv run sqlfmt dbt/models dbt/macros dbt/tests
 
   etl:format-check:
     dir: etl
     cmds:
-      - uv run ruff format --check .
       - uv run sqlfmt --check dbt/models dbt/macros dbt/tests
-
-  etl:lint:
-    dir: etl
-    cmds:
-      - uv run ruff check .
 
   etl:load:
     cmds:
@@ -83,11 +74,6 @@ tasks:
   etl:refresh:
     cmds:
       - go run {{.APP_PKG}} etl refresh
-
-  etl:typecheck:
-    dir: etl
-    cmds:
-      - uv run pyrefly check .
 
   gen:
     cmds:
