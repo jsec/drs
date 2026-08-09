@@ -10,7 +10,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jsec/drs/internal/api"
 	"github.com/jsec/drs/internal/database"
 )
 
@@ -43,9 +42,11 @@ func run(logger *slog.Logger) error {
 	}
 	defer pool.Close()
 
+	db := database.New(pool)
+
 	srv := &http.Server{
 		Addr:              ":" + port,
-		Handler:           api.New(logger, database.New(pool)).Handler(),
+		Handler:           newApplication(logger, db).routes(),
 		ReadHeaderTimeout: 5 * time.Second,
 		WriteTimeout:      15 * time.Second,
 		IdleTimeout:       time.Minute,

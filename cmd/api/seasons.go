@@ -1,4 +1,4 @@
-package api
+package main
 
 import (
 	"net/http"
@@ -6,8 +6,8 @@ import (
 	"github.com/jsec/drs/internal/httpx"
 )
 
-func (app *Application) listSeasons(w http.ResponseWriter, r *http.Request) error {
-	list, err := app.seasons.List(r.Context())
+func (app *application) listSeasonsHandler(w http.ResponseWriter, r *http.Request) error {
+	list, err := app.seasons.ListSeasons(r.Context())
 	if err != nil {
 		return err
 	}

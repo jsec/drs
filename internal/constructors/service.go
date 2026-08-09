@@ -16,7 +16,7 @@ func NewService(queries *database.Queries) *Service {
 	return &Service{queries: queries}
 }
 
-func (s *Service) List(ctx context.Context) ([]ConstructorResponse, error) {
+func (s *Service) ListConstructors(ctx context.Context) ([]ConstructorResponse, error) {
 	rows, err := s.queries.ListConstructors(ctx)
 	if err != nil {
 		return nil, err
@@ -25,29 +25,26 @@ func (s *Service) List(ctx context.Context) ([]ConstructorResponse, error) {
 	out := make([]ConstructorResponse, 0, len(rows))
 
 	for _, row := range rows {
-		out = append(out, toListResponse(row))
+		out = append(out, ConstructorResponse{
+			ID:            row.ID,
+			Name:          row.Name,
+			Color:         row.Color,
+			FirstRaceDate: dateToString(row.FirstRaceDate),
+			LastRaceDate:  dateToString(row.LastRaceDate),
+			Championships: row.Championships,
+			Wins:          row.Wins,
+			Podiums:       row.Podiums,
+		})
 	}
 
 	return out, nil
-}
-
-func toListResponse(row database.ListConstructorsRow) ConstructorResponse {
-	return ConstructorResponse{
-		ID:            row.ID,
-		Name:          row.Name,
-		Color:         row.Color,
-		FirstRaceDate: dateToString(row.FirstRaceDate),
-		LastRaceDate:  dateToString(row.LastRaceDate),
-		Championships: row.Championships,
-		Wins:          row.Wins,
-		Podiums:       row.Podiums,
-	}
 }
 
 func dateToString(d pgtype.Date) *string {
 	if !d.Valid {
 		return nil
 	}
+
 	s := d.Time.Format("2006-01-02")
 	return &s
 }
