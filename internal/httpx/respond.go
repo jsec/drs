@@ -6,14 +6,14 @@ import (
 	"net/http"
 )
 
-func WriteJSON(log *slog.Logger, w http.ResponseWriter, status int, v any) error {
+func WriteJSON(logger *slog.Logger, w http.ResponseWriter, status int, v any) error {
 	buf, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
 
 	if err := writeJSON(w, status, buf); err != nil {
-		log.Error("write response body", "err", err)
+		logger.Error("write response body", "err", err)
 	}
 
 	return nil

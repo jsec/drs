@@ -15,15 +15,15 @@ import (
 )
 
 func main() {
-	log := setupLogger()
+	logger := setupLogger()
 
-	if err := run(log); err != nil {
-		log.Error("server exited with error", "err", err)
+	if err := run(logger); err != nil {
+		logger.Error("server exited with error", "err", err)
 		os.Exit(1)
 	}
 }
 
-func run(log *slog.Logger) error {
+func run(logger *slog.Logger) error {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
 		return errors.New("DATABASE_URL is required")
@@ -45,14 +45,17 @@ func run(log *slog.Logger) error {
 
 	srv := &http.Server{
 		Addr:              ":" + port,
-		Handler:           api.NewHandler(log, database.New(pool)),
+		Handler:           api.New(logger, database.New(pool)).Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		IdleTimeout:       time.Minute,
+		ErrorLog:          slog.NewLogLogger(logger.Handler(), slog.LevelError),
 	}
 
 	errChan := make(chan error, 1)
 
 	go func() {
-		log.Info("server listening", "addr", srv.Addr)
+		logger.Info("server listening", "addr", srv.Addr)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			errChan <- err
 		}
@@ -62,7 +65,7 @@ func run(log *slog.Logger) error {
 	case err := <-errChan:
 		return err
 	case <-ctx.Done():
-		log.Info("shutdown signal received")
+		logger.Info("shutdown signal received")
 	}
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

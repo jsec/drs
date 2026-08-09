@@ -14,8 +14,8 @@ type Error struct {
 type HandlerFunc func(http.ResponseWriter, *http.Request) error
 
 type handler struct {
-	log *slog.Logger
-	fn  HandlerFunc
+	logger *slog.Logger
+	fn     HandlerFunc
 }
 
 func (e *Error) Error() string { return e.Message }
@@ -24,8 +24,8 @@ func NewError(status int, message string) *Error {
 	return &Error{Status: status, Message: message}
 }
 
-func Handle(log *slog.Logger, fn HandlerFunc) http.Handler {
-	return handler{log: log, fn: fn}
+func Handle(logger *slog.Logger, fn HandlerFunc) http.Handler {
+	return handler{logger: logger, fn: fn}
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +35,7 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		h.log.Error("unhandled handler error",
+		h.logger.Error("unhandled handler error",
 			"method", r.Method,
 			"path", r.URL.Path,
 			"err", err,

@@ -31,7 +31,7 @@ func (s *statusRecorder) WriteHeader(code int) {
 	s.ResponseWriter.WriteHeader(code)
 }
 
-func Logging(log *slog.Logger) Middleware {
+func Logging(logger *slog.Logger) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
@@ -39,7 +39,7 @@ func Logging(log *slog.Logger) Middleware {
 
 			next.ServeHTTP(rec, r)
 
-			log.Info("request",
+			logger.Info("request",
 				"method", r.Method,
 				"path", r.URL.Path,
 				"status", rec.status,
@@ -49,12 +49,12 @@ func Logging(log *slog.Logger) Middleware {
 	}
 }
 
-func Recover(log *slog.Logger) Middleware {
+func Recover(logger *slog.Logger) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			defer func() {
 				if rec := recover(); rec != nil {
-					log.Error("panic recovered",
+					logger.Error("panic recovered",
 						"method", r.Method,
 						"path", r.URL.Path,
 						"panic", rec,
