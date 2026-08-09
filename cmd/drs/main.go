@@ -22,6 +22,7 @@ func main() {
 		Usage: "DRS CLI",
 		Commands: []*cli.Command{
 			serveCommand(logger),
+			etlCommand(logger),
 		},
 	}
 

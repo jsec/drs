@@ -20,9 +20,8 @@ tasks:
       - air
 
   etl:build:
-    dir: etl
     cmds:
-      - uv run python -m scripts.build
+      - go run {{.APP_PKG}} etl build
 
   etl:check:
     cmds:
@@ -63,9 +62,8 @@ tasks:
       - uv run ruff check .
 
   etl:load:
-    dir: etl
     cmds:
-      - uv run python -m scripts.load
+      - go run {{.APP_PKG}} etl load
 
   etl:migrate:
     dir: etl
@@ -84,8 +82,7 @@ tasks:
 
   etl:refresh:
     cmds:
-      - task: etl:load
-      - task: etl:build
+      - go run {{.APP_PKG}} etl refresh
 
   etl:typecheck:
     dir: etl
