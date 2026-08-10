@@ -111,7 +111,7 @@ func downloadDumpFile(ctx context.Context, url string) (dumpPath string, cleanup
 		return "", nil, err
 	}
 
-	dumpPath = filepath.Join(tmpDir, assetName)
+	dumpPath = filepath.Join(tmpDir, fileName)
 	if err := extractDump(zipPath, dumpPath); err != nil {
 		cleanup()
 		return "", nil, err
@@ -199,6 +199,7 @@ func loadDumpFile(ctx context.Context, databaseURL, dumpPath string) error {
 		"-c", "set search_path to f1db",
 		"-f", dumpPath,
 	)
+	cmd.Env = append(os.Environ(), "PGOPTIONS=-c client_min_messages=warning")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
