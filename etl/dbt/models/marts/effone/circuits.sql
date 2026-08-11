@@ -2,8 +2,11 @@ with
     circuits as (select * from {{ ref("int_f1db__circuits_with_countries") }}),
 
     circuit_races as (
-        select circuit_id, race_id, race_official_name, race_date from {{ ref("int_f1db__races_with_circuits") }}
+        select circuit_id, circuit_layout_id, race_id, race_official_name, race_date
+        from {{ ref("int_f1db__races_with_circuits") }}
     ),
+
+    layouts as (select * from {{ ref("stg_f1db__circuit_layout") }}),
 
     first_last_races as (
         select distinct
@@ -13,7 +16,8 @@ with
             first_value(race_date) over first_race as first_race_date,
             first_value(race_id) over last_race as last_race_id,
             first_value(race_official_name) over last_race as last_race_name,
-            first_value(race_date) over last_race as last_race_date
+            first_value(race_date) over last_race as last_race_date,
+            first_value(circuit_layout_id) over last_race as current_layout_id
         from circuit_races
         window
             first_race as (partition by circuit_id order by race_date, race_id),
@@ -24,7 +28,7 @@ select
     circuits.circuit_id,
     circuits.circuit_name,
     circuits.circuit_full_name,
-    circuits.previous_names,
+    string_to_array(circuits.previous_names, ';') as previous_names,
     circuits.circuit_type,
     circuits.direction,
     circuits.place_name as location,
@@ -41,6 +45,10 @@ select
     first_last_races.last_race_id,
     first_last_races.last_race_name,
     first_last_races.last_race_date,
+    first_last_races.current_layout_id,
+    current_layout.length_km as current_layout_length_km,
+    current_layout.turns as current_layout_turns,
     {{ var("refresh_id") }}::bigint as refresh_id
 from circuits
 left join first_last_races on circuits.circuit_id = first_last_races.circuit_id
+left join layouts as current_layout on first_last_races.current_layout_id = current_layout.circuit_layout_id

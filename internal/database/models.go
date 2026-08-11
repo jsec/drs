@@ -9,27 +9,46 @@ import (
 )
 
 type EffoneCircuit struct {
-	CircuitFullName string
-	CircuitID       string
-	CircuitName     string
-	CircuitType     string
-	Country         string
-	CountryID       string
-	Direction       string
-	FirstRaceDate   pgtype.Date
-	FirstRaceID     pgtype.Int4
-	FirstRaceName   pgtype.Text
-	LastRaceDate    pgtype.Date
-	LastRaceID      pgtype.Int4
-	LastRaceName    pgtype.Text
-	Latitude        pgtype.Numeric
-	LengthKm        pgtype.Numeric
-	Location        string
-	Longitude       pgtype.Numeric
-	PreviousNames   pgtype.Text
-	RaceCount       int32
-	RefreshID       int64
-	Turns           int32
+	CircuitFullName       string
+	CircuitID             string
+	CircuitName           string
+	CircuitType           string
+	Country               string
+	CountryID             string
+	Direction             string
+	FirstRaceDate         pgtype.Date
+	FirstRaceID           pgtype.Int4
+	FirstRaceName         pgtype.Text
+	LastRaceDate          pgtype.Date
+	LastRaceID            pgtype.Int4
+	LastRaceName          pgtype.Text
+	Latitude              pgtype.Numeric
+	LengthKm              pgtype.Numeric
+	Location              string
+	Longitude             pgtype.Numeric
+	CurrentLayoutID       pgtype.Text
+	CurrentLayoutLengthKm pgtype.Numeric
+	CurrentLayoutTurns    pgtype.Int4
+	PreviousNames         []string
+	RaceCount             int32
+	RefreshID             int64
+	Turns                 int32
+}
+
+type EffoneCircuitLayout struct {
+	CircuitLayoutID        string
+	CircuitID              string
+	IsCurrentConfiguration bool
+	LengthKm               pgtype.Numeric
+	Turns                  int32
+	RaceCount              int32
+	FirstRaceID            pgtype.Int4
+	FirstRaceName          pgtype.Text
+	FirstRaceDate          pgtype.Date
+	LastRaceID             pgtype.Int4
+	LastRaceName           pgtype.Text
+	LastRaceDate           pgtype.Date
+	RefreshID              int64
 }
 
 type EffoneConstructor struct {

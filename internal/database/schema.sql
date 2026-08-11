@@ -37,6 +37,27 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: circuit_layouts; Type: TABLE; Schema: effone; Owner: -
+--
+
+CREATE TABLE effone.circuit_layouts (
+    circuit_layout_id text CONSTRAINT circuit_layouts__dbt_tmp_circuit_layout_id_not_null NOT NULL,
+    circuit_id text CONSTRAINT circuit_layouts__dbt_tmp_circuit_id_not_null NOT NULL,
+    is_current_configuration boolean CONSTRAINT circuit_layouts__dbt_tmp_is_current_configuration_not_null NOT NULL,
+    length_km numeric(6,3) CONSTRAINT circuit_layouts__dbt_tmp_length_km_not_null NOT NULL,
+    turns integer CONSTRAINT circuit_layouts__dbt_tmp_turns_not_null NOT NULL,
+    race_count integer CONSTRAINT circuit_layouts__dbt_tmp_race_count_not_null NOT NULL,
+    first_race_id integer,
+    first_race_name text,
+    first_race_date date,
+    last_race_id integer,
+    last_race_name text,
+    last_race_date date,
+    refresh_id bigint CONSTRAINT circuit_layouts__dbt_tmp_refresh_id_not_null NOT NULL
+);
+
+
+--
 -- Name: circuits; Type: TABLE; Schema: effone; Owner: -
 --
 
@@ -58,7 +79,10 @@ CREATE TABLE effone.circuits (
     length_km numeric(6,3) CONSTRAINT circuits__dbt_tmp_length_km_not_null1 NOT NULL,
     location text CONSTRAINT circuits__dbt_tmp_location_not_null1 NOT NULL,
     longitude numeric(10,6) CONSTRAINT circuits__dbt_tmp_longitude_not_null1 NOT NULL,
-    previous_names text,
+    current_layout_id text,
+    current_layout_length_km numeric(6,3),
+    current_layout_turns integer,
+    previous_names text[],
     race_count integer CONSTRAINT circuits__dbt_tmp_race_count_not_null1 NOT NULL,
     refresh_id bigint CONSTRAINT circuits__dbt_tmp_refresh_id_not_null1 NOT NULL,
     turns integer CONSTRAINT circuits__dbt_tmp_turns_not_null1 NOT NULL
@@ -617,6 +641,20 @@ CREATE TABLE effone.sprint_results (
 
 ALTER TABLE ONLY effone.refresh_runs
     ADD CONSTRAINT refresh_runs_pkey PRIMARY KEY (refresh_id);
+
+
+--
+-- Name: circuit_layouts_circuit_id_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX circuit_layouts_circuit_id_idx ON effone.circuit_layouts USING btree (circuit_id);
+
+
+--
+-- Name: circuit_layouts_circuit_layout_id_uidx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE UNIQUE INDEX circuit_layouts_circuit_layout_id_uidx ON effone.circuit_layouts USING btree (circuit_layout_id);
 
 
 --

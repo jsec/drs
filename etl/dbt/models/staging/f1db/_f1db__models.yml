@@ -92,6 +92,22 @@ models:
       - name: country_id
         tests:
           - not_null
+  - name: stg_f1db__circuit_layout
+    columns:
+      - name: circuit_layout_id
+        tests:
+          - not_null
+          - unique
+      - name: circuit_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_f1db__circuit')
+                field: circuit_id
+      - name: is_current_configuration
+        tests:
+          - not_null
   - name: stg_f1db__race
     columns:
       - name: race_id

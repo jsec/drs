@@ -35,6 +35,10 @@ models:
         circuits:
           +post-hook:
             - "{{ create_index('circuits_circuit_id_uidx', ['circuit_id'], unique=true) }}"
+        circuit_layouts:
+          +post-hook:
+            - "{{ create_index('circuit_layouts_circuit_layout_id_uidx', ['circuit_layout_id'], unique=true) }}"
+            - "{{ create_index('circuit_layouts_circuit_id_idx', ['circuit_id']) }}"
         constructors:
           +post-hook:
             - "{{ create_index('constructors_constructor_id_uidx', ['constructor_id'], unique=true) }}"

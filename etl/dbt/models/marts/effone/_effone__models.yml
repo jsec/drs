@@ -67,8 +67,21 @@ models:
         data_type: numeric(10, 6)
         constraints:
           - type: not_null
-      - name: previous_names
+      - name: current_layout_id
         data_type: text
+        description: Layout id (SVG asset key) used in the circuit's most recent race.
+        tests:
+          - relationships:
+              arguments:
+                to: ref('circuit_layouts')
+                field: circuit_layout_id
+      - name: current_layout_length_km
+        data_type: numeric(6, 3)
+      - name: current_layout_turns
+        data_type: integer
+      - name: previous_names
+        data_type: text[]
+        description: Former circuit names, most recent first. Null when the circuit was never renamed.
       - name: race_count
         data_type: integer
         constraints:
@@ -85,6 +98,71 @@ models:
         data_type: integer
         constraints:
           - type: not_null
+
+  - name: circuit_layouts
+    description: One row per circuit layout with dimensions and F1 race-usage history.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: circuit_layout_id
+        data_type: text
+        description: F1DB layout id, also the SVG asset key for the layout diagram.
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+          - unique
+      - name: circuit_id
+        data_type: text
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('circuits')
+                field: circuit_id
+          - unique:
+              config:
+                where: is_current_configuration
+      - name: is_current_configuration
+        data_type: boolean
+        description: True for the circuit's current effective layout.
+        constraints:
+          - type: not_null
+      - name: length_km
+        data_type: numeric(6, 3)
+        constraints:
+          - type: not_null
+      - name: turns
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: race_count
+        data_type: integer
+        description: Number of F1 races run on this layout. Zero if never raced.
+        constraints:
+          - type: not_null
+      - name: first_race_id
+        data_type: integer
+      - name: first_race_name
+        data_type: text
+      - name: first_race_date
+        data_type: date
+      - name: last_race_id
+        data_type: integer
+      - name: last_race_name
+        data_type: text
+      - name: last_race_date
+        data_type: date
+      - name: refresh_id
+        data_type: bigint
+        description: Identifier for the refresh run that produced this row.
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
 
   - name: constructors
     description: One row per constructor with all-time summary metrics.

@@ -29,6 +29,13 @@ models:
           - not_null
           - unique
 
+  - name: int_f1db__circuit_layouts_with_races
+    columns:
+      - name: circuit_layout_id
+        tests:
+          - not_null
+          - unique
+
   - name: int_f1db__race_results_with_entities
     tests:
       - dbt_utils.unique_combination_of_columns:
