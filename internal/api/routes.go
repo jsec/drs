@@ -13,8 +13,8 @@ func (app *application) routes() http.Handler {
 
 	return chainMiddleware(
 		mux,
+		recoverMiddleware(app.logger),
 		loggingMiddleware(app.logger),
 		timeoutMiddleware(5*time.Second),
-		recoverMiddleware(app.logger),
 	)
 }
