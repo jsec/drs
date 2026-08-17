@@ -9,10 +9,10 @@ import (
 )
 
 type Service struct {
-	queries *database.Queries
+	queries database.Querier
 }
 
-func NewService(queries *database.Queries) *Service {
+func NewService(queries database.Querier) *Service {
 	return &Service{queries: queries}
 }
 
