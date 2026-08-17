@@ -22,6 +22,7 @@ func Serve(ctx context.Context, logger *slog.Logger, db *database.Queries) error
 		Addr:              ":" + port,
 		Handler:           newApplication(logger, db).routes(),
 		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
 		WriteTimeout:      15 * time.Second,
 		IdleTimeout:       time.Minute,
 		ErrorLog:          slog.NewLogLogger(logger.Handler(), slog.LevelError),
