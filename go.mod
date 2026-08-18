@@ -3,7 +3,7 @@ module github.com/jsec/drs
 go 1.26.5
 
 require (
-	github.com/charmbracelet/log v1.0.0
+	github.com/charmbracelet/log/v2 v2.0.0
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/urfave/cli/v3 v3.10.1
 	golang.org/x/sync v0.17.0
