@@ -13,27 +13,27 @@ import { columns } from './columns';
 
 const route = getRouteApi(('/circuits/'));
 
-export type SortKey = 'country' | 'first_race' | 'last_race' | 'name';
+export type SortKey = 'country' | 'first_race_year' | 'last_race_year' | 'name';
 
 type Props = {
     circuits: ListCircuitsResponse[];
 };
 
-export const SORTS: { key: SortKey; label: string }[] = [
-    { key: 'name', label: 'Name' },
-    { key: 'country', label: 'Country' },
-    { key: 'first_race', label: 'First Race' },
-    { key: 'last_race', label: 'Last Race' },
+export const SORTS: { desc: boolean; key: SortKey; label: string }[] = [
+    { desc: true, key: 'name', label: 'Name' },
+    { desc: true, key: 'country', label: 'Country' },
+    { desc: false, key: 'first_race_year', label: 'First Race' },
+    { desc: true, key: 'last_race_year', label: 'Last Race' },
 ];
 
 export const CircuitsTable = ({ circuits }: Props) => {
-    const { sort = 'last_race' } = route.useSearch();
+    const { sort = 'last_race_year' } = route.useSearch();
     const navigate = route.useNavigate();
 
     const setSort = (next: SortKey) => void navigate({ search: () => ({ sort: next }) });
 
     const sorting = useMemo<SortingState>(
-        () => [{ desc: true, id: sort }],
+        () => [{ desc: SORTS.find(s => s.key === sort)?.desc ?? true, id: sort }],
         [sort],
     );
 

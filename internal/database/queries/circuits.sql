@@ -3,8 +3,8 @@ SELECT
     circuit_id,
     circuit_name as name,
     country,
-    first_race_name as first_race,
-    last_race_name as last_race,
+    first_race_date,
+    last_race_date,
     location,
     race_count
 FROM effone.circuits

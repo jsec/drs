@@ -16,8 +16,8 @@ SELECT
     circuit_id,
     circuit_name as name,
     country,
-    first_race_name as first_race,
-    last_race_name as last_race,
+    first_race_date,
+    last_race_date,
     location,
     race_count
 FROM effone.circuits
@@ -25,13 +25,13 @@ ORDER BY last_race_date DESC
 `
 
 type ListCircuitsRow struct {
-	CircuitID string
-	Name      string
-	Country   string
-	FirstRace pgtype.Text
-	LastRace  pgtype.Text
-	Location  string
-	RaceCount int32
+	CircuitID     string
+	Name          string
+	Country       string
+	FirstRaceDate pgtype.Date
+	LastRaceDate  pgtype.Date
+	Location      string
+	RaceCount     int32
 }
 
 func (q *Queries) ListCircuits(ctx context.Context) ([]ListCircuitsRow, error) {
@@ -47,8 +47,8 @@ func (q *Queries) ListCircuits(ctx context.Context) ([]ListCircuitsRow, error) {
 			&i.CircuitID,
 			&i.Name,
 			&i.Country,
-			&i.FirstRace,
-			&i.LastRace,
+			&i.FirstRaceDate,
+			&i.LastRaceDate,
 			&i.Location,
 			&i.RaceCount,
 		); err != nil {

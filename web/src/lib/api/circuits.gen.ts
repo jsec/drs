@@ -13,8 +13,8 @@ export interface ListCircuitsResponse {
   circuit_id: string;
   name: string;
   country: string;
-  first_race?: string;
-  last_race?: string;
-  location?: string;
+  first_race_year?: number /* int32 */;
+  last_race_year?: number /* int32 */;
+  location: string;
   race_count: number /* int */;
 }
