@@ -10,6 +10,7 @@ import (
 
 type Querier interface {
 	CreateRefreshRun(ctx context.Context, arg CreateRefreshRunParams) (int64, error)
+	ListCircuits(ctx context.Context) ([]ListCircuitsRow, error)
 	ListConstructors(ctx context.Context) ([]ListConstructorsRow, error)
 	ListSeasons(ctx context.Context) ([]ListSeasonsRow, error)
 	MarkRefreshFailed(ctx context.Context, arg MarkRefreshFailedParams) error

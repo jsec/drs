@@ -13,7 +13,7 @@ type Service struct {
 }
 
 func NewService(queries database.Querier) *Service {
-	return &Service{queries: queries}
+	return &Service{queries}
 }
 
 func (s *Service) ListConstructors(ctx context.Context) ([]ConstructorResponse, error) {
