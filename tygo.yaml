@@ -5,3 +5,6 @@ packages:
   - path: github.com/jsec/drs/internal/constructors
     output_path: web/src/lib/api/constructors.gen.ts
     preserve_comments: default
+  - path: github.com/jsec/drs/internal/circuits
+    output_path: web/src/lib/api/circuits.gen.ts
+    preserve_comments: default

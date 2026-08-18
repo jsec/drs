@@ -55,12 +55,6 @@ export const calendarQuery = (year: number) =>
         queryKey: ['calendar', year],
     });
 
-export const circuitsQuery = (year: number) =>
-    queryOptions({
-        queryFn: () => getCircuits(),
-        queryKey: ['circuits', year],
-    });
-
 export const driverSeasonQuery = (year: number, code: string) =>
     queryOptions({
         queryFn: () => {
