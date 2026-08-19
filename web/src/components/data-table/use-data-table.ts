@@ -1,4 +1,4 @@
-import type { ColumnDef, FilterFn, SortingState } from '@tanstack/react-table';
+import type { ColumnDef, FilterFn, OnChangeFn, SortingState } from '@tanstack/react-table';
 
 import {
     getCoreRowModel,
@@ -12,10 +12,17 @@ type UseDataTableOptions<T> = {
     columns: ColumnDef<T, unknown>[];
     data: T[];
     filter?: FilterFn<T>;
+    onSortingChange?: OnChangeFn<SortingState>;
     sorting?: SortingState;
 };
 
-export function useDataTable<T>({ columns, data, filter, sorting }: UseDataTableOptions<T>) {
+export function useDataTable<T>({
+    columns,
+    data,
+    filter,
+    onSortingChange,
+    sorting,
+}: UseDataTableOptions<T>) {
     const [search, setSearch] = useState('');
     const deferredSearch = useDeferredValue(search);
 
@@ -26,13 +33,16 @@ export function useDataTable<T>({ columns, data, filter, sorting }: UseDataTable
     const table = useReactTable<T>({
         columns,
         data,
+        enableMultiSort: false,
+        enableSortingRemoval: true,
         getCoreRowModel: coreRowModel,
         getFilteredRowModel: filter ? filteredRowModel : undefined,
-        getSortedRowModel: sorting ? sortedRowModel : undefined,
+        getSortedRowModel: sortedRowModel,
         globalFilterFn: filter,
+        ...(onSortingChange && { onSortingChange }),
         state: {
             globalFilter: filter ? deferredSearch : undefined,
-            sorting,
+            ...(sorting && { sorting }),
         },
     });
 

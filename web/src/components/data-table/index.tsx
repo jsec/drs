@@ -2,7 +2,7 @@ import type { LinkProps } from '@tanstack/react-router';
 import type { RowData, Table } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 
-import { CaretDownIcon, CaretRightIcon, CaretUpIcon } from '@phosphor-icons/react';
+import { CaretDownIcon, CaretRightIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { flexRender } from '@tanstack/react-table';
 
@@ -34,6 +34,24 @@ declare module '@tanstack/react-table' {
 }
 
 const LINK_STYLE = { color: 'inherit', display: 'block', textDecoration: 'none' } as const;
+
+const ARIA_SORT: Record<string, 'ascending' | 'descending' | 'none'> = {
+    asc: 'ascending',
+    desc: 'descending',
+    false: 'none',
+};
+
+const SortCaret = ({ direction }: { direction: 'asc' | 'desc' | false }) => {
+    if (direction === 'asc') {
+        return <CaretUpIcon className="table-head-caret" size={12} weight="bold" />;
+    }
+
+    if (direction === 'desc') {
+        return <CaretDownIcon className="table-head-caret" size={12} weight="bold" />;
+    }
+
+    return <CaretUpDownIcon className="table-head-caret table-head-caret--idle" size={12} weight="bold" />;
+};
 
 type DataTableProps<T> = {
     headerPy?: number;
@@ -73,6 +91,7 @@ export function DataTable<T>({ headerPy = 14, px = 18, rowPy = 14, table }: Data
 
                             return (
                                 <TableHead
+                                    aria-sort={h.column.getCanSort() ? ARIA_SORT[String(sorted)] : undefined}
                                     key={h.id}
                                     scope="col"
                                     style={{
@@ -83,15 +102,14 @@ export function DataTable<T>({ headerPy = 14, px = 18, rowPy = 14, table }: Data
                                 >
                                     {h.column.getCanSort()
                                         ? (
-                                                <span className="table-head-sort">
+                                                <button
+                                                    className="table-head-sort"
+                                                    onClick={h.column.getToggleSortingHandler()}
+                                                    type="button"
+                                                >
                                                     {label}
-                                                    {sorted === 'asc' && (
-                                                        <CaretUpIcon className="table-head-caret" size={12} weight="bold" />
-                                                    )}
-                                                    {sorted === 'desc' && (
-                                                        <CaretDownIcon className="table-head-caret" size={12} weight="bold" />
-                                                    )}
-                                                </span>
+                                                    <SortCaret direction={sorted} />
+                                                </button>
                                             )
                                         : label}
                                 </TableHead>

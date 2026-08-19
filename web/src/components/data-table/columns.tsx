@@ -54,7 +54,7 @@ export function makeColumns<T>() {
         id: opts.id ?? key,
         meta: buildMeta(opts),
         sortDescFirst: false,
-        sortingFn: opts.sort,
+        ...(opts.sort && { sortingFn: opts.sort }),
     });
 
     const custom = (
@@ -72,7 +72,7 @@ export function makeColumns<T>() {
         id: opts.id,
         meta: buildMeta(opts),
         sortDescFirst: opts.descFirst ?? false,
-        sortingFn: opts.sort,
+        ...(opts.sort && { sortingFn: opts.sort }),
     });
 
     const num = <K extends KeysMatching<T, ReactNode>>(
@@ -96,7 +96,7 @@ export function makeColumns<T>() {
         id: opts.id ?? key,
         meta: buildMeta(opts),
         sortDescFirst: true,
-        sortingFn: opts.sort,
+        ...(opts.sort && { sortingFn: opts.sort }),
     });
 
     const ordinal = (
@@ -132,7 +132,7 @@ export function makeColumns<T>() {
         id: opts.id ?? key,
         meta: buildMeta(opts),
         sortDescFirst: false,
-        sortingFn: opts.sort,
+        ...(opts.sort && { sortingFn: opts.sort }),
     });
 
     const trophy = <K extends KeysMatching<T, number>>(
@@ -150,7 +150,7 @@ export function makeColumns<T>() {
         id: opts.id ?? key,
         meta: buildMeta({ align: 'center', ...opts }),
         sortDescFirst: true,
-        sortingFn: opts.sort,
+        ...(opts.sort && { sortingFn: opts.sort }),
     });
 
     return { competitor, custom, num, ordinal, text, trophy };
