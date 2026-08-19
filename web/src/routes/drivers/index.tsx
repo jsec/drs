@@ -1,11 +1,15 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
+import type { SortSearch } from '#/components/data-table';
+
+import { readSortSearch } from '#/components/data-table';
 import { allTimeDriversQuery } from '#/data/queries';
 
-import type { Category, Sort } from './-components/drivers-table';
+import type { Category } from './-components/drivers-table';
 
-import { CATEGORIES, DriversTable, SORTS } from './-components/drivers-table';
+import { CATEGORIES, DriversTable } from './-components/drivers-table';
+import { SORT_IDS } from './-components/drivers-table/columns';
 
 const DriversIndex = () => {
     const { data } = useSuspenseQuery(allTimeDriversQuery());
@@ -14,9 +18,9 @@ const DriversIndex = () => {
 
 export const Route = createFileRoute('/drivers/')({
     component: DriversIndex,
-    validateSearch: (s: Record<string, unknown>): { category?: Category; sort?: Sort } => ({
+    validateSearch: (s: Record<string, unknown>): SortSearch & { category?: Category } => ({
         category: CATEGORIES.some(c => c.key === s.category) ? (s.category as Category) : undefined,
-        sort: SORTS.some(so => so.key === s.sort) ? (s.sort as Sort) : undefined,
+        ...readSortSearch(SORT_IDS)(s),
     }),
     // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
     loader: async ({ context }) => {

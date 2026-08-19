@@ -3,10 +3,12 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import type { ListSeasonsResponse } from '#/lib/api/types';
 
+import { readSortSearch } from '#/components/data-table';
 import { Card } from '#/components/ui/card';
 import { api } from '#/lib/query/api';
 
 import { SeasonsTable } from './-components/seasons-table';
+import { SORT_IDS } from './-components/seasons-table/columns';
 
 const seasonsQuery = queryOptions({
     queryFn: () => api.get('seasons').json<ListSeasonsResponse>(),
@@ -32,6 +34,8 @@ const Seasons = () => {
 
 export const Route = createFileRoute('/seasons/')({
     component: Seasons,
+    validateSearch: readSortSearch(SORT_IDS),
+    // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData(seasonsQuery);
         return { crumbs: [{ label: 'Seasons' }] };

@@ -8,6 +8,8 @@ export type Season = ListSeasonsResponse[number];
 
 const col = makeColumns<Season>();
 
+export const SORT_IDS = ['season', 'raceCount', 'wdc', 'wcc'] as const;
+
 export const columns = [
     col.num('season', {
         header: 'SEASON',
@@ -18,12 +20,14 @@ export const columns = [
     }),
     col.num('raceCount', { align: 'center', header: 'RACES', width: '10%' }),
     col.competitor('wdc', {
+        accessor: s => s.wdc.name,
         header: 'WORLD CHAMPION',
         label: s => s.wdc.name,
         visual: s => <CountryFlag aria-hidden className="season-champion-flag" code={s.wdc.countryCode} />,
         width: '39%',
     }),
     col.custom({
+        accessor: s => s.wcc?.name ?? '',
         cell: (info) => {
             const { wcc } = info.row.original;
             if (!wcc) {

@@ -9,4 +9,4 @@ SELECT
     win_count AS wins,
     podium_count AS podiums
 FROM effone.constructors
-ORDER BY constructor_name;
+ORDER BY championship_count DESC, win_count DESC;

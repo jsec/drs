@@ -3,9 +3,11 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import type { ListCircuitsResponse } from '#/lib/api/circuits.gen';
 
+import { readSortSearch } from '#/components/data-table';
 import { api } from '#/lib/query/api';
 
-import { CircuitsTable, type SortKey, SORTS } from './-components/circuits-table';
+import { CircuitsTable } from './-components/circuits-table';
+import { SORT_IDS } from './-components/circuits-table/columns';
 
 const listCircuitsQuery = queryOptions({
     queryFn: () => api.get('circuits').json<ListCircuitsResponse[]>(),
@@ -19,9 +21,7 @@ const Circuits = () => {
 
 export const Route = createFileRoute('/circuits/')({
     component: Circuits,
-    validateSearch: (s: Record<string, unknown>): { sort?: SortKey } => ({
-        sort: SORTS.some(so => so.key === s.sort) ? (s.sort as SortKey) : undefined,
-    }),
+    validateSearch: readSortSearch(SORT_IDS),
     // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData(listCircuitsQuery);

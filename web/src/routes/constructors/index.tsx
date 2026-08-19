@@ -3,11 +3,11 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import type { ListConstructorsResponse } from '#/lib/api/types';
 
+import { readSortSearch } from '#/components/data-table';
 import { api } from '#/lib/query/api';
 
-import type { Sort } from './-components/constructors-table';
-
-import { ConstructorsTable, SORTS } from './-components/constructors-table';
+import { ConstructorsTable } from './-components/constructors-table';
+import { SORT_IDS } from './-components/constructors-table/columns';
 
 const constructorsQuery = queryOptions({
     queryFn: () => api.get('constructors').json<ListConstructorsResponse>(),
@@ -21,9 +21,7 @@ const Constructors = () => {
 
 export const Route = createFileRoute('/constructors/')({
     component: Constructors,
-    validateSearch: (s: Record<string, unknown>): { sort?: Sort } => ({
-        sort: SORTS.some(so => so.key === s.sort) ? (s.sort as Sort) : undefined,
-    }),
+    validateSearch: readSortSearch(SORT_IDS),
     // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData(constructorsQuery);

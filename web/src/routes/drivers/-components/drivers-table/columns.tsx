@@ -9,6 +9,8 @@ import { DriverAvatar } from '#/components/f1-ui';
 
 const col = makeColumns<AllTimeDriver>();
 
+export const SORT_IDS = ['name', 'years', 'starts', 'wins', 'poles', 'podiums', 'titles'] as const;
+
 const byTitles: SortingFn<AllTimeDriver> = (a, b) =>
     a.original.titles - b.original.titles || a.original.wins - b.original.wins;
 

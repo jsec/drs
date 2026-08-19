@@ -9,6 +9,8 @@ type Constructor = ListConstructorsResponse[number];
 
 const col = makeColumns<Constructor>();
 
+export const SORT_IDS = ['name', 'years', 'titles', 'wins', 'podiums'] as const;
+
 const byTitles: SortingFn<Constructor> = (a, b) =>
     a.original.championships - b.original.championships || a.original.wins - b.original.wins;
 
@@ -24,6 +26,7 @@ export function makeConstructorColumns(maxWins: number) {
             width: '38%',
         }),
         col.custom({
+            accessor: c => c.firstRaceDate,
             cell: (info) => {
                 const { firstRaceDate, lastRaceDate } = info.row.original;
 
@@ -42,6 +45,7 @@ export function makeConstructorColumns(maxWins: number) {
         }),
         col.trophy('championships', { header: 'TITLES', id: 'titles', size: 12, sort: byTitles, width: '9%' }),
         col.custom({
+            accessor: c => c.wins,
             cell: (info) => {
                 const c = info.row.original;
                 return (
@@ -55,6 +59,7 @@ export function makeConstructorColumns(maxWins: number) {
                     </div>
                 );
             },
+            descFirst: true,
             header: 'WINS',
             id: 'wins',
             width: '23%',

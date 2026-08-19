@@ -1,12 +1,10 @@
-import type { SortingState } from '@tanstack/react-table';
-
 import { MagnifyingGlassIcon } from '@phosphor-icons/react';
 import { getRouteApi } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
 import type { AllTimeDriver } from '#/data/types';
 
-import { DataTable, useDataTable } from '#/components/data-table';
+import { DataTable, useDataTable, useUrlSorting } from '#/components/data-table';
 import { Pill } from '#/components/f1-ui';
 import { Card } from '#/components/ui/card';
 import { Input, InputGroup } from '#/components/ui/input';
@@ -14,20 +12,11 @@ import { Input, InputGroup } from '#/components/ui/input';
 import { columns, fuzzy } from './columns';
 
 export type Category = 'active' | 'all' | 'champions';
-export type Sort = 'name' | 'poles' | 'starts' | 'titles' | 'wins';
 
 export const CATEGORIES: { key: Category; label: string }[] = [
     { key: 'all', label: 'All drivers' },
     { key: 'champions', label: 'World Champions' },
     { key: 'active', label: 'Active' },
-];
-
-export const SORTS: { key: Sort; label: string }[] = [
-    { key: 'titles', label: 'Titles' },
-    { key: 'wins', label: 'Wins' },
-    { key: 'poles', label: 'Poles' },
-    { key: 'starts', label: 'Starts' },
-    { key: 'name', label: 'Name' },
 ];
 
 const route = getRouteApi('/drivers/');
@@ -37,13 +26,11 @@ type Props = {
 };
 
 export const DriversTable = ({ drivers }: Props) => {
-    const { category = 'all', sort = 'titles' } = route.useSearch();
+    const { category = 'all' } = route.useSearch();
     const navigate = route.useNavigate();
 
     const setCategory = (next: Category) =>
         void navigate({ search: prev => ({ ...prev, category: next }) });
-    const setSort = (next: Sort) =>
-        void navigate({ search: prev => ({ ...prev, sort: next }) });
 
     const data = useMemo(
         () =>
@@ -55,12 +42,15 @@ export const DriversTable = ({ drivers }: Props) => {
         [drivers, category],
     );
 
-    const sorting: SortingState = useMemo(
-        () => [{ desc: sort !== 'name', id: sort }],
-        [sort],
-    );
+    const { onSortingChange, sorting } = useUrlSorting(route);
 
-    const { search, setSearch, table } = useDataTable({ columns, data, filter: fuzzy, sorting });
+    const { search, setSearch, table } = useDataTable({
+        columns,
+        data,
+        filter: fuzzy,
+        onSortingChange,
+        sorting,
+    });
 
     const shown = table.getRowModel().rows.length;
 
@@ -91,17 +81,6 @@ export const DriversTable = ({ drivers }: Props) => {
                     {CATEGORIES.map(c => (
                         <Pill active={category === c.key} key={c.key} onClick={() => setCategory(c.key)}>
                             {c.label}
-                        </Pill>
-                    ))}
-                </div>
-
-                <div className="f1-toolbar-spacer" />
-
-                <div className="f1-control-group">
-                    <span className="f1-sort-label">SORT</span>
-                    {SORTS.map(s => (
-                        <Pill active={sort === s.key} key={s.key} onClick={() => setSort(s.key)} variant="subtle">
-                            {s.label}
                         </Pill>
                     ))}
                 </div>

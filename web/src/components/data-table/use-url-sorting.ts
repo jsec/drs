@@ -16,6 +16,22 @@ type SortingRoute = {
     useSearch: () => SortSearch;
 };
 
+export function readSortSearch(ids: readonly string[]) {
+    const allowed = new Set(ids);
+
+    return (search: Record<string, unknown>): SortSearch => {
+        const sort = typeof search.sort === 'string' && allowed.has(search.sort)
+            ? search.sort
+            : undefined;
+
+        if (sort == null) {
+            return {};
+        }
+
+        return { dir: search.dir === 'desc' ? 'desc' : 'asc', sort };
+    };
+}
+
 export function useUrlSorting(route: SortingRoute) {
     const { dir, sort } = route.useSearch();
     const navigate = route.useNavigate();
