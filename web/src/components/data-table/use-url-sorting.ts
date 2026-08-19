@@ -4,16 +4,16 @@ import { useCallback, useMemo } from 'react';
 
 export type SortDirection = 'asc' | 'desc';
 
-export type SortSearch = {
-    dir?: SortDirection;
-    sort?: string;
-};
-
-type SortingRoute = {
+export type SortingRoute = {
     useNavigate: () => (opts: {
         search: (prev: Record<string, unknown>) => Record<string, unknown>;
     }) => unknown;
     useSearch: () => SortSearch;
+};
+
+export type SortSearch = {
+    dir?: SortDirection;
+    sort?: string;
 };
 
 export function readSortSearch(ids: readonly string[]) {

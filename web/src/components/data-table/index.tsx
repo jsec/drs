@@ -21,7 +21,7 @@ import './data-table.css';
 
 export { makeColumns } from './columns';
 export { useDataTable } from './use-data-table';
-export { readSortSearch, type SortDirection, type SortSearch, useUrlSorting } from './use-url-sorting';
+export { readSortSearch, type SortDirection, type SortingRoute, type SortSearch, useUrlSorting } from './use-url-sorting';
 
 declare module '@tanstack/react-table' {
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-unused-vars
