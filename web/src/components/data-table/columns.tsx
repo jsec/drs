@@ -23,6 +23,7 @@ type Shared<T> = {
     id?: string;
     link?: (row: T) => LinkProps | undefined;
     sort?: SortingFnOption<T>;
+    sortable?: boolean;
     trailing?: 'caret';
     width?: string;
 };
@@ -35,19 +36,24 @@ const sizeClass = (size?: Size) => (size ? SIZE_CLASS[size] : undefined);
 export function makeColumns<T>() {
     const competitor = (
         key: keyof T & string,
-        opts: Shared<T> & { label: (row: T) => ReactNode; visual: (row: T) => ReactNode },
+        opts: Shared<T> & {
+            accessor?: (row: T) => unknown;
+            label: (row: T) => ReactNode;
+            visual: (row: T) => ReactNode;
+        },
     ): ColumnDef<T, unknown> => ({
-        accessorKey: key,
+        accessorFn: opts.accessor ?? (row => row[key]),
         cell: info => (
             <span className="table-cell-entity">
                 {opts.visual(info.row.original)}
                 <span className="table-cell-entity-label">{opts.label(info.row.original)}</span>
             </span>
         ),
-        enableSorting: opts.sort != null,
+        enableSorting: canSort(opts),
         header: opts.header,
         id: opts.id ?? key,
         meta: buildMeta(opts),
+        sortDescFirst: false,
         sortingFn: opts.sort,
     });
 
@@ -55,15 +61,17 @@ export function makeColumns<T>() {
         opts: Shared<T> & {
             accessor?: (row: T) => unknown;
             cell: (info: CellContext<T, unknown>) => ReactNode;
+            descFirst?: boolean;
             id: string;
         },
     ): ColumnDef<T, unknown> => ({
         accessorFn: opts.accessor,
         cell: info => opts.cell(info),
-        enableSorting: opts.sort != null,
+        enableSorting: canSort(opts) && opts.accessor != null,
         header: opts.header,
         id: opts.id,
         meta: buildMeta(opts),
+        sortDescFirst: opts.descFirst ?? false,
         sortingFn: opts.sort,
     });
 
@@ -83,10 +91,11 @@ export function makeColumns<T>() {
                 {info.row.original[key] as ReactNode}
             </span>
         ),
-        enableSorting: opts.sort != null,
+        enableSorting: canSort(opts),
         header: opts.header,
         id: opts.id ?? key,
         meta: buildMeta(opts),
+        sortDescFirst: true,
         sortingFn: opts.sort,
     });
 
@@ -118,10 +127,11 @@ export function makeColumns<T>() {
                 </span>
             );
         },
-        enableSorting: opts.sort != null,
+        enableSorting: canSort(opts),
         header: opts.header,
         id: opts.id ?? key,
         meta: buildMeta(opts),
+        sortDescFirst: false,
         sortingFn: opts.sort,
     });
 
@@ -135,10 +145,11 @@ export function makeColumns<T>() {
                 <TrophyCount count={info.row.original[key] as number} size={opts.size} />
             </span>
         ),
-        enableSorting: opts.sort != null,
+        enableSorting: canSort(opts),
         header: opts.header,
         id: opts.id ?? key,
         meta: buildMeta({ align: 'center', ...opts }),
+        sortDescFirst: true,
         sortingFn: opts.sort,
     });
 
@@ -152,4 +163,8 @@ function buildMeta<T>(opts: Shared<T>): ColumnMeta<T, unknown> {
         trailing: opts.trailing,
         width: opts.width,
     };
+}
+
+function canSort<T>(opts: Shared<T>): boolean {
+    return opts.sortable !== false;
 }
