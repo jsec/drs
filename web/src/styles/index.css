@@ -1,5 +1,6 @@
-@layer tokens, base, utilities, layout, components, features;
 
+@import '@mantine/core/styles.layer.css';
+@import '@mantine/charts/styles.layer.css';
 @import './tokens.css' layer(tokens);
 @import './base.css' layer(base);
 @import './utilities.css' layer(utilities);

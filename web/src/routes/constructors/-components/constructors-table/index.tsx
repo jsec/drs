@@ -1,10 +1,10 @@
+import { Card } from '@mantine/core';
 import { getRouteApi } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
 import type { ListConstructorsResponse } from '#/lib/api/types';
 
 import { DataTable, useDataTable, useUrlSorting } from '#/components/data-table';
-import { Card } from '#/components/ui/card';
 
 import { makeConstructorColumns } from './columns';
 

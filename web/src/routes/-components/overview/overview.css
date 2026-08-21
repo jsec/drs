@@ -16,7 +16,7 @@
         font-weight: 700;
         letter-spacing: 1.5px;
         text-transform: uppercase;
-        color: var(--color-muted-foreground);
+        color: var(--mantine-color-dimmed);
     }
     .overview-title {
         margin: 6px 0 0;
@@ -28,7 +28,7 @@
     .overview-desc {
         margin-top: 4px;
         font-size: 13px;
-        color: var(--color-muted-foreground);
+        color: var(--mantine-color-dimmed);
     }
     .overview-header-meta {
         flex: none;
@@ -36,7 +36,7 @@
     }
     .overview-header-meta-label {
         font-size: 12px;
-        color: var(--color-muted-foreground);
+        color: var(--mantine-color-dimmed);
     }
     .overview-header-meta-value {
         font-family: var(--font-mono);
@@ -49,7 +49,7 @@
     }
     .overview-card-head {
         padding: 16px 24px;
-        border-bottom: 1px solid var(--color-border);
+        border-bottom: 1px solid var(--mantine-color-default-border);
     }
     .overview-card-title {
         font-family: var(--font-display);
@@ -59,7 +59,7 @@
     .overview-card-sub {
         margin-top: 1px;
         font-size: 12px;
-        color: var(--color-muted-foreground);
+        color: var(--mantine-color-dimmed);
     }
 
     .overview-totals {
@@ -71,7 +71,7 @@
         transition: background var(--dur-fast) var(--ease-out);
     }
     .overview-total + .overview-total {
-        border-left: 1px solid var(--color-border);
+        border-left: 1px solid var(--mantine-color-default-border);
     }
     .overview-total-value {
         font-family: var(--font-display);
@@ -86,35 +86,35 @@
         font-weight: 700;
         letter-spacing: 1px;
         text-transform: uppercase;
-        color: var(--color-muted-foreground);
+        color: var(--mantine-color-dimmed);
     }
     .overview-total-meta {
         margin-top: 3px;
         font-family: var(--font-mono);
         font-size: 12px;
-        color: var(--color-muted-foreground);
+        color: var(--mantine-color-dimmed);
     }
 
     .overview-records-head {
         padding: 14px 24px 11px;
-        border-top: 1px solid var(--color-border);
+        border-top: 1px solid var(--mantine-color-default-border);
         background: color-mix(in srgb, var(--color-muted) 40%, transparent);
         font-size: 11px;
         font-weight: 700;
         letter-spacing: 1px;
         text-transform: uppercase;
-        color: var(--color-muted-foreground);
+        color: var(--mantine-color-dimmed);
     }
     .overview-records {
         display: grid;
         grid-template-columns: repeat(5, minmax(0, 1fr));
-        border-top: 1px solid var(--color-border);
+        border-top: 1px solid var(--mantine-color-default-border);
     }
     .overview-record {
         padding: 18px 20px;
     }
     .overview-record + .overview-record {
-        border-left: 1px solid var(--color-border);
+        border-left: 1px solid var(--mantine-color-default-border);
     }
     .overview-record-label {
         display: flex;
@@ -124,7 +124,7 @@
         font-weight: 600;
         letter-spacing: 0.5px;
         text-transform: uppercase;
-        color: var(--color-muted-foreground);
+        color: var(--mantine-color-dimmed);
     }
     .overview-record-value {
         margin-top: 9px;
@@ -150,7 +150,7 @@
         align-items: center;
         justify-content: space-between;
         padding: 15px 18px;
-        border-bottom: 1px solid var(--color-border);
+        border-bottom: 1px solid var(--mantine-color-default-border);
     }
     .overview-standings-title {
         font-family: var(--font-display);
@@ -160,13 +160,13 @@
     .overview-standings-sub {
         margin-top: 1px;
         font-size: 12px;
-        color: var(--color-muted-foreground);
+        color: var(--mantine-color-dimmed);
     }
     .overview-pts-label {
         font-family: var(--font-mono);
         font-size: 10.5px;
         letter-spacing: 0.5px;
-        color: var(--color-muted-foreground);
+        color: var(--mantine-color-dimmed);
     }
 
     .overview-row {
@@ -175,7 +175,7 @@
         align-items: center;
         gap: 11px;
         padding: 10px 18px;
-        border-top: 1px solid var(--color-border);
+        border-top: 1px solid var(--mantine-color-default-border);
         transition: background var(--dur-fast) var(--ease-out);
     }
     .overview-total:hover,
@@ -213,7 +213,7 @@
     .overview-row-code {
         font-family: var(--font-mono);
         font-size: 10.5px;
-        color: var(--color-muted-foreground);
+        color: var(--mantine-color-dimmed);
     }
     .overview-bar {
         overflow: hidden;

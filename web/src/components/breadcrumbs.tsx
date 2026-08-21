@@ -28,7 +28,7 @@ export const Breadcrumbs = () => {
                                     <Link
                                         params={c.params}
                                         style={{
-                                            color: 'var(--color-primary)',
+                                            color: 'var(--mantine-primary-color-filled)',
                                             fontWeight: 600,
                                             textDecoration: 'none',
                                             whiteSpace: 'nowrap',

@@ -31,14 +31,14 @@ const Calendar = () => {
                             style={{ overflow: 'hidden', padding: 0 }}
                         >
                             <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 18, padding: '14px 20px' }}>
-                                <span className="f1-num f1-display" style={{ color: 'var(--color-border)', fontSize: 20, fontWeight: 700, width: 42 }}>
+                                <span className="f1-num f1-display" style={{ color: 'var(--mantine-color-default-border)', fontSize: 20, fontWeight: 700, width: 42 }}>
                                     {r.round}
                                 </span>
                                 <div style={{
                                     alignItems: 'center',
                                     background: 'var(--color-accent)',
                                     borderRadius: 6,
-                                    color: 'var(--color-foreground)',
+                                    color: 'var(--mantine-color-text)',
                                     display: 'flex',
                                     fontSize: 13,
                                     fontWeight: 700,
@@ -51,20 +51,20 @@ const Calendar = () => {
                                 </div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ fontSize: 15, fontWeight: 700 }}>{r.name}</div>
-                                    <div style={{ color: 'var(--color-muted-foreground)', fontSize: 12 }}>{r.circuit}</div>
+                                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12 }}>{r.circuit}</div>
                                 </div>
-                                <span style={{ color: 'var(--color-muted-foreground)', fontSize: 12.5, width: 120 }}>{r.date}</span>
+                                <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12.5, width: 120 }}>{r.date}</span>
                                 <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 9, width: 200 }}>
                                     {isDone && winner
                                         ? (
                                                 <>
-                                                    <span style={{ color: 'var(--color-muted-foreground)', fontSize: 11, fontWeight: 600 }}>WINNER</span>
+                                                    <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 11, fontWeight: 600 }}>WINNER</span>
                                                     <div style={{ background: winner.color, borderRadius: 2, flexShrink: 0, height: 20, width: 4 }} />
                                                     <span style={{ fontSize: 13, fontWeight: 600 }}>{winner.short}</span>
                                                 </>
                                             )
                                         : (
-                                                <span style={{ color: isNext ? 'var(--color-primary)' : 'var(--color-muted-foreground)', fontSize: 12, fontWeight: 700 }}>
+                                                <span style={{ color: isNext ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-dimmed)', fontSize: 12, fontWeight: 700 }}>
                                                     {isNext ? 'UP NEXT' : 'Scheduled'}
                                                 </span>
                                             )}

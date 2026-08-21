@@ -2,12 +2,20 @@ import type { Icon } from '@phosphor-icons/react';
 import type { QueryClient } from '@tanstack/react-query';
 
 import {
+    ActionIcon,
+    AppShell,
+    Burger,
+    NavLink,
+    useComputedColorScheme,
+    useMantineColorScheme,
+} from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import {
     ChartPieSliceIcon,
     ClockCounterClockwiseIcon,
     FlagCheckeredIcon,
     MapTrifoldIcon,
     MoonIcon,
-    SidebarSimpleIcon,
     SunIcon,
     UserListIcon,
     WrenchIcon,
@@ -18,13 +26,9 @@ import {
     Outlet,
     useMatchRoute,
 } from '@tanstack/react-router';
-import { useState } from 'react';
 
 import { Breadcrumbs } from '#/components/breadcrumbs';
-import { Button } from '#/components/ui/button';
 import { COMPLETED, CURRENT_YEAR, TOTAL_ROUNDS } from '#/data/fixtures';
-import { useTheme } from '#/lib/theme';
-import { cn } from '#/lib/utils';
 
 type MyRouterContext = {
     queryClient: QueryClient;
@@ -33,7 +37,6 @@ type MyRouterContext = {
 type NavItem = {
     icon: Icon;
     label: string;
-    params?: Record<string, string>;
     to: string;
 };
 
@@ -67,14 +70,29 @@ const navItems: NavItem[] = [
 
 const progressPct = Math.round((COMPLETED / TOTAL_ROUNDS) * 100);
 
+const NAV_CLASS_NAMES = { body: 'f1-nav-body', label: 'f1-nav-label', root: 'f1-nav-item' };
+
 const RootLayout = () => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
-    const { resolvedTheme, toggleTheme } = useTheme();
+    const [isMobileOpen, { toggle: toggleMobile }] = useDisclosure(false);
+    const [isCollapsed, { toggle: toggleCollapsed }] = useDisclosure(false);
+    const { toggleColorScheme } = useMantineColorScheme();
+    const colorScheme = useComputedColorScheme('dark', { getInitialValueInEffect: false });
     const matchRoute = useMatchRoute();
 
     return (
-        <div className="f1-app">
-            <nav className="f1-sidebar" data-collapsed={isCollapsed}>
+        <AppShell
+            header={{ height: 60 }}
+            layout="alt"
+            navbar={{
+                breakpoint: 'sm',
+                collapsed: { mobile: !isMobileOpen },
+                width: isCollapsed ? 60 : 232,
+            }}
+            padding={28}
+            transitionDuration={280}
+            transitionTimingFunction="var(--ease-out)"
+        >
+            <AppShell.Navbar className="f1-sidebar" data-collapsed={isCollapsed} withBorder={false}>
                 <div className="f1-brand">
                     <div className="f1-brand-mark">
                         <FlagCheckeredIcon color="#fff" size={19} weight="bold" />
@@ -89,27 +107,26 @@ const RootLayout = () => {
                     </div>
                 </div>
 
-                <div className="f1-nav-list">
+                <AppShell.Section className="f1-nav-list" grow>
                     {navItems.map((item) => {
                         const isActive = !!matchRoute({
                             fuzzy: item.to !== '/',
-                            params: item.params,
                             to: item.to,
                         });
                         return (
-                            <Link
-                                className={cn('f1-nav-item', isActive && 'f1-nav-item--active')}
+                            <NavLink
+                                active={isActive}
+                                classNames={NAV_CLASS_NAMES}
+                                component={Link}
                                 key={item.label}
-                                params={item.params}
+                                label={item.label}
+                                leftSection={<item.icon size={18} weight={isActive ? 'fill' : 'regular'} />}
                                 title={isCollapsed ? item.label : undefined}
                                 to={item.to}
-                            >
-                                <item.icon size={18} weight={isActive ? 'fill' : 'regular'} />
-                                <span className="f1-nav-label">{item.label}</span>
-                            </Link>
+                            />
                         );
                     })}
-                </div>
+                </AppShell.Section>
 
                 <div className="f1-season-progress">
                     <div className="f1-season-progress-label">
@@ -127,38 +144,41 @@ const RootLayout = () => {
                         <div className="f1-progress-fill" style={{ width: `${progressPct}%` }} />
                     </div>
                 </div>
+            </AppShell.Navbar>
 
-            </nav>
+            <AppShell.Header className="f1-header">
+                <Burger
+                    aria-label={isMobileOpen ? 'Close navigation' : 'Open navigation'}
+                    hiddenFrom="sm"
+                    onClick={toggleMobile}
+                    opened={isMobileOpen}
+                    size="sm"
+                />
+                <Burger
+                    aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                    onClick={toggleCollapsed}
+                    opened={!isCollapsed}
+                    size="sm"
+                    visibleFrom="sm"
+                />
+                <Breadcrumbs />
+                <div className="f1-toolbar-spacer" />
+                <ActionIcon
+                    aria-label="Toggle color scheme"
+                    onClick={toggleColorScheme}
+                    size={36}
+                    variant="default"
+                >
+                    {colorScheme === 'dark' ? <SunIcon size={18} /> : <MoonIcon size={18} />}
+                </ActionIcon>
+            </AppShell.Header>
 
-            <div className="f1-main">
-                <header className="f1-header">
-                    <Button
-                        aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                        onClick={() => setIsCollapsed(c => !c)}
-                        size="icon"
-                        variant="ghost"
-                    >
-                        <SidebarSimpleIcon size={18} />
-                    </Button>
-                    <Breadcrumbs />
-                    <div className="f1-toolbar-spacer" />
-                    <Button
-                        aria-label="Toggle color scheme"
-                        onClick={toggleTheme}
-                        size="icon"
-                        variant="outline"
-                    >
-                        {resolvedTheme === 'dark' ? <SunIcon size={18} /> : <MoonIcon size={18} />}
-                    </Button>
-                </header>
-
-                <main className="f1-scroll f1-content">
-                    <div className="f1-content-inner">
-                        <Outlet />
-                    </div>
-                </main>
-            </div>
-        </div>
+            <AppShell.Main>
+                <div className="f1-content-inner">
+                    <Outlet />
+                </div>
+            </AppShell.Main>
+        </AppShell>
     );
 };
 

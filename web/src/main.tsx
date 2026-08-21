@@ -1,3 +1,4 @@
+import { MantineProvider } from '@mantine/core';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
@@ -5,9 +6,9 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
+import { theme } from './lib/mantine-theme';
 import TanStackQueryDevtools from './lib/query/devtools';
 import { queryClient } from './lib/query/root-provider';
-import { ThemeProvider } from './lib/theme';
 import { router } from './router';
 import './styles/index.css';
 
@@ -19,7 +20,7 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
     <StrictMode>
-        <ThemeProvider>
+        <MantineProvider defaultColorScheme="auto" theme={theme}>
             <QueryClientProvider client={queryClient}>
                 <RouterProvider router={router} />
                 {import.meta.env.DEV && (
@@ -37,6 +38,6 @@ createRoot(rootElement).render(
                     />
                 )}
             </QueryClientProvider>
-        </ThemeProvider>
+        </MantineProvider>
     </StrictMode>,
 );

@@ -1,8 +1,7 @@
 import type { ErrorComponentProps } from '@tanstack/react-router';
 
+import { Button } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
-
-import { Button } from '#/components/ui/button';
 
 import './route-fallback.css';
 
@@ -18,7 +17,7 @@ export const RouteError = ({ error, reset }: ErrorComponentProps) => {
                 ? <pre className="route-fallback-detail">{error.message}</pre>
                 : null}
             <div className="route-fallback-actions">
-                <Button onClick={reset} type="button" variant="outline">
+                <Button onClick={reset} type="button" variant="default">
                     Try again
                 </Button>
                 <Link className="route-fallback-link" to="/">

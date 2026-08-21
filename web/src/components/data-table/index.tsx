@@ -2,19 +2,11 @@ import type { LinkProps } from '@tanstack/react-router';
 import type { RowData, Table } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 
+import { Table as TablePrimitive } from '@mantine/core';
 import { CaretDownIcon, CaretRightIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { flexRender } from '@tanstack/react-table';
 
-import {
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableHeader,
-    Table as TablePrimitive,
-    TableRow,
-} from '#/components/ui/table';
 import { cn } from '#/lib/utils';
 
 import './data-table.css';
@@ -75,15 +67,15 @@ export function DataTable<T>({ headerPy = 14, px = 18, rowPy = 14, table }: Data
     const hasCaret = linkColumn?.columnDef.meta?.trailing === 'caret';
 
     return (
-        <TableContainer>
-            <TablePrimitive>
+        <TablePrimitive.ScrollContainer minWidth={720} type="native">
+            <TablePrimitive className="data-table">
                 <colgroup>
                     {columns.map(column => (
                         <col key={column.id} style={{ width: column.columnDef.meta?.width }} />
                     ))}
                 </colgroup>
-                <TableHeader>
-                    <tr>
+                <TablePrimitive.Thead>
+                    <TablePrimitive.Tr>
                         {headers.map((h) => {
                             const label = h.isPlaceholder
                                 ? null
@@ -91,7 +83,7 @@ export function DataTable<T>({ headerPy = 14, px = 18, rowPy = 14, table }: Data
                             const sorted = h.column.getIsSorted();
 
                             return (
-                                <TableHead
+                                <TablePrimitive.Th
                                     aria-sort={h.column.getCanSort() ? ARIA_SORT[String(sorted)] : undefined}
                                     key={h.id}
                                     scope="col"
@@ -113,17 +105,17 @@ export function DataTable<T>({ headerPy = 14, px = 18, rowPy = 14, table }: Data
                                                 </button>
                                             )
                                         : label}
-                                </TableHead>
+                                </TablePrimitive.Th>
                             );
                         })}
-                    </tr>
-                </TableHeader>
-                <TableBody>
+                    </TablePrimitive.Tr>
+                </TablePrimitive.Thead>
+                <TablePrimitive.Tbody>
                     {rows.map((row, i) => {
                         const link = linkColumn?.columnDef.meta?.link?.(row.original);
 
                         return (
-                            <TableRow
+                            <TablePrimitive.Tr
                                 className={cn('f1-row', link && 'f1-row--clickable')}
                                 key={row.id}
                                 onClick={link ? () => void navigate(link) : undefined}
@@ -155,7 +147,7 @@ export function DataTable<T>({ headerPy = 14, px = 18, rowPy = 14, table }: Data
                                     }
 
                                     return (
-                                        <TableCell
+                                        <TablePrimitive.Td
                                             key={cell.id}
                                             style={{ paddingBlock: rowPy, paddingInline: px, textAlign: align }}
                                         >
@@ -171,14 +163,14 @@ export function DataTable<T>({ headerPy = 14, px = 18, rowPy = 14, table }: Data
                                                         </Link>
                                                     )
                                                 : content}
-                                        </TableCell>
+                                        </TablePrimitive.Td>
                                     );
                                 })}
-                            </TableRow>
+                            </TablePrimitive.Tr>
                         );
                     })}
-                </TableBody>
+                </TablePrimitive.Tbody>
             </TablePrimitive>
-        </TableContainer>
+        </TablePrimitive.ScrollContainer>
     );
 }

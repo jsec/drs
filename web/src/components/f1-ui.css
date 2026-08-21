@@ -16,7 +16,7 @@
 
 .f1-mini-stat-label {
   margin-top: 2px;
-  color: var(--color-muted-foreground);
+  color: var(--mantine-color-dimmed);
   font-size: 11px;
   font-weight: 600;
 }
@@ -33,7 +33,7 @@
 }
 
 .f1-stat-card-label {
-  color: var(--color-muted-foreground);
+  color: var(--mantine-color-dimmed);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -49,8 +49,28 @@
 
 .f1-stat-card-sub {
   margin-top: 2px;
-  color: var(--color-muted-foreground);
+  color: var(--mantine-color-dimmed);
   font-size: 12px;
+}
+
+.f1-section-card-body {
+  padding: 0 18px 18px;
+}
+
+.f1-section-card-body[data-flush="true"] {
+  padding: 0;
+}
+
+.f1-pill[data-active="true"] {
+  border-color: var(--mantine-color-text);
+  background: var(--mantine-color-text);
+  color: var(--mantine-color-body);
+}
+
+.f1-pill[data-active="true"][data-variant="subtle"] {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--mantine-primary-color-filled) 12%, transparent);
+  color: var(--mantine-primary-color-filled);
 }
 
 .f1-trophy-count {

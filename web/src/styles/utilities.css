@@ -27,7 +27,7 @@
 .f1-lift:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
+  border-color: color-mix(in srgb, var(--mantine-primary-color-filled) 30%, var(--mantine-color-default-border));
 }
 
 .f1-scroll::-webkit-scrollbar {
@@ -37,7 +37,7 @@
 .f1-scroll::-webkit-scrollbar-thumb {
   background: var(--neutral-300);
   border-radius: 8px;
-  border: 2px solid var(--color-background);
+  border: 2px solid var(--mantine-color-body);
 }
 
 .f1-control-group {
@@ -47,7 +47,7 @@
 }
 
 .f1-text-muted {
-  color: var(--color-muted-foreground);
+  color: var(--mantine-color-dimmed);
 }
 
 .f1-truncate {

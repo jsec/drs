@@ -43,7 +43,7 @@ export function makeConstructorColumns(maxWins: number) {
             id: 'years',
             width: '10%',
         }),
-        col.trophy('championships', { header: 'TITLES', id: 'titles', size: 12, sort: byTitles, width: '9%' }),
+        col.trophy('championships', { header: 'TITLES', id: 'titles', sort: byTitles, width: '9%' }),
         col.custom({
             accessor: c => c.wins,
             cell: (info) => {
@@ -53,7 +53,7 @@ export function makeConstructorColumns(maxWins: number) {
                         <span className={cn('table-cell-num', 'table-cell-num-display')} style={{ width: 34 }}>
                             {c.wins}
                         </span>
-                        <div style={{ background: 'var(--color-border)', borderRadius: 9999, flex: 1, height: 6, maxWidth: 150, overflow: 'hidden' }}>
+                        <div style={{ background: 'var(--mantine-color-default-border)', borderRadius: 9999, flex: 1, height: 6, maxWidth: 150, overflow: 'hidden' }}>
                             <div style={{ background: c.color, borderRadius: 9999, height: '100%', width: `${(c.wins / maxWins) * 100}%` }} />
                         </div>
                     </div>

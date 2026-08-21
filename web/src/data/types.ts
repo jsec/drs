@@ -57,11 +57,6 @@ export type CareerTotals = {
     wins: number;
 };
 
-export type ChartSeries = {
-    color: string;
-    values: number[];
-};
-
 export type Circuit = {
     code: string;
     corners: number;

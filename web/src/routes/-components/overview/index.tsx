@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 
+import { Card } from '@mantine/core';
 import { CrownIcon, FlagCheckeredIcon, TimerIcon, TrophyIcon, WrenchIcon } from '@phosphor-icons/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
-import { Card } from '#/components/ui/card';
 import { COMPLETED, CURRENT_YEAR, TOTAL_ROUNDS } from '#/data/fixtures';
 import { standingsQuery } from '#/data/queries';
 
@@ -22,7 +22,7 @@ const TOTALS: Total[] = [
 const RECORDS: RecordStat[] = [
     { icon: <CrownIcon color="var(--gold-500)" size={15} weight="fill" />, label: 'WDC', sub: '🇬🇧 Hamilton · 🇩🇪 Schumacher', value: 7 },
     { icon: <WrenchIcon color="#DC0000" size={15} weight="fill" />, label: 'WCC', sub: '🇮🇹 Scuderia Ferrari', value: 16 },
-    { icon: <TrophyIcon color="var(--color-primary)" size={15} weight="fill" />, label: 'Most wins', sub: '🇬🇧 Lewis Hamilton', value: 105 },
+    { icon: <TrophyIcon color="var(--mantine-primary-color-filled)" size={15} weight="fill" />, label: 'Most wins', sub: '🇬🇧 Lewis Hamilton', value: 105 },
     { icon: <TimerIcon color="var(--teal-500)" size={15} weight="fill" />, label: 'Most poles', sub: '🇬🇧 Lewis Hamilton', value: 104 },
     { icon: <FlagCheckeredIcon color="var(--blue-500)" size={15} weight="fill" />, label: 'Most starts', sub: '🇪🇸 Fernando Alonso', value: 416 },
 ];
@@ -89,7 +89,7 @@ export const Overview = () => {
                     </div>
                     {drivers.map((d, i) => (
                         <div className="overview-row" key={d.code}>
-                            <span className="overview-row-pos" style={{ color: i === 0 ? 'var(--color-primary)' : 'var(--color-muted-foreground)' }}>{i + 1}</span>
+                            <span className="overview-row-pos" style={{ color: i === 0 ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-dimmed)' }}>{i + 1}</span>
                             <span className="overview-row-team" style={{ background: d.color }} />
                             <span className="overview-row-flag">{d.flag}</span>
                             <div className="overview-row-name">
@@ -114,7 +114,7 @@ export const Overview = () => {
                     </div>
                     {constructors.map(c => (
                         <div className="overview-row" key={c.key}>
-                            <span className="overview-row-pos" style={{ color: c.pos === 1 ? 'var(--color-primary)' : 'var(--color-muted-foreground)' }}>{c.pos}</span>
+                            <span className="overview-row-pos" style={{ color: c.pos === 1 ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-dimmed)' }}>{c.pos}</span>
                             <span className="overview-row-team" style={{ background: c.color }} />
                             <span className="overview-row-flag">{c.flag}</span>
                             <div className="overview-row-name">

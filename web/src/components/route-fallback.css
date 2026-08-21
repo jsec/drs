@@ -15,7 +15,7 @@
 }
 
 .route-fallback-message {
-    color: var(--color-muted-foreground);
+    color: var(--mantine-color-dimmed);
     font-size: var(--text-sm);
     margin: 0;
     max-width: 46ch;
@@ -24,7 +24,7 @@
 .route-fallback-detail {
     background: var(--color-accent);
     border-radius: var(--radius-sm);
-    color: var(--color-muted-foreground);
+    color: var(--mantine-color-dimmed);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     max-width: 100%;
@@ -42,7 +42,7 @@
 }
 
 .route-fallback-link {
-    color: var(--color-primary);
+    color: var(--mantine-primary-color-filled);
     font-size: var(--text-sm);
     font-weight: 600;
     text-decoration: none;

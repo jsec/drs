@@ -1,10 +1,10 @@
+import { Card } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 
 import { DataTable, useDataTable } from '#/components/data-table';
 import { Pill } from '#/components/f1-ui';
-import { Card } from '#/components/ui/card';
 import { TOTAL_ROUNDS } from '#/data/fixtures';
 import { standingsQuery } from '#/data/queries';
 import { parseYear } from '#/lib/route-params';

@@ -1,10 +1,10 @@
+import { Card } from '@mantine/core';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
 import type { ListSeasonsResponse } from '#/lib/api/types';
 
 import { readSortSearch } from '#/components/data-table';
-import { Card } from '#/components/ui/card';
 import { api } from '#/lib/query/api';
 
 import { SeasonsTable } from './-components/seasons-table';

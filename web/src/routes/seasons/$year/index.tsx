@@ -1,3 +1,4 @@
+import { LineChart } from '@mantine/charts';
 import {
     CalendarDotsIcon,
     CrownIcon,
@@ -10,8 +11,8 @@ import { memo, useMemo } from 'react';
 
 import type { CalendarRound, SeasonDriver } from '#/data/types';
 
+import { toChartData, toChartSeries } from '#/components/chart-data';
 import { GridHeader, SectionCard, StatCard, TeamBar } from '#/components/f1-ui';
-import { LineChart, roundLabels } from '#/components/line-chart';
 import { seasonOverviewQuery } from '#/data/queries';
 import { parseYear } from '#/lib/route-params';
 
@@ -32,14 +33,14 @@ const MiniRaceCell = memo(function MiniRaceCell({ completed, driverByCode, r, ye
     let background: string;
     let border: string;
     if (isDone) {
-        background = 'var(--color-card)';
-        border = '1px solid var(--color-border)';
+        background = 'var(--mantine-color-default)';
+        border = '1px solid var(--mantine-color-default-border)';
     } else if (isNext) {
-        background = 'color-mix(in srgb, var(--color-primary) 6%, var(--color-background))';
-        border = '1px solid color-mix(in srgb, var(--color-primary) 40%, var(--color-border))';
+        background = 'color-mix(in srgb, var(--mantine-primary-color-filled) 6%, var(--mantine-color-body))';
+        border = '1px solid color-mix(in srgb, var(--mantine-primary-color-filled) 40%, var(--mantine-color-default-border))';
     } else {
         background = 'var(--color-accent)';
-        border = '1px solid var(--color-border)';
+        border = '1px solid var(--mantine-color-default-border)';
     }
 
     const cell = (
@@ -47,13 +48,13 @@ const MiniRaceCell = memo(function MiniRaceCell({ completed, driverByCode, r, ye
             className={isDone ? 'f1-lift' : undefined}
             style={{ background, border, borderRadius: 7, cursor: isDone ? 'pointer' : 'default', padding: '9px 10px' }}
         >
-            <div className="f1-num" style={{ color: 'var(--color-muted-foreground)', fontSize: 10, fontWeight: 700 }}>
+            <div className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontSize: 10, fontWeight: 700 }}>
                 R
                 {r.round}
             </div>
             <div style={{ fontSize: 12.5, fontWeight: 700, marginTop: 2 }}>{r.code}</div>
-            <div style={{ color: 'var(--color-muted-foreground)', fontSize: 10.5, marginTop: 1 }}>{r.date}</div>
-            <div style={{ background: winner?.color ?? 'var(--color-border)', borderRadius: 2, height: 3, marginTop: 7 }} />
+            <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 10.5, marginTop: 1 }}>{r.date}</div>
+            <div style={{ background: winner?.color ?? 'var(--mantine-color-default-border)', borderRadius: 2, height: 3, marginTop: 7 }} />
         </div>
     );
 
@@ -69,7 +70,7 @@ const MiniRaceCell = memo(function MiniRaceCell({ completed, driverByCode, r, ye
 });
 
 const ACTION_LINK: React.CSSProperties = {
-    color: 'var(--color-primary)',
+    color: 'var(--mantine-primary-color-filled)',
     fontSize: 12,
     fontWeight: 600,
     textDecoration: 'none',
@@ -85,15 +86,14 @@ const SeasonOverview = () => {
         [data.drivers],
     );
 
-    const progressionSeries = data.progression.map(p => ({ color: p.color, values: p.values }));
-    const xLabels = roundLabels(data.completed + 1, 2);
-    xLabels[0] = 'Start';
+    const progressionSeries = toChartSeries(data.progression);
+    const progressionData = toChartData(data.progression, i => (i === 0 ? 'Start' : `R${i}`));
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ alignItems: 'flex-end', display: 'flex', justifyContent: 'space-between' }}>
                 <div>
-                    <div style={{ color: 'var(--color-muted-foreground)', fontSize: 12, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
                         FIA FORMULA 1 WORLD CHAMPIONSHIP
                     </div>
                     <h1 className="f1-display" style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 700, letterSpacing: '-0.02em', margin: '6px 0 0' }}>
@@ -101,7 +101,7 @@ const SeasonOverview = () => {
                     </h1>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: 'var(--color-muted-foreground)', fontSize: 12 }}>Last round</div>
+                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12 }}>Last round</div>
                     <div style={{ fontSize: 15, fontWeight: 700 }}>{data.lastRaceName}</div>
                 </div>
             </div>
@@ -109,7 +109,7 @@ const SeasonOverview = () => {
             {/* KPI cards */}
             <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(2, 1fr)' }}>
                 <StatCard
-                    accent="var(--color-primary)"
+                    accent="var(--mantine-primary-color-filled)"
                     icon={<FlagCheckeredIcon size={15} weight="fill" />}
                     label="Round"
                     sub="season progress"
@@ -123,7 +123,7 @@ const SeasonOverview = () => {
                     value={data.leader.short}
                 />
                 <StatCard
-                    accent="var(--color-primary)"
+                    accent="var(--mantine-primary-color-filled)"
                     icon={<GaugeIcon size={15} weight="fill" />}
                     label="Lead Margin"
                     sub={`over ${data.runnerUp.short}`}
@@ -162,7 +162,7 @@ const SeasonOverview = () => {
                             params={{ driverId: d.code, year }}
                             style={{
                                 alignItems: 'center',
-                                borderTop: '1px solid var(--color-border)',
+                                borderTop: '1px solid var(--mantine-color-default-border)',
                                 color: 'inherit',
                                 display: 'grid',
                                 gridTemplateColumns: DRIVER_COLS,
@@ -171,17 +171,17 @@ const SeasonOverview = () => {
                             }}
                             to="/seasons/$year/drivers/$driverId"
                         >
-                            <span className="f1-num" style={{ color: 'var(--color-muted-foreground)', fontWeight: 700 }}>{i + 1}</span>
+                            <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontWeight: 700 }}>{i + 1}</span>
                             <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 11 }}>
                                 <TeamBar color={d.color} />
                                 <div style={{ minWidth: 0 }}>
                                     <div style={{ fontSize: 13.5, fontWeight: 600, whiteSpace: 'nowrap' }}>{d.short}</div>
-                                    <div style={{ color: 'var(--color-muted-foreground)', fontSize: 11 }}>{d.teamName}</div>
+                                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 11 }}>{d.teamName}</div>
                                 </div>
                             </div>
                             <span className="f1-num f1-display" style={{ fontWeight: 700, textAlign: 'right' }}>{d.points}</span>
-                            <span className="f1-num" style={{ color: 'var(--color-muted-foreground)', textAlign: 'center' }}>{d.wins}</span>
-                            <span className="f1-num" style={{ color: 'var(--color-muted-foreground)', fontSize: 12.5, textAlign: 'right' }}>
+                            <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', textAlign: 'center' }}>{d.wins}</span>
+                            <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12.5, textAlign: 'right' }}>
                                 {i === 0 ? '—' : `-${data.leader.points - d.points}`}
                             </span>
                         </Link>
@@ -200,17 +200,17 @@ const SeasonOverview = () => {
                     {data.constructors.map(c => (
                         <div
                             key={c.key}
-                            style={{ borderTop: '1px solid var(--color-border)', padding: '8px 18px' }}
+                            style={{ borderTop: '1px solid var(--mantine-color-default-border)', padding: '8px 18px' }}
                         >
                             <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', justifyContent: 'space-between', marginBottom: 5 }}>
                                 <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 9 }}>
-                                    <span className="f1-num" style={{ color: 'var(--color-muted-foreground)', fontSize: 11, fontWeight: 700, textAlign: 'center', width: 18 }}>{c.pos}</span>
+                                    <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontSize: 11, fontWeight: 700, textAlign: 'center', width: 18 }}>{c.pos}</span>
                                     <span style={{ fontSize: 13, fontWeight: 600 }}>{c.name}</span>
                                 </div>
                                 <span className="f1-num f1-display" style={{ fontSize: 13, fontWeight: 700 }}>{c.points}</span>
                             </div>
                             <div style={{ marginLeft: 27 }}>
-                                <div style={{ background: 'var(--color-border)', borderRadius: 9999, height: 5, overflow: 'hidden' }}>
+                                <div style={{ background: 'var(--mantine-color-default-border)', borderRadius: 9999, height: 5, overflow: 'hidden' }}>
                                     <div style={{ background: c.color, borderRadius: 9999, height: '100%', width: `${(c.points / maxConstructor) * 100}%` }} />
                                 </div>
                             </div>
@@ -224,7 +224,7 @@ const SeasonOverview = () => {
                 <div style={{ alignItems: 'flex-start', display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                     <div>
                         <div style={{ fontSize: 15, fontWeight: 700 }}>Championship Points Progression</div>
-                        <div style={{ color: 'var(--color-muted-foreground)', fontSize: 12, marginTop: 2 }}>
+                        <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12, marginTop: 2 }}>
                             Cumulative points after each round · top 6 drivers
                         </div>
                     </div>
@@ -238,15 +238,12 @@ const SeasonOverview = () => {
                     </div>
                 </div>
                 <LineChart
-                    ariaLabel="Cumulative championship points after each round, top 6 drivers"
-                    height={280}
+                    data={progressionData}
+                    dataKey="x"
+                    h={280}
                     series={progressionSeries}
-                    ticks={6}
-                    viewHeight={300}
-                    viewWidth={1100}
-                    xLabels={xLabels}
-                    yMax={250}
-                    yMin={0}
+                    xAxisProps={{ interval: 1 }}
+                    yAxisProps={{ domain: [0, 250], tickCount: 6 }}
                 />
             </div>
 

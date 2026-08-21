@@ -27,7 +27,8 @@ export default [
     },
     {
         ignores: [
-            'eslint.config.js', 
+            'eslint.config.js',
+            'postcss.config.cjs',
             'src/routeTree.gen.ts', 
             'dist/**',
             '*.gen.ts'

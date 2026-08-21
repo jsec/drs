@@ -1,26 +1,42 @@
 @layer features {
+.data-table thead {
+  background: var(--color-accent);
+}
+.data-table tbody tr {
+  border-top: 1px solid var(--mantine-color-default-border);
+}
+.data-table th {
+  color: var(--mantine-color-dimmed);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.data-table td {
+  min-width: 0;
+}
 .table-cell-num {
-  color: var(--color-muted-foreground);
+  color: var(--mantine-color-dimmed);
   font-family: var(--font-sans);
   font-variant-numeric: tabular-nums;
 }
 .table-cell-num-display {
-  color: var(--color-foreground);
+  color: var(--mantine-color-text);
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: var(--tracking-tight);
 }
 .table-cell-rank {
-  color: var(--color-muted-foreground);
+  color: var(--mantine-color-dimmed);
   font-family: var(--font-sans);
   font-variant-numeric: tabular-nums;
   font-weight: 700;
 }
 .table-cell-text {
-  color: var(--color-foreground);
+  color: var(--mantine-color-text);
 }
 .table-cell-text-muted {
-  color: var(--color-muted-foreground);
+  color: var(--mantine-color-dimmed);
 }
 .table-cell-entity {
   display: flex;
@@ -70,12 +86,12 @@
   opacity: 1;
 }
 .table-head-sort:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--mantine-primary-color-filled);
   outline-offset: 2px;
 }
 .table-head-caret {
   flex-shrink: 0;
-  color: var(--color-muted-foreground);
+  color: var(--mantine-color-dimmed);
   opacity: 0.6;
 }
 .table-head-caret--idle {

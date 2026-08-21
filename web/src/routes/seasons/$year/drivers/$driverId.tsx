@@ -1,8 +1,9 @@
+import { LineChart } from '@mantine/charts';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 
+import { toChartData, toChartSeries } from '#/components/chart-data';
 import { GridHeader, MiniStat } from '#/components/f1-ui';
-import { LineChart, roundLabels } from '#/components/line-chart';
 import { getSeasonDriver } from '#/data/fixtures';
 import { driverSeasonQuery } from '#/data/queries';
 import { parseYear } from '#/lib/route-params';
@@ -13,6 +14,7 @@ const DriverSeason = () => {
     const { driverId, year } = Route.useParams();
     const { data } = useSuspenseQuery(driverSeasonQuery(Number(year), driverId));
     const { driver, pos } = data;
+    const progressionLines = [{ code: driver.code, color: driver.color, values: data.progression }];
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -86,15 +88,12 @@ const DriverSeason = () => {
                 <div className="f1-card" style={{ padding: 16 }}>
                     <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>Points Progression</div>
                     <LineChart
-                        ariaLabel={`${driver.name} cumulative points progression`}
-                        height={200}
-                        series={[{ color: driver.color, values: data.progression }]}
-                        ticks={5}
-                        viewHeight={260}
-                        viewWidth={520}
-                        xLabels={roundLabels(data.progression.length, 2)}
-                        yMax={data.pointsMax}
-                        yMin={0}
+                        data={toChartData(progressionLines, i => `R${i}`)}
+                        dataKey="x"
+                        h={200}
+                        series={toChartSeries(progressionLines)}
+                        xAxisProps={{ interval: 1 }}
+                        yAxisProps={{ domain: [0, data.pointsMax], tickCount: 5 }}
                     />
                 </div>
                 <div className="f1-card" style={{ padding: 16 }}>
@@ -121,7 +120,7 @@ const DriverSeason = () => {
                                     width: '100%',
                                 }}
                                 />
-                                <span style={{ color: 'var(--color-muted-foreground)', fontSize: 9.5, marginTop: 4 }}>{f.round}</span>
+                                <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 9.5, marginTop: 4 }}>{f.round}</span>
                             </div>
                         ))}
                     </div>
@@ -145,7 +144,7 @@ const DriverSeason = () => {
                         params={{ round: String(r.round), year }}
                         style={{
                             alignItems: 'center',
-                            borderTop: '1px solid var(--color-border)',
+                            borderTop: '1px solid var(--mantine-color-default-border)',
                             color: 'inherit',
                             display: 'grid',
                             gridTemplateColumns: COLS,
@@ -154,9 +153,9 @@ const DriverSeason = () => {
                         }}
                         to="/seasons/$year/races/$round"
                     >
-                        <span className="f1-num" style={{ color: 'var(--color-muted-foreground)', fontWeight: 700 }}>{r.round}</span>
+                        <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontWeight: 700 }}>{r.round}</span>
                         <span style={{ fontSize: 13, fontWeight: 600 }}>{r.gp}</span>
-                        <span className="f1-num" style={{ color: 'var(--color-muted-foreground)', textAlign: 'center' }}>{r.grid}</span>
+                        <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', textAlign: 'center' }}>{r.grid}</span>
                         <span className="f1-num f1-display" style={{ fontWeight: 700, textAlign: 'center' }}>{r.finish}</span>
                         <span style={{ color: r.statusColor, fontSize: 11, fontWeight: 700, textAlign: 'center' }}>{r.status}</span>
                         <span className="f1-num" style={{ fontWeight: 700, textAlign: 'right' }}>{r.pts > 0 ? r.pts : '–'}</span>

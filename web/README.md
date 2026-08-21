@@ -26,9 +26,8 @@ routes in `src/routes`.
 
 ## Styling
 
-This project uses [Mantine](https://mantine.dev/) as its base component library.
-Global styles are limited to Mantine's core stylesheet and document-level
-defaults in `src/styles.css`.
+This project uses [Mantine 9](https://mantine.dev/) as its base component
+library. The theme override lives in `src/lib/mantine-theme.ts`.
 
 ## Data Fetching
 

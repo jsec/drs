@@ -46,105 +46,21 @@
 }
 
 :root {
-  --color-background:        var(--neutral-0);
-  --color-foreground:        var(--neutral-950);
+  --color-accent:                    var(--neutral-100);
+  --color-muted:                     var(--neutral-100);
 
-  --color-card:              var(--neutral-0);
-  --color-card-foreground:   var(--neutral-950);
-
-  --color-popover:           var(--neutral-0);
-  --color-popover-foreground:var(--neutral-950);
-
-  --color-primary:           var(--red-500);
-  --color-primary-hover:     var(--red-600);
-  --color-primary-foreground:var(--neutral-0);
-
-  --color-secondary:         var(--neutral-100);
-  --color-secondary-foreground: var(--neutral-900);
-
-  --color-muted:             var(--neutral-100);
-  --color-muted-foreground:  var(--neutral-500);
-
-  --color-accent:            var(--neutral-100);
-  --color-accent-foreground: var(--neutral-900);
-
-  --color-destructive:       #dc2626;
-  --color-destructive-foreground: var(--neutral-0);
-
-  --color-success:           var(--green-500);
-  --color-success-foreground:var(--neutral-0);
-  --color-warning:           var(--gold-500);
-  --color-warning-foreground:var(--neutral-950);
-  --color-info:              var(--sky-500);
-  --color-info-foreground:   var(--neutral-0);
-
-  --color-border:            var(--neutral-200);
-  --color-input:             var(--neutral-200);
-  --color-ring:              var(--red-500);
-
-  --chart-1: var(--red-500);
-  --chart-2: var(--teal-500);
-  --chart-3: var(--orange-500);
-  --chart-4: var(--blue-500);
-  --chart-5: var(--gold-500);
-
-  --color-sidebar:                    var(--neutral-950);
-  --color-sidebar-foreground:         var(--neutral-300);
-  --color-sidebar-muted:              var(--neutral-500);
-  --color-sidebar-primary:            var(--red-500);
-  --color-sidebar-primary-foreground: var(--neutral-0);
-  --color-sidebar-accent:             rgba(255, 255, 255, 0.06);
-  --color-sidebar-accent-foreground:  var(--neutral-0);
-  --color-sidebar-border:             rgba(255, 255, 255, 0.08);
-  --color-sidebar-ring:               var(--red-500);
+  --color-sidebar:                   var(--neutral-950);
+  --color-sidebar-foreground:        var(--neutral-300);
+  --color-sidebar-muted:             var(--neutral-500);
+  --color-sidebar-primary:           var(--red-500);
+  --color-sidebar-accent:            rgba(255, 255, 255, 0.06);
+  --color-sidebar-accent-foreground: var(--neutral-0);
 }
 
-.dark {
-  --color-background:        var(--neutral-950);
-  --color-foreground:        var(--neutral-50);
-
-  --color-card:              #1d1d27;
-  --color-card-foreground:   var(--neutral-50);
-
-  --color-popover:           #1d1d27;
-  --color-popover-foreground:var(--neutral-50);
-
-  --color-primary:           var(--red-500);
-  --color-primary-hover:     var(--red-400);
-  --color-primary-foreground:var(--neutral-0);
-
-  --color-secondary:         var(--neutral-800);
-  --color-secondary-foreground: var(--neutral-50);
-
-  --color-muted:             var(--neutral-800);
-  --color-muted-foreground:  var(--neutral-400);
-
-  --color-accent:            #2a2a36;
-  --color-accent-foreground: var(--neutral-50);
-
-  --color-destructive:       #ef4444;
-  --color-destructive-foreground: var(--neutral-50);
-
-  --color-success:           #22c55e;
-  --color-warning:           var(--gold-500);
-  --color-info:              #38bdf8;
-
-  --color-border:            rgba(255, 255, 255, 0.10);
-  --color-input:             rgba(255, 255, 255, 0.12);
-  --color-ring:              var(--red-500);
-
-  --chart-1: var(--red-500);
-  --chart-2: var(--teal-500);
-  --chart-3: var(--orange-500);
-  --chart-4: #6ea8ff;
-  --chart-5: var(--gold-500);
-
-  --color-sidebar:               var(--neutral-1000);
-  --color-sidebar-foreground:    var(--neutral-300);
-  --color-sidebar-muted:         var(--neutral-500);
-  --color-sidebar-accent:        rgba(255, 255, 255, 0.06);
-  --color-sidebar-accent-foreground: var(--neutral-0);
-  --color-sidebar-border:        rgba(255, 255, 255, 0.08);
+[data-mantine-color-scheme='dark'] {
+  --color-accent:  #2a2a36;
+  --color-muted:   var(--neutral-800);
+  --color-sidebar: var(--neutral-1000);
 }
 
 :root {

@@ -792,7 +792,7 @@ function raceStatus(isDnf: boolean, fin: number): string {
 }
 
 function raceStatusColor(isDnf: boolean, fin: number): string {
-    if (isDnf) return 'var(--color-primary)';
+    if (isDnf) return 'var(--mantine-primary-color-filled)';
     if (fin <= 3) return 'var(--gold-500)';
     if (fin <= 10) return 'var(--green-500)';
     return 'var(--neutral-400)';

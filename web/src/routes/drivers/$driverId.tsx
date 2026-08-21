@@ -15,8 +15,8 @@ const COLS = '84px 1fr 64px 60px 78px 60px 80px 24px';
 
 const getPositionColor = (pos: number): string => {
     if (pos === 1) return GOLD;
-    if (pos <= 3) return 'var(--color-foreground)';
-    return 'var(--color-muted-foreground)';
+    if (pos <= 3) return 'var(--mantine-color-text)';
+    return 'var(--mantine-color-dimmed)';
 };
 
 const DriverCareer = () => {
@@ -80,12 +80,12 @@ const DriverCareer = () => {
             <div className="f1-card" style={{ padding: 0 }}>
                 <div style={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between', padding: '15px 20px' }}>
                     <span style={{ fontSize: 15, fontWeight: 700 }}>Seasons</span>
-                    <span style={{ color: 'var(--color-muted-foreground)', fontSize: 12 }}>
+                    <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12 }}>
                         Select a season to open its full dashboard
                     </span>
                 </div>
                 <div style={{
-                    color: 'var(--color-muted-foreground)',
+                    color: 'var(--mantine-color-dimmed)',
                     display: 'grid',
                     fontSize: 10.5,
                     fontWeight: 700,
@@ -114,7 +114,7 @@ const DriverCareer = () => {
                             style={{
                                 alignItems: 'center',
                                 background: s.champ ? 'color-mix(in srgb, var(--gold-500) 7%, transparent)' : undefined,
-                                borderTop: '1px solid var(--color-border)',
+                                borderTop: '1px solid var(--mantine-color-default-border)',
                                 color: 'inherit',
                                 display: 'grid',
                                 gridTemplateColumns: COLS,
@@ -127,12 +127,12 @@ const DriverCareer = () => {
                             <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 9 }}>
                                 <span className="f1-num" style={{ color: posColor, fontSize: 13.5, fontWeight: 700 }}>{s.posLabel}</span>
                                 {s.champ ? <TrophyIcon color={GOLD} size={12} weight="fill" /> : null}
-                                {s.label ? <span style={{ color: 'var(--color-muted-foreground)', fontSize: 12, fontWeight: 600 }}>{s.label}</span> : null}
+                                {s.label ? <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12, fontWeight: 600 }}>{s.label}</span> : null}
                             </div>
-                            <span className="f1-num" style={{ color: 'var(--color-muted-foreground)', textAlign: 'center' }}>{s.starts}</span>
+                            <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', textAlign: 'center' }}>{s.starts}</span>
                             <span className="f1-num f1-display" style={{ fontWeight: 700, textAlign: 'center' }}>{s.wins}</span>
-                            <span className="f1-num" style={{ color: 'var(--color-muted-foreground)', textAlign: 'center' }}>{s.podiums}</span>
-                            <span className="f1-num" style={{ color: 'var(--color-muted-foreground)', textAlign: 'center' }}>{s.poles}</span>
+                            <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', textAlign: 'center' }}>{s.podiums}</span>
+                            <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', textAlign: 'center' }}>{s.poles}</span>
                             <span className="f1-num f1-display" style={{ fontWeight: 700, textAlign: 'right' }}>{s.points}</span>
                             <CaretRightIcon color="var(--neutral-400)" size={14} />
                         </Link>

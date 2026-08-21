@@ -1,30 +1,26 @@
 import type { ReactNode } from 'react';
 
+import { Button, Card, Group, Text } from '@mantine/core';
 import { TrophyIcon } from '@phosphor-icons/react';
 
-import {
-    Button,
-} from './ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from './ui/card';
 import './f1-ui.css';
 
 export const GOLD = 'var(--gold-500)';
 
+const AVATAR_SIZE = { lg: 44, md: 30 } as const;
+const BAR_HEIGHT = { lg: 26, md: 24, sm: 20 } as const;
+const SQUARE_SIZE = { bar: { height: 30, width: 10 }, dot: { height: 14, width: 14 } } as const;
+
 export const DriverAvatar = ({
     code,
     color,
-    size = 30,
+    size = 'md',
 }: {
     code: string;
     color: string;
-    size?: number;
+    size?: keyof typeof AVATAR_SIZE;
 }) => {
+    const px = AVATAR_SIZE[size];
     return (
         <div
             style={{
@@ -34,11 +30,11 @@ export const DriverAvatar = ({
                 color: '#fff',
                 display: 'flex',
                 flexShrink: 0,
-                fontSize: size * 0.36,
+                fontSize: px * 0.36,
                 fontWeight: 700,
-                height: size,
+                height: px,
                 justifyContent: 'center',
-                width: size,
+                width: px,
             }}
         >
             {code}
@@ -49,22 +45,20 @@ export const DriverAvatar = ({
 export const GridHeader = ({
     children,
     columns,
-    px = 18,
 }: {
     children: ReactNode;
     columns: string;
-    px?: number;
 }) => {
     return (
         <div
             style={{
-                color: 'var(--color-muted-foreground)',
+                color: 'var(--mantine-color-dimmed)',
                 display: 'grid',
                 fontSize: 10.5,
                 fontWeight: 700,
                 gridTemplateColumns: columns,
                 letterSpacing: '0.5px',
-                padding: `0 ${px}px 8px`,
+                padding: '0 18px 8px',
                 textTransform: 'uppercase',
             }}
         >
@@ -100,11 +94,12 @@ export const Pill = ({
     return (
         <Button
             aria-pressed={active}
+            className="f1-pill"
             data-active={active}
             onClick={onClick}
-            size={variant === 'solid' ? 'default' : 'sm'}
+            size={variant === 'solid' ? 'sm' : 'xs'}
             type="button"
-            variant={variant === 'solid' ? 'outline' : 'subtle'}
+            variant={variant === 'solid' ? 'default' : 'subtle'}
         >
             {children}
         </Button>
@@ -126,18 +121,18 @@ export const SectionCard = ({
 }) => {
     return (
         <Card>
-            <CardHeader>
+            <Group align="flex-start" gap="md" justify="space-between" px={18} py={15} wrap="nowrap">
                 <div>
-                    <CardTitle>{title}</CardTitle>
+                    <Text fw={700} fz={15}>{title}</Text>
                     {subtitle
-                        ? <CardDescription>{subtitle}</CardDescription>
+                        ? <Text c="dimmed" fz={12} mt={2}>{subtitle}</Text>
                         : null}
                 </div>
                 {action}
-            </CardHeader>
-            <CardContent data-flush={!padded}>
+            </Group>
+            <div className="f1-section-card-body" data-flush={!padded}>
                 {children}
-            </CardContent>
+            </div>
         </Card>
     );
 };
@@ -175,21 +170,19 @@ export const StatCard = ({
 
 export const TeamBar = ({
     color,
-    height = 26,
-    width = 4,
+    size = 'lg',
 }: {
     color: string;
-    height?: number;
-    width?: number;
+    size?: keyof typeof BAR_HEIGHT;
 }) => {
     return (
         <div
             style={{
                 background: color,
-                borderRadius: width,
+                borderRadius: 4,
                 flexShrink: 0,
-                height,
-                width,
+                height: BAR_HEIGHT[size],
+                width: 4,
             }}
         />
     );
@@ -197,12 +190,10 @@ export const TeamBar = ({
 
 export const TeamSquare = ({
     color,
-    height = 14,
-    width = 14,
+    size = 'dot',
 }: {
     color: string;
-    height?: number;
-    width?: number;
+    size?: keyof typeof SQUARE_SIZE;
 }) => {
     return (
         <div
@@ -210,21 +201,21 @@ export const TeamSquare = ({
                 background: color,
                 borderRadius: 3,
                 flexShrink: 0,
-                height,
-                width,
+                height: SQUARE_SIZE[size].height,
+                width: SQUARE_SIZE[size].width,
             }}
         />
     );
 };
 
-export const TrophyCount = ({ count, size = 12 }: { count: number; size?: number }) => {
+export const TrophyCount = ({ count }: { count: number }) => {
     if (count <= 0) {
         return null;
     }
 
     return (
-        <span className="f1-trophy-count" style={{ fontSize: size + 1 }}>
-            <TrophyIcon size={size} weight="fill" />
+        <span className="f1-trophy-count" style={{ fontSize: 13 }}>
+            <TrophyIcon size={12} weight="fill" />
             {count}
         </span>
     );

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { MantineProvider } from '@mantine/core';
 import {
     createMemoryHistory,
     createRootRoute,
@@ -12,6 +13,8 @@ import {
 import { render } from '@testing-library/react';
 
 import type { SortingRoute } from '#/components/data-table';
+
+import { theme } from '#/lib/mantine-theme';
 
 export async function renderWithRouter(ui: ReactNode, initialUrl = '/') {
     const rootRoute = createRootRoute();
@@ -30,7 +33,11 @@ export async function renderWithRouter(ui: ReactNode, initialUrl = '/') {
 
     await router.load();
 
-    const result = render(<RouterProvider router={router as never} />);
+    const result = render(
+        <MantineProvider env="test" theme={theme}>
+            <RouterProvider router={router as never} />
+        </MantineProvider>,
+    );
 
     return { ...result, router };
 }

@@ -1,3 +1,4 @@
+import { Card, TextInput } from '@mantine/core';
 import { MagnifyingGlassIcon } from '@phosphor-icons/react';
 import { getRouteApi } from '@tanstack/react-router';
 import { useMemo } from 'react';
@@ -6,8 +7,6 @@ import type { AllTimeDriver } from '#/data/types';
 
 import { DataTable, useDataTable, useUrlSorting } from '#/components/data-table';
 import { Pill } from '#/components/f1-ui';
-import { Card } from '#/components/ui/card';
-import { Input, InputGroup } from '#/components/ui/input';
 
 import { columns, fuzzy } from './columns';
 
@@ -68,14 +67,13 @@ export const DriversTable = ({ drivers }: Props) => {
             </div>
 
             <div className="f1-toolbar">
-                <InputGroup>
-                    <MagnifyingGlassIcon color="var(--color-muted-foreground)" data-icon="inline-start" size={15} />
-                    <Input
-                        onChange={e => setSearch(e.currentTarget.value)}
-                        placeholder="Search name or nationality…"
-                        value={search}
-                    />
-                </InputGroup>
+                <TextInput
+                    leftSection={<MagnifyingGlassIcon size={15} />}
+                    onChange={e => setSearch(e.currentTarget.value)}
+                    placeholder="Search name or nationality…"
+                    value={search}
+                    w={260}
+                />
 
                 <div className="f1-control-group">
                     {CATEGORIES.map(c => (

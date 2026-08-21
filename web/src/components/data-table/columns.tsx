@@ -137,12 +137,12 @@ export function makeColumns<T>() {
 
     const trophy = <K extends KeysMatching<T, number>>(
         key: K,
-        opts: Shared<T> & { size?: number } = {},
+        opts: Shared<T> = {},
     ): ColumnDef<T, unknown> => ({
         accessorKey: key,
         cell: info => (
             <span className="table-cell-trophy">
-                <TrophyCount count={info.row.original[key] as number} size={opts.size} />
+                <TrophyCount count={info.row.original[key] as number} />
             </span>
         ),
         enableSorting: canSort(opts),

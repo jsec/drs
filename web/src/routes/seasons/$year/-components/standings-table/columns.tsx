@@ -3,7 +3,7 @@ import type { SeasonConstructor, SeasonDriver } from '#/data/types';
 import { makeColumns } from '#/components/data-table';
 import { TeamBar, TeamSquare } from '#/components/f1-ui';
 
-const CODE_STYLE = { color: 'var(--color-muted-foreground)', fontSize: 11, fontWeight: 700, marginLeft: 8 } as const;
+const CODE_STYLE = { color: 'var(--mantine-color-dimmed)', fontSize: 11, fontWeight: 700, marginLeft: 8 } as const;
 
 export function makeConstructorColumns(maxConstructor: number) {
     const col = makeColumns<SeasonConstructor>();
@@ -13,14 +13,14 @@ export function makeConstructorColumns(maxConstructor: number) {
         col.competitor('name', {
             header: 'CONSTRUCTOR',
             label: c => c.name,
-            visual: c => <TeamSquare color={c.color} height={30} width={10} />,
+            visual: c => <TeamSquare color={c.color} size="bar" />,
             width: '240px',
         }),
         col.custom({
             cell: (info) => {
                 const c = info.row.original;
                 return (
-                    <div style={{ background: 'var(--color-border)', borderRadius: 9999, height: 9, overflow: 'hidden' }}>
+                    <div style={{ background: 'var(--mantine-color-default-border)', borderRadius: 9999, height: 9, overflow: 'hidden' }}>
                         <div style={{ background: c.color, borderRadius: 9999, height: '100%', width: `${(c.points / maxConstructor) * 100}%` }} />
                     </div>
                 );
@@ -46,7 +46,7 @@ export function makeDriverColumns(year: string) {
                 </>
             ),
             link: d => ({ params: { driverId: d.code, year }, to: '/seasons/$year/drivers/$driverId' }),
-            visual: d => <TeamBar color={d.color} height={24} />,
+            visual: d => <TeamBar color={d.color} size="md" />,
         }),
         col.text('teamName', { header: 'TEAM', muted: true, size: 'sm', width: '130px' }),
         col.num('wins', { align: 'center', header: 'WINS', width: '70px' }),

@@ -8,8 +8,8 @@ html, body, #app {
 
 body {
   margin: 0;
-  background-color: var(--color-background);
-  color: var(--color-foreground);
+  background-color: var(--mantine-color-body);
+  color: var(--mantine-color-text);
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: 1.5;
@@ -17,6 +17,6 @@ body {
 }
 
 :focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--color-ring) 25%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--mantine-primary-color-filled) 25%, transparent);
   outline-offset: 2px;
 }

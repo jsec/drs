@@ -1,8 +1,9 @@
+import { LineChart } from '@mantine/charts';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
+import { toChartData, toChartSeries } from '#/components/chart-data';
 import { DriverAvatar, GridHeader, SectionCard, TeamBar } from '#/components/f1-ui';
-import { LineChart } from '#/components/line-chart';
 import { raceDetailQuery } from '#/data/queries';
 import { parseRound, parseYear } from '#/lib/route-params';
 
@@ -21,7 +22,7 @@ const HERO_STYLE: React.CSSProperties = {
 
 const RESULT_ROW_STYLE: React.CSSProperties = {
     alignItems: 'center',
-    borderTop: '1px solid var(--color-border)',
+    borderTop: '1px solid var(--mantine-color-default-border)',
     color: 'inherit',
     display: 'grid',
     gridTemplateColumns: RESULT_COLS,
@@ -38,7 +39,7 @@ const QUAL_ROW_STYLE: React.CSSProperties = {
 };
 
 const CENTER_LINE_STYLE: React.CSSProperties = {
-    background: 'var(--color-border)',
+    background: 'var(--mantine-color-default-border)',
     bottom: 0,
     left: '50%',
     position: 'absolute',
@@ -48,7 +49,7 @@ const CENTER_LINE_STYLE: React.CSSProperties = {
 
 const getDeltaColor = (delta: number): string => {
     if (delta > 0) return 'var(--green-500)';
-    if (delta < 0) return 'var(--color-primary)';
+    if (delta < 0) return 'var(--mantine-primary-color-filled)';
     return 'var(--neutral-300)';
 };
 
@@ -56,10 +57,10 @@ const RaceDetail = () => {
     const { round, year } = Route.useParams();
     const { data } = useSuspenseQuery(raceDetailQuery(Number(year), Number(round)));
 
-    const positionSeries = data.positionLines.map(p => ({ color: p.color, values: p.values }));
-    const paceSeries = data.paceLines.map(p => ({ color: p.color, values: p.values }));
-    const posLabels = Array.from({ length: 15 }, (_, i) => (i % 4 === 0 ? `L${i * 5 + 1}` : null));
-    const paceLabels = Array.from({ length: 24 }, (_, i) => (i % 6 === 0 ? `L${i + 1}` : null));
+    const positionSeries = toChartSeries(data.positionLines);
+    const positionData = toChartData(data.positionLines, i => `L${i * 5 + 1}`);
+    const paceSeries = toChartSeries(data.paceLines);
+    const paceData = toChartData(data.paceLines, i => `L${i + 1}`);
 
     const headStats = [
         { label: 'POLE', value: data.pole.short },
@@ -109,10 +110,10 @@ const RaceDetail = () => {
                         >
                             <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 14 }}>
                                 <span className="f1-display" style={{ color: MEDALS[i], fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 700 }}>{i + 1}</span>
-                                <DriverAvatar code={r.code} color={r.driver.color} size={44} />
+                                <DriverAvatar code={r.code} color={r.driver.color} size="lg" />
                                 <div>
                                     <div style={{ fontSize: 15, fontWeight: 700 }}>{r.driver.name}</div>
-                                    <div style={{ color: 'var(--color-muted-foreground)', fontSize: 12 }}>{r.driver.teamName}</div>
+                                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12 }}>{r.driver.teamName}</div>
                                     <div className="f1-num" style={{ fontSize: 12, fontWeight: 600, marginTop: 2 }}>
                                         {i === 0 ? '1:32:14.882' : r.gap}
                                     </div>
@@ -127,38 +128,31 @@ const RaceDetail = () => {
             <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '1fr 1fr' }}>
                 <div className="f1-card" style={{ padding: 16 }}>
                     <div style={{ fontSize: 15, fontWeight: 700 }}>Position Changes</div>
-                    <div style={{ color: 'var(--color-muted-foreground)', fontSize: 12, marginBottom: 8 }}>
+                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12, marginBottom: 8 }}>
                         Track position lap-by-lap · top 5
                     </div>
                     <LineChart
-                        ariaLabel="Track position lap by lap, top 5 drivers"
-                        height={240}
-                        invertY
+                        data={positionData}
+                        dataKey="x"
+                        h={240}
                         series={positionSeries}
-                        ticks={5}
-                        viewHeight={300}
-                        viewWidth={560}
-                        xLabels={posLabels}
-                        yMax={10}
-                        yMin={1}
+                        xAxisProps={{ interval: 3 }}
+                        yAxisProps={{ domain: [1, 10], reversed: true, tickCount: 5 }}
                     />
                 </div>
                 <div className="f1-card" style={{ padding: 16 }}>
                     <div style={{ fontSize: 15, fontWeight: 700 }}>Race Pace</div>
-                    <div style={{ color: 'var(--color-muted-foreground)', fontSize: 12, marginBottom: 8 }}>
+                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12, marginBottom: 8 }}>
                         Lap time (s) · lower is faster
                     </div>
                     <LineChart
-                        ariaLabel="Race pace, lap time in seconds"
-                        height={240}
+                        data={paceData}
+                        dataKey="x"
+                        h={240}
                         series={paceSeries}
-                        ticks={5}
-                        viewHeight={300}
-                        viewWidth={560}
-                        xLabels={paceLabels}
-                        yFormat={v => v.toFixed(1)}
-                        yMax={82}
-                        yMin={77.5}
+                        valueFormatter={v => v.toFixed(1)}
+                        xAxisProps={{ interval: 5 }}
+                        yAxisProps={{ domain: [77.5, 82], tickCount: 5 }}
                     />
                 </div>
             </div>
@@ -182,12 +176,12 @@ const RaceDetail = () => {
                                 style={RESULT_ROW_STYLE}
                                 to="/seasons/$year/drivers/$driverId"
                             >
-                                <span className="f1-num" style={{ color: 'var(--color-muted-foreground)', fontWeight: 700 }}>{r.pos}</span>
+                                <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontWeight: 700 }}>{r.pos}</span>
                                 <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 9 }}>
-                                    <TeamBar color={r.driver.color} height={20} />
+                                    <TeamBar color={r.driver.color} size="sm" />
                                     <span style={{ fontSize: 13, fontWeight: 600 }}>{r.driver.short}</span>
                                 </div>
-                                <span className="f1-num" style={{ color: 'var(--color-muted-foreground)', fontSize: 12.5, textAlign: 'center' }}>{r.grid}</span>
+                                <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12.5, textAlign: 'center' }}>{r.grid}</span>
                                 <span className="f1-num" style={{ fontSize: 12.5, textAlign: 'right' }}>{r.gap}</span>
                                 <span className="f1-num" style={{ color: r.pts > 0 ? 'inherit' : 'var(--neutral-300)', fontWeight: 700, textAlign: 'right' }}>
                                     {r.pts > 0 ? r.pts : '–'}
@@ -199,7 +193,7 @@ const RaceDetail = () => {
 
                 <div className="f1-card" style={{ padding: 16 }}>
                     <div style={{ fontSize: 15, fontWeight: 700 }}>Qualifying vs Race</div>
-                    <div style={{ color: 'var(--color-muted-foreground)', fontSize: 12, marginBottom: 14 }}>
+                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12, marginBottom: 14 }}>
                         Positions gained or lost on Sunday
                     </div>
                     {data.results.slice(0, 10).map((r) => {
@@ -209,7 +203,7 @@ const RaceDetail = () => {
                         return (
                             <div key={r.code} style={QUAL_ROW_STYLE}>
                                 <span style={{ fontSize: 12, fontWeight: 700, width: 40 }}>{r.code}</span>
-                                <span className="f1-num" style={{ color: 'var(--color-muted-foreground)', fontSize: 11, width: 62 }}>
+                                <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontSize: 11, width: 62 }}>
                                     P
                                     {r.grid}
                                     →P
