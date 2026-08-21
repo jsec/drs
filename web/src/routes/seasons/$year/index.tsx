@@ -1,4 +1,3 @@
-import { LineChart } from '@mantine/charts';
 import {
     CalendarDotsIcon,
     CrownIcon,
@@ -11,8 +10,8 @@ import { memo, useMemo } from 'react';
 
 import type { CalendarRound, SeasonDriver } from '#/data/types';
 
-import { toChartData, toChartSeries } from '#/components/chart-data';
 import { GridHeader, SectionCard, StatCard, TeamBar } from '#/components/f1-ui';
+import { LineChart, toChartData, toChartSeries } from '#/components/line-chart';
 import { seasonOverviewQuery } from '#/data/queries';
 import { parseYear } from '#/lib/route-params';
 

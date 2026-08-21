@@ -1,6 +1,5 @@
 import type { MantineColorsTuple } from '@mantine/core';
 
-import { LineChart } from '@mantine/charts';
 import { Card, createTheme, Table } from '@mantine/core';
 
 // F1 red
@@ -54,16 +53,6 @@ export const theme = createTheme({
                 radius: 'xl',
                 shadow: 'sm',
                 withBorder: true,
-            },
-        }),
-        LineChart: LineChart.extend({
-            defaultProps: {
-                curveType: 'linear',
-                gridAxis: 'y',
-                gridColor: 'var(--mantine-color-default-border)',
-                strokeWidth: 2.4,
-                tickLine: 'none',
-                withDots: false,
             },
         }),
         Table: Table.extend({

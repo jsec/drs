@@ -1,9 +1,8 @@
-import { LineChart } from '@mantine/charts';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 
-import { toChartData, toChartSeries } from '#/components/chart-data';
 import { GridHeader, MiniStat } from '#/components/f1-ui';
+import { LineChart, toChartData, toChartSeries } from '#/components/line-chart';
 import { getSeasonDriver } from '#/data/fixtures';
 import { driverSeasonQuery } from '#/data/queries';
 import { parseYear } from '#/lib/route-params';
