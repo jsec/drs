@@ -1,9 +1,10 @@
+import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
 import type { CircuitSummaryResponse } from '#/lib/api/circuits.gen';
 
-import { MiniStat } from '#/components/f1-ui';
+import { GridHeader, MiniStat } from '#/components/f1-ui';
 import { api } from '#/lib/query/api';
 
 import { CircuitLayout } from './-components/circuit-layout';
@@ -34,7 +35,7 @@ const CircuitDetail = () => {
     const years = `${year(data.firstRace.date)}-${year(data.lastRace.date)}`;
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <Stack gap={16}>
             <div className="circuit-hero">
                 <CircuitLayout
                     className="circuit-hero-watermark"
@@ -47,68 +48,59 @@ const CircuitDetail = () => {
                         <CircuitLayout layoutId={data.layoutId} name={data.name} size={46} />
                     </div>
                     <div>
-                        <span className="f1-display" style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 700, letterSpacing: '-0.02em' }}>
+                        <Text className="f1-display" ff="var(--font-display)" fw={700} fz={30} inherit lts="-0.02em" span>
                             {data.name}
-                        </span>
-                        <div style={{ fontSize: 13, marginTop: 5, opacity: 0.9 }}>
+                        </Text>
+                        <Box fz={13} mt={5} opacity={0.9}>
                             {`${data.country} · ${years} · Circuit summary`}
-                        </div>
+                        </Box>
                     </div>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gap: 8, gridTemplateColumns: 'repeat(4, 1fr)' }}>
+            <SimpleGrid cols={4} spacing={8}>
                 <MiniStat label="GRANDS PRIX" value={data.raceCount} />
                 <MiniStat label="TURNS" value={data.turns} />
                 <MiniStat label="FIRST RACE" value={year(data.firstRace.date)} />
                 <MiniStat label="LAST RACE" value={year(data.lastRace.date)} />
-            </div>
+            </SimpleGrid>
 
-            <div className="f1-card" style={{ padding: 0 }}>
-                <div style={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between', padding: '15px 20px' }}>
-                    <span style={{ fontSize: 15, fontWeight: 700 }}>Races</span>
-                    <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12 }}>
+            <Box className="f1-card" p={0}>
+                <Group justify="space-between" px={20} py={15} wrap="nowrap">
+                    <Text fw={700} fz={15} inherit span>Races</Text>
+                    <Text c="dimmed" fz={12} inherit span>
                         Every Grand Prix held at this circuit
-                    </span>
-                </div>
-                <div style={{
-                    color: 'var(--mantine-color-dimmed)',
-                    display: 'grid',
-                    fontSize: 10.5,
-                    fontWeight: 700,
-                    gridTemplateColumns: RACE_COLS,
-                    letterSpacing: '0.5px',
-                    padding: '0 20px 8px',
-                    textTransform: 'uppercase',
-                }}
-                >
+                    </Text>
+                </Group>
+                <GridHeader columns={RACE_COLS} px={20}>
                     <span>DATE</span>
                     <span>GRAND PRIX</span>
                     <span>WINNER</span>
-                </div>
+                </GridHeader>
                 {data.races.map(race => (
-                    <div
+                    <Box
                         key={race.raceId}
+                        px={20}
+                        py={11}
                         style={{
                             alignItems: 'center',
                             borderTop: '1px solid var(--mantine-color-default-border)',
                             display: 'grid',
                             gridTemplateColumns: RACE_COLS,
-                            padding: '11px 20px',
                         }}
                     >
-                        <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12.5 }}>
+                        <Text c="dimmed" className="f1-num" fz={12.5} inherit span>
                             {race.date ?? '—'}
-                        </span>
-                        <span style={{ fontSize: 13.5, fontWeight: 600 }}>{race.name}</span>
-                        <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12.5 }}>
+                        </Text>
+                        <Text fw={600} fz={13.5} inherit span>{race.name}</Text>
+                        <Text c="dimmed" fz={12.5} inherit span>
                             {race.winnerName}
-                        </span>
-                    </div>
+                        </Text>
+                    </Box>
                 ))}
-            </div>
+            </Box>
 
-            <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 11.5 }}>
+            <Box c="dimmed" fz={11.5}>
                 Circuit layouts from
                 {' '}
                 <a
@@ -120,8 +112,8 @@ const CircuitDetail = () => {
                     f1db
                 </a>
                 , licensed under CC BY 4.0.
-            </div>
-        </div>
+            </Box>
+        </Stack>
     );
 };
 

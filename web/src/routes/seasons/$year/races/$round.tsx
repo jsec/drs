@@ -1,3 +1,4 @@
+import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
@@ -10,13 +11,9 @@ const MEDALS = ['#f59f00', '#adb5bd', '#e8590c'];
 const RESULT_COLS = '36px 1fr 72px 90px 48px';
 
 const HERO_STYLE: React.CSSProperties = {
-    alignItems: 'center',
     background: 'linear-gradient(110deg, var(--neutral-950), var(--neutral-800))',
     borderRadius: 'var(--radius-lg)',
     color: '#fff',
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '22px 26px',
 };
 
 const RESULT_ROW_STYLE: React.CSSProperties = {
@@ -27,23 +24,6 @@ const RESULT_ROW_STYLE: React.CSSProperties = {
     gridTemplateColumns: RESULT_COLS,
     padding: '8px 18px',
     textDecoration: 'none',
-};
-
-const QUAL_ROW_STYLE: React.CSSProperties = {
-    alignItems: 'center',
-    display: 'flex',
-    flexWrap: 'nowrap',
-    gap: 10,
-    marginBottom: 11,
-};
-
-const CENTER_LINE_STYLE: React.CSSProperties = {
-    background: 'var(--mantine-color-default-border)',
-    bottom: 0,
-    left: '50%',
-    position: 'absolute',
-    top: 0,
-    width: 1,
 };
 
 const getDeltaColor = (delta: number): string => {
@@ -68,34 +48,34 @@ const RaceDetail = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <Stack gap={16}>
             {/* Hero */}
-            <div style={HERO_STYLE}>
+            <Group gap={0} justify="space-between" px={26} py={22} style={HERO_STYLE} wrap="nowrap">
                 <div>
-                    <div style={{ color: 'var(--color-sidebar-muted)', fontSize: 12, fontWeight: 700, letterSpacing: '1px' }}>
+                    <Box c="var(--color-sidebar-muted)" fw={700} fz={12} lts="1px">
                         {`ROUND ${data.round} · ${data.year}`}
-                    </div>
-                    <div className="f1-display" style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em', margin: '6px 0' }}>
+                    </Box>
+                    <Box className="f1-display" ff="var(--font-display)" fw={700} fz={28} lts="-0.02em" my={6}>
                         {data.name}
-                    </div>
-                    <div style={{ color: 'var(--neutral-300)', fontSize: 13 }}>
+                    </Box>
+                    <Box c="var(--neutral-300)" fz={13}>
                         {`${data.circuit} · ${data.date} · ${data.laps} laps`}
-                    </div>
+                    </Box>
                 </div>
-                <div style={{ display: 'flex', gap: 26 }}>
+                <Group gap={26} wrap="nowrap">
                     {headStats.map(s => (
-                        <div key={s.label} style={{ textAlign: 'center' }}>
-                            <div style={{ color: 'var(--color-sidebar-muted)', fontSize: 11, fontWeight: 600 }}>{s.label}</div>
-                            <div className="f1-display" style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, marginTop: 3 }}>
+                        <Box key={s.label} ta="center">
+                            <Box c="var(--color-sidebar-muted)" fw={600} fz={11}>{s.label}</Box>
+                            <Box className="f1-display" ff="var(--font-display)" fw={700} fz={16} mt={3}>
                                 {s.value}
-                            </div>
-                        </div>
+                            </Box>
+                        </Box>
                     ))}
-                </div>
-            </div>
+                </Group>
+            </Group>
 
             {/* Podium cards */}
-            <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(3, 1fr)' }}>
+            <SimpleGrid cols={3} spacing={16}>
                 {data.results.slice(0, 3).map((r, i) => (
                     <Link
                         key={r.code}
@@ -103,33 +83,34 @@ const RaceDetail = () => {
                         style={{ color: 'inherit', textDecoration: 'none' }}
                         to="/seasons/$year/drivers/$driverId"
                     >
-                        <div
+                        <Box
                             className="f1-card f1-lift"
-                            style={{ borderTop: `4px solid ${r.driver.color}`, cursor: 'pointer', padding: 16 }}
+                            p={16}
+                            style={{ borderTop: `4px solid ${r.driver.color}`, cursor: 'pointer' }}
                         >
-                            <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 14 }}>
-                                <span className="f1-display" style={{ color: MEDALS[i], fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 700 }}>{i + 1}</span>
+                            <Group gap={14} wrap="nowrap">
+                                <Text c={MEDALS[i]} className="f1-display" ff="var(--font-display)" fw={700} fz={30} inherit span>{i + 1}</Text>
                                 <DriverAvatar code={r.code} color={r.driver.color} size="lg" />
                                 <div>
-                                    <div style={{ fontSize: 15, fontWeight: 700 }}>{r.driver.name}</div>
-                                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12 }}>{r.driver.teamName}</div>
-                                    <div className="f1-num" style={{ fontSize: 12, fontWeight: 600, marginTop: 2 }}>
+                                    <Box fw={700} fz={15}>{r.driver.name}</Box>
+                                    <Box c="dimmed" fz={12}>{r.driver.teamName}</Box>
+                                    <Box className="f1-num" fw={600} fz={12} mt={2}>
                                         {i === 0 ? '1:32:14.882' : r.gap}
-                                    </div>
+                                    </Box>
                                 </div>
-                            </div>
-                        </div>
+                            </Group>
+                        </Box>
                     </Link>
                 ))}
-            </div>
+            </SimpleGrid>
 
             {/* Charts */}
-            <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '1fr 1fr' }}>
-                <div className="f1-card" style={{ padding: 16 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700 }}>Position Changes</div>
-                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12, marginBottom: 8 }}>
+            <SimpleGrid cols={2} spacing={16}>
+                <Box className="f1-card" p={16}>
+                    <Box fw={700} fz={15}>Position Changes</Box>
+                    <Box c="dimmed" fz={12} mb={8}>
                         Track position lap-by-lap · top 5
-                    </div>
+                    </Box>
                     <LineChart
                         data={positionData}
                         dataKey="x"
@@ -138,12 +119,12 @@ const RaceDetail = () => {
                         xAxisProps={{ interval: 3 }}
                         yAxisProps={{ domain: [1, 10], reversed: true, tickCount: 5 }}
                     />
-                </div>
-                <div className="f1-card" style={{ padding: 16 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700 }}>Race Pace</div>
-                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12, marginBottom: 8 }}>
+                </Box>
+                <Box className="f1-card" p={16}>
+                    <Box fw={700} fz={15}>Race Pace</Box>
+                    <Box c="dimmed" fz={12} mb={8}>
                         Lap time (s) · lower is faster
-                    </div>
+                    </Box>
                     <LineChart
                         data={paceData}
                         dataKey="x"
@@ -153,8 +134,8 @@ const RaceDetail = () => {
                         xAxisProps={{ interval: 5 }}
                         yAxisProps={{ domain: [77.5, 82], tickCount: 5 }}
                     />
-                </div>
-            </div>
+                </Box>
+            </SimpleGrid>
 
             {/* Results + Qual vs Race */}
             <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '7.2fr 4.8fr' }}>
@@ -166,7 +147,7 @@ const RaceDetail = () => {
                         <span style={{ textAlign: 'right' }}>GAP</span>
                         <span style={{ textAlign: 'right' }}>PTS</span>
                     </GridHeader>
-                    <div className="f1-scroll" style={{ maxHeight: 430, overflowY: 'auto' }}>
+                    <Box className="f1-scroll" mah={430} style={{ overflowY: 'auto' }}>
                         {data.results.map(r => (
                             <Link
                                 className="f1-row"
@@ -175,61 +156,67 @@ const RaceDetail = () => {
                                 style={RESULT_ROW_STYLE}
                                 to="/seasons/$year/drivers/$driverId"
                             >
-                                <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontWeight: 700 }}>{r.pos}</span>
-                                <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 9 }}>
+                                <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.pos}</Text>
+                                <Group gap={9} wrap="nowrap">
                                     <TeamBar color={r.driver.color} size="sm" />
-                                    <span style={{ fontSize: 13, fontWeight: 600 }}>{r.driver.short}</span>
-                                </div>
-                                <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12.5, textAlign: 'center' }}>{r.grid}</span>
-                                <span className="f1-num" style={{ fontSize: 12.5, textAlign: 'right' }}>{r.gap}</span>
-                                <span className="f1-num" style={{ color: r.pts > 0 ? 'inherit' : 'var(--neutral-300)', fontWeight: 700, textAlign: 'right' }}>
+                                    <Text fw={600} fz={13} inherit span>{r.driver.short}</Text>
+                                </Group>
+                                <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="center">{r.grid}</Text>
+                                <Text className="f1-num" fz={12.5} inherit span ta="right">{r.gap}</Text>
+                                <Text c={r.pts > 0 ? 'inherit' : 'var(--neutral-300)'} className="f1-num" fw={700} inherit span ta="right">
                                     {r.pts > 0 ? r.pts : '–'}
-                                </span>
+                                </Text>
                             </Link>
                         ))}
-                    </div>
+                    </Box>
                 </SectionCard>
 
-                <div className="f1-card" style={{ padding: 16 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700 }}>Qualifying vs Race</div>
-                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12, marginBottom: 14 }}>
+                <Box className="f1-card" p={16}>
+                    <Box fw={700} fz={15}>Qualifying vs Race</Box>
+                    <Box c="dimmed" fz={12} mb={14}>
                         Positions gained or lost on Sunday
-                    </div>
+                    </Box>
                     {data.results.slice(0, 10).map((r) => {
                         const delta = r.grid - r.pos;
                         const mag = (Math.min(Math.abs(delta), 8) / 8) * 45;
                         const color = getDeltaColor(delta);
                         return (
-                            <div key={r.code} style={QUAL_ROW_STYLE}>
-                                <span style={{ fontSize: 12, fontWeight: 700, width: 40 }}>{r.code}</span>
-                                <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontSize: 11, width: 62 }}>
+                            <Group gap={10} key={r.code} mb={11} wrap="nowrap">
+                                <Text fw={700} fz={12} inherit span w={40}>{r.code}</Text>
+                                <Text c="dimmed" className="f1-num" fz={11} inherit span w={62}>
                                     P
                                     {r.grid}
                                     →P
                                     {r.pos}
-                                </span>
-                                <div style={{ flex: 1, height: 14, position: 'relative' }}>
-                                    <div style={CENTER_LINE_STYLE} />
-                                    <div style={{
-                                        background: color,
-                                        borderRadius: 3,
-                                        height: 8,
-                                        left: delta >= 0 ? '50%' : `${50 - mag}%`,
-                                        position: 'absolute',
-                                        top: 3,
-                                        width: `${Math.max(mag, 1)}%`,
-                                    }}
+                                </Text>
+                                <Box flex={1} h={14} pos="relative">
+                                    <Box
+                                        bg="var(--mantine-color-default-border)"
+                                        bottom={0}
+                                        left="50%"
+                                        pos="absolute"
+                                        top={0}
+                                        w={1}
                                     />
-                                </div>
-                                <span className="f1-num" style={{ color, fontSize: 12, fontWeight: 700, textAlign: 'right', width: 34 }}>
+                                    <Box
+                                        bg={color}
+                                        h={8}
+                                        left={delta >= 0 ? '50%' : `${50 - mag}%`}
+                                        pos="absolute"
+                                        style={{ borderRadius: 3 }}
+                                        top={3}
+                                        w={`${Math.max(mag, 1)}%`}
+                                    />
+                                </Box>
+                                <Text c={color} className="f1-num" fw={700} fz={12} inherit span ta="right" w={34}>
                                     {delta > 0 ? `+${delta}` : delta}
-                                </span>
-                            </div>
+                                </Text>
+                            </Group>
                         );
                     })}
-                </div>
+                </Box>
             </div>
-        </div>
+        </Stack>
     );
 };
 

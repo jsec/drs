@@ -1,3 +1,4 @@
+import { Box, Group, Stack, Text } from '@mantine/core';
 import { CaretRightIcon } from '@phosphor-icons/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
@@ -11,7 +12,7 @@ const Calendar = () => {
     const { data } = useSuspenseQuery(calendarQuery(Number(year)));
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <Stack gap={16}>
             <div>
                 <h1 className="f1-page-title">{`${year} Race Calendar`}</h1>
                 <div className="f1-page-description">
@@ -19,59 +20,64 @@ const Calendar = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+            <Stack gap={9}>
                 {data.calendar.map((r) => {
                     const isDone = r.round <= data.completed;
                     const isNext = r.round === data.completed + 1;
                     const winner = r.winner ? getSeasonDriver(r.winner) : null;
                     const row = (
-                        <div
+                        <Box
                             className={`f1-card${isDone ? ' f1-row' : ''}`}
                             key={r.round}
-                            style={{ overflow: 'hidden', padding: 0 }}
+                            p={0}
+                            style={{ overflow: 'hidden' }}
                         >
-                            <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 18, padding: '14px 20px' }}>
-                                <span className="f1-num f1-display" style={{ color: 'var(--mantine-color-default-border)', fontSize: 20, fontWeight: 700, width: 42 }}>
+                            <Group gap={18} px={20} py={14} wrap="nowrap">
+                                <Text c="var(--mantine-color-default-border)" className="f1-num f1-display" fw={700} fz={20} inherit span w={42}>
                                     {r.round}
-                                </span>
-                                <div style={{
-                                    alignItems: 'center',
-                                    background: 'var(--color-accent)',
-                                    borderRadius: 6,
-                                    color: 'var(--mantine-color-text)',
-                                    display: 'flex',
-                                    fontSize: 13,
-                                    fontWeight: 700,
-                                    height: 40,
-                                    justifyContent: 'center',
-                                    width: 54,
-                                }}
+                                </Text>
+                                <Group
+                                    bg="var(--color-accent)"
+                                    c="var(--mantine-color-text)"
+                                    fw={700}
+                                    fz={13}
+                                    h={40}
+                                    justify="center"
+                                    style={{ borderRadius: 6 }}
+                                    w={54}
+                                    wrap="nowrap"
                                 >
                                     {r.code}
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ fontSize: 15, fontWeight: 700 }}>{r.name}</div>
-                                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12 }}>{r.circuit}</div>
-                                </div>
-                                <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12.5, width: 120 }}>{r.date}</span>
-                                <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 9, width: 200 }}>
+                                </Group>
+                                <Box flex={1} miw={0}>
+                                    <Box fw={700} fz={15}>{r.name}</Box>
+                                    <Box c="dimmed" fz={12}>{r.circuit}</Box>
+                                </Box>
+                                <Text c="dimmed" fz={12.5} inherit span w={120}>{r.date}</Text>
+                                <Group gap={9} w={200} wrap="nowrap">
                                     {isDone && winner
                                         ? (
                                                 <>
-                                                    <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 11, fontWeight: 600 }}>WINNER</span>
-                                                    <div style={{ background: winner.color, borderRadius: 2, flexShrink: 0, height: 20, width: 4 }} />
-                                                    <span style={{ fontSize: 13, fontWeight: 600 }}>{winner.short}</span>
+                                                    <Text c="dimmed" fw={600} fz={11} inherit span>WINNER</Text>
+                                                    <Box bg={winner.color} h={20} style={{ borderRadius: 2, flexShrink: 0 }} w={4} />
+                                                    <Text fw={600} fz={13} inherit span>{winner.short}</Text>
                                                 </>
                                             )
                                         : (
-                                                <span style={{ color: isNext ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-dimmed)', fontSize: 12, fontWeight: 700 }}>
+                                                <Text
+                                                    c={isNext ? 'var(--mantine-primary-color-filled)' : 'dimmed'}
+                                                    fw={700}
+                                                    fz={12}
+                                                    inherit
+                                                    span
+                                                >
                                                     {isNext ? 'UP NEXT' : 'Scheduled'}
-                                                </span>
+                                                </Text>
                                             )}
-                                </div>
+                                </Group>
                                 <CaretRightIcon color="var(--neutral-300)" size={15} />
-                            </div>
-                        </div>
+                            </Group>
+                        </Box>
                     );
                     if (isDone) {
                         return (
@@ -88,8 +94,8 @@ const Calendar = () => {
 
                     return row;
                 })}
-            </div>
-        </div>
+            </Stack>
+        </Stack>
     );
 };
 

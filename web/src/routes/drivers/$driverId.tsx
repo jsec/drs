@@ -1,11 +1,12 @@
 import type { CSSProperties } from 'react';
 
+import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { CaretRightIcon, TrophyIcon } from '@phosphor-icons/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 
 import { CountryFlag } from '#/components/country-flag';
-import { GOLD, MiniStat } from '#/components/f1-ui';
+import { GOLD, GridHeader, MiniStat } from '#/components/f1-ui';
 import { CURRENT_YEAR, getAllTimeDriver } from '#/data/fixtures';
 import { driverCareerQuery } from '#/data/queries';
 
@@ -26,7 +27,7 @@ const DriverCareer = () => {
     const countryCode = driver.countryCode;
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <Stack gap={16}>
             <div
                 className="driver-hero"
                 style={{ '--driver-color': driver.color } as CSSProperties}
@@ -37,64 +38,43 @@ const DriverCareer = () => {
                         {driver.code}
                     </div>
                     <div>
-                        <div style={{ alignItems: 'center', display: 'flex', gap: 10 }}>
-                            <span className="f1-display" style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 700, letterSpacing: '-0.02em' }}>
+                        <Group gap={10} wrap="nowrap">
+                            <Text className="f1-display" ff="var(--font-display)" fw={700} fz={30} inherit lts="-0.02em" span>
                                 {driver.name}
-                            </span>
+                            </Text>
                             {driver.titles > 0
                                 ? (
-                                        <div style={{
-                                            alignItems: 'center',
-                                            background: 'rgba(255,255,255,.18)',
-                                            borderRadius: 20,
-                                            display: 'flex',
-                                            flexWrap: 'nowrap',
-                                            fontSize: 13,
-                                            fontWeight: 700,
-                                            gap: 4,
-                                            padding: '4px 10px',
-                                        }}
-                                        >
+                                        <Group className="driver-hero-badge" gap={4} wrap="nowrap">
                                             <TrophyIcon size={13} weight="fill" />
                                             World Champion
-                                        </div>
+                                        </Group>
                                     )
                                 : null}
-                        </div>
-                        <div style={{ fontSize: 13, marginTop: 5, opacity: 0.9 }}>
+                        </Group>
+                        <Box fz={13} mt={5} opacity={0.9}>
                             {`${driver.nat} · ${driver.years} · Career summary`}
-                        </div>
+                        </Box>
                     </div>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gap: 8, gridTemplateColumns: 'repeat(6, 1fr)' }}>
+            <SimpleGrid cols={6} spacing={8}>
                 <MiniStat label="SEASONS" value={seasons.length} />
                 <MiniStat label="STARTS" value={driver.starts} />
                 <MiniStat label="WINS" value={driver.wins} />
                 <MiniStat label="POLES" value={driver.poles} />
                 <MiniStat label="PODIUMS" value={driver.podiums} />
                 <MiniStat label="TITLES" value={driver.titles} />
-            </div>
+            </SimpleGrid>
 
-            <div className="f1-card" style={{ padding: 0 }}>
-                <div style={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between', padding: '15px 20px' }}>
-                    <span style={{ fontSize: 15, fontWeight: 700 }}>Seasons</span>
-                    <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12 }}>
+            <Box className="f1-card" p={0}>
+                <Group justify="space-between" px={20} py={15} wrap="nowrap">
+                    <Text fw={700} fz={15} inherit span>Seasons</Text>
+                    <Text c="dimmed" fz={12} inherit span>
                         Select a season to open its full dashboard
-                    </span>
-                </div>
-                <div style={{
-                    color: 'var(--mantine-color-dimmed)',
-                    display: 'grid',
-                    fontSize: 10.5,
-                    fontWeight: 700,
-                    gridTemplateColumns: COLS,
-                    letterSpacing: '0.5px',
-                    padding: '0 20px 8px',
-                    textTransform: 'uppercase',
-                }}
-                >
+                    </Text>
+                </Group>
+                <GridHeader columns={COLS} px={20}>
                     <span>SEASON</span>
                     <span>CHAMPIONSHIP</span>
                     <span style={{ textAlign: 'center' }}>STARTS</span>
@@ -103,7 +83,7 @@ const DriverCareer = () => {
                     <span style={{ textAlign: 'center' }}>POLES</span>
                     <span style={{ textAlign: 'right' }}>POINTS</span>
                     <span />
-                </div>
+                </GridHeader>
                 {seasons.map((s) => {
                     const posColor = getPositionColor(s.pos);
                     return (
@@ -123,23 +103,23 @@ const DriverCareer = () => {
                             }}
                             to="/seasons/$year"
                         >
-                            <span className="f1-num f1-display" style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.4px' }}>{s.year}</span>
-                            <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 9 }}>
-                                <span className="f1-num" style={{ color: posColor, fontSize: 13.5, fontWeight: 700 }}>{s.posLabel}</span>
+                            <Text className="f1-num f1-display" fw={700} fz={16} inherit lts="-0.4px" span>{s.year}</Text>
+                            <Group gap={9} wrap="nowrap">
+                                <Text c={posColor} className="f1-num" fw={700} fz={13.5} inherit span>{s.posLabel}</Text>
                                 {s.champ ? <TrophyIcon color={GOLD} size={12} weight="fill" /> : null}
-                                {s.label ? <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12, fontWeight: 600 }}>{s.label}</span> : null}
-                            </div>
-                            <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', textAlign: 'center' }}>{s.starts}</span>
-                            <span className="f1-num f1-display" style={{ fontWeight: 700, textAlign: 'center' }}>{s.wins}</span>
-                            <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', textAlign: 'center' }}>{s.podiums}</span>
-                            <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', textAlign: 'center' }}>{s.poles}</span>
-                            <span className="f1-num f1-display" style={{ fontWeight: 700, textAlign: 'right' }}>{s.points}</span>
+                                {s.label ? <Text c="dimmed" fw={600} fz={12} inherit span>{s.label}</Text> : null}
+                            </Group>
+                            <Text c="dimmed" className="f1-num" inherit span ta="center">{s.starts}</Text>
+                            <Text className="f1-num f1-display" fw={700} inherit span ta="center">{s.wins}</Text>
+                            <Text c="dimmed" className="f1-num" inherit span ta="center">{s.podiums}</Text>
+                            <Text c="dimmed" className="f1-num" inherit span ta="center">{s.poles}</Text>
+                            <Text className="f1-num f1-display" fw={700} inherit span ta="right">{s.points}</Text>
                             <CaretRightIcon color="var(--neutral-400)" size={14} />
                         </Link>
                     );
                 })}
-            </div>
-        </div>
+            </Box>
+        </Stack>
     );
 };
 

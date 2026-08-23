@@ -45,9 +45,11 @@ export const DriverAvatar = ({
 export const GridHeader = ({
     children,
     columns,
+    px = 18,
 }: {
     children: ReactNode;
     columns: string;
+    px?: number;
 }) => {
     return (
         <div
@@ -58,7 +60,7 @@ export const GridHeader = ({
                 fontWeight: 700,
                 gridTemplateColumns: columns,
                 letterSpacing: '0.5px',
-                padding: '0 18px 8px',
+                padding: `0 ${px}px 8px`,
                 textTransform: 'uppercase',
             }}
         >

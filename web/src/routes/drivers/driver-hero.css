@@ -42,6 +42,14 @@
   padding: 24px 28px;
 }
 
+.driver-hero-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .driver-hero-code {
   display: flex;
   flex-shrink: 0;

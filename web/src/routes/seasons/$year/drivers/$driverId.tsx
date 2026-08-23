@@ -1,3 +1,4 @@
+import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 
@@ -16,76 +17,82 @@ const DriverSeason = () => {
     const progressionLines = [{ code: driver.code, color: driver.color, values: data.progression }];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{
-                alignItems: 'center',
-                background: `linear-gradient(110deg, ${driver.color}, ${driver.colorDark})`,
-                borderRadius: 'var(--radius-lg)',
-                color: '#fff',
-                display: 'flex',
-                gap: 24,
-                overflow: 'hidden',
-                padding: '24px 28px',
-                position: 'relative',
-            }}
-            >
-                <div style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 140,
-                    fontWeight: 700,
-                    lineHeight: 0.8,
-                    opacity: 0.18,
-                    position: 'absolute',
-                    right: 24,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
+        <Stack gap={16}>
+            <Group
+                gap={24}
+                pos="relative"
+                px={28}
+                py={24}
+                style={{
+                    background: `linear-gradient(110deg, ${driver.color}, ${driver.colorDark})`,
+                    borderRadius: 'var(--radius-lg)',
+                    color: '#fff',
+                    overflow: 'hidden',
                 }}
+                wrap="nowrap"
+            >
+                <Box
+                    ff="var(--font-display)"
+                    fw={700}
+                    fz={140}
+                    opacity={0.18}
+                    pos="absolute"
+                    right={24}
+                    style={{ lineHeight: 0.8, transform: 'translateY(-50%)' }}
+                    top="50%"
                 >
                     {driver.number}
-                </div>
-                <div style={{
-                    alignItems: 'center',
-                    background: 'rgba(255,255,255,.18)',
-                    border: '2px solid rgba(255,255,255,.5)',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    flexShrink: 0,
-                    fontSize: 24,
-                    fontWeight: 700,
-                    height: 78,
-                    justifyContent: 'center',
-                    width: 78,
-                }}
+                </Box>
+                <Group
+                    fw={700}
+                    fz={24}
+                    h={78}
+                    justify="center"
+                    style={{
+                        background: 'rgba(255,255,255,.18)',
+                        border: '2px solid rgba(255,255,255,.5)',
+                        borderRadius: '50%',
+                        flexShrink: 0,
+                    }}
+                    w={78}
+                    wrap="nowrap"
                 >
                     {driver.code}
-                </div>
-                <div style={{ paddingRight: 130, zIndex: 1 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '1px', opacity: 0.85 }}>
+                </Group>
+                <Box pr={130} style={{ zIndex: 1 }}>
+                    <Box fw={700} fz={12} lts="1px" opacity={0.85}>
                         {`${driver.teamName} · #${driver.number}`}
-                    </div>
-                    <div className="f1-display" style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 700, letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>
+                    </Box>
+                    <Box
+                        className="f1-display"
+                        ff="var(--font-display)"
+                        fw={700}
+                        fz={30}
+                        lts="-0.02em"
+                        style={{ whiteSpace: 'nowrap' }}
+                    >
                         {driver.name}
-                    </div>
-                    <div style={{ fontSize: 13, opacity: 0.9 }}>
+                    </Box>
+                    <Box fz={13} opacity={0.9}>
                         {`${driver.country} · Championship P${pos}`}
-                    </div>
-                </div>
-            </div>
+                    </Box>
+                </Box>
+            </Group>
 
             {/* Stat tiles */}
-            <div style={{ display: 'grid', gap: 8, gridTemplateColumns: 'repeat(6, 1fr)' }}>
+            <SimpleGrid cols={6} spacing={8}>
                 <MiniStat label="POINTS" value={driver.points} />
                 <MiniStat label="WINS" value={driver.wins} />
                 <MiniStat label="PODIUMS" value={driver.podiums} />
                 <MiniStat label="POLES" value={driver.poles} />
                 <MiniStat label="STANDING" value={`P${pos}`} />
                 <MiniStat label="CAR NO." value={`#${driver.number}`} />
-            </div>
+            </SimpleGrid>
 
             {/* Charts */}
-            <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '1fr 1fr' }}>
-                <div className="f1-card" style={{ padding: 16 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>Points Progression</div>
+            <SimpleGrid cols={2} spacing={16}>
+                <Box className="f1-card" p={16}>
+                    <Box fw={700} fz={15} mb={8}>Points Progression</Box>
                     <LineChart
                         data={toChartData(progressionLines, i => `R${i}`)}
                         dataKey="x"
@@ -94,40 +101,36 @@ const DriverSeason = () => {
                         xAxisProps={{ interval: 1 }}
                         yAxisProps={{ domain: [0, data.pointsMax], tickCount: 5 }}
                     />
-                </div>
-                <div className="f1-card" style={{ padding: 16 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 10 }}>Finishing Positions</div>
-                    <div style={{ alignItems: 'flex-end', display: 'flex', flexWrap: 'nowrap', gap: 6, height: 180 }}>
+                </Box>
+                <Box className="f1-card" p={16}>
+                    <Box fw={700} fz={15} mb={10}>Finishing Positions</Box>
+                    <Group align="flex-end" gap={6} h={180} wrap="nowrap">
                         {data.finishes.map(f => (
-                            <div
+                            <Stack
+                                align="center"
+                                gap={0}
+                                h="100%"
+                                justify="flex-end"
                                 key={f.round}
-                                style={{
-                                    alignItems: 'center',
-                                    display: 'flex',
-                                    flex: 1,
-                                    flexDirection: 'column',
-                                    height: '100%',
-                                    justifyContent: 'flex-end',
-                                }}
+                                style={{ flex: 1 }}
                             >
-                                <span className="f1-num" style={{ color: 'var(--neutral-700)', fontSize: 10, fontWeight: 700, marginBottom: 3 }}>{f.pos}</span>
-                                <div style={{
-                                    background: f.color,
-                                    borderRadius: '4px 4px 0 0',
-                                    height: `${(100 - ((f.pos - 1) / 19) * 100) * 0.9}%`,
-                                    maxWidth: 26,
-                                    width: '100%',
-                                }}
+                                <Text c="var(--neutral-700)" className="f1-num" fw={700} fz={10} inherit mb={3} span>{f.pos}</Text>
+                                <Box
+                                    bg={f.color}
+                                    h={`${(100 - ((f.pos - 1) / 19) * 100) * 0.9}%`}
+                                    maw={26}
+                                    style={{ borderRadius: '4px 4px 0 0' }}
+                                    w="100%"
                                 />
-                                <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 9.5, marginTop: 4 }}>{f.round}</span>
-                            </div>
+                                <Text c="dimmed" fz={9.5} inherit mt={4} span>{f.round}</Text>
+                            </Stack>
                         ))}
-                    </div>
-                </div>
-            </div>
+                    </Group>
+                </Box>
+            </SimpleGrid>
 
-            <div className="f1-card" style={{ padding: 0 }}>
-                <div style={{ fontSize: 15, fontWeight: 700, padding: '15px 18px' }}>Race-by-Race Results</div>
+            <Box className="f1-card" p={0}>
+                <Box fw={700} fz={15} px={18} py={15}>Race-by-Race Results</Box>
                 <GridHeader columns={COLS}>
                     <span>RND</span>
                     <span>GRAND PRIX</span>
@@ -152,16 +155,16 @@ const DriverSeason = () => {
                         }}
                         to="/seasons/$year/races/$round"
                     >
-                        <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontWeight: 700 }}>{r.round}</span>
-                        <span style={{ fontSize: 13, fontWeight: 600 }}>{r.gp}</span>
-                        <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', textAlign: 'center' }}>{r.grid}</span>
-                        <span className="f1-num f1-display" style={{ fontWeight: 700, textAlign: 'center' }}>{r.finish}</span>
-                        <span style={{ color: r.statusColor, fontSize: 11, fontWeight: 700, textAlign: 'center' }}>{r.status}</span>
-                        <span className="f1-num" style={{ fontWeight: 700, textAlign: 'right' }}>{r.pts > 0 ? r.pts : '–'}</span>
+                        <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.round}</Text>
+                        <Text fw={600} fz={13} inherit span>{r.gp}</Text>
+                        <Text c="dimmed" className="f1-num" inherit span ta="center">{r.grid}</Text>
+                        <Text className="f1-num f1-display" fw={700} inherit span ta="center">{r.finish}</Text>
+                        <Text c={r.statusColor} fw={700} fz={11} inherit span ta="center">{r.status}</Text>
+                        <Text className="f1-num" fw={700} inherit span ta="right">{r.pts > 0 ? r.pts : '–'}</Text>
                     </Link>
                 ))}
-            </div>
-        </div>
+            </Box>
+        </Stack>
     );
 };
 

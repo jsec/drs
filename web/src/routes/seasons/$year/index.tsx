@@ -1,3 +1,4 @@
+import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import {
     CalendarDotsIcon,
     CrownIcon,
@@ -43,18 +44,25 @@ const MiniRaceCell = memo(function MiniRaceCell({ completed, driverByCode, r, ye
     }
 
     const cell = (
-        <div
+        <Box
             className={isDone ? 'f1-lift' : undefined}
-            style={{ background, border, borderRadius: 7, cursor: isDone ? 'pointer' : 'default', padding: '9px 10px' }}
+            px={10}
+            py={9}
+            style={{ background, border, borderRadius: 7, cursor: isDone ? 'pointer' : 'default' }}
         >
-            <div className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontSize: 10, fontWeight: 700 }}>
+            <Box c="dimmed" className="f1-num" fw={700} fz={10}>
                 R
                 {r.round}
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, marginTop: 2 }}>{r.code}</div>
-            <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 10.5, marginTop: 1 }}>{r.date}</div>
-            <div style={{ background: winner?.color ?? 'var(--mantine-color-default-border)', borderRadius: 2, height: 3, marginTop: 7 }} />
-        </div>
+            </Box>
+            <Box fw={700} fz={12.5} mt={2}>{r.code}</Box>
+            <Box c="dimmed" fz={10.5} mt={1}>{r.date}</Box>
+            <Box
+                bg={winner?.color ?? 'var(--mantine-color-default-border)'}
+                h={3}
+                mt={7}
+                style={{ borderRadius: 2 }}
+            />
+        </Box>
     );
 
     if (isDone) {
@@ -89,24 +97,33 @@ const SeasonOverview = () => {
     const progressionData = toChartData(data.progression, i => (i === 0 ? 'Start' : `R${i}`));
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ alignItems: 'flex-end', display: 'flex', justifyContent: 'space-between' }}>
+        <Stack gap={16}>
+            <Group align="flex-end" gap={0} justify="space-between" wrap="nowrap">
                 <div>
-                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+                    <Box c="dimmed" fw={700} fz={12} lts="1.5px" tt="uppercase">
                         FIA FORMULA 1 WORLD CHAMPIONSHIP
-                    </div>
-                    <h1 className="f1-display" style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 700, letterSpacing: '-0.02em', margin: '6px 0 0' }}>
+                    </Box>
+                    <Box
+                        className="f1-display"
+                        component="h1"
+                        ff="var(--font-display)"
+                        fw={700}
+                        fz={30}
+                        lts="-0.02em"
+                        mb={0}
+                        mt={6}
+                    >
                         {`${data.year} Season Overview`}
-                    </h1>
+                    </Box>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12 }}>Last round</div>
-                    <div style={{ fontSize: 15, fontWeight: 700 }}>{data.lastRaceName}</div>
-                </div>
-            </div>
+                <Box ta="right">
+                    <Box c="dimmed" fz={12}>Last round</Box>
+                    <Box fw={700} fz={15}>{data.lastRaceName}</Box>
+                </Box>
+            </Group>
 
             {/* KPI cards */}
-            <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(2, 1fr)' }}>
+            <SimpleGrid cols={2} spacing={16}>
                 <StatCard
                     accent="var(--mantine-primary-color-filled)"
                     icon={<FlagCheckeredIcon size={15} weight="fill" />}
@@ -135,7 +152,7 @@ const SeasonOverview = () => {
                     sub={data.nextRace.name}
                     value={data.nextRace.code}
                 />
-            </div>
+            </SimpleGrid>
 
             <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '7.2fr 4.8fr' }}>
                 <SectionCard
@@ -170,19 +187,19 @@ const SeasonOverview = () => {
                             }}
                             to="/seasons/$year/drivers/$driverId"
                         >
-                            <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontWeight: 700 }}>{i + 1}</span>
-                            <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 11 }}>
+                            <Text c="dimmed" className="f1-num" fw={700} inherit span>{i + 1}</Text>
+                            <Group gap={11} wrap="nowrap">
                                 <TeamBar color={d.color} />
-                                <div style={{ minWidth: 0 }}>
-                                    <div style={{ fontSize: 13.5, fontWeight: 600, whiteSpace: 'nowrap' }}>{d.short}</div>
-                                    <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 11 }}>{d.teamName}</div>
-                                </div>
-                            </div>
-                            <span className="f1-num f1-display" style={{ fontWeight: 700, textAlign: 'right' }}>{d.points}</span>
-                            <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', textAlign: 'center' }}>{d.wins}</span>
-                            <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12.5, textAlign: 'right' }}>
+                                <Box miw={0}>
+                                    <Box fw={600} fz={13.5} style={{ whiteSpace: 'nowrap' }}>{d.short}</Box>
+                                    <Box c="dimmed" fz={11}>{d.teamName}</Box>
+                                </Box>
+                            </Group>
+                            <Text className="f1-num f1-display" fw={700} inherit span ta="right">{d.points}</Text>
+                            <Text c="dimmed" className="f1-num" inherit span ta="center">{d.wins}</Text>
+                            <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="right">
                                 {i === 0 ? '—' : `-${data.leader.points - d.points}`}
-                            </span>
+                            </Text>
                         </Link>
                     ))}
                 </SectionCard>
@@ -197,45 +214,56 @@ const SeasonOverview = () => {
                     title="Constructors"
                 >
                     {data.constructors.map(c => (
-                        <div
+                        <Box
                             key={c.key}
-                            style={{ borderTop: '1px solid var(--mantine-color-default-border)', padding: '8px 18px' }}
+                            px={18}
+                            py={8}
+                            style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}
                         >
-                            <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', justifyContent: 'space-between', marginBottom: 5 }}>
-                                <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 9 }}>
-                                    <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontSize: 11, fontWeight: 700, textAlign: 'center', width: 18 }}>{c.pos}</span>
-                                    <span style={{ fontSize: 13, fontWeight: 600 }}>{c.name}</span>
-                                </div>
-                                <span className="f1-num f1-display" style={{ fontSize: 13, fontWeight: 700 }}>{c.points}</span>
-                            </div>
-                            <div style={{ marginLeft: 27 }}>
-                                <div style={{ background: 'var(--mantine-color-default-border)', borderRadius: 9999, height: 5, overflow: 'hidden' }}>
-                                    <div style={{ background: c.color, borderRadius: 9999, height: '100%', width: `${(c.points / maxConstructor) * 100}%` }} />
-                                </div>
-                            </div>
-                        </div>
+                            <Group justify="space-between" mb={5} wrap="nowrap">
+                                <Group gap={9} wrap="nowrap">
+                                    <Text c="dimmed" className="f1-num" fw={700} fz={11} inherit span ta="center" w={18}>{c.pos}</Text>
+                                    <Text fw={600} fz={13} inherit span>{c.name}</Text>
+                                </Group>
+                                <Text className="f1-num f1-display" fw={700} fz={13} inherit span>{c.points}</Text>
+                            </Group>
+                            <Box ml={27}>
+                                <Box
+                                    bg="var(--mantine-color-default-border)"
+                                    h={5}
+                                    style={{ borderRadius: 9999, overflow: 'hidden' }}
+                                >
+                                    <Box
+                                        bg={c.color}
+                                        h="100%"
+                                        style={{ borderRadius: 9999 }}
+                                        w={`${(c.points / maxConstructor) * 100}%`}
+                                    />
+                                </Box>
+                            </Box>
+                        </Box>
                     ))}
                 </SectionCard>
             </div>
 
             {/* Points progression chart */}
-            <div className="f1-card" style={{ padding: 16 }}>
-                <div style={{ alignItems: 'flex-start', display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+            <Box className="f1-card" p={16}>
+                <Group align="flex-start" gap={0} justify="space-between" mb={6} wrap="nowrap">
                     <div>
-                        <div style={{ fontSize: 15, fontWeight: 700 }}>Championship Points Progression</div>
-                        <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12, marginTop: 2 }}>
+                        <Box fw={700} fz={15}>Championship Points Progression</Box>
+                        <Box c="dimmed" fz={12} mt={2}>
                             Cumulative points after each round · top 6 drivers
-                        </div>
+                        </Box>
                     </div>
-                    <div style={{ display: 'flex', gap: 14 }}>
+                    <Group gap={14} wrap="nowrap">
                         {data.progression.map(l => (
-                            <div key={l.code} style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', fontSize: 12, fontWeight: 600, gap: 6 }}>
-                                <div style={{ background: l.color, borderRadius: 2, height: 3, width: 11 }} />
+                            <Group fw={600} fz={12} gap={6} key={l.code} wrap="nowrap">
+                                <Box bg={l.color} h={3} style={{ borderRadius: 2 }} w={11} />
                                 {l.code}
-                            </div>
+                            </Group>
                         ))}
-                    </div>
-                </div>
+                    </Group>
+                </Group>
                 <LineChart
                     data={progressionData}
                     dataKey="x"
@@ -244,7 +272,7 @@ const SeasonOverview = () => {
                     xAxisProps={{ interval: 1 }}
                     yAxisProps={{ domain: [0, 250], tickCount: 6 }}
                 />
-            </div>
+            </Box>
 
             <SectionCard
                 action={(
@@ -254,7 +282,7 @@ const SeasonOverview = () => {
                 )}
                 title={`${data.year} Calendar`}
             >
-                <div style={{ display: 'grid', gap: 9, gridTemplateColumns: 'repeat(8, 1fr)' }}>
+                <SimpleGrid cols={8} spacing={9}>
                     {data.calendar.map(r => (
                         <MiniRaceCell
                             completed={data.completed}
@@ -264,9 +292,9 @@ const SeasonOverview = () => {
                             year={year}
                         />
                     ))}
-                </div>
+                </SimpleGrid>
             </SectionCard>
-        </div>
+        </Stack>
     );
 };
 
