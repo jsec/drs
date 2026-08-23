@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/jsec/drs/internal/dbtypes"
 )
@@ -25,13 +27,8 @@ func TestInt4_MarshalJSON(t *testing.T) {
 			t.Parallel()
 
 			got, err := tt.val.MarshalJSON()
-			if err != nil {
-				t.Fatalf("MarshalJSON() unexpected error: %v", err)
-			}
-
-			if string(got) != tt.want {
-				t.Errorf("MarshalJSON() = %s, want %s", got, tt.want)
-			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, string(got))
 		})
 	}
 }

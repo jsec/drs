@@ -2,8 +2,8 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/jsec/drs/internal/circuits"
 	"github.com/jsec/drs/internal/database"
@@ -63,18 +64,8 @@ func TestGetCircuitSummaryHandler(t *testing.T) {
 
 			handle(app.logger, app.getCircuitSummaryHandler).ServeHTTP(rec, req)
 
-			if rec.Code != tt.wantStatus {
-				t.Fatalf("status = %d, want %d", rec.Code, tt.wantStatus)
-			}
-
-			var body map[string]string
-			if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil {
-				t.Fatalf("unmarshal body: %v", err)
-			}
-
-			if body["error"] != tt.wantError {
-				t.Errorf("error = %q, want %q", body["error"], tt.wantError)
-			}
+			assert.Equal(t, tt.wantStatus, rec.Code)
+			assert.JSONEq(t, fmt.Sprintf(`{"error":%q}`, tt.wantError), rec.Body.String())
 		})
 	}
 }

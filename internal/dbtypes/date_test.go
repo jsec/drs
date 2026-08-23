@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/jsec/drs/internal/dbtypes"
 )
@@ -35,13 +37,8 @@ func TestDate_MarshalJSON(t *testing.T) {
 			t.Parallel()
 
 			got, err := tt.date.MarshalJSON()
-			if err != nil {
-				t.Fatalf("MarshalJSON() unexpected error: %v", err)
-			}
-
-			if string(got) != tt.want {
-				t.Errorf("MarshalJSON() = %s, want %s", got, tt.want)
-			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, string(got))
 		})
 	}
 }
@@ -62,16 +59,7 @@ func TestDate_Year(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := tt.date.Year()
-
-			switch {
-			case tt.want == nil && got != nil:
-				t.Errorf("Year() = %d, want nil", *got)
-			case tt.want != nil && got == nil:
-				t.Errorf("Year() = nil, want %d", *tt.want)
-			case tt.want != nil && *got != *tt.want:
-				t.Errorf("Year() = %d, want %d", *got, *tt.want)
-			}
+			assert.Equal(t, tt.want, tt.date.Year())
 		})
 	}
 }

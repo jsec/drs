@@ -2,12 +2,12 @@ package seasons_test
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/jsec/drs/internal/database"
 	"github.com/jsec/drs/internal/seasons"
@@ -118,33 +118,13 @@ func TestService_ListSeasons(t *testing.T) {
 			got, err := svc.ListSeasons(context.Background())
 
 			if tt.wantErr != nil {
-				if !errors.Is(err, tt.wantErr) {
-					t.Fatalf("ListSeasons() error = %v, want %v", err, tt.wantErr)
-				}
-				if got != nil {
-					t.Errorf("ListSeasons() = %v, want nil on error", got)
-				}
+				require.ErrorIs(t, err, tt.wantErr)
+				assert.Nil(t, got)
 				return
 			}
 
-			if err != nil {
-				t.Fatalf("ListSeasons() unexpected error: %v", err)
-			}
-
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ListSeasons() mismatch\ngot:  %s\nwant: %s", dump(t, got), dump(t, tt.want))
-			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
-}
-
-func dump(t *testing.T, v any) string {
-	t.Helper()
-
-	b, err := json.MarshalIndent(v, "", "  ")
-	if err != nil {
-		t.Fatalf("marshal: %v", err)
-	}
-
-	return string(b)
 }
