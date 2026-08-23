@@ -36,7 +36,7 @@ export interface CircuitSummaryResponse {
   name: string;
   circuitType: string;
   country: string;
-  firstRaceId: string;
+  countryId: string;
   firstRace: CircuitRaceSummary;
   lastRace: CircuitRaceSummary;
   layoutId: string;
