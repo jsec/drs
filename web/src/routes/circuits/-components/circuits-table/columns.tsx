@@ -17,7 +17,12 @@ export const SORT_IDS = [
 
 export const columns = [
     col.ordinal(),
-    col.text('name', { header: 'CIRCUIT', sort: 'text', width: '19%' }),
+    col.text('name', {
+        header: 'CIRCUIT',
+        link: c => ({ params: { circuitId: c.circuit_id }, to: '/circuits/$circuitId' }),
+        sort: 'text',
+        width: '19%',
+    }),
     col.text('location', { fallback: '—', header: 'LOCATION', muted: true, width: '19%' }),
     col.text('country', { header: 'COUNTRY', muted: true, sort: 'text', width: '21%' }),
     col.num('first_race_year', { align: 'center', header: 'FIRST RACE', size: 'sm', sort: 'basic', width: '12%' }),
