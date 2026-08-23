@@ -13,8 +13,8 @@ export interface ConstructorResponse {
   id: string;
   name: string;
   color: string;
-  firstRaceDate?: string;
-  lastRaceDate?: string;
+  firstRaceDate?: any /* dbtypes.Date */;
+  lastRaceDate?: any /* dbtypes.Date */;
   championships: number /* int32 */;
   wins: number /* int32 */;
   podiums: number /* int32 */;

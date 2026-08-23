@@ -1,0 +1,8 @@
+@layer features {
+.circuit-layout {
+  width: var(--circuit-layout-size);
+  height: var(--circuit-layout-size);
+  background-color: currentColor;
+  mask: var(--circuit-layout-src) no-repeat center / contain;
+}
+}
