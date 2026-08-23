@@ -2,9 +2,14 @@ package circuits
 
 import (
 	"context"
+	"errors"
+
+	"github.com/jackc/pgx/v5"
 
 	"github.com/jsec/drs/internal/database"
 )
+
+var ErrNotFound = errors.New("circuit not found")
 
 type Service struct {
 	queries database.Querier
@@ -39,6 +44,9 @@ func (s *Service) ListCircuits(ctx context.Context) ([]ListCircuitsResponse, err
 
 func (s *Service) GetCircuitSummary(ctx context.Context, circuitID string) (CircuitSummaryResponse, error) {
 	circuit, err := s.queries.GetCircuitInfo(ctx, circuitID)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return CircuitSummaryResponse{}, ErrNotFound
+	}
 	if err != nil {
 		return CircuitSummaryResponse{}, err
 	}

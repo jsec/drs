@@ -1,9 +1,12 @@
 package api
 
 import (
+	"errors"
 	"log/slog"
 	"net/http"
 )
+
+var errNotFound = errors.New("not found")
 
 type handlerFunc func(http.ResponseWriter, *http.Request) error
 
@@ -17,13 +20,21 @@ func handle(logger *slog.Logger, fn handlerFunc) http.Handler {
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if err := h.fn(w, r); err != nil {
-		h.logger.Error("unhandled handler error",
-			"method", r.Method,
-			"path", r.URL.Path,
-			"err", err,
-		)
-
-		writeError(w, http.StatusInternalServerError, "internal server error")
+	err := h.fn(w, r)
+	if err == nil {
+		return
 	}
+
+	if errors.Is(err, errNotFound) {
+		writeError(w, http.StatusNotFound, "not found")
+		return
+	}
+
+	h.logger.Error("unhandled handler error",
+		"method", r.Method,
+		"path", r.URL.Path,
+		"err", err,
+	)
+
+	writeError(w, http.StatusInternalServerError, "internal server error")
 }
