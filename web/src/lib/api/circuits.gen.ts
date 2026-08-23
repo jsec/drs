@@ -18,3 +18,30 @@ export interface ListCircuitsResponse {
   location: string;
   race_count: number /* int */;
 }
+export interface CircuitRaceSummary {
+  raceId: any /* dbtypes.Int4 */;
+  date?: any /* dbtypes.Date */;
+  name: string;
+}
+export interface CircuitRace {
+  raceId: number /* int */;
+  date: any /* dbtypes.Date */;
+  layoutId: string;
+  name: string;
+  winnerId: string;
+  winnerName: string;
+}
+export interface CircuitSummaryResponse {
+  circuitId: string;
+  name: string;
+  circuitType: string;
+  country: string;
+  firstRaceId: string;
+  firstRace: CircuitRaceSummary;
+  lastRace: CircuitRaceSummary;
+  layoutId: string;
+  previousNames: string[];
+  raceCount: number /* int */;
+  turns: number /* int */;
+  races: CircuitRace[];
+}

@@ -3,8 +3,6 @@ package circuits
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
-
 	"github.com/jsec/drs/internal/database"
 )
 
@@ -29,8 +27,8 @@ func (s *Service) ListCircuits(ctx context.Context) ([]ListCircuitsResponse, err
 			CircuitID:     row.CircuitID,
 			Name:          row.Name,
 			Country:       row.Country,
-			FirstRaceYear: year(row.FirstRaceDate),
-			LastRaceYear:  year(row.LastRaceDate),
+			FirstRaceYear: row.FirstRaceDate.Year(),
+			LastRaceYear:  row.LastRaceDate.Year(),
 			Location:      row.Location,
 			RaceCount:     int(row.RaceCount),
 		})
@@ -39,12 +37,52 @@ func (s *Service) ListCircuits(ctx context.Context) ([]ListCircuitsResponse, err
 	return out, nil
 }
 
-func year(d pgtype.Date) *int32 {
-	if !d.Valid {
-		return nil
+func (s *Service) GetCircuitSummary(ctx context.Context, circuitID string) (CircuitSummaryResponse, error) {
+	circuit, err := s.queries.GetCircuitInfo(ctx, circuitID)
+	if err != nil {
+		return CircuitSummaryResponse{}, err
 	}
 
-	y := int32(d.Time.Year())
+	raceList, err := s.queries.GetRacesByCircuitId(ctx, circuitID)
+	if err != nil {
+		return CircuitSummaryResponse{}, err
+	}
 
-	return &y
+	races := make([]CircuitRace, 0, len(raceList))
+
+	for _, race := range raceList {
+		races = append(races, CircuitRace{
+			RaceID:     int(race.RaceID),
+			Date:       race.RaceDate,
+			LayoutID:   race.CircuitLayoutID,
+			Name:       race.RaceOfficialName,
+			WinnerID:   race.WinnerDriverID.String,
+			WinnerName: race.WinnerDriverName.String,
+		})
+	}
+
+	result := CircuitSummaryResponse{
+		CircuitID:   circuit.CircuitID,
+		Name:        circuit.Name,
+		CircuitType: circuit.CircuitType,
+		Country:     circuit.Country,
+		CountryID:   circuit.CountryID,
+		FirstRace: CircuitRaceSummary{
+			RaceID: circuit.FirstRaceID,
+			Date:   circuit.FirstRaceDate,
+			Name:   circuit.FirstRaceName.String,
+		},
+		LastRace: CircuitRaceSummary{
+			RaceID: circuit.LastRaceID,
+			Date:   circuit.LastRaceDate,
+			Name:   circuit.LastRaceName.String,
+		},
+		CurrentLayoutId: circuit.CurrentLayoutID.String,
+		PreviousNames:   circuit.PreviousNames,
+		RaceCount:       int(circuit.RaceCount),
+		Turns:           int(circuit.Turns),
+		Races:           races,
+	}
+
+	return result, nil
 }

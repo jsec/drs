@@ -77,8 +77,16 @@ tasks:
 
   gen:
     cmds:
+      - task: gen:schema
       - task: gen:sqlc
       - task: gen:tygo
+
+  gen:schema:
+    cmds:
+      - >-
+        pg_dump "$DATABASE_URL" -n effone --schema-only --no-owner --no-privileges
+        | grep -vE '^\\'
+        > internal/database/schema.sql
 
   gen:sqlc:
     dir: internal/database
@@ -97,12 +105,6 @@ tasks:
     cmds:
       - go run {{.APP_PKG}} serve
 
-  schema:
-    cmds:
-      - >-
-        pg_dump "$DATABASE_URL" -n effone --schema-only --no-owner --no-privileges
-        | grep -vE '^\\'
-        > internal/database/schema.sql
 
   test:
     cmds:

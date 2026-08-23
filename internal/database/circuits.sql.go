@@ -9,7 +9,119 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jsec/drs/internal/dbtypes"
 )
+
+const getCircuitInfo = `-- name: GetCircuitInfo :one
+SELECT
+    circuit_id,
+    circuit_full_name as name,
+    circuit_type,
+    country,
+    country_id,
+    first_race_id,
+    first_race_date,
+    first_race_name,
+    last_race_id,
+    last_race_date,
+    last_race_name,
+    current_layout_id,
+    previous_names,
+    race_count,
+    turns
+FROM effone.circuits
+WHERE circuit_id = $1
+`
+
+type GetCircuitInfoRow struct {
+	CircuitID       string
+	Name            string
+	CircuitType     string
+	Country         string
+	CountryID       string
+	FirstRaceID     dbtypes.Int4
+	FirstRaceDate   dbtypes.Date
+	FirstRaceName   pgtype.Text
+	LastRaceID      dbtypes.Int4
+	LastRaceDate    dbtypes.Date
+	LastRaceName    pgtype.Text
+	CurrentLayoutID pgtype.Text
+	PreviousNames   []string
+	RaceCount       int32
+	Turns           int32
+}
+
+func (q *Queries) GetCircuitInfo(ctx context.Context, circuitID string) (GetCircuitInfoRow, error) {
+	row := q.db.QueryRow(ctx, getCircuitInfo, circuitID)
+	var i GetCircuitInfoRow
+	err := row.Scan(
+		&i.CircuitID,
+		&i.Name,
+		&i.CircuitType,
+		&i.Country,
+		&i.CountryID,
+		&i.FirstRaceID,
+		&i.FirstRaceDate,
+		&i.FirstRaceName,
+		&i.LastRaceID,
+		&i.LastRaceDate,
+		&i.LastRaceName,
+		&i.CurrentLayoutID,
+		&i.PreviousNames,
+		&i.RaceCount,
+		&i.Turns,
+	)
+	return i, err
+}
+
+const getRacesByCircuitId = `-- name: GetRacesByCircuitId :many
+SELECT
+    race_id,
+    race_date,
+    circuit_layout_id,
+    race_official_name,
+    winner_driver_id,
+    winner_driver_name
+FROM effone.races
+WHERE circuit_id = $1
+ORDER BY race_date DESC
+`
+
+type GetRacesByCircuitIdRow struct {
+	RaceID           int32
+	RaceDate         dbtypes.Date
+	CircuitLayoutID  string
+	RaceOfficialName string
+	WinnerDriverID   pgtype.Text
+	WinnerDriverName pgtype.Text
+}
+
+func (q *Queries) GetRacesByCircuitId(ctx context.Context, circuitID string) ([]GetRacesByCircuitIdRow, error) {
+	rows, err := q.db.Query(ctx, getRacesByCircuitId, circuitID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRacesByCircuitIdRow
+	for rows.Next() {
+		var i GetRacesByCircuitIdRow
+		if err := rows.Scan(
+			&i.RaceID,
+			&i.RaceDate,
+			&i.CircuitLayoutID,
+			&i.RaceOfficialName,
+			&i.WinnerDriverID,
+			&i.WinnerDriverName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
 
 const listCircuits = `-- name: ListCircuits :many
 SELECT
@@ -28,8 +140,8 @@ type ListCircuitsRow struct {
 	CircuitID     string
 	Name          string
 	Country       string
-	FirstRaceDate pgtype.Date
-	LastRaceDate  pgtype.Date
+	FirstRaceDate dbtypes.Date
+	LastRaceDate  dbtypes.Date
 	Location      string
 	RaceCount     int32
 }

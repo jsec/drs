@@ -13,3 +13,12 @@ sql:
         emit_json_tags: false
         emit_pointers_for_null_types: false
         emit_interface: true
+        overrides:
+          - db_type: "date"
+            go_type: "github.com/jsec/drs/internal/dbtypes.Date"
+          - db_type: "date"
+            go_type: "github.com/jsec/drs/internal/dbtypes.Date"
+            nullable: true
+          - db_type: "pg_catalog.int4"
+            go_type: "github.com/jsec/drs/internal/dbtypes.Int4"
+            nullable: true

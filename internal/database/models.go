@@ -6,6 +6,7 @@ package database
 
 import (
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jsec/drs/internal/dbtypes"
 )
 
 type EffoneCircuit struct {
@@ -16,11 +17,11 @@ type EffoneCircuit struct {
 	Country               string
 	CountryID             string
 	Direction             string
-	FirstRaceDate         pgtype.Date
-	FirstRaceID           pgtype.Int4
+	FirstRaceDate         dbtypes.Date
+	FirstRaceID           dbtypes.Int4
 	FirstRaceName         pgtype.Text
-	LastRaceDate          pgtype.Date
-	LastRaceID            pgtype.Int4
+	LastRaceDate          dbtypes.Date
+	LastRaceID            dbtypes.Int4
 	LastRaceName          pgtype.Text
 	Latitude              pgtype.Numeric
 	LengthKm              pgtype.Numeric
@@ -28,7 +29,7 @@ type EffoneCircuit struct {
 	Longitude             pgtype.Numeric
 	CurrentLayoutID       pgtype.Text
 	CurrentLayoutLengthKm pgtype.Numeric
-	CurrentLayoutTurns    pgtype.Int4
+	CurrentLayoutTurns    dbtypes.Int4
 	PreviousNames         []string
 	RaceCount             int32
 	RefreshID             int64
@@ -42,12 +43,12 @@ type EffoneCircuitLayout struct {
 	LengthKm               pgtype.Numeric
 	Turns                  int32
 	RaceCount              int32
-	FirstRaceID            pgtype.Int4
+	FirstRaceID            dbtypes.Int4
 	FirstRaceName          pgtype.Text
-	FirstRaceDate          pgtype.Date
-	LastRaceID             pgtype.Int4
+	FirstRaceDate          dbtypes.Date
+	LastRaceID             dbtypes.Int4
 	LastRaceName           pgtype.Text
-	LastRaceDate           pgtype.Date
+	LastRaceDate           dbtypes.Date
 	RefreshID              int64
 }
 
@@ -59,11 +60,11 @@ type EffoneConstructor struct {
 	CountryID            string
 	EntryCount           int32
 	FastestLapCount      int32
-	FirstRaceDate        pgtype.Date
-	FirstRaceID          pgtype.Int4
+	FirstRaceDate        dbtypes.Date
+	FirstRaceID          dbtypes.Int4
 	FirstRaceName        pgtype.Text
-	LastRaceDate         pgtype.Date
-	LastRaceID           pgtype.Int4
+	LastRaceDate         dbtypes.Date
+	LastRaceID           dbtypes.Int4
 	LastRaceName         pgtype.Text
 	Nationality          string
 	PodiumCount          int32
@@ -92,8 +93,8 @@ type EffoneConstructorSeasonSummary struct {
 	FastestLapCount           int32
 	FinalOrder                int32
 	FinalPoints               pgtype.Numeric
-	FinalPointsX100           pgtype.Int4
-	FinalPosition             pgtype.Int4
+	FinalPointsX100           dbtypes.Int4
+	FinalPosition             dbtypes.Int4
 	FinalPositionText         pgtype.Text
 	PodiumCount               int32
 	PointsDelta               pgtype.Numeric
@@ -124,14 +125,14 @@ type EffoneConstructorStandingsSnapshot struct {
 	EngineManufacturerID string
 	Points               pgtype.Numeric
 	PointsGained         pgtype.Numeric
-	PointsGainedX100     pgtype.Int4
+	PointsGainedX100     dbtypes.Int4
 	PointsX100           int32
-	Position             pgtype.Int4
-	PositionChange       pgtype.Int4
+	Position             dbtypes.Int4
+	PositionChange       dbtypes.Int4
 	PositionText         string
 	PreviousPoints       pgtype.Numeric
-	PreviousPointsX100   pgtype.Int4
-	PreviousPosition     pgtype.Int4
+	PreviousPointsX100   dbtypes.Int4
+	PreviousPosition     dbtypes.Int4
 	RaceID               int32
 	RaceRound            int32
 	RefreshID            int64
@@ -141,23 +142,23 @@ type EffoneConstructorStandingsSnapshot struct {
 type EffoneDriver struct {
 	ChampionshipCount            int32
 	CountryOfBirthID             string
-	DateOfBirth                  pgtype.Date
-	DateOfDeath                  pgtype.Date
+	DateOfBirth                  dbtypes.Date
+	DateOfDeath                  dbtypes.Date
 	DriverCode                   string
 	DriverFullName               string
 	DriverID                     string
 	DriverName                   string
-	DriverNumber                 pgtype.Int4
+	DriverNumber                 dbtypes.Int4
 	EntryCount                   int32
 	FastestLapCount              int32
 	FirstName                    string
-	FirstRaceDate                pgtype.Date
-	FirstRaceID                  pgtype.Int4
+	FirstRaceDate                dbtypes.Date
+	FirstRaceID                  dbtypes.Int4
 	FirstRaceName                pgtype.Text
 	Gender                       string
 	LastName                     string
-	LastRaceDate                 pgtype.Date
-	LastRaceID                   pgtype.Int4
+	LastRaceDate                 dbtypes.Date
+	LastRaceID                   dbtypes.Int4
 	LastRaceName                 pgtype.Text
 	Nationality                  string
 	NationalityCountryID         string
@@ -189,8 +190,8 @@ type EffoneDriverSeasonSummary struct {
 	EntryCount                int32
 	FastestLapCount           int32
 	FinalPoints               pgtype.Numeric
-	FinalPointsX100           pgtype.Int4
-	FinalPosition             pgtype.Int4
+	FinalPointsX100           dbtypes.Int4
+	FinalPosition             dbtypes.Int4
 	FinalPositionText         pgtype.Text
 	PodiumCount               int32
 	PointsDelta               pgtype.Numeric
@@ -221,14 +222,14 @@ type EffoneDriverStandingsSnapshot struct {
 	DriverName         string
 	Points             pgtype.Numeric
 	PointsGained       pgtype.Numeric
-	PointsGainedX100   pgtype.Int4
+	PointsGainedX100   dbtypes.Int4
 	PointsX100         int32
-	Position           pgtype.Int4
-	PositionChange     pgtype.Int4
+	Position           dbtypes.Int4
+	PositionChange     dbtypes.Int4
 	PositionText       string
 	PreviousPoints     pgtype.Numeric
-	PreviousPointsX100 pgtype.Int4
-	PreviousPosition   pgtype.Int4
+	PreviousPointsX100 dbtypes.Int4
+	PreviousPosition   dbtypes.Int4
 	RaceID             int32
 	RaceRound          int32
 	RefreshID          int64
@@ -236,7 +237,7 @@ type EffoneDriverStandingsSnapshot struct {
 }
 
 type EffoneFastestLap struct {
-	CarNumber            pgtype.Int4
+	CarNumber            dbtypes.Int4
 	CircuitID            string
 	ConstructorID        string
 	ConstructorName      string
@@ -245,16 +246,16 @@ type EffoneFastestLap struct {
 	DriverName           string
 	EngineManufacturerID string
 	FastestLapOrder      int32
-	FastestLapPosition   pgtype.Int4
+	FastestLapPosition   dbtypes.Int4
 	Gap                  pgtype.Text
-	GapMs                pgtype.Int4
+	GapMs                dbtypes.Int4
 	Interval             pgtype.Text
-	IntervalMs           pgtype.Int4
-	LapNumber            pgtype.Int4
+	IntervalMs           dbtypes.Int4
+	LapNumber            dbtypes.Int4
 	LapTime              pgtype.Text
-	LapTimeMs            pgtype.Int4
+	LapTimeMs            dbtypes.Int4
 	PositionText         string
-	RaceDate             pgtype.Date
+	RaceDate             dbtypes.Date
 	RaceID               int32
 	RaceName             string
 	RaceRound            int32
@@ -264,7 +265,7 @@ type EffoneFastestLap struct {
 }
 
 type EffonePitStop struct {
-	CarNumber            pgtype.Int4
+	CarNumber            dbtypes.Int4
 	CircuitID            string
 	ConstructorID        string
 	ConstructorName      string
@@ -272,11 +273,11 @@ type EffonePitStop struct {
 	DriverID             string
 	DriverName           string
 	Duration             pgtype.Text
-	DurationMs           pgtype.Int4
+	DurationMs           dbtypes.Int4
 	EngineManufacturerID string
 	LapNumber            int32
 	PositionText         string
-	RaceDate             pgtype.Date
+	RaceDate             dbtypes.Date
 	RaceID               int32
 	RaceName             string
 	RaceRound            int32
@@ -284,16 +285,16 @@ type EffonePitStop struct {
 	Season               int32
 	StopNumber           int32
 	StopOrder            int32
-	StopPosition         pgtype.Int4
+	StopPosition         dbtypes.Int4
 	TyreManufacturerID   string
 }
 
 type EffoneQualifyingResult struct {
 	AdvancedToQ2         bool
 	AdvancedToQ3         bool
-	BestQualifyingMs     pgtype.Int4
+	BestQualifyingMs     dbtypes.Int4
 	BestQualifyingTime   pgtype.Text
-	CarNumber            pgtype.Int4
+	CarNumber            dbtypes.Int4
 	CircuitID            string
 	ConstructorID        string
 	ConstructorName      string
@@ -302,22 +303,22 @@ type EffoneQualifyingResult struct {
 	DriverName           string
 	EngineManufacturerID string
 	Gap                  pgtype.Text
-	GapMs                pgtype.Int4
+	GapMs                dbtypes.Int4
 	Interval             pgtype.Text
-	IntervalMs           pgtype.Int4
+	IntervalMs           dbtypes.Int4
 	IsEntry              bool
 	IsQualifyingP1       bool
-	Laps                 pgtype.Int4
+	Laps                 dbtypes.Int4
 	PositionText         string
 	Q1                   pgtype.Text
-	Q1Ms                 pgtype.Int4
+	Q1Ms                 dbtypes.Int4
 	Q2                   pgtype.Text
-	Q2Ms                 pgtype.Int4
+	Q2Ms                 dbtypes.Int4
 	Q3                   pgtype.Text
-	Q3Ms                 pgtype.Int4
-	QualifyingOrder      pgtype.Int4
-	QualifyingPosition   pgtype.Int4
-	RaceDate             pgtype.Date
+	Q3Ms                 dbtypes.Int4
+	QualifyingOrder      dbtypes.Int4
+	QualifyingPosition   dbtypes.Int4
+	RaceDate             dbtypes.Date
 	RaceID               int32
 	RaceName             string
 	RaceRound            int32
@@ -332,20 +333,20 @@ type EffoneRace struct {
 	CircuitType                 string
 	CourseLengthKm              pgtype.Numeric
 	Direction                   string
-	Fp1Date                     pgtype.Date
+	Fp1Date                     dbtypes.Date
 	Fp1Time                     pgtype.Time
-	Fp2Date                     pgtype.Date
+	Fp2Date                     dbtypes.Date
 	Fp2Time                     pgtype.Time
-	Fp3Date                     pgtype.Date
+	Fp3Date                     dbtypes.Date
 	Fp3Time                     pgtype.Time
 	GrandPrixID                 string
 	GrandPrixName               string
 	PoleDriverID                pgtype.Text
 	PoleDriverName              pgtype.Text
-	QualifyingDate              pgtype.Date
+	QualifyingDate              dbtypes.Date
 	QualifyingFormat            string
 	QualifyingTime              pgtype.Time
-	RaceDate                    pgtype.Date
+	RaceDate                    dbtypes.Date
 	RaceDistanceKm              pgtype.Numeric
 	RaceID                      int32
 	RaceLaps                    int32
@@ -355,10 +356,10 @@ type EffoneRace struct {
 	RaceTime                    pgtype.Time
 	RefreshID                   int64
 	ScheduledDistanceKm         pgtype.Numeric
-	ScheduledLaps               pgtype.Int4
+	ScheduledLaps               dbtypes.Int4
 	Season                      int32
-	SprintDate                  pgtype.Date
-	SprintQualifyingDate        pgtype.Date
+	SprintDate                  dbtypes.Date
+	SprintQualifyingDate        dbtypes.Date
 	SprintQualifyingFormat      pgtype.Text
 	SprintQualifyingTime        pgtype.Time
 	SprintTime                  pgtype.Time
@@ -374,7 +375,7 @@ type EffoneRace struct {
 }
 
 type EffoneRaceResult struct {
-	CarNumber            pgtype.Int4
+	CarNumber            dbtypes.Int4
 	CircuitID            string
 	ConstructorID        string
 	ConstructorName      string
@@ -382,16 +383,16 @@ type EffoneRaceResult struct {
 	DriverID             string
 	DriverName           string
 	ElapsedTime          pgtype.Text
-	ElapsedTimeMs        pgtype.Int4
+	ElapsedTimeMs        dbtypes.Int4
 	EngineManufacturerID string
 	FinishOrder          int32
-	FinishPosition       pgtype.Int4
+	FinishPosition       dbtypes.Int4
 	Gap                  pgtype.Text
-	GapLaps              pgtype.Int4
-	GapMs                pgtype.Int4
-	GridPosition         pgtype.Int4
+	GapLaps              dbtypes.Int4
+	GapMs                dbtypes.Int4
+	GridPosition         dbtypes.Int4
 	Interval             pgtype.Text
-	IntervalMs           pgtype.Int4
+	IntervalMs           dbtypes.Int4
 	IsClassifiedFinish   bool
 	IsDnf                bool
 	IsDriverOfTheDay     bool
@@ -404,14 +405,14 @@ type EffoneRaceResult struct {
 	IsPolePosition       bool
 	IsStart              bool
 	IsWin                bool
-	LapsCompleted        pgtype.Int4
-	PitStopCount         pgtype.Int4
+	LapsCompleted        dbtypes.Int4
+	PitStopCount         dbtypes.Int4
 	Points               pgtype.Numeric
 	PointsX100           int32
-	PositionsGained      pgtype.Int4
+	PositionsGained      dbtypes.Int4
 	PositionText         string
-	QualifyingPosition   pgtype.Int4
-	RaceDate             pgtype.Date
+	QualifyingPosition   dbtypes.Int4
+	RaceDate             dbtypes.Date
 	RaceID               int32
 	RaceName             string
 	RaceRound            int32
@@ -420,7 +421,7 @@ type EffoneRaceResult struct {
 	Status               pgtype.Text
 	StatusCategory       string
 	TimePenalty          pgtype.Text
-	TimePenaltyMs        pgtype.Int4
+	TimePenaltyMs        dbtypes.Int4
 	TyreManufacturerID   string
 }
 
@@ -429,7 +430,7 @@ type EffoneRefreshRun struct {
 	RefreshID     int64
 	StartedAt     pgtype.Timestamptz
 	FinishedAt    pgtype.Timestamptz
-	DurationMs    pgtype.Int4
+	DurationMs    dbtypes.Int4
 	SourceVersion pgtype.Text
 	Status        string
 	// Per-table row counts captured by refreshes.
@@ -441,8 +442,8 @@ type EffoneRefreshRun struct {
 type EffoneSeason struct {
 	ConstructorCount   int32
 	DriverCount        int32
-	FirstRaceDate      pgtype.Date
-	LastRaceDate       pgtype.Date
+	FirstRaceDate      dbtypes.Date
+	LastRaceDate       dbtypes.Date
 	RaceCount          int32
 	RefreshID          int64
 	Season             int32
@@ -454,7 +455,7 @@ type EffoneSeason struct {
 }
 
 type EffoneSprintResult struct {
-	CarNumber            pgtype.Int4
+	CarNumber            dbtypes.Int4
 	CircuitID            string
 	ConstructorID        string
 	ConstructorName      string
@@ -462,16 +463,16 @@ type EffoneSprintResult struct {
 	DriverID             string
 	DriverName           string
 	ElapsedTime          pgtype.Text
-	ElapsedTimeMs        pgtype.Int4
+	ElapsedTimeMs        dbtypes.Int4
 	EngineManufacturerID string
 	FinishOrder          int32
-	FinishPosition       pgtype.Int4
+	FinishPosition       dbtypes.Int4
 	Gap                  pgtype.Text
-	GapLaps              pgtype.Int4
-	GapMs                pgtype.Int4
-	GridPosition         pgtype.Int4
+	GapLaps              dbtypes.Int4
+	GapMs                dbtypes.Int4
+	GridPosition         dbtypes.Int4
 	Interval             pgtype.Text
-	IntervalMs           pgtype.Int4
+	IntervalMs           dbtypes.Int4
 	IsClassifiedFinish   bool
 	IsDnf                bool
 	IsEntry              bool
@@ -480,13 +481,13 @@ type EffoneSprintResult struct {
 	IsPointsFinish       bool
 	IsStart              bool
 	IsWin                bool
-	LapsCompleted        pgtype.Int4
+	LapsCompleted        dbtypes.Int4
 	Points               pgtype.Numeric
 	PointsX100           int32
-	PositionsGained      pgtype.Int4
+	PositionsGained      dbtypes.Int4
 	PositionText         string
-	QualifyingPosition   pgtype.Int4
-	RaceDate             pgtype.Date
+	QualifyingPosition   dbtypes.Int4
+	RaceDate             dbtypes.Date
 	RaceID               int32
 	RaceName             string
 	RaceRound            int32
@@ -495,6 +496,6 @@ type EffoneSprintResult struct {
 	Status               pgtype.Text
 	StatusCategory       string
 	TimePenalty          pgtype.Text
-	TimePenaltyMs        pgtype.Int4
+	TimePenaltyMs        dbtypes.Int4
 	TyreManufacturerID   string
 }

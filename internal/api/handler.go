@@ -13,7 +13,7 @@ type handler struct {
 }
 
 func handle(logger *slog.Logger, fn handlerFunc) http.Handler {
-	return handler{logger: logger, fn: fn}
+	return handler{logger, fn}
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

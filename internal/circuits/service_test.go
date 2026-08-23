@@ -12,6 +12,7 @@ import (
 
 	"github.com/jsec/drs/internal/circuits"
 	"github.com/jsec/drs/internal/database"
+	"github.com/jsec/drs/internal/dbtypes"
 )
 
 type stubQuerier struct {
@@ -24,13 +25,13 @@ func (s stubQuerier) ListCircuits(context.Context) ([]database.ListCircuitsRow, 
 	return s.rows, s.err
 }
 
-func date(s string) pgtype.Date {
+func date(s string) dbtypes.Date {
 	tm, err := time.Parse("2006-01-02", s)
 	if err != nil {
 		panic(err)
 	}
 
-	return pgtype.Date{Time: tm, Valid: true}
+	return dbtypes.Date{Date: pgtype.Date{Time: tm, Valid: true}}
 }
 
 func yearptr(y int32) *int32 {

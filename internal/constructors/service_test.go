@@ -12,6 +12,7 @@ import (
 
 	"github.com/jsec/drs/internal/constructors"
 	"github.com/jsec/drs/internal/database"
+	"github.com/jsec/drs/internal/dbtypes"
 )
 
 type stubQuerier struct {
@@ -24,17 +25,13 @@ func (s stubQuerier) ListConstructors(context.Context) ([]database.ListConstruct
 	return s.rows, s.err
 }
 
-func date(s string) pgtype.Date {
+func date(s string) dbtypes.Date {
 	tm, err := time.Parse("2006-01-02", s)
 	if err != nil {
 		panic(err)
 	}
 
-	return pgtype.Date{Time: tm, Valid: true}
-}
-
-func strptr(s string) *string {
-	return &s
+	return dbtypes.Date{Date: pgtype.Date{Time: tm, Valid: true}}
 }
 
 func TestService_ListConstructors(t *testing.T) {
@@ -65,8 +62,8 @@ func TestService_ListConstructors(t *testing.T) {
 				ID:            "ferrari",
 				Name:          "Ferrari",
 				Color:         "#E8002D",
-				FirstRaceDate: strptr("1950-05-13"),
-				LastRaceDate:  strptr("2024-12-08"),
+				FirstRaceDate: date("1950-05-13"),
+				LastRaceDate:  date("2024-12-08"),
 				Championships: 16,
 				Wins:          249,
 				Podiums:       819,
@@ -100,7 +97,7 @@ func TestService_ListConstructors(t *testing.T) {
 				ID:            "brawn",
 				Name:          "Brawn",
 				Color:         "#B5E227",
-				FirstRaceDate: strptr("2009-03-29"),
+				FirstRaceDate: date("2009-03-29"),
 				Championships: 1,
 				Wins:          8,
 				Podiums:       15,
