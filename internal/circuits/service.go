@@ -74,6 +74,7 @@ func (s *Service) GetCircuitSummary(ctx context.Context, circuitID string) (Circ
 		Name:        circuit.Name,
 		CircuitType: circuit.CircuitType,
 		Country:     circuit.Country,
+		CountryCode: circuit.CountryCode,
 		CountryID:   circuit.CountryID,
 		FirstRace: CircuitRaceSummary{
 			RaceID: circuit.FirstRaceID,

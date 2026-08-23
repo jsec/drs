@@ -18,6 +18,7 @@ SELECT
     circuit_full_name as name,
     circuit_type,
     country,
+    country_code,
     country_id,
     first_race_id,
     first_race_date,
@@ -38,6 +39,7 @@ type GetCircuitInfoRow struct {
 	Name            string
 	CircuitType     string
 	Country         string
+	CountryCode     string
 	CountryID       string
 	FirstRaceID     dbtypes.Int4
 	FirstRaceDate   dbtypes.Date
@@ -59,6 +61,7 @@ func (q *Queries) GetCircuitInfo(ctx context.Context, circuitID string) (GetCirc
 		&i.Name,
 		&i.CircuitType,
 		&i.Country,
+		&i.CountryCode,
 		&i.CountryID,
 		&i.FirstRaceID,
 		&i.FirstRaceDate,

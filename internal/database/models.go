@@ -15,6 +15,7 @@ type EffoneCircuit struct {
 	CircuitName           string
 	CircuitType           string
 	Country               string
+	CountryCode           string
 	CountryID             string
 	Direction             string
 	FirstRaceDate         dbtypes.Date

@@ -4,11 +4,12 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import type { CircuitSummaryResponse } from '#/lib/api/circuits.gen';
 
+import { CountryFlag } from '#/components/country-flag';
 import { GridHeader, MiniStat } from '#/components/f1-ui';
 import { api } from '#/lib/query/api';
 
-import { CircuitLayout } from './-components/circuit-layout';
 import './circuit-hero.css';
+import { CircuitLayout } from './-components/circuit-layout';
 
 const RACE_COLS = '110px 1fr 200px';
 
@@ -37,11 +38,10 @@ const CircuitDetail = () => {
     return (
         <Stack gap={16}>
             <div className="circuit-hero">
-                <CircuitLayout
-                    className="circuit-hero-watermark"
-                    layoutId={data.layoutId}
-                    name={data.name}
-                    size={220}
+                <CountryFlag
+                    aria-hidden
+                    className="circuit-hero-flag"
+                    code={data.countryCode}
                 />
                 <div className="circuit-hero-content">
                     <div className="circuit-hero-mark">

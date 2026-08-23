@@ -32,6 +32,7 @@ type CircuitSummaryResponse struct {
 	Name            string             `json:"name"`
 	CircuitType     string             `json:"circuitType"`
 	Country         string             `json:"country"`
+	CountryCode     string             `json:"countryCode"`
 	CountryID       string             `json:"countryId"`
 	FirstRace       CircuitRaceSummary `json:"firstRace"`
 	LastRace        CircuitRaceSummary `json:"lastRace"`

@@ -34,6 +34,7 @@ select
     circuits.place_name as location,
     circuits.country_id,
     circuits.country,
+    circuits.country_code,
     circuits.latitude,
     circuits.longitude,
     circuits.length_km,

@@ -28,6 +28,7 @@ SELECT
     circuit_full_name as name,
     circuit_type,
     country,
+    country_code,
     country_id,
     first_race_id,
     first_race_date,

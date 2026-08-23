@@ -21,12 +21,14 @@
   pointer-events: none;
 }
 
-.circuit-hero-watermark {
+.circuit-hero-flag {
   position: absolute;
   top: 50%;
-  right: 2%;
+  right: -6%;
+  width: min(42%, 360px);
+  height: auto;
   transform: translateY(-50%) rotate(-4deg);
-  opacity: 0.18;
+  opacity: 0.28;
   pointer-events: none;
 }
 

@@ -31,6 +31,13 @@ models:
         data_type: text
         constraints:
           - type: not_null
+      - name: country_code
+        data_type: text
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+          - iso_alpha2_country_code
       - name: country_id
         data_type: text
         constraints:
