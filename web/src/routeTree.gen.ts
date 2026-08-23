@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CircuitsIndexRouteImport } from './routes/circuits/index'
+import { Route as CircuitsCircuitIdRouteImport } from './routes/circuits/$circuitId'
 import { Route as ConstructorsIndexRouteImport } from './routes/constructors/index'
 import { Route as DriversIndexRouteImport } from './routes/drivers/index'
 import { Route as DriversDriverIdRouteImport } from './routes/drivers/$driverId'
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
 const CircuitsIndexRoute = CircuitsIndexRouteImport.update({
   id: '/circuits/',
   path: '/circuits/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CircuitsCircuitIdRoute = CircuitsCircuitIdRouteImport.update({
+  id: '/circuits/$circuitId',
+  path: '/circuits/$circuitId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConstructorsIndexRoute = ConstructorsIndexRouteImport.update({
@@ -80,6 +86,7 @@ const SeasonsYearRacesRoundRoute = SeasonsYearRacesRoundRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/circuits/$circuitId': typeof CircuitsCircuitIdRoute
   '/drivers/$driverId': typeof DriversDriverIdRoute
   '/circuits/': typeof CircuitsIndexRoute
   '/constructors/': typeof ConstructorsIndexRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/circuits/$circuitId': typeof CircuitsCircuitIdRoute
   '/drivers/$driverId': typeof DriversDriverIdRoute
   '/circuits': typeof CircuitsIndexRoute
   '/constructors': typeof ConstructorsIndexRoute
@@ -107,6 +115,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/circuits/$circuitId': typeof CircuitsCircuitIdRoute
   '/drivers/$driverId': typeof DriversDriverIdRoute
   '/circuits/': typeof CircuitsIndexRoute
   '/constructors/': typeof ConstructorsIndexRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/circuits/$circuitId'
     | '/drivers/$driverId'
     | '/circuits/'
     | '/constructors/'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/circuits/$circuitId'
     | '/drivers/$driverId'
     | '/circuits'
     | '/constructors'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/circuits/$circuitId'
     | '/drivers/$driverId'
     | '/circuits/'
     | '/constructors/'
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CircuitsCircuitIdRoute: typeof CircuitsCircuitIdRoute
   DriversDriverIdRoute: typeof DriversDriverIdRoute
   CircuitsIndexRoute: typeof CircuitsIndexRoute
   ConstructorsIndexRoute: typeof ConstructorsIndexRoute
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/circuits'
       fullPath: '/circuits/'
       preLoaderRoute: typeof CircuitsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/circuits/$circuitId': {
+      id: '/circuits/$circuitId'
+      path: '/circuits/$circuitId'
+      fullPath: '/circuits/$circuitId'
+      preLoaderRoute: typeof CircuitsCircuitIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/constructors/': {
@@ -258,6 +278,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CircuitsCircuitIdRoute: CircuitsCircuitIdRoute,
   DriversDriverIdRoute: DriversDriverIdRoute,
   CircuitsIndexRoute: CircuitsIndexRoute,
   ConstructorsIndexRoute: ConstructorsIndexRoute,
