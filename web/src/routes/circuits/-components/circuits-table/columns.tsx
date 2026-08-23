@@ -18,6 +18,7 @@ export const SORT_IDS = [
 export const columns = [
     col.ordinal(),
     col.text('name', {
+        bold: true,
         header: 'CIRCUIT',
         link: c => ({ params: { circuitId: c.circuit_id }, to: '/circuits/$circuitId' }),
         sort: 'text',

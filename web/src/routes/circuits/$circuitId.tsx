@@ -3,12 +3,13 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import type { CircuitSummaryResponse } from '#/lib/api/circuits.gen';
 
-import { MiniStat, SectionCard } from '#/components/f1-ui';
+import { MiniStat } from '#/components/f1-ui';
 import { api } from '#/lib/query/api';
 
 import { CircuitLayout } from './-components/circuit-layout';
+import './circuit-hero.css';
 
-const RACE_COLS = '92px 1fr 200px';
+const RACE_COLS = '110px 1fr 200px';
 
 type CircuitRace = CircuitSummaryResponse['races'][number] & { date: null | string };
 
@@ -30,30 +31,61 @@ const CircuitDetail = () => {
     const { circuitId } = Route.useParams();
     const { data } = useSuspenseQuery(circuitSummaryQuery(circuitId));
 
+    const years = `${year(data.firstRace.date)}-${year(data.lastRace.date)}`;
+
     return (
-        <div className="f1-page-stack">
-            <div className="f1-page-header">
-                <div>
-                    <h1 className="f1-page-title">
-                        {data.name}
-                    </h1>
-                    <div className="f1-page-description">
-                        {`${data.country} · ${data.raceCount} Grands Prix`}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="circuit-hero">
+                <CircuitLayout
+                    className="circuit-hero-watermark"
+                    layoutId={data.layoutId}
+                    name={data.name}
+                    size={220}
+                />
+                <div className="circuit-hero-content">
+                    <div className="circuit-hero-mark">
+                        <CircuitLayout layoutId={data.layoutId} name={data.name} size={46} />
+                    </div>
+                    <div>
+                        <span className="f1-display" style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 700, letterSpacing: '-0.02em' }}>
+                            {data.name}
+                        </span>
+                        <div style={{ fontSize: 13, marginTop: 5, opacity: 0.9 }}>
+                            {`${data.country} · ${years} · Circuit summary`}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="f1-card" style={{ alignItems: 'center', display: 'flex', gap: 28, padding: 24 }}>
-                <CircuitLayout layoutId={data.layoutId} name={data.name} />
-                <div style={{ display: 'grid', flex: 1, gap: 12, gridTemplateColumns: 'repeat(4, 1fr)' }}>
-                    <MiniStat label="Turns" value={data.turns} />
-                    <MiniStat label="Grands Prix" value={data.raceCount} />
-                    <MiniStat label="First race" value={year(data.firstRace.date)} />
-                    <MiniStat label="Last race" value={year(data.lastRace.date)} />
-                </div>
+            <div style={{ display: 'grid', gap: 8, gridTemplateColumns: 'repeat(4, 1fr)' }}>
+                <MiniStat label="GRANDS PRIX" value={data.raceCount} />
+                <MiniStat label="TURNS" value={data.turns} />
+                <MiniStat label="FIRST RACE" value={year(data.firstRace.date)} />
+                <MiniStat label="LAST RACE" value={year(data.lastRace.date)} />
             </div>
 
-            <SectionCard padded={false} title="Races">
+            <div className="f1-card" style={{ padding: 0 }}>
+                <div style={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between', padding: '15px 20px' }}>
+                    <span style={{ fontSize: 15, fontWeight: 700 }}>Races</span>
+                    <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12 }}>
+                        Every Grand Prix held at this circuit
+                    </span>
+                </div>
+                <div style={{
+                    color: 'var(--mantine-color-dimmed)',
+                    display: 'grid',
+                    fontSize: 10.5,
+                    fontWeight: 700,
+                    gridTemplateColumns: RACE_COLS,
+                    letterSpacing: '0.5px',
+                    padding: '0 20px 8px',
+                    textTransform: 'uppercase',
+                }}
+                >
+                    <span>DATE</span>
+                    <span>GRAND PRIX</span>
+                    <span>WINNER</span>
+                </div>
                 {data.races.map(race => (
                     <div
                         key={race.raceId}
@@ -62,19 +94,19 @@ const CircuitDetail = () => {
                             borderTop: '1px solid var(--mantine-color-default-border)',
                             display: 'grid',
                             gridTemplateColumns: RACE_COLS,
-                            padding: '9px 18px',
+                            padding: '11px 20px',
                         }}
                     >
                         <span className="f1-num" style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12.5 }}>
                             {race.date ?? '—'}
                         </span>
-                        <span style={{ fontSize: 13.5 }}>{race.name}</span>
+                        <span style={{ fontSize: 13.5, fontWeight: 600 }}>{race.name}</span>
                         <span style={{ color: 'var(--mantine-color-dimmed)', fontSize: 12.5 }}>
                             {race.winnerName}
                         </span>
                     </div>
                 ))}
-            </SectionCard>
+            </div>
 
             <div style={{ color: 'var(--mantine-color-dimmed)', fontSize: 11.5 }}>
                 Circuit layouts from

@@ -110,7 +110,7 @@ export function makeColumns<T>() {
 
     const text = <K extends KeysMatching<T, ReactNode>>(
         key: K,
-        opts: Shared<T> & { fallback?: ReactNode; muted?: boolean; size?: Size } = {},
+        opts: Shared<T> & { bold?: boolean; fallback?: ReactNode; muted?: boolean; size?: Size } = {},
     ): ColumnDef<T, unknown> => ({
         accessorKey: key,
         cell: (info) => {
@@ -119,6 +119,7 @@ export function makeColumns<T>() {
                 <span
                     className={cn(
                         'table-cell-text',
+                        opts.bold && 'table-cell-text-bold',
                         opts.muted && 'table-cell-text-muted',
                         sizeClass(opts.size),
                     )}

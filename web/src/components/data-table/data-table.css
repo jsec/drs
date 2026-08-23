@@ -35,6 +35,10 @@
 .table-cell-text {
   color: var(--mantine-color-text);
 }
+.table-cell-text-bold {
+  font-size: var(--table-text-md);
+  font-weight: 600;
+}
 .table-cell-text-muted {
   color: var(--mantine-color-dimmed);
 }
