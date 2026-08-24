@@ -1818,6 +1818,151 @@ models:
         constraints:
           - type: not_null
 
+  - name: driver_season_constructor_summaries
+    config:
+      contract:
+        enforced: true
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - season
+              - driver_id
+              - constructor_id
+    columns:
+      - name: average_qualifying_position
+        data_type: numeric(6, 2)
+      - name: constructor_id
+        data_type: text
+        description: Constructor the driver raced for during the season.
+        constraints:
+          - type: not_null
+        tests:
+          - relationships:
+              arguments:
+                to: ref('constructors')
+                field: constructor_id
+      - name: constructor_name
+        data_type: text
+        constraints:
+          - type: not_null
+      - name: constructor_sequence
+        data_type: integer
+        description: Order of the constructor within the driver's season, by first race date. 1 for the first constructor.
+        constraints:
+          - type: not_null
+      - name: driver_code
+        data_type: text
+        constraints:
+          - type: not_null
+      - name: driver_id
+        data_type: text
+        description: Driver summarized for the season.
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('drivers')
+                field: driver_id
+      - name: driver_name
+        data_type: text
+        constraints:
+          - type: not_null
+      - name: entry_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: fastest_lap_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: podium_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: qualifying_entry_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: qualifying_p1_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: qualifying_position_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: race_entry_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: race_points
+        data_type: numeric(8, 2)
+        constraints:
+          - type: not_null
+      - name: race_points_x100
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: race_start_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: refresh_id
+        data_type: bigint
+        description: Identifier for the refresh run that produced this row.
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+      - name: season
+        data_type: integer
+        description: Championship year.
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+      - name: sprint_entry_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: sprint_points
+        data_type: numeric(8, 2)
+        constraints:
+          - type: not_null
+      - name: sprint_points_x100
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: sprint_start_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: start_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: total_points
+        data_type: numeric(8, 2)
+        constraints:
+          - type: not_null
+      - name: total_points_x100
+        data_type: integer
+        description: Computed race plus sprint points multiplied by 100.
+        constraints:
+          - type: not_null
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                inclusive: true
+      - name: win_count
+        data_type: integer
+        constraints:
+          - type: not_null
+
   - name: constructor_season_summaries
     description: One row per official constructor season standing row with computed race/sprint totals and final standing fields.
     config:

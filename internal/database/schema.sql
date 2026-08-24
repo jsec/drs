@@ -193,6 +193,41 @@ CREATE TABLE effone.constructors (
 
 
 --
+-- Name: driver_season_constructor_summaries; Type: TABLE; Schema: effone; Owner: -
+--
+
+CREATE TABLE effone.driver_season_constructor_summaries (
+    average_qualifying_position numeric(6,2),
+    constructor_id text CONSTRAINT driver_season_constructor_summaries__db_constructor_id_not_null NOT NULL,
+    constructor_name text CONSTRAINT driver_season_constructor_summaries___constructor_name_not_null NOT NULL,
+    constructor_sequence integer CONSTRAINT driver_season_constructor_summari_constructor_sequence_not_null NOT NULL,
+    driver_code text CONSTRAINT driver_season_constructor_summaries__dbt_t_driver_code_not_null NOT NULL,
+    driver_id text CONSTRAINT driver_season_constructor_summaries__dbt_tmp_driver_id_not_null NOT NULL,
+    driver_name text CONSTRAINT driver_season_constructor_summaries__dbt_t_driver_name_not_null NOT NULL,
+    entry_count integer CONSTRAINT driver_season_constructor_summaries__dbt_t_entry_count_not_null NOT NULL,
+    fastest_lap_count integer CONSTRAINT driver_season_constructor_summaries__fastest_lap_count_not_null NOT NULL,
+    podium_count integer CONSTRAINT driver_season_constructor_summaries__dbt__podium_count_not_null NOT NULL,
+    qualifying_entry_count integer CONSTRAINT driver_season_constructor_summa_qualifying_entry_count_not_null NOT NULL,
+    qualifying_p1_count integer CONSTRAINT driver_season_constructor_summarie_qualifying_p1_count_not_null NOT NULL,
+    qualifying_position_count integer CONSTRAINT driver_season_constructor_su_qualifying_position_count_not_null NOT NULL,
+    race_entry_count integer CONSTRAINT driver_season_constructor_summaries___race_entry_count_not_null NOT NULL,
+    race_points numeric(8,2) CONSTRAINT driver_season_constructor_summaries__dbt_t_race_points_not_null NOT NULL,
+    race_points_x100 integer CONSTRAINT driver_season_constructor_summaries___race_points_x100_not_null NOT NULL,
+    race_start_count integer CONSTRAINT driver_season_constructor_summaries___race_start_count_not_null NOT NULL,
+    refresh_id bigint CONSTRAINT driver_season_constructor_summaries__dbt_tm_refresh_id_not_null NOT NULL,
+    season integer CONSTRAINT driver_season_constructor_summaries__dbt_tmp_season_not_null NOT NULL,
+    sprint_entry_count integer NOT NULL,
+    sprint_points numeric(8,2) CONSTRAINT driver_season_constructor_summaries__dbt_sprint_points_not_null NOT NULL,
+    sprint_points_x100 integer NOT NULL,
+    sprint_start_count integer NOT NULL,
+    start_count integer CONSTRAINT driver_season_constructor_summaries__dbt_t_start_count_not_null NOT NULL,
+    total_points numeric(8,2) CONSTRAINT driver_season_constructor_summaries__dbt__total_points_not_null NOT NULL,
+    total_points_x100 integer CONSTRAINT driver_season_constructor_summaries__total_points_x100_not_null NOT NULL,
+    win_count integer CONSTRAINT driver_season_constructor_summaries__dbt_tmp_win_count_not_null NOT NULL
+);
+
+
+--
 -- Name: driver_season_summaries; Type: TABLE; Schema: effone; Owner: -
 --
 
@@ -684,6 +719,20 @@ CREATE INDEX constructor_standings_race_position_idx ON effone.constructor_stand
 --
 
 CREATE INDEX constructor_standings_season_constructor_idx ON effone.constructor_standings_snapshots USING btree (season, constructor_id);
+
+
+--
+-- Name: driver_season_constructor_summaries_driver_season_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX driver_season_constructor_summaries_driver_season_idx ON effone.driver_season_constructor_summaries USING btree (driver_id, season);
+
+
+--
+-- Name: driver_season_constructor_summaries_season_driver_ctor_uidx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE UNIQUE INDEX driver_season_constructor_summaries_season_driver_ctor_uidx ON effone.driver_season_constructor_summaries USING btree (season, driver_id, constructor_id);
 
 
 --

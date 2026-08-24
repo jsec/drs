@@ -96,6 +96,10 @@ models:
             - "{{ create_index('driver_season_summaries_season_driver_uidx', ['season', 'driver_id'], unique=true) }}"
             - "{{ create_index('driver_season_summaries_driver_season_idx', ['driver_id', 'season']) }}"
             - "{{ create_index('driver_season_summaries_season_position_idx', ['season', 'final_position']) }}"
+        driver_season_constructor_summaries:
+          +post-hook:
+            - "{{ create_index('driver_season_constructor_summaries_season_driver_ctor_uidx', ['season', 'driver_id', 'constructor_id'], unique=true) }}"
+            - "{{ create_index('driver_season_constructor_summaries_driver_season_idx', ['driver_id', 'season']) }}"
         constructor_season_summaries:
           +post-hook:
             - "{{ create_index('constructor_season_summaries_season_final_order_uidx', ['season', 'final_order'], unique=true) }}"
