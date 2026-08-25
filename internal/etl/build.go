@@ -85,6 +85,13 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 		return err
 	}
 
+	logger.Info("generating docs")
+	if err = generateDocs(ctx, refreshID, schema, target); err != nil {
+		logger.Error("dbt docs generate failed",
+			"err", err,
+		)
+	}
+
 	return nil
 }
 
@@ -131,4 +138,34 @@ func rowCounts(ctx context.Context, pool *pgxpool.Pool) (map[string]int64, error
 	}
 
 	return counts, nil
+}
+
+func generateDocs(ctx context.Context, refreshId int64, schema, target string) error {
+	vars, err := json.Marshal(dbtVars{
+		RefreshID:  refreshId,
+		F1dbSchema: schema,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.CommandContext(
+		ctx,
+		"uv", "run", "dbt", "docs", "generate",
+		"--project-dir", "./dbt",
+		"--profiles-dir", "./dbt",
+		"--target", target,
+		"--vars", string(vars),
+	)
+
+	cmd.Dir = "etl"
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	return nil
 }

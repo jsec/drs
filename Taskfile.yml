@@ -42,6 +42,11 @@ tasks:
     cmds:
       - uv run dbt parse --project-dir ./dbt --profiles-dir ./dbt
 
+  etl:docs:
+    dir: etl
+    cmds:
+      - uv run dbt docs serve --project-dir ./dbt --profiles-dir ./dbt
+
   etl:format:
     dir: etl
     cmds:
