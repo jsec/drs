@@ -10,6 +10,7 @@ select
     grands_prix.grand_prix_name,
     grands_prix.grand_prix_full_name,
     grands_prix.grand_prix_short_name,
+    grands_prix.grand_prix_code,
     circuits.circuit_name,
     circuits.circuit_full_name,
     circuits.country_id as circuit_country_id,
