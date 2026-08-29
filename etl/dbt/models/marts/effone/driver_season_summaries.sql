@@ -1,6 +1,4 @@
 with
-    season_drivers as (select * from {{ ref("stg_f1db__season_driver_standing") }}),
-
     drivers as (select * from {{ ref("int_f1db__drivers_with_countries") }}),
 
     race_results as (select * from {{ ref("race_results") }}),
@@ -8,6 +6,16 @@ with
     sprint_results as (select * from {{ ref("sprint_results") }}),
 
     qualifying_results as (select * from {{ ref("qualifying_results") }}),
+
+    driver_standings as (select * from {{ ref("driver_standings_snapshots") }}),
+
+    driver_seasons as (
+        select season, driver_id
+        from race_results
+        union
+        select season, driver_id
+        from sprint_results
+    ),
 
     race_aggregates as (
         select
@@ -46,15 +54,29 @@ with
         group by season, driver_id
     ),
 
+    race_events as (
+        select season, driver_id, constructor_id, race_date, race_round, 2 as event_order
+        from race_results
+        union all
+        select season, driver_id, constructor_id, race_date, race_round, 1 as event_order
+        from sprint_results
+    ),
+
     last_constructor as (
         select distinct on (season, driver_id) season, driver_id, constructor_id
-        from race_results
-        order by season, driver_id, race_date desc, race_round desc
+        from race_events
+        order by season, driver_id, race_date desc, race_round desc, event_order desc
+    ),
+
+    latest_standings as (
+        select distinct on (season, driver_id) season, driver_id, points, position, position_text, championship_won
+        from driver_standings
+        order by season, driver_id, race_round desc, race_id desc
     )
 
 select
-    season_drivers.season,
-    season_drivers.driver_id,
+    driver_seasons.season,
+    driver_seasons.driver_id,
     drivers.driver_name,
     drivers.driver_code,
     last_constructor.constructor_id,
@@ -78,36 +100,40 @@ select
     coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0) as total_points,
     ((coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0)) * 100)::integer
     as total_points_x100,
-    season_drivers.position_number as final_position,
-    season_drivers.position_text as final_position_text,
-    season_drivers.points as final_points,
-    (season_drivers.points * 100)::integer as final_points_x100,
-    season_drivers.championship_won,
+    latest_standings.position as final_position,
+    latest_standings.position_text as final_position_text,
+    coalesce(latest_standings.points, 0) as final_points,
+    (coalesce(latest_standings.points, 0) * 100)::integer as final_points_x100,
+    coalesce(latest_standings.championship_won, false) as championship_won,
     (coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0))
-    - season_drivers.points as points_delta,
+    - coalesce(latest_standings.points, 0) as points_delta,
     (
         (
             (coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0))
-            - season_drivers.points
+            - coalesce(latest_standings.points, 0)
         )
         * 100
     )::integer as points_delta_x100,
     {{ var("refresh_id") }}::bigint as refresh_id
-from season_drivers
-join drivers on season_drivers.driver_id = drivers.driver_id
+from driver_seasons
+join drivers on driver_seasons.driver_id = drivers.driver_id
 left join
     race_aggregates
-    on season_drivers.season = race_aggregates.season
-    and season_drivers.driver_id = race_aggregates.driver_id
+    on driver_seasons.season = race_aggregates.season
+    and driver_seasons.driver_id = race_aggregates.driver_id
 left join
     sprint_aggregates
-    on season_drivers.season = sprint_aggregates.season
-    and season_drivers.driver_id = sprint_aggregates.driver_id
+    on driver_seasons.season = sprint_aggregates.season
+    and driver_seasons.driver_id = sprint_aggregates.driver_id
 left join
     qualifying_aggregates
-    on season_drivers.season = qualifying_aggregates.season
-    and season_drivers.driver_id = qualifying_aggregates.driver_id
+    on driver_seasons.season = qualifying_aggregates.season
+    and driver_seasons.driver_id = qualifying_aggregates.driver_id
 left join
     last_constructor
-    on season_drivers.season = last_constructor.season
-    and season_drivers.driver_id = last_constructor.driver_id
+    on driver_seasons.season = last_constructor.season
+    and driver_seasons.driver_id = last_constructor.driver_id
+left join
+    latest_standings
+    on driver_seasons.season = latest_standings.season
+    and driver_seasons.driver_id = latest_standings.driver_id

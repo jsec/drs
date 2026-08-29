@@ -1661,7 +1661,7 @@ models:
           - type: not_null
 
   - name: driver_season_summaries
-    description: One row per driver season with computed race/sprint totals and official final standing fields.
+    description: One row per driver season with computed race/sprint totals and the latest available championship standing fields.
     config:
       contract:
         enforced: true
@@ -1671,6 +1671,7 @@ models:
             combination_of_columns:
               - season
               - driver_id
+      - driver_season_summaries_participation_coverage
     columns:
       - name: average_qualifying_position
         data_type: numeric(6, 2)
