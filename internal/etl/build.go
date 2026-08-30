@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -51,7 +52,10 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 
 	defer func() {
 		if err != nil {
-			markErr := queries.MarkRefreshFailed(ctx, database.MarkRefreshFailedParams{
+			cleanupCtx, cancel := failureCleanupContext(ctx)
+			defer cancel()
+
+			markErr := queries.MarkRefreshFailed(cleanupCtx, database.MarkRefreshFailedParams{
 				RefreshID:    refreshID,
 				ErrorMessage: pgtype.Text{String: err.Error(), Valid: true},
 			})
@@ -93,6 +97,10 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 	}
 
 	return nil
+}
+
+func failureCleanupContext(ctx context.Context) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
 }
 
 func runDBT(ctx context.Context, refreshID int64, schema, target string) error {
