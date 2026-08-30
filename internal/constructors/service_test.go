@@ -16,7 +16,6 @@ import (
 )
 
 type stubQuerier struct {
-	database.Querier
 	rows []database.ListConstructorsRow
 	err  error
 }

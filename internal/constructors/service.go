@@ -6,12 +6,18 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-type Service struct {
-	queries database.Querier
+type constructorsQueries interface {
+	ListConstructors(ctx context.Context) ([]database.ListConstructorsRow, error)
 }
 
-func NewService(queries database.Querier) *Service {
-	return &Service{queries}
+type Service struct {
+	queries constructorsQueries
+}
+
+func NewService(queries constructorsQueries) *Service {
+	return &Service{
+		queries: queries,
+	}
 }
 
 func (s *Service) ListConstructors(ctx context.Context) ([]ConstructorResponse, error) {

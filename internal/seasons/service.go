@@ -6,12 +6,18 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-type Service struct {
-	queries database.Querier
+type seasonQueries interface {
+	ListSeasons(ctx context.Context) ([]database.ListSeasonsRow, error)
 }
 
-func NewService(queries database.Querier) *Service {
-	return &Service{queries: queries}
+type Service struct {
+	queries seasonQueries
+}
+
+func NewService(queries seasonQueries) *Service {
+	return &Service{
+		queries: queries,
+	}
 }
 
 func (s *Service) ListSeasons(ctx context.Context) ([]SeasonResponse, error) {

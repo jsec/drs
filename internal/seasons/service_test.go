@@ -14,7 +14,6 @@ import (
 )
 
 type stubQuerier struct {
-	database.Querier
 	rows []database.ListSeasonsRow
 	err  error
 }

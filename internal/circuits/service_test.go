@@ -16,13 +16,20 @@ import (
 )
 
 type stubQuerier struct {
-	database.Querier
 	rows []database.ListCircuitsRow
 	err  error
 }
 
 func (s stubQuerier) ListCircuits(context.Context) ([]database.ListCircuitsRow, error) {
 	return s.rows, s.err
+}
+
+func (s stubQuerier) GetCircuitInfo(context.Context, string) (database.GetCircuitInfoRow, error) {
+	return database.GetCircuitInfoRow{}, s.err
+}
+
+func (s stubQuerier) GetRacesByCircuitId(context.Context, string) ([]database.GetRacesByCircuitIdRow, error) {
+	return nil, s.err
 }
 
 func date(s string) dbtypes.Date {

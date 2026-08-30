@@ -18,12 +18,19 @@ import (
 )
 
 type stubQuerier struct {
-	database.Querier
 	circuitErr error
 }
 
 func (s stubQuerier) GetCircuitInfo(context.Context, string) (database.GetCircuitInfoRow, error) {
 	return database.GetCircuitInfoRow{}, s.circuitErr
+}
+
+func (stubQuerier) ListCircuits(context.Context) ([]database.ListCircuitsRow, error) {
+	return nil, nil
+}
+
+func (stubQuerier) GetRacesByCircuitId(context.Context, string) ([]database.GetRacesByCircuitIdRow, error) {
+	return nil, nil
 }
 
 func TestGetCircuitSummaryHandler(t *testing.T) {

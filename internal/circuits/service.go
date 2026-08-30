@@ -11,12 +11,20 @@ import (
 
 var ErrNotFound = errors.New("circuit not found")
 
-type Service struct {
-	queries database.Querier
+type circuitQueries interface {
+	ListCircuits(context.Context) ([]database.ListCircuitsRow, error)
+	GetCircuitInfo(context.Context, string) (database.GetCircuitInfoRow, error)
+	GetRacesByCircuitId(context.Context, string) ([]database.GetRacesByCircuitIdRow, error)
 }
 
-func NewService(queries database.Querier) *Service {
-	return &Service{queries}
+type Service struct {
+	queries circuitQueries
+}
+
+func NewService(queries circuitQueries) *Service {
+	return &Service{
+		queries: queries,
+	}
 }
 
 func (s *Service) ListCircuits(ctx context.Context) ([]ListCircuitsResponse, error) {
