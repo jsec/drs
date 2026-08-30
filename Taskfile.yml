@@ -15,6 +15,26 @@ tasks:
       - task --list-all
     silent: true
 
+  deps:
+    cmds:
+      - task: deps:api
+      - task: deps:etl
+      - task: deps:web
+
+  deps:api:
+    cmds:
+      - go mod tidy
+
+  deps:etl:
+    dir: etl
+    cmds:
+      - uv sync
+
+  deps:web:
+    dir: web
+    cmds:
+      - pnpm install
+
   dev:
     cmds:
       - air
