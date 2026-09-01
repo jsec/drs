@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 )
 
 type asset struct {
@@ -29,6 +30,8 @@ const (
 	fileName   = "f1db-sql-postgresql.sql"
 	releaseURL = "https://api.github.com/repos/f1db/f1db/releases/latest"
 )
+
+var httpClient = &http.Client{Timeout: 30 * time.Second}
 
 func Load(ctx context.Context, logger *slog.Logger) error {
 	token := os.Getenv("GITHUB_TOKEN")
@@ -74,7 +77,7 @@ func getLatestRelease(ctx context.Context, token string) (version, downloadURL s
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Accept", "application/vnd.github+json")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -126,7 +129,7 @@ func downloadFile(ctx context.Context, url, dest string) error {
 		return err
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return err
 	}
