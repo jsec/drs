@@ -2,6 +2,7 @@ package seasons
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jsec/drs/internal/database"
 )
@@ -23,7 +24,7 @@ func NewService(queries seasonQueries) *Service {
 func (s *Service) ListSeasons(ctx context.Context) ([]SeasonResponse, error) {
 	rows, err := s.queries.ListSeasons(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("listing seasons: %w", err)
 	}
 
 	out := make([]SeasonResponse, 0, len(rows))

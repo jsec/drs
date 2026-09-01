@@ -16,8 +16,10 @@ import (
 )
 
 type stubQuerier struct {
-	rows []database.ListCircuitsRow
-	err  error
+	rows        []database.ListCircuitsRow
+	circuit     database.GetCircuitInfoRow
+	err         error
+	raceListErr error
 }
 
 func (s stubQuerier) ListCircuits(context.Context) ([]database.ListCircuitsRow, error) {
@@ -25,11 +27,11 @@ func (s stubQuerier) ListCircuits(context.Context) ([]database.ListCircuitsRow, 
 }
 
 func (s stubQuerier) GetCircuitInfo(context.Context, string) (database.GetCircuitInfoRow, error) {
-	return database.GetCircuitInfoRow{}, s.err
+	return s.circuit, s.err
 }
 
 func (s stubQuerier) GetRacesByCircuitId(context.Context, string) ([]database.GetRacesByCircuitIdRow, error) {
-	return nil, s.err
+	return nil, s.raceListErr
 }
 
 func date(s string) dbtypes.Date {
@@ -51,11 +53,12 @@ func TestService_ListCircuits(t *testing.T) {
 	errQuery := errors.New("query failed")
 
 	tests := []struct {
-		name    string
-		rows    []database.ListCircuitsRow
-		err     error
-		want    []circuits.ListCircuitsResponse
-		wantErr error
+		name           string
+		rows           []database.ListCircuitsRow
+		err            error
+		want           []circuits.ListCircuitsResponse
+		wantErr        error
+		wantErrMessage string
 	}{
 		{
 			name: "valid dates",
@@ -118,9 +121,10 @@ func TestService_ListCircuits(t *testing.T) {
 			want: []circuits.ListCircuitsResponse{},
 		},
 		{
-			name:    "query error",
-			err:     errQuery,
-			wantErr: errQuery,
+			name:           "query error",
+			err:            errQuery,
+			wantErr:        errQuery,
+			wantErrMessage: "listing circuits: query failed",
 		},
 	}
 
@@ -134,12 +138,47 @@ func TestService_ListCircuits(t *testing.T) {
 
 			if tt.wantErr != nil {
 				require.ErrorIs(t, err, tt.wantErr)
+				assert.EqualError(t, err, tt.wantErrMessage)
 				assert.Nil(t, got)
 				return
 			}
 
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestService_GetCircuitSummaryWrapsQueryErrors(t *testing.T) {
+	t.Parallel()
+
+	errQuery := errors.New("query failed")
+
+	tests := []struct {
+		name    string
+		queries stubQuerier
+		wantErr string
+	}{
+		{
+			name:    "circuit info",
+			queries: stubQuerier{err: errQuery},
+			wantErr: "getting circuit info: query failed",
+		},
+		{
+			name:    "circuit races",
+			queries: stubQuerier{raceListErr: errQuery},
+			wantErr: "getting circuit races: query failed",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			_, err := circuits.NewService(tt.queries).GetCircuitSummary(context.Background(), "monza")
+
+			require.ErrorIs(t, err, errQuery)
+			assert.EqualError(t, err, tt.wantErr)
 		})
 	}
 }

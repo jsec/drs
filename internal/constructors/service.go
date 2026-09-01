@@ -2,6 +2,7 @@ package constructors
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jsec/drs/internal/database"
 )
@@ -23,7 +24,7 @@ func NewService(queries constructorsQueries) *Service {
 func (s *Service) ListConstructors(ctx context.Context) ([]ConstructorResponse, error) {
 	rows, err := s.queries.ListConstructors(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("listing constructors: %w", err)
 	}
 
 	out := make([]ConstructorResponse, 0, len(rows))

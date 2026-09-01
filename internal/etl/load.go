@@ -47,7 +47,7 @@ func Load(ctx context.Context, logger *slog.Logger) error {
 	logger.Info("getting latest f1db release")
 	version, downloadURL, err := getLatestRelease(ctx, token)
 	if err != nil {
-		return err
+		return fmt.Errorf("getting latest f1db release: %w", err)
 	}
 
 	logger.Info("found latest f1db release", "version", version)
@@ -55,13 +55,13 @@ func Load(ctx context.Context, logger *slog.Logger) error {
 	logger.Info("downloading dump file")
 	dumpPath, cleanup, err := downloadDumpFile(ctx, downloadURL)
 	if err != nil {
-		return err
+		return fmt.Errorf("downloading f1db dump: %w", err)
 	}
 	defer cleanup()
 
 	logger.Info("loading dump file")
 	if err := loadDumpFile(ctx, databaseURL, dumpPath); err != nil {
-		return err
+		return fmt.Errorf("loading f1db dump: %w", err)
 	}
 	logger.Info("loaded dump file")
 
@@ -111,13 +111,13 @@ func downloadDumpFile(ctx context.Context, url string) (dumpPath string, cleanup
 	zipPath := filepath.Join(tmpDir, assetName)
 	if err := downloadFile(ctx, url, zipPath); err != nil {
 		cleanup()
-		return "", nil, err
+		return "", nil, fmt.Errorf("downloading dump file: %w", err)
 	}
 
 	dumpPath = filepath.Join(tmpDir, fileName)
 	if err := extractDump(zipPath, dumpPath); err != nil {
 		cleanup()
-		return "", nil, err
+		return "", nil, fmt.Errorf("extracting dump file: %w", err)
 	}
 
 	return dumpPath, cleanup, nil

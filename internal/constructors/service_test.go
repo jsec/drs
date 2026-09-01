@@ -39,11 +39,12 @@ func TestService_ListConstructors(t *testing.T) {
 	errQuery := errors.New("query failed")
 
 	tests := []struct {
-		name    string
-		rows    []database.ListConstructorsRow
-		err     error
-		want    []constructors.ConstructorResponse
-		wantErr error
+		name           string
+		rows           []database.ListConstructorsRow
+		err            error
+		want           []constructors.ConstructorResponse
+		wantErr        error
+		wantErrMessage string
 	}{
 		{
 			name: "valid dates",
@@ -108,9 +109,10 @@ func TestService_ListConstructors(t *testing.T) {
 			want: []constructors.ConstructorResponse{},
 		},
 		{
-			name:    "query error",
-			err:     errQuery,
-			wantErr: errQuery,
+			name:           "query error",
+			err:            errQuery,
+			wantErr:        errQuery,
+			wantErrMessage: "listing constructors: query failed",
 		},
 	}
 
@@ -124,6 +126,7 @@ func TestService_ListConstructors(t *testing.T) {
 
 			if tt.wantErr != nil {
 				require.ErrorIs(t, err, tt.wantErr)
+				assert.EqualError(t, err, tt.wantErrMessage)
 				assert.Nil(t, got)
 				return
 			}

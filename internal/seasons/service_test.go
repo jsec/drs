@@ -32,11 +32,12 @@ func TestService_ListSeasons(t *testing.T) {
 	errQuery := errors.New("query failed")
 
 	tests := []struct {
-		name    string
-		rows    []database.ListSeasonsRow
-		err     error
-		want    []seasons.SeasonResponse
-		wantErr error
+		name           string
+		rows           []database.ListSeasonsRow
+		err            error
+		want           []seasons.SeasonResponse
+		wantErr        error
+		wantErrMessage string
 	}{
 		{
 			name: "full row with wcc",
@@ -102,9 +103,10 @@ func TestService_ListSeasons(t *testing.T) {
 			want: []seasons.SeasonResponse{},
 		},
 		{
-			name:    "query error",
-			err:     errQuery,
-			wantErr: errQuery,
+			name:           "query error",
+			err:            errQuery,
+			wantErr:        errQuery,
+			wantErrMessage: "listing seasons: query failed",
 		},
 	}
 
@@ -118,6 +120,7 @@ func TestService_ListSeasons(t *testing.T) {
 
 			if tt.wantErr != nil {
 				require.ErrorIs(t, err, tt.wantErr)
+				assert.EqualError(t, err, tt.wantErrMessage)
 				assert.Nil(t, got)
 				return
 			}

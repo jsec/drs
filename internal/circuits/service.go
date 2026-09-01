@@ -3,6 +3,7 @@ package circuits
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgx/v5"
 
@@ -30,7 +31,7 @@ func NewService(queries circuitQueries) *Service {
 func (s *Service) ListCircuits(ctx context.Context) ([]ListCircuitsResponse, error) {
 	rows, err := s.queries.ListCircuits(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("listing circuits: %w", err)
 	}
 
 	out := make([]ListCircuitsResponse, 0, len(rows))
@@ -56,12 +57,12 @@ func (s *Service) GetCircuitSummary(ctx context.Context, circuitID string) (Circ
 		return CircuitSummaryResponse{}, ErrNotFound
 	}
 	if err != nil {
-		return CircuitSummaryResponse{}, err
+		return CircuitSummaryResponse{}, fmt.Errorf("getting circuit info: %w", err)
 	}
 
 	raceList, err := s.queries.GetRacesByCircuitId(ctx, circuitID)
 	if err != nil {
-		return CircuitSummaryResponse{}, err
+		return CircuitSummaryResponse{}, fmt.Errorf("getting circuit races: %w", err)
 	}
 
 	races := make([]CircuitRace, 0, len(raceList))
