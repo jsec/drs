@@ -10,13 +10,13 @@ export interface Service {
 // source: types.go
 
 export interface ListCircuitsResponse {
-  circuit_id: string;
+  circuitId: string;
   name: string;
   country: string;
-  first_race_year?: number /* int32 */;
-  last_race_year?: number /* int32 */;
+  firstRaceYear?: number /* int32 */;
+  lastRaceYear?: number /* int32 */;
   location: string;
-  race_count: number /* int */;
+  raceCount: number /* int */;
 }
 export interface CircuitRaceSummary {
   raceId: any /* dbtypes.Int4 */;
