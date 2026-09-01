@@ -9,7 +9,7 @@ import (
 	"github.com/jsec/drs/internal/etl"
 )
 
-func etlCommand(logger *slog.Logger) *cli.Command {
+func etlCommand(logger *slog.Logger, config config) *cli.Command {
 	return &cli.Command{
 		Name:  "etl",
 		Usage: "data pipeline commands",
@@ -18,7 +18,7 @@ func etlCommand(logger *slog.Logger) *cli.Command {
 				Name:  "load",
 				Usage: "load the latest f1db dump",
 				Action: func(ctx context.Context, _ *cli.Command) error {
-					return etl.Load(ctx, logger)
+					return etl.Load(ctx, logger, config.databaseURL, config.githubToken)
 				},
 			},
 			{
@@ -26,7 +26,7 @@ func etlCommand(logger *slog.Logger) *cli.Command {
 				Usage: "rebuild the effone database",
 				Flags: etlFlags(),
 				Action: func(ctx context.Context, cmd *cli.Command) error {
-					pool, err := openPool(ctx)
+					pool, err := openPool(ctx, config.databaseURL)
 					if err != nil {
 						return err
 					}
@@ -40,13 +40,13 @@ func etlCommand(logger *slog.Logger) *cli.Command {
 				Usage: "load the latest dump, then rebuild the effone database",
 				Flags: etlFlags(),
 				Action: func(ctx context.Context, cmd *cli.Command) error {
-					pool, err := openPool(ctx)
+					pool, err := openPool(ctx, config.databaseURL)
 					if err != nil {
 						return err
 					}
 					defer pool.Close()
 
-					return etl.Refresh(ctx, logger, pool, cmd.String("schema"), cmd.String("target"))
+					return etl.Refresh(ctx, logger, pool, config.databaseURL, config.githubToken, cmd.String("schema"), cmd.String("target"))
 				},
 			},
 		},

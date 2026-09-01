@@ -5,19 +5,13 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/jsec/drs/internal/database"
 	"golang.org/x/sync/errgroup"
 )
 
-func Serve(ctx context.Context, logger *slog.Logger, db *database.Queries) error {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
-	}
-
+func Serve(ctx context.Context, logger *slog.Logger, db *database.Queries, port string) error {
 	srv := &http.Server{
 		Addr:              ":" + port,
 		Handler:           newApplication(logger, db).routes(),

@@ -33,13 +33,11 @@ const (
 
 var httpClient = &http.Client{Timeout: 30 * time.Second}
 
-func Load(ctx context.Context, logger *slog.Logger) error {
-	token := os.Getenv("GITHUB_TOKEN")
+func Load(ctx context.Context, logger *slog.Logger, databaseURL, token string) error {
 	if token == "" {
 		return errors.New("GITHUB_TOKEN is required")
 	}
 
-	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
 		return errors.New("DATABASE_URL is required")
 	}

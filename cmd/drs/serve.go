@@ -10,18 +10,18 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-func serveCommand(logger *slog.Logger) *cli.Command {
+func serveCommand(logger *slog.Logger, config config) *cli.Command {
 	return &cli.Command{
 		Name:  "serve",
 		Usage: "run the API server",
 		Action: func(ctx context.Context, _ *cli.Command) error {
-			pool, err := openPool(ctx)
+			pool, err := openPool(ctx, config.databaseURL)
 			if err != nil {
 				return err
 			}
 			defer pool.Close()
 
-			return api.Serve(ctx, logger, database.New(pool))
+			return api.Serve(ctx, logger, database.New(pool), config.port)
 		},
 	}
 }

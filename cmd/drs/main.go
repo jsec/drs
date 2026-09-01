@@ -12,7 +12,8 @@ import (
 )
 
 func main() {
-	logger := setupLogger()
+	config := loadConfig()
+	logger := setupLogger(config.appEnv)
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
@@ -21,8 +22,8 @@ func main() {
 		Name:  "drs",
 		Usage: "DRS CLI",
 		Commands: []*cli.Command{
-			serveCommand(logger),
-			etlCommand(logger),
+			serveCommand(logger, config),
+			etlCommand(logger, config),
 		},
 	}
 
@@ -32,8 +33,8 @@ func main() {
 	}
 }
 
-func setupLogger() *slog.Logger {
-	switch os.Getenv("APP_ENV") {
+func setupLogger(appEnv string) *slog.Logger {
+	switch appEnv {
 	case "", "dev":
 		return slog.New(charmlog.New(os.Stderr))
 	default:
