@@ -3,13 +3,13 @@ package circuits
 import "github.com/jsec/drs/internal/dbtypes"
 
 type ListCircuitsResponse struct {
-	CircuitID     string `json:"circuit_id"`
+	CircuitID     string `json:"circuitId"`
 	Name          string `json:"name"`
 	Country       string `json:"country"`
-	FirstRaceYear *int32 `json:"first_race_year,omitempty"`
-	LastRaceYear  *int32 `json:"last_race_year,omitempty"`
+	FirstRaceYear *int32 `json:"firstRaceYear,omitempty"`
+	LastRaceYear  *int32 `json:"lastRaceYear,omitempty"`
 	Location      string `json:"location"`
-	RaceCount     int    `json:"race_count"`
+	RaceCount     int    `json:"raceCount"`
 }
 
 type CircuitRaceSummary struct {
