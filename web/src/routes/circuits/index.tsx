@@ -1,16 +1,15 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
-import type { ListCircuitsResponse } from '#/lib/api/circuits.gen';
-
 import { readSortSearch } from '#/components/data-table';
+import { CircuitListSchema } from '#/lib/api/circuits';
 import { api } from '#/lib/query/api';
 
 import { CircuitsTable } from './-components/circuits-table';
 import { SORT_IDS } from './-components/circuits-table/columns';
 
 const listCircuitsQuery = queryOptions({
-    queryFn: () => api.get('circuits').json<ListCircuitsResponse[]>(),
+    queryFn: () => api.get('circuits').json(CircuitListSchema),
     queryKey: ['circuits'],
 });
 

@@ -2,9 +2,9 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
 import type { SortSearch } from '#/components/data-table';
-import type { DriverShortSummary } from '#/lib/api/drivers.gen';
 
 import { readSortSearch } from '#/components/data-table';
+import { DriverShortSummaryListSchema } from '#/lib/api/drivers';
 import { api } from '#/lib/query/api';
 
 import type { Category } from './-components/drivers-table';
@@ -13,7 +13,7 @@ import { CATEGORIES, DriversTable } from './-components/drivers-table';
 import { SORT_IDS } from './-components/drivers-table/columns';
 
 const listDriversQuery = queryOptions({
-    queryFn: () => api.get('drivers').json<DriverShortSummary[]>(),
+    queryFn: () => api.get('drivers').json(DriverShortSummaryListSchema),
     queryKey: ['drivers'],
 });
 

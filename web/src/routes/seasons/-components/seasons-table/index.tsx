@@ -1,6 +1,6 @@
 import { getRouteApi } from '@tanstack/react-router';
 
-import type { ListSeasonsResponse } from '#/lib/api/types';
+import type { ListSeasonsResponse } from '#/lib/api/seasons';
 
 import { DataTable, useDataTable, useUrlSorting } from '#/components/data-table';
 

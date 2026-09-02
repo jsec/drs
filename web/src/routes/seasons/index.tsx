@@ -2,16 +2,15 @@ import { Card } from '@mantine/core';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
-import type { ListSeasonsResponse } from '#/lib/api/types';
-
 import { readSortSearch } from '#/components/data-table';
+import { SeasonListSchema } from '#/lib/api/seasons';
 import { api } from '#/lib/query/api';
 
 import { SeasonsTable } from './-components/seasons-table';
 import { SORT_IDS } from './-components/seasons-table/columns';
 
 const seasonsQuery = queryOptions({
-    queryFn: () => api.get('seasons').json<ListSeasonsResponse>(),
+    queryFn: () => api.get('seasons').json(SeasonListSchema),
     queryKey: ['seasons'],
 });
 

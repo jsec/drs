@@ -2,10 +2,9 @@ import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
-import type { CircuitSummaryResponse } from '#/lib/api/circuits.gen';
-
 import { CountryFlag } from '#/components/country-flag';
 import { GridHeader, MiniStat } from '#/components/f1-ui';
+import { CircuitSummarySchema } from '#/lib/api/circuits';
 import { api } from '#/lib/query/api';
 
 import './circuit-hero.css';
@@ -13,17 +12,9 @@ import { CircuitLayout } from './-components/circuit-layout';
 
 const RACE_COLS = '110px 1fr 200px';
 
-type CircuitRace = CircuitSummaryResponse['races'][number] & { date: null | string };
-
-type CircuitSummary = Omit<CircuitSummaryResponse, 'firstRace' | 'lastRace' | 'races'> & {
-    firstRace: { date: null | string; name: string };
-    lastRace: { date: null | string; name: string };
-    races: CircuitRace[];
-};
-
 const circuitSummaryQuery = (circuitId: string) =>
     queryOptions({
-        queryFn: () => api.get(`circuits/${circuitId}`).json<CircuitSummary>(),
+        queryFn: () => api.get(`circuits/${circuitId}`).json(CircuitSummarySchema),
         queryKey: ['circuit-summary', circuitId],
     });
 

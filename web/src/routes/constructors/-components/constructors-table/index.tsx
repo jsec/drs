@@ -2,7 +2,7 @@ import { Card } from '@mantine/core';
 import { getRouteApi } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
-import type { ListConstructorsResponse } from '#/lib/api/types';
+import type { ListConstructorsResponse } from '#/lib/api/constructors';
 
 import { DataTable, useDataTable, useUrlSorting } from '#/components/data-table';
 

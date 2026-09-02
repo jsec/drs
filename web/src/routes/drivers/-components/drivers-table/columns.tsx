@@ -2,7 +2,7 @@ import type { FilterFn, SortingFn } from '@tanstack/react-table';
 
 import { rankItem } from '@tanstack/match-sorter-utils';
 
-import type { DriverShortSummary } from '#/lib/api/drivers.gen';
+import type { DriverShortSummary } from '#/lib/api/drivers';
 
 import { makeColumns } from '#/components/data-table';
 import { DriverAvatar } from '#/components/f1-ui';
@@ -20,7 +20,10 @@ const byTitles: SortingFn<DriverShortSummary> = (a, b) =>
 const byWins: SortingFn<DriverShortSummary> = (a, b) =>
     a.original.wins - b.original.wins || a.original.podiums - b.original.podiums;
 
-export const formatYears = ({ firstYear, isActive, lastYear }: DriverShortSummary) => {
+export const formatYears = ({ firstYear, isActive, lastYear }: Pick<
+    DriverShortSummary,
+    'firstYear' | 'isActive' | 'lastYear'
+>) => {
     if (!firstYear) {
         return '-';
     }

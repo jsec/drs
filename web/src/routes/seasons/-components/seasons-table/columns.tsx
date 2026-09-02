@@ -1,4 +1,4 @@
-import type { ListSeasonsResponse } from '#/lib/api/types';
+import type { ListSeasonsResponse } from '#/lib/api/seasons';
 
 import { CountryFlag } from '#/components/country-flag';
 import { makeColumns } from '#/components/data-table';

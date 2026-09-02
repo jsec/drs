@@ -104,7 +104,6 @@ tasks:
     cmds:
       - task: gen:schema
       - task: gen:sqlc
-      - task: gen:tygo
 
   gen:schema:
     cmds:
@@ -117,10 +116,6 @@ tasks:
     dir: internal/database
     cmds:
       - sqlc generate
-
-  gen:tygo:
-    cmds:
-      - tygo generate
 
   lint:
     cmds:

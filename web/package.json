@@ -32,7 +32,8 @@
         "country-flag-icons": "1.6.20",
         "ky": "2.0.2",
         "react": "19.2.8",
-        "react-dom": "19.2.8"
+        "react-dom": "19.2.8",
+        "valibot": "^1.4.2"
     },
     "devDependencies": {
         "@jarsec/eslint-config": "7.4.0",

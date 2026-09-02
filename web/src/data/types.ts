@@ -57,17 +57,6 @@ export type CareerTotals = {
     wins: number;
 };
 
-export type Circuit = {
-    code: string;
-    corners: number;
-    country: string;
-    laps: number;
-    length: string;
-    name: string;
-    path: string;
-    round: number;
-};
-
 export type DriverCareer = {
     driver: AllTimeDriver;
     seasons: CareerSeason[];

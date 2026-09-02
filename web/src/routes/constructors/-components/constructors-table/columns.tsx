@@ -1,6 +1,6 @@
 import type { SortingFn } from '@tanstack/react-table';
 
-import type { ListConstructorsResponse } from '#/lib/api/types';
+import type { ListConstructorsResponse } from '#/lib/api/constructors';
 
 import { makeColumns } from '#/components/data-table';
 import { cn } from '#/lib/utils';

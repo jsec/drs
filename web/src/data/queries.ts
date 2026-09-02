@@ -3,7 +3,6 @@ import { queryOptions } from '@tanstack/react-query';
 import {
     getAllTimeDrivers,
     getCalendar,
-    getCircuits,
     getDriverCareer,
     getDriverSeason,
     getRaceDetail,

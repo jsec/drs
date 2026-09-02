@@ -3,7 +3,7 @@ import { MagnifyingGlassIcon } from '@phosphor-icons/react';
 import { getRouteApi } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
-import type { DriverShortSummary } from '#/lib/api/drivers.gen';
+import type { DriverShortSummary } from '#/lib/api/drivers';
 
 import { DataTable, useDataTable, useUrlSorting } from '#/components/data-table';
 import { Pill } from '#/components/f1-ui';

@@ -1,7 +1,7 @@
 import { Card } from '@mantine/core';
 import { getRouteApi } from '@tanstack/react-router';
 
-import type { ListCircuitsResponse } from '#/lib/api/circuits.gen';
+import type { ListCircuitsResponse } from '#/lib/api/circuits';
 
 import { DataTable, useDataTable, useUrlSorting } from '#/components/data-table';
 

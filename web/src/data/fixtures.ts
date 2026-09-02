@@ -3,7 +3,6 @@ import type {
     AllTimeDriver,
     CalendarRound,
     CareerSeason,
-    Circuit,
     DriverCareer,
     DriverRaceRow,
     DriverSeasonDetail,
@@ -519,10 +518,59 @@ export function getAllTimeDrivers(): AllTimeDriver[] {
     return ALL_TIME_DRIVERS;
 }
 
+export function getCalendar(): { calendar: CalendarRound[]; completed: number } {
+    return { calendar: CALENDAR, completed: COMPLETED };
+}
+
 export function getDriverCareer(id: string): DriverCareer | undefined {
     const driver = driverBySlug[id];
     if (!driver) return undefined;
     return { driver, seasons: buildCareer(driver) };
+}
+
+export function getDriverSeason(code: string): DriverSeasonDetail | undefined {
+    const driver = driverByCode[code];
+    if (!driver) return undefined;
+    const pos = SEASON_DRIVERS.findIndex(d => d.code === code) + 1;
+
+    let progression = PROGRESSION[code];
+    if (!progression) {
+        progression = [0];
+        for (let i = 1; i <= COMPLETED; i++) {
+            progression.push(Math.round((driver.points * i) / COMPLETED));
+        }
+    }
+    const pointsMax = Math.max(50, Math.ceil(driver.points / 50) * 50);
+
+    const baseP = Math.min(pos, 15);
+    const ptsTable = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
+
+    const finishes: FinishBar[] = [];
+    for (let i = 0; i < COMPLETED; i++) {
+        const p = Math.max(1, Math.round(baseP + Math.sin(i * 1.3) * 2));
+        finishes.push({
+            color: p <= 3 ? '#f59f00' : (p <= 10 ? driver.color : 'var(--neutral-300)'),
+            pos: p,
+            round: 'R' + (i + 1),
+        });
+    }
+
+    const races: DriverRaceRow[] = CALENDAR.slice(0, COMPLETED).map((rc, i) => {
+        const fin = Math.max(1, Math.round(baseP + Math.sin(i * 1.3) * 2));
+        const isDnf = code === 'COL' && i === 4;
+        const pp = fin <= 10 && !isDnf ? ptsTable[fin - 1] : 0;
+        return {
+            finish: isDnf ? 'DNF' : fin,
+            gp: rc.name,
+            grid: Math.max(1, fin + ((i % 3) - 1)),
+            pts: pp,
+            round: rc.round,
+            status: raceStatus(isDnf, fin),
+            statusColor: raceStatusColor(isDnf, fin),
+        };
+    });
+
+    return { driver, finishes, pointsMax, pos, progression, races };
 }
 
 export function getRaceDetail(round: number): RaceDetail | undefined {
@@ -576,6 +624,16 @@ export function getSeasonOverview(): SeasonOverview {
         runnerUp: SEASON_DRIVERS[1],
         totalRounds: TOTAL_ROUNDS,
         year: CURRENT_YEAR,
+    };
+}
+
+export function getStandings(): Standings {
+    return {
+        completed: COMPLETED,
+        constructors: SEASON_CONSTRUCTORS,
+        drivers: SEASON_DRIVERS,
+        leaderPoints: SEASON_DRIVERS[0].points,
+        maxConstructor: SEASON_CONSTRUCTORS[0]?.points || 1,
     };
 }
 
@@ -656,132 +714,6 @@ function buildCareer(d: AllTimeDriver): CareerSeason[] {
         });
     }
     return out.toReversed();
-}
-
-const CIRCUITS: Circuit[] = [
-    {
-        code: 'MON',
-        corners: 19,
-        country: 'Monaco',
-        laps: 78,
-        length: '3.337 km',
-        name: 'Circuit de Monaco',
-        path: 'M20,80 C20,40 50,30 80,35 C110,40 100,70 130,70 C160,70 170,50 180,60 C190,70 160,90 120,88 C70,86 60,95 40,92 C25,90 20,90 20,80 Z',
-        round: 8,
-    },
-    {
-        code: 'SPA',
-        corners: 19,
-        country: 'Belgium',
-        laps: 44,
-        length: '7.004 km',
-        name: 'Spa-Francorchamps',
-        path: 'M25,90 C25,60 40,40 70,42 C95,44 90,20 115,25 C145,31 130,55 160,55 C185,55 185,80 160,82 C120,85 110,75 85,80 C55,86 60,95 40,93 C28,92 25,95 25,90 Z',
-        round: 14,
-    },
-    {
-        code: 'MNZ',
-        corners: 11,
-        country: 'Italy',
-        laps: 53,
-        length: '5.793 km',
-        name: 'Autodromo di Monza',
-        path: 'M30,30 L160,30 C180,30 185,45 170,52 L60,80 C40,86 35,75 55,68 L120,45 C100,52 50,55 40,55 C25,55 25,30 30,30 Z',
-        round: 16,
-    },
-    {
-        code: 'SUZ',
-        corners: 18,
-        country: 'Japan',
-        laps: 53,
-        length: '5.807 km',
-        name: 'Suzuka Circuit',
-        path: 'M30,40 C30,25 55,28 70,38 C90,52 75,60 95,62 C120,64 115,40 140,45 C170,51 175,75 150,82 C110,92 100,78 70,82 C45,85 30,80 35,65 C38,55 50,55 45,48 C40,42 30,50 30,40 Z',
-        round: 3,
-    },
-    {
-        code: 'BCN',
-        corners: 16,
-        country: 'Spain',
-        laps: 66,
-        length: '4.657 km',
-        name: 'Barcelona-Catalunya',
-        path: 'M28,45 C28,30 55,30 75,38 C100,48 130,30 155,42 C180,54 180,78 150,80 C100,83 90,72 65,78 C42,84 28,80 30,68 C32,58 45,58 40,52 C36,47 28,52 28,45 Z',
-        round: 9,
-    },
-    {
-        code: 'COTA',
-        corners: 20,
-        country: 'United States',
-        laps: 56,
-        length: '5.513 km',
-        name: 'Circuit of the Americas',
-        path: 'M30,85 C30,40 45,25 60,35 C72,43 65,55 80,55 C100,55 95,28 120,32 C150,37 145,60 165,62 C188,64 185,88 160,86 C120,83 110,78 85,82 C55,87 45,90 30,85 Z',
-        round: 19,
-    },
-];
-
-export function getCalendar(): { calendar: CalendarRound[]; completed: number } {
-    return { calendar: CALENDAR, completed: COMPLETED };
-}
-
-export function getCircuits(): Circuit[] {
-    return CIRCUITS;
-}
-
-export function getDriverSeason(code: string): DriverSeasonDetail | undefined {
-    const driver = driverByCode[code];
-    if (!driver) return undefined;
-    const pos = SEASON_DRIVERS.findIndex(d => d.code === code) + 1;
-
-    let progression = PROGRESSION[code];
-    if (!progression) {
-        progression = [0];
-        for (let i = 1; i <= COMPLETED; i++) {
-            progression.push(Math.round((driver.points * i) / COMPLETED));
-        }
-    }
-    const pointsMax = Math.max(50, Math.ceil(driver.points / 50) * 50);
-
-    const baseP = Math.min(pos, 15);
-    const ptsTable = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
-
-    const finishes: FinishBar[] = [];
-    for (let i = 0; i < COMPLETED; i++) {
-        const p = Math.max(1, Math.round(baseP + Math.sin(i * 1.3) * 2));
-        finishes.push({
-            color: p <= 3 ? '#f59f00' : (p <= 10 ? driver.color : 'var(--neutral-300)'),
-            pos: p,
-            round: 'R' + (i + 1),
-        });
-    }
-
-    const races: DriverRaceRow[] = CALENDAR.slice(0, COMPLETED).map((rc, i) => {
-        const fin = Math.max(1, Math.round(baseP + Math.sin(i * 1.3) * 2));
-        const isDnf = code === 'COL' && i === 4;
-        const pp = fin <= 10 && !isDnf ? ptsTable[fin - 1] : 0;
-        return {
-            finish: isDnf ? 'DNF' : fin,
-            gp: rc.name,
-            grid: Math.max(1, fin + ((i % 3) - 1)),
-            pts: pp,
-            round: rc.round,
-            status: raceStatus(isDnf, fin),
-            statusColor: raceStatusColor(isDnf, fin),
-        };
-    });
-
-    return { driver, finishes, pointsMax, pos, progression, races };
-}
-
-export function getStandings(): Standings {
-    return {
-        completed: COMPLETED,
-        constructors: SEASON_CONSTRUCTORS,
-        drivers: SEASON_DRIVERS,
-        leaderPoints: SEASON_DRIVERS[0].points,
-        maxConstructor: SEASON_CONSTRUCTORS[0]?.points || 1,
-    };
 }
 
 function raceStatus(isDnf: boolean, fin: number): string {

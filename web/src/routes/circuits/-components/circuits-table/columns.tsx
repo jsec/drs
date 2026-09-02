@@ -1,4 +1,4 @@
-import type { ListCircuitsResponse } from '#/lib/api/circuits.gen';
+import type { ListCircuitsResponse } from '#/lib/api/circuits';
 
 import { makeColumns } from '#/components/data-table';
 

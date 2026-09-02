@@ -1,16 +1,15 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
-import type { ListConstructorsResponse } from '#/lib/api/types';
-
 import { readSortSearch } from '#/components/data-table';
+import { ConstructorListSchema } from '#/lib/api/constructors';
 import { api } from '#/lib/query/api';
 
 import { ConstructorsTable } from './-components/constructors-table';
 import { SORT_IDS } from './-components/constructors-table/columns';
 
 const constructorsQuery = queryOptions({
-    queryFn: () => api.get('constructors').json<ListConstructorsResponse>(),
+    queryFn: () => api.get('constructors').json(ConstructorListSchema),
     queryKey: ['constructors'],
 });
 
