@@ -13,6 +13,8 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /circuits", handle(app.logger, app.listCircuitsHandler))
 	mux.Handle("GET /circuits/{circuitID}", handle(app.logger, app.getCircuitSummaryHandler))
 
+	mux.Handle("GET /drivers/{driverID}", handle(app.logger, app.getDriverSummaryHandler))
+
 	return chainMiddleware(
 		mux,
 		recoverMiddleware(app.logger),

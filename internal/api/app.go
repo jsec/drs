@@ -6,6 +6,7 @@ import (
 	"github.com/jsec/drs/internal/circuits"
 	"github.com/jsec/drs/internal/constructors"
 	"github.com/jsec/drs/internal/database"
+	"github.com/jsec/drs/internal/drivers"
 	"github.com/jsec/drs/internal/seasons"
 )
 
@@ -14,6 +15,7 @@ type application struct {
 	seasons      *seasons.Service
 	constructors *constructors.Service
 	circuits     *circuits.Service
+	drivers      *drivers.Service
 }
 
 func newApplication(logger *slog.Logger, queries *database.Queries) *application {
@@ -22,5 +24,6 @@ func newApplication(logger *slog.Logger, queries *database.Queries) *application
 		seasons:      seasons.NewService(queries),
 		constructors: constructors.NewService(queries),
 		circuits:     circuits.NewService(queries),
+		drivers:      drivers.NewService(queries),
 	}
 }
