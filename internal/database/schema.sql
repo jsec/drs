@@ -233,37 +233,37 @@ CREATE TABLE effone.driver_season_constructor_summaries (
 
 CREATE TABLE effone.driver_season_summaries (
     average_qualifying_position numeric(6,2),
-    championship_won boolean CONSTRAINT driver_season_summaries__dbt_tmp_championship_won_not_null NOT NULL,
-    constructor_id text CONSTRAINT driver_season_summaries__dbt_tmp_constructor_id_not_null1 NOT NULL,
-    driver_code text CONSTRAINT driver_season_summaries__dbt_tmp_driver_code_not_null NOT NULL,
-    driver_id text CONSTRAINT driver_season_summaries__dbt_tmp_driver_id_not_null NOT NULL,
-    driver_name text CONSTRAINT driver_season_summaries__dbt_tmp_driver_name_not_null NOT NULL,
-    entry_count integer CONSTRAINT driver_season_summaries__dbt_tmp_entry_count_not_null NOT NULL,
-    fastest_lap_count integer CONSTRAINT driver_season_summaries__dbt_tmp_fastest_lap_count_not_null NOT NULL,
+    championship_won boolean CONSTRAINT driver_season_summaries__dbt_tmp_championship_won_not_null1 NOT NULL,
+    constructor_id text CONSTRAINT driver_season_summaries__dbt_tmp_constructor_id_not_null NOT NULL,
+    driver_code text CONSTRAINT driver_season_summaries__dbt_tmp_driver_code_not_null1 NOT NULL,
+    driver_id text CONSTRAINT driver_season_summaries__dbt_tmp_driver_id_not_null1 NOT NULL,
+    driver_name text CONSTRAINT driver_season_summaries__dbt_tmp_driver_name_not_null1 NOT NULL,
+    entry_count integer CONSTRAINT driver_season_summaries__dbt_tmp_entry_count_not_null1 NOT NULL,
+    fastest_lap_count integer CONSTRAINT driver_season_summaries__dbt_tmp_fastest_lap_count_not_null1 NOT NULL,
     final_points numeric(8,2),
     final_points_x100 integer,
     final_position integer,
     final_position_text text,
-    podium_count integer CONSTRAINT driver_season_summaries__dbt_tmp_podium_count_not_null NOT NULL,
-    points_delta numeric(8,2) CONSTRAINT driver_season_summaries__dbt_tmp_points_delta_not_null NOT NULL,
-    points_delta_x100 integer CONSTRAINT driver_season_summaries__dbt_tmp_points_delta_x100_not_null NOT NULL,
-    qualifying_entry_count integer CONSTRAINT driver_season_summaries__dbt_tm_qualifying_entry_count_not_null NOT NULL,
-    qualifying_p1_count integer CONSTRAINT driver_season_summaries__dbt_tmp_qualifying_p1_count_not_null NOT NULL,
-    qualifying_position_count integer CONSTRAINT driver_season_summaries__dbt_qualifying_position_count_not_null NOT NULL,
-    race_entry_count integer CONSTRAINT driver_season_summaries__dbt_tmp_race_entry_count_not_null NOT NULL,
-    race_points numeric(8,2) CONSTRAINT driver_season_summaries__dbt_tmp_race_points_not_null NOT NULL,
-    race_points_x100 integer CONSTRAINT driver_season_summaries__dbt_tmp_race_points_x100_not_null NOT NULL,
-    race_start_count integer CONSTRAINT driver_season_summaries__dbt_tmp_race_start_count_not_null NOT NULL,
-    refresh_id bigint CONSTRAINT driver_season_summaries__dbt_tmp_refresh_id_not_null NOT NULL,
-    season integer CONSTRAINT driver_season_summaries__dbt_tmp_season_not_null NOT NULL,
-    sprint_entry_count integer CONSTRAINT driver_season_summaries__dbt_tmp_sprint_entry_count_not_null NOT NULL,
-    sprint_points numeric(8,2) CONSTRAINT driver_season_summaries__dbt_tmp_sprint_points_not_null NOT NULL,
-    sprint_points_x100 integer CONSTRAINT driver_season_summaries__dbt_tmp_sprint_points_x100_not_null NOT NULL,
-    sprint_start_count integer CONSTRAINT driver_season_summaries__dbt_tmp_sprint_start_count_not_null NOT NULL,
-    start_count integer CONSTRAINT driver_season_summaries__dbt_tmp_start_count_not_null NOT NULL,
-    total_points numeric(8,2) CONSTRAINT driver_season_summaries__dbt_tmp_total_points_not_null NOT NULL,
-    total_points_x100 integer CONSTRAINT driver_season_summaries__dbt_tmp_total_points_x100_not_null NOT NULL,
-    win_count integer CONSTRAINT driver_season_summaries__dbt_tmp_win_count_not_null NOT NULL
+    podium_count integer CONSTRAINT driver_season_summaries__dbt_tmp_podium_count_not_null1 NOT NULL,
+    points_delta numeric(8,2) CONSTRAINT driver_season_summaries__dbt_tmp_points_delta_not_null1 NOT NULL,
+    points_delta_x100 integer CONSTRAINT driver_season_summaries__dbt_tmp_points_delta_x100_not_null1 NOT NULL,
+    qualifying_entry_count integer CONSTRAINT driver_season_summaries__dbt_t_qualifying_entry_count_not_null1 NOT NULL,
+    qualifying_p1_count integer CONSTRAINT driver_season_summaries__dbt_tmp_qualifying_p1_count_not_null1 NOT NULL,
+    qualifying_position_count integer CONSTRAINT driver_season_summaries__db_qualifying_position_count_not_null1 NOT NULL,
+    race_entry_count integer CONSTRAINT driver_season_summaries__dbt_tmp_race_entry_count_not_null1 NOT NULL,
+    race_points numeric(8,2) CONSTRAINT driver_season_summaries__dbt_tmp_race_points_not_null1 NOT NULL,
+    race_points_x100 integer CONSTRAINT driver_season_summaries__dbt_tmp_race_points_x100_not_null1 NOT NULL,
+    race_start_count integer CONSTRAINT driver_season_summaries__dbt_tmp_race_start_count_not_null1 NOT NULL,
+    refresh_id bigint CONSTRAINT driver_season_summaries__dbt_tmp_refresh_id_not_null1 NOT NULL,
+    season integer CONSTRAINT driver_season_summaries__dbt_tmp_season_not_null1 NOT NULL,
+    sprint_entry_count integer CONSTRAINT driver_season_summaries__dbt_tmp_sprint_entry_count_not_null1 NOT NULL,
+    sprint_points numeric(8,2) CONSTRAINT driver_season_summaries__dbt_tmp_sprint_points_not_null1 NOT NULL,
+    sprint_points_x100 integer CONSTRAINT driver_season_summaries__dbt_tmp_sprint_points_x100_not_null1 NOT NULL,
+    sprint_start_count integer CONSTRAINT driver_season_summaries__dbt_tmp_sprint_start_count_not_null1 NOT NULL,
+    start_count integer CONSTRAINT driver_season_summaries__dbt_tmp_start_count_not_null1 NOT NULL,
+    total_points numeric(8,2) CONSTRAINT driver_season_summaries__dbt_tmp_total_points_not_null1 NOT NULL,
+    total_points_x100 integer CONSTRAINT driver_season_summaries__dbt_tmp_total_points_x100_not_null1 NOT NULL,
+    win_count integer CONSTRAINT driver_season_summaries__dbt_tmp_win_count_not_null1 NOT NULL
 );
 
 
@@ -517,6 +517,7 @@ CREATE TABLE effone.races (
     fp2_time time without time zone,
     fp3_date date,
     fp3_time time without time zone,
+    grand_prix_code text,
     grand_prix_id text CONSTRAINT races__dbt_tmp_grand_prix_id_not_null1 NOT NULL,
     grand_prix_name text CONSTRAINT races__dbt_tmp_grand_prix_name_not_null1 NOT NULL,
     pole_driver_id text,
@@ -548,6 +549,7 @@ CREATE TABLE effone.races (
     turns integer CONSTRAINT races__dbt_tmp_turns_not_null1 NOT NULL,
     winner_constructor_id text,
     winner_constructor_name text,
+    winner_driver_code text,
     winner_driver_id text,
     winner_driver_name text
 );
@@ -733,6 +735,27 @@ CREATE INDEX driver_season_constructor_summaries_driver_season_idx ON effone.dri
 --
 
 CREATE UNIQUE INDEX driver_season_constructor_summaries_season_driver_ctor_uidx ON effone.driver_season_constructor_summaries USING btree (season, driver_id, constructor_id);
+
+
+--
+-- Name: driver_season_summaries_driver_season_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX driver_season_summaries_driver_season_idx ON effone.driver_season_summaries USING btree (driver_id, season);
+
+
+--
+-- Name: driver_season_summaries_season_driver_uidx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE UNIQUE INDEX driver_season_summaries_season_driver_uidx ON effone.driver_season_summaries USING btree (season, driver_id);
+
+
+--
+-- Name: driver_season_summaries_season_position_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX driver_season_summaries_season_position_idx ON effone.driver_season_summaries USING btree (season, final_position);
 
 
 --

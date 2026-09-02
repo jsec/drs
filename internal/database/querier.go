@@ -14,6 +14,7 @@ type Querier interface {
 	GetRacesByCircuitId(ctx context.Context, circuitID string) ([]GetRacesByCircuitIdRow, error)
 	ListCircuits(ctx context.Context) ([]ListCircuitsRow, error)
 	ListConstructors(ctx context.Context) ([]ListConstructorsRow, error)
+	ListDriverSeasons(ctx context.Context, driverID string) ([]ListDriverSeasonsRow, error)
 	ListSeasons(ctx context.Context) ([]ListSeasonsRow, error)
 	MarkRefreshFailed(ctx context.Context, arg MarkRefreshFailedParams) error
 	MarkRefreshSucceeded(ctx context.Context, arg MarkRefreshSucceededParams) error

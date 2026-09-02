@@ -181,6 +181,36 @@ type EffoneDriver struct {
 	WinCount                     int32
 }
 
+type EffoneDriverSeasonConstructorSummary struct {
+	AverageQualifyingPosition pgtype.Numeric
+	ConstructorID             string
+	ConstructorName           string
+	ConstructorSequence       int32
+	DriverCode                string
+	DriverID                  string
+	DriverName                string
+	EntryCount                int32
+	FastestLapCount           int32
+	PodiumCount               int32
+	QualifyingEntryCount      int32
+	QualifyingP1Count         int32
+	QualifyingPositionCount   int32
+	RaceEntryCount            int32
+	RacePoints                pgtype.Numeric
+	RacePointsX100            int32
+	RaceStartCount            int32
+	RefreshID                 int64
+	Season                    int32
+	SprintEntryCount          int32
+	SprintPoints              pgtype.Numeric
+	SprintPointsX100          int32
+	SprintStartCount          int32
+	StartCount                int32
+	TotalPoints               pgtype.Numeric
+	TotalPointsX100           int32
+	WinCount                  int32
+}
+
 type EffoneDriverSeasonSummary struct {
 	AverageQualifyingPosition pgtype.Numeric
 	ChampionshipWon           bool
@@ -340,6 +370,7 @@ type EffoneRace struct {
 	Fp2Time                     pgtype.Time
 	Fp3Date                     dbtypes.Date
 	Fp3Time                     pgtype.Time
+	GrandPrixCode               pgtype.Text
 	GrandPrixID                 string
 	GrandPrixName               string
 	PoleDriverID                pgtype.Text
@@ -371,6 +402,7 @@ type EffoneRace struct {
 	Turns                       int32
 	WinnerConstructorID         pgtype.Text
 	WinnerConstructorName       pgtype.Text
+	WinnerDriverCode            pgtype.Text
 	WinnerDriverID              pgtype.Text
 	WinnerDriverName            pgtype.Text
 }
