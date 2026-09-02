@@ -29,13 +29,15 @@ type DriverSummary struct {
 }
 
 type DriverShortSummary struct {
-	Code          string `json:"code"`
-	Name          string `json:"name"`
-	Starts        int32  `json:"starts"`
-	Wins          int32  `json:"wins"`
-	Podiums       int32  `json:"podiums"`
-	Poles         int32  `json:"poles"`
-	Championships int32  `json:"championships"`
-	FirstYear     *int32 `json:"firstYear"`
-	LastYear      *int32 `json:"LastYear"`
+	Code             string `json:"code"`
+	Name             string `json:"name"`
+	Starts           int32  `json:"starts"`
+	Wins             int32  `json:"wins"`
+	Podiums          int32  `json:"podiums"`
+	Poles            int32  `json:"poles"`
+	Championships    int32  `json:"championships"`
+	IsActive         bool   `json:"isActive"`
+	ConstructorColor string `json:"constructorColor"`
+	FirstYear        *int32 `json:"firstYear"`
+	LastYear         *int32 `json:"LastYear"`
 }

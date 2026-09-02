@@ -36,15 +36,17 @@ func (s *Service) ListDrivers(ctx context.Context) ([]DriverShortSummary, error)
 
 	for _, d := range drivers {
 		driver := DriverShortSummary{
-			Code:          d.Code,
-			Name:          d.Name,
-			Starts:        d.Starts,
-			Wins:          d.Wins,
-			Podiums:       d.Podiums,
-			Poles:         d.Poles,
-			Championships: d.Championships,
-			FirstYear:     d.FirstRaceDate.Year(),
-			LastYear:      d.LastRaceDate.Year(),
+			Code:             d.Code,
+			Name:             d.Name,
+			Starts:           d.Starts,
+			Wins:             d.Wins,
+			Podiums:          d.Podiums,
+			Poles:            d.Poles,
+			Championships:    d.Championships,
+			IsActive:         d.IsActive.Bool,
+			ConstructorColor: d.ConstructorColor.String,
+			FirstYear:        d.FirstRaceDate.Year(),
+			LastYear:         d.LastRaceDate.Year(),
 		}
 
 		response = append(response, driver)
