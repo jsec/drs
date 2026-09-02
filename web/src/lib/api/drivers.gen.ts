@@ -22,6 +22,7 @@ export interface DriverSummary {
   seasons: driverSeasonSummary[];
 }
 export interface DriverShortSummary {
+  id: string;
   code: string;
   name: string;
   starts: number /* int32 */;

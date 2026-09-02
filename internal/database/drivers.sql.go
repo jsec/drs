@@ -132,6 +132,7 @@ active_drivers AS (
     ORDER BY driver_id, constructor_sequence DESC
 )
 SELECT
+    d.driver_id as id,
     d.driver_code AS code,
     d.driver_name AS name,
     d.start_count AS starts,
@@ -149,6 +150,7 @@ LEFT JOIN effone.constructors c ON a.constructor_id = c.constructor_id
 `
 
 type ListDriversRow struct {
+	ID               string
 	Code             string
 	Name             string
 	Starts           int32
@@ -172,6 +174,7 @@ func (q *Queries) ListDrivers(ctx context.Context) ([]ListDriversRow, error) {
 	for rows.Next() {
 		var i ListDriversRow
 		if err := rows.Scan(
+			&i.ID,
 			&i.Code,
 			&i.Name,
 			&i.Starts,

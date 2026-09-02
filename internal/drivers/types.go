@@ -29,6 +29,7 @@ type DriverSummary struct {
 }
 
 type DriverShortSummary struct {
+	ID               string `json:"id"`
 	Code             string `json:"code"`
 	Name             string `json:"name"`
 	Starts           int32  `json:"starts"`

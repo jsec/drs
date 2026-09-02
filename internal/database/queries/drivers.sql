@@ -45,6 +45,7 @@ active_drivers AS (
     ORDER BY driver_id, constructor_sequence DESC
 )
 SELECT
+    d.driver_id as id,
     d.driver_code AS code,
     d.driver_name AS name,
     d.start_count AS starts,
