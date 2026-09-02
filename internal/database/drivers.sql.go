@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jsec/drs/internal/dbtypes"
 )
 
 const getDriverSummary = `-- name: GetDriverSummary :one
@@ -106,6 +107,62 @@ func (q *Queries) ListDriverSeasons(ctx context.Context, driverID string) ([]Lis
 			&i.Poles,
 			&i.Points,
 			&i.Position,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listDrivers = `-- name: ListDrivers :many
+SELECT
+    driver_code AS code,
+    driver_name AS name,
+    start_count AS starts,
+    win_count AS wins,
+    podium_count AS podiums,
+    qualifying_p1_count AS poles,
+    championship_count AS championships,
+    first_race_date,
+    last_race_date
+FROM effone.drivers
+`
+
+type ListDriversRow struct {
+	Code          string
+	Name          string
+	Starts        int32
+	Wins          int32
+	Podiums       int32
+	Poles         int32
+	Championships int32
+	FirstRaceDate dbtypes.Date
+	LastRaceDate  dbtypes.Date
+}
+
+func (q *Queries) ListDrivers(ctx context.Context) ([]ListDriversRow, error) {
+	rows, err := q.db.Query(ctx, listDrivers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListDriversRow
+	for rows.Next() {
+		var i ListDriversRow
+		if err := rows.Scan(
+			&i.Code,
+			&i.Name,
+			&i.Starts,
+			&i.Wins,
+			&i.Podiums,
+			&i.Poles,
+			&i.Championships,
+			&i.FirstRaceDate,
+			&i.LastRaceDate,
 		); err != nil {
 			return nil, err
 		}

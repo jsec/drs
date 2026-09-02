@@ -30,3 +30,16 @@ SELECT
     championship_count AS championships
 FROM effone.drivers
 WHERE driver_id = $1;
+
+-- name: ListDrivers :many
+SELECT
+    driver_code AS code,
+    driver_name AS name,
+    start_count AS starts,
+    win_count AS wins,
+    podium_count AS podiums,
+    qualifying_p1_count AS poles,
+    championship_count AS championships,
+    first_race_date,
+    last_race_date
+FROM effone.drivers;

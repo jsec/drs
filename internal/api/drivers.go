@@ -19,3 +19,12 @@ func (app *application) getDriverSummaryHandler(w http.ResponseWriter, r *http.R
 
 	return respondJSON(app.logger, w, http.StatusOK, summary)
 }
+
+func (app *application) listDriversHandler(w http.ResponseWriter, r *http.Request) error {
+	drivers, err := app.drivers.ListDrivers(r.Context())
+	if err != nil {
+		return err
+	}
+
+	return respondJSON(app.logger, w, http.StatusOK, drivers)
+}
