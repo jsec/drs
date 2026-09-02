@@ -40,5 +40,5 @@ type DriverShortSummary struct {
 	IsActive         bool   `json:"isActive"`
 	ConstructorColor string `json:"constructorColor"`
 	FirstYear        *int32 `json:"firstYear"`
-	LastYear         *int32 `json:"LastYear"`
+	LastYear         *int32 `json:"lastYear"`
 }

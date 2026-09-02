@@ -1,18 +1,24 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
 import type { SortSearch } from '#/components/data-table';
+import type { DriverShortSummary } from '#/lib/api/drivers.gen';
 
 import { readSortSearch } from '#/components/data-table';
-import { allTimeDriversQuery } from '#/data/queries';
+import { api } from '#/lib/query/api';
 
 import type { Category } from './-components/drivers-table';
 
 import { CATEGORIES, DriversTable } from './-components/drivers-table';
 import { SORT_IDS } from './-components/drivers-table/columns';
 
+const listDriversQuery = queryOptions({
+    queryFn: () => api.get('drivers').json<DriverShortSummary[]>(),
+    queryKey: ['drivers'],
+});
+
 const DriversIndex = () => {
-    const { data } = useSuspenseQuery(allTimeDriversQuery());
+    const { data } = useSuspenseQuery(listDriversQuery);
     return <DriversTable drivers={data} />;
 };
 
@@ -24,7 +30,7 @@ export const Route = createFileRoute('/drivers/')({
     }),
     // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
     loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData(allTimeDriversQuery());
+        await context.queryClient.ensureQueryData(listDriversQuery);
         return { crumbs: [{ label: 'Drivers' }] };
     },
 });

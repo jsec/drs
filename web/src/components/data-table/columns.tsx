@@ -7,12 +7,6 @@ import { cn } from '#/lib/utils';
 
 type Alignment = 'center' | 'right';
 
-/**
- * Keys of `T` whose value is assignable to `V` (e.g. numeric or renderable
- * columns). Constrains which columns a builder accepts; TypeScript will not
- * narrow `T[K]` back to `V` through this, so the cell still coerces the read,
- * but that coercion is now guaranteed sound by the key constraint.
- */
 type KeysMatching<T, V> = string & {
     [K in keyof T]-?: T[K] extends V ? K : never;
 }[keyof T];

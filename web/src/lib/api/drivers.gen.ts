@@ -33,5 +33,5 @@ export interface DriverShortSummary {
   isActive: boolean;
   constructorColor: string;
   firstYear?: number /* int32 */;
-  LastYear?: number /* int32 */;
+  lastYear?: number /* int32 */;
 }

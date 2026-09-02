@@ -3,7 +3,7 @@ import { MagnifyingGlassIcon } from '@phosphor-icons/react';
 import { getRouteApi } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
-import type { AllTimeDriver } from '#/data/types';
+import type { DriverShortSummary } from '#/lib/api/drivers.gen';
 
 import { DataTable, useDataTable, useUrlSorting } from '#/components/data-table';
 import { Pill } from '#/components/f1-ui';
@@ -21,7 +21,7 @@ export const CATEGORIES: { key: Category; label: string }[] = [
 const route = getRouteApi('/drivers/');
 
 type Props = {
-    drivers: AllTimeDriver[];
+    drivers: DriverShortSummary[];
 };
 
 export const DriversTable = ({ drivers }: Props) => {
@@ -31,14 +31,17 @@ export const DriversTable = ({ drivers }: Props) => {
     const setCategory = (next: Category) =>
         void navigate({ search: prev => ({ ...prev, category: next }) });
 
-    const data = useMemo(
-        () =>
-            drivers.filter(
-                d =>
-                    category === 'all'
-                    || (category === 'champions' ? d.titles > 0 : d.active),
-            ),
-        [drivers, category],
+    const data = useMemo(() => {
+        if (category === 'active') {
+            return drivers.filter(d => d.isActive);
+        }
+
+        if (category === 'champions') {
+            return drivers.filter(d => d.championships > 0);
+        }
+
+        return drivers;
+    }, [drivers, category],
     );
 
     const { onSortingChange, sorting } = useUrlSorting(route);
