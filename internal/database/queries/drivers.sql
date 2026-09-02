@@ -16,3 +16,17 @@ FROM effone.driver_season_constructor_summaries dscs
     JOIN effone.constructors c ON dscs.constructor_id = c.constructor_id
 WHERE dscs.driver_id = $1
 ORDER BY dscs.season DESC, dscs.constructor_sequence;
+
+-- name: GetDriverSummary :one
+SELECT
+    driver_code AS code,
+    driver_name AS name,
+    nationality AS country,
+    nationality_country_code AS country_code,
+    start_count AS starts,
+    win_count AS wins,
+    podium_count AS podiums,
+    qualifying_p1_count AS poles,
+    championship_count AS championships
+FROM effone.drivers
+WHERE driver_id = $1;

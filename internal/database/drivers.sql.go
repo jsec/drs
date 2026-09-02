@@ -11,6 +11,50 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getDriverSummary = `-- name: GetDriverSummary :one
+SELECT
+    driver_code AS code,
+    driver_name AS name,
+    nationality AS country,
+    nationality_country_code AS country_code,
+    start_count AS starts,
+    win_count AS wins,
+    podium_count AS podiums,
+    qualifying_p1_count AS poles,
+    championship_count AS championships
+FROM effone.drivers
+WHERE driver_id = $1
+`
+
+type GetDriverSummaryRow struct {
+	Code          string
+	Name          string
+	Country       string
+	CountryCode   string
+	Starts        int32
+	Wins          int32
+	Podiums       int32
+	Poles         int32
+	Championships int32
+}
+
+func (q *Queries) GetDriverSummary(ctx context.Context, driverID string) (GetDriverSummaryRow, error) {
+	row := q.db.QueryRow(ctx, getDriverSummary, driverID)
+	var i GetDriverSummaryRow
+	err := row.Scan(
+		&i.Code,
+		&i.Name,
+		&i.Country,
+		&i.CountryCode,
+		&i.Starts,
+		&i.Wins,
+		&i.Podiums,
+		&i.Poles,
+		&i.Championships,
+	)
+	return i, err
+}
+
 const listDriverSeasons = `-- name: ListDriverSeasons :many
 SELECT
     dscs.season,
