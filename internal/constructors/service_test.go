@@ -126,7 +126,7 @@ func TestService_ListConstructors(t *testing.T) {
 
 			if tt.wantErr != nil {
 				require.ErrorIs(t, err, tt.wantErr)
-				assert.EqualError(t, err, tt.wantErrMessage)
+				require.EqualError(t, err, tt.wantErrMessage)
 				assert.Nil(t, got)
 				return
 			}

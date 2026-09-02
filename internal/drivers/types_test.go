@@ -18,6 +18,6 @@ func TestDriverShortSummary_UsesCamelCaseLastYear(t *testing.T) {
 	assert.NoError(t, err)
 	var response map[string]any
 	assert.NoError(t, json.Unmarshal(jsonSummary, &response))
-	assert.Equal(t, float64(2012), response["lastYear"])
+	assert.InDelta(t, 2012, response["lastYear"], 0)
 	assert.NotContains(t, response, "LastYear")
 }
