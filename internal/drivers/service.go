@@ -88,16 +88,20 @@ func (s *Service) GetSummary(ctx context.Context, driverId string) (DriverSummar
 	}
 
 	response := DriverSummary{
-		Code:          summary.Code,
-		Name:          summary.Name,
-		Country:       summary.Country,
-		CountryCode:   summary.CountryCode,
-		Starts:        summary.Starts,
-		Wins:          summary.Wins,
-		Podiums:       summary.Podiums,
-		Poles:         summary.Poles,
-		Championships: summary.Championships,
-		Seasons:       seasons,
+		Code:             summary.Code,
+		Name:             summary.Name,
+		Country:          summary.Country,
+		CountryCode:      summary.CountryCode,
+		Starts:           summary.Starts,
+		Wins:             summary.Wins,
+		Podiums:          summary.Podiums,
+		Poles:            summary.Poles,
+		Championships:    summary.Championships,
+		IsActive:         summary.IsActive.Bool,
+		ConstructorColor: summary.ConstructorColor.String,
+		FirstYear:        summary.FirstRaceDate.Year(),
+		LastYear:         summary.LastRaceDate.Year(),
+		Seasons:          seasons,
 	}
 
 	return response, nil

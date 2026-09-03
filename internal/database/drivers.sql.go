@@ -13,30 +13,52 @@ import (
 )
 
 const getDriverSummary = `-- name: GetDriverSummary :one
+WITH current_season AS (
+    SELECT max(season) AS season
+    FROM effone.driver_season_constructor_summaries
+),
+active_drivers AS (
+    SELECT DISTINCT ON (driver_id)
+        driver_id,
+        constructor_id
+    FROM effone.driver_season_constructor_summaries
+    WHERE season = (SELECT season FROM current_season)
+    ORDER BY driver_id, constructor_sequence DESC
+)
 SELECT
-    driver_code AS code,
-    driver_name AS name,
-    nationality AS country,
-    nationality_country_code AS country_code,
-    start_count AS starts,
-    win_count AS wins,
-    podium_count AS podiums,
-    qualifying_p1_count AS poles,
-    championship_count AS championships
-FROM effone.drivers
-WHERE driver_id = $1
+    d.driver_code AS code,
+    d.driver_name AS name,
+    d.nationality AS country,
+    d.nationality_country_code AS country_code,
+    d.start_count AS starts,
+    d.win_count AS wins,
+    d.podium_count AS podiums,
+    d.qualifying_p1_count AS poles,
+    d.championship_count AS championships,
+    d.first_race_date,
+    d.last_race_date,
+    a.driver_id IS NOT NULL AS is_active,
+    c.primary_color_hex AS constructor_color
+FROM effone.drivers d
+LEFT JOIN active_drivers a ON d.driver_id = a.driver_id
+LEFT JOIN effone.constructors c ON a.constructor_id = c.constructor_id
+WHERE d.driver_id = $1
 `
 
 type GetDriverSummaryRow struct {
-	Code          string
-	Name          string
-	Country       string
-	CountryCode   string
-	Starts        int32
-	Wins          int32
-	Podiums       int32
-	Poles         int32
-	Championships int32
+	Code             string
+	Name             string
+	Country          string
+	CountryCode      string
+	Starts           int32
+	Wins             int32
+	Podiums          int32
+	Poles            int32
+	Championships    int32
+	FirstRaceDate    dbtypes.Date
+	LastRaceDate     dbtypes.Date
+	IsActive         pgtype.Bool
+	ConstructorColor pgtype.Text
 }
 
 func (q *Queries) GetDriverSummary(ctx context.Context, driverID string) (GetDriverSummaryRow, error) {
@@ -52,6 +74,10 @@ func (q *Queries) GetDriverSummary(ctx context.Context, driverID string) (GetDri
 		&i.Podiums,
 		&i.Poles,
 		&i.Championships,
+		&i.FirstRaceDate,
+		&i.LastRaceDate,
+		&i.IsActive,
+		&i.ConstructorColor,
 	)
 	return i, err
 }

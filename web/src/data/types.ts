@@ -14,7 +14,6 @@ export type AllTimeDriver = {
     code: string;
     color: string;
     countryCode?: string;
-    /** Stable URL slug derived from `name`; independent of array order. */
     id: string;
     name: string;
     nat: string;
@@ -35,19 +34,6 @@ export type CalendarRound = {
     winner: null | string;
 };
 
-export type CareerSeason = {
-    champ: boolean;
-    label: string;
-    podiums: number;
-    points: number;
-    poles: number;
-    pos: number;
-    posLabel: string;
-    starts: number;
-    wins: number;
-    year: number;
-};
-
 export type CareerTotals = {
     debut: number;
     podiums: number;
@@ -55,11 +41,6 @@ export type CareerTotals = {
     races: number;
     titles: number;
     wins: number;
-};
-
-export type DriverCareer = {
-    driver: AllTimeDriver;
-    seasons: CareerSeason[];
 };
 
 export type DriverRaceRow = {

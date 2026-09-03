@@ -2,8 +2,6 @@ import type {
     AllTimeConstructor,
     AllTimeDriver,
     CalendarRound,
-    CareerSeason,
-    DriverCareer,
     DriverRaceRow,
     DriverSeasonDetail,
     FinishBar,
@@ -522,12 +520,6 @@ export function getCalendar(): { calendar: CalendarRound[]; completed: number } 
     return { calendar: CALENDAR, completed: COMPLETED };
 }
 
-export function getDriverCareer(id: string): DriverCareer | undefined {
-    const driver = driverBySlug[id];
-    if (!driver) return undefined;
-    return { driver, seasons: buildCareer(driver) };
-}
-
 export function getDriverSeason(code: string): DriverSeasonDetail | undefined {
     const driver = driverByCode[code];
     if (!driver) return undefined;
@@ -635,85 +627,6 @@ export function getStandings(): Standings {
         leaderPoints: SEASON_DRIVERS[0].points,
         maxConstructor: SEASON_CONSTRUCTORS[0]?.points || 1,
     };
-}
-
-function buildCareer(d: AllTimeDriver): CareerSeason[] {
-    const m = /(\d{4})\D*(\d{4})?/.exec(d.years);
-    const start = m ? +m[1] : 2020;
-    let end = m && m[2] ? +m[2] : CURRENT_YEAR;
-    if (end < start) end = start;
-    let nS = end - start + 1;
-    if (nS > 30) nS = 30;
-
-    const w: number[] = [];
-    for (let i = 0; i < nS; i++) {
-        w.push(Math.pow(Math.sin((Math.PI * (i + 0.5)) / nS), 1.2) + 0.18);
-    }
-    const sum = w.reduce((a, b) => a + b, 0);
-    const dist = (total: number): number[] => {
-        if (total <= 0) return w.map(() => 0);
-        const raw = w.map(x => (x / sum) * total);
-        const f = raw.map(x => Math.floor(x));
-        const rem = total - f.reduce((a, b) => a + b, 0);
-        const ord = raw
-            .map((x, i): [number, number] => [i, x - Math.floor(x)])
-            .toSorted((a, b) => b[1] - a[1]);
-        for (let k = 0; k < rem; k++) f[ord[k % nS][0]]++;
-        return f;
-    };
-
-    const wins = dist(d.wins);
-    const poles = dist(d.poles);
-    const pods = dist(d.podiums);
-    for (let i = 0; i < nS; i++) if (pods[i] < wins[i]) pods[i] = wins[i];
-    const starts = dist(d.starts).map(x => Math.max(1, x));
-
-    const titleIdx = new Set<number>();
-    if (d.titles > 0) {
-        const topWins = wins
-            .map((x, i): [number, number] => [i, x])
-            .toSorted((a, b) => b[1] - a[1])
-            .slice(0, d.titles);
-        for (const a of topWins) titleIdx.add(a[0]);
-    }
-
-    const out: CareerSeason[] = [];
-    for (let i = 0; i < nS; i++) {
-        const yr = start + i;
-        const wi = wins[i];
-        const pi = pods[i];
-        const si = starts[i];
-        let pos: number;
-        let label = '';
-        if (titleIdx.has(i)) {
-            pos = 1;
-            label = 'Champion';
-        } else {
-            if (wi >= 7) pos = 2;
-            else if (wi >= 4) pos = 3 + (i % 2);
-            else if (wi >= 2) pos = 4 + (i % 3);
-            else if (wi >= 1) pos = 6 + (i % 3);
-            else if (pi >= 2) pos = 7 + (i % 4);
-            else if (pi >= 1) pos = 10 + (i % 4);
-            else pos = 12 + ((yr * 7 + i) % 7);
-            if (pos === 2) label = 'Runner-up';
-            else if (pos === 3) label = '3rd';
-        }
-        const pts = Math.round(wi * 25 + (pi - wi) * 12 + Math.max(0, si - pi) * (wi > 0 ? 3 : 1.2));
-        out.push({
-            champ: titleIdx.has(i),
-            label,
-            podiums: pi,
-            points: pts,
-            poles: poles[i],
-            pos,
-            posLabel: 'P' + pos,
-            starts: si,
-            wins: wi,
-            year: yr,
-        });
-    }
-    return out.toReversed();
 }
 
 function raceStatus(isDnf: boolean, fin: number): string {

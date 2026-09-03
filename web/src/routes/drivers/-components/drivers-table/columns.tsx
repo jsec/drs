@@ -7,10 +7,9 @@ import type { DriverShortSummary } from '#/lib/api/drivers';
 import { makeColumns } from '#/components/data-table';
 import { DriverAvatar } from '#/components/f1-ui';
 
-const col = makeColumns<DriverShortSummary>();
+import { driverSummaryColor, formatDriverYears } from '../driver-summary';
 
-const FORMER_CHAMPION_COLOR = '#c79100';
-const INACTIVE_DRIVER_COLOR = 'var(--neutral-500)';
+const col = makeColumns<DriverShortSummary>();
 
 export const SORT_IDS = ['name', 'years', 'starts', 'wins', 'poles', 'podiums', 'titles'] as const;
 
@@ -20,31 +19,8 @@ const byTitles: SortingFn<DriverShortSummary> = (a, b) =>
 const byWins: SortingFn<DriverShortSummary> = (a, b) =>
     a.original.wins - b.original.wins || a.original.podiums - b.original.podiums;
 
-export const formatYears = ({ firstYear, isActive, lastYear }: Pick<
-    DriverShortSummary,
-    'firstYear' | 'isActive' | 'lastYear'
->) => {
-    if (!firstYear) {
-        return '-';
-    }
-
-    if (isActive || !lastYear) {
-        return `${firstYear}–`;
-    }
-
-    return `${firstYear}–${lastYear}`;
-};
-
-export const driverBadgeColor = ({ championships, constructorColor, isActive }: Pick<
-    DriverShortSummary,
-    'championships' | 'constructorColor' | 'isActive'
->) => {
-    if (isActive) {
-        return constructorColor;
-    }
-
-    return championships > 0 ? FORMER_CHAMPION_COLOR : INACTIVE_DRIVER_COLOR;
-};
+export const formatYears = formatDriverYears;
+export const driverBadgeColor = driverSummaryColor;
 
 export const fuzzy: FilterFn<DriverShortSummary> = (row, _columnId, value, addMeta) => {
     const ranked = rankItem(`${row.original.name} ${row.original.code}`, value as string);

@@ -3,7 +3,6 @@ import { queryOptions } from '@tanstack/react-query';
 import {
     getAllTimeDrivers,
     getCalendar,
-    getDriverCareer,
     getDriverSeason,
     getRaceDetail,
     getSeasonOverview,
@@ -20,16 +19,6 @@ export const allTimeDriversQuery = () =>
     queryOptions({
         queryFn: () => getAllTimeDrivers(),
         queryKey: ['all-time-drivers'],
-    });
-
-export const driverCareerQuery = (driverId: string) =>
-    queryOptions({
-        queryFn: () => {
-            const career = getDriverCareer(driverId);
-            if (!career) throw new Error(`Unknown driver ${driverId}`);
-            return career;
-        },
-        queryKey: ['driver-career', driverId],
     });
 
 export const raceDetailQuery = (year: number, round: number) =>
