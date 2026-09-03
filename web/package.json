@@ -17,9 +17,9 @@
         "lint": "eslint"
     },
     "dependencies": {
-        "@mantine/charts": "^9.5.1",
-        "@mantine/core": "^9.5.1",
-        "@mantine/hooks": "^9.5.1",
+        "@mantine/charts": "9.5.1",
+        "@mantine/core": "9.5.1",
+        "@mantine/hooks": "9.5.1",
         "@phosphor-icons/react": "2.1.10",
         "@tanstack/match-sorter-utils": "8.19.4",
         "@tanstack/react-devtools": "0.10.12",
@@ -33,7 +33,7 @@
         "ky": "2.0.2",
         "react": "19.2.8",
         "react-dom": "19.2.8",
-        "valibot": "^1.4.2"
+        "valibot": "1.4.2"
     },
     "devDependencies": {
         "@jarsec/eslint-config": "7.4.0",
@@ -41,16 +41,16 @@
         "@tanstack/router-cli": "1.167.32",
         "@testing-library/dom": "10.4.1",
         "@testing-library/react": "16.3.2",
-        "@types/node": "^26",
+        "@types/node": "26.2.0",
         "@types/react": "19.2.18",
         "@types/react-dom": "19.2.4",
         "@vitejs/plugin-react": "6.1.0",
-        "eslint": "^10.9.0",
+        "eslint": "10.9.1",
         "eslint-plugin-only-warn": "1.2.1",
         "jsdom": "29.1.1",
-        "postcss": "^8.5.26",
-        "postcss-preset-mantine": "^1.18.0",
-        "postcss-simple-vars": "^7.0.1",
+        "postcss": "8.5.26",
+        "postcss-preset-mantine": "1.18.0",
+        "postcss-simple-vars": "7.0.1",
         "typescript": "6.0.3",
         "vite": "8.2.2",
         "vitest": "4.1.11"
