@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "engines": {
-        "node": "26.7.0"
+        "node": "26.8.1"
     },
     "imports": {
         "#/*": "./src/*"
@@ -23,28 +23,28 @@
         "@phosphor-icons/react": "2.1.10",
         "@tanstack/match-sorter-utils": "8.19.4",
         "@tanstack/react-devtools": "0.10.12",
-        "@tanstack/react-query": "5.101.4",
-        "@tanstack/react-query-devtools": "5.101.4",
-        "@tanstack/react-router": "1.170.31",
+        "@tanstack/react-query": "5.102.8",
+        "@tanstack/react-query-devtools": "5.102.8",
+        "@tanstack/react-router": "1.170.32",
         "@tanstack/react-router-devtools": "1.167.1",
         "@tanstack/react-table": "8.21.3",
-        "@tanstack/router-plugin": "1.168.34",
+        "@tanstack/router-plugin": "1.168.35",
         "country-flag-icons": "1.6.20",
-        "ky": "2.0.2",
+        "ky": "2.1.0",
         "react": "19.2.8",
         "react-dom": "19.2.8",
         "valibot": "^1.4.2"
     },
     "devDependencies": {
-        "@jarsec/eslint-config": "7.4.0",
+        "@jarsec/eslint-config": "7.5.0",
         "@tanstack/devtools-vite": "0.8.5",
-        "@tanstack/router-cli": "1.167.32",
+        "@tanstack/router-cli": "1.167.33",
         "@testing-library/dom": "10.4.1",
-        "@testing-library/react": "16.3.2",
-        "@types/node": "^26",
+        "@testing-library/react": "16.3.3",
+        "@types/node": "^26.2.0",
         "@types/react": "19.2.18",
-        "@types/react-dom": "19.2.4",
-        "@vitejs/plugin-react": "6.1.0",
+        "@types/react-dom": "19.2.5",
+        "@vitejs/plugin-react": "6.1.1",
         "eslint": "^10.9.0",
         "eslint-plugin-only-warn": "1.2.1",
         "jsdom": "29.1.1",
