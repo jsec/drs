@@ -272,7 +272,9 @@ CREATE TABLE effone.driver_season_summaries (
 --
 
 CREATE TABLE effone.driver_standings_snapshots (
+    car_number integer,
     championship_won boolean CONSTRAINT driver_standings_snapshots__dbt_tmp_championship_won_not_null1 NOT NULL,
+    constructor_id text,
     driver_code text CONSTRAINT driver_standings_snapshots__dbt_tmp_driver_code_not_null1 NOT NULL,
     driver_id text CONSTRAINT driver_standings_snapshots__dbt_tmp_driver_id_not_null1 NOT NULL,
     driver_name text CONSTRAINT driver_standings_snapshots__dbt_tmp_driver_name_not_null1 NOT NULL,
@@ -280,6 +282,7 @@ CREATE TABLE effone.driver_standings_snapshots (
     points_gained numeric(8,2),
     points_gained_x100 integer,
     points_x100 integer CONSTRAINT driver_standings_snapshots__dbt_tmp_points_x100_not_null1 NOT NULL,
+    podium_count integer CONSTRAINT driver_standings_snapshots__dbt_tmp_podium_count_not_null1 NOT NULL,
     "position" integer,
     position_change integer,
     position_text text CONSTRAINT driver_standings_snapshots__dbt_tmp_position_text_not_null1 NOT NULL,
@@ -288,8 +291,10 @@ CREATE TABLE effone.driver_standings_snapshots (
     previous_position integer,
     race_id integer CONSTRAINT driver_standings_snapshots__dbt_tmp_race_id_not_null1 NOT NULL,
     race_round integer CONSTRAINT driver_standings_snapshots__dbt_tmp_race_round_not_null1 NOT NULL,
+    qualifying_p1_count integer CONSTRAINT driver_standings_snapshots__dbt_t_qualifying_p1_count_not_null1 NOT NULL,
     refresh_id bigint CONSTRAINT driver_standings_snapshots__dbt_tmp_refresh_id_not_null1 NOT NULL,
-    season integer CONSTRAINT driver_standings_snapshots__dbt_tmp_season_not_null1 NOT NULL
+    season integer CONSTRAINT driver_standings_snapshots__dbt_tmp_season_not_null1 NOT NULL,
+    win_count integer CONSTRAINT driver_standings_snapshots__dbt_tmp_win_count_not_null1 NOT NULL
 );
 
 

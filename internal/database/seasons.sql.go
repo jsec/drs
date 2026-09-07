@@ -9,7 +9,196 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jsec/drs/internal/dbtypes"
 )
+
+const listSeasonConstructorStandings = `-- name: ListSeasonConstructorStandings :many
+WITH latest_round AS (
+    SELECT max(race_round) AS race_round
+    FROM effone.constructor_standings_snapshots
+    WHERE season = $1
+)
+SELECT
+    css.position,
+    css.position_text AS position_label,
+    css.points,
+    css.constructor_id,
+    css.constructor_name AS name,
+    c.primary_color_hex AS constructor_color
+FROM effone.constructor_standings_snapshots AS css
+JOIN latest_round
+    ON css.race_round = latest_round.race_round
+JOIN effone.constructors AS c
+    ON css.constructor_id = c.constructor_id
+WHERE css.season = $1
+ORDER BY css.position NULLS LAST, css.constructor_name
+`
+
+type ListSeasonConstructorStandingsRow struct {
+	Position         dbtypes.Int4
+	PositionLabel    string
+	Points           pgtype.Numeric
+	ConstructorID    string
+	Name             string
+	ConstructorColor string
+}
+
+func (q *Queries) ListSeasonConstructorStandings(ctx context.Context, season int32) ([]ListSeasonConstructorStandingsRow, error) {
+	rows, err := q.db.Query(ctx, listSeasonConstructorStandings, season)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSeasonConstructorStandingsRow
+	for rows.Next() {
+		var i ListSeasonConstructorStandingsRow
+		if err := rows.Scan(
+			&i.Position,
+			&i.PositionLabel,
+			&i.Points,
+			&i.ConstructorID,
+			&i.Name,
+			&i.ConstructorColor,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listSeasonDriverProgression = `-- name: ListSeasonDriverProgression :many
+SELECT
+    dss.race_round,
+    dss.driver_id,
+    dss.driver_code AS code,
+    dss.points
+FROM effone.driver_standings_snapshots AS dss
+WHERE dss.season = $1
+ORDER BY dss.driver_id, dss.race_round
+`
+
+type ListSeasonDriverProgressionRow struct {
+	RaceRound int32
+	DriverID  string
+	Code      string
+	Points    pgtype.Numeric
+}
+
+func (q *Queries) ListSeasonDriverProgression(ctx context.Context, season int32) ([]ListSeasonDriverProgressionRow, error) {
+	rows, err := q.db.Query(ctx, listSeasonDriverProgression, season)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSeasonDriverProgressionRow
+	for rows.Next() {
+		var i ListSeasonDriverProgressionRow
+		if err := rows.Scan(
+			&i.RaceRound,
+			&i.DriverID,
+			&i.Code,
+			&i.Points,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listSeasonDriverStandings = `-- name: ListSeasonDriverStandings :many
+WITH latest_round AS (
+    SELECT max(race_round) AS race_round
+    FROM effone.driver_standings_snapshots
+    WHERE season = $1
+)
+SELECT
+    dss.position,
+    dss.position_text AS position_label,
+    dss.points,
+    dss.driver_id,
+    dss.driver_code AS code,
+    dss.driver_name AS name,
+    d.nationality AS country,
+    d.nationality_country_code AS country_code,
+    dss.constructor_id,
+    c.constructor_name,
+    c.primary_color_hex AS constructor_color,
+    dss.car_number,
+    dss.win_count AS wins,
+    dss.podium_count AS podiums,
+    dss.qualifying_p1_count AS poles
+FROM effone.driver_standings_snapshots AS dss
+JOIN latest_round
+    ON dss.race_round = latest_round.race_round
+JOIN effone.drivers AS d
+    ON dss.driver_id = d.driver_id
+LEFT JOIN effone.constructors AS c
+    ON dss.constructor_id = c.constructor_id
+WHERE dss.season = $1
+ORDER BY dss.position NULLS LAST, dss.driver_name
+`
+
+type ListSeasonDriverStandingsRow struct {
+	Position         dbtypes.Int4
+	PositionLabel    string
+	Points           pgtype.Numeric
+	DriverID         string
+	Code             string
+	Name             string
+	Country          string
+	CountryCode      string
+	ConstructorID    pgtype.Text
+	ConstructorName  pgtype.Text
+	ConstructorColor pgtype.Text
+	CarNumber        dbtypes.Int4
+	Wins             int32
+	Podiums          int32
+	Poles            int32
+}
+
+func (q *Queries) ListSeasonDriverStandings(ctx context.Context, season int32) ([]ListSeasonDriverStandingsRow, error) {
+	rows, err := q.db.Query(ctx, listSeasonDriverStandings, season)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSeasonDriverStandingsRow
+	for rows.Next() {
+		var i ListSeasonDriverStandingsRow
+		if err := rows.Scan(
+			&i.Position,
+			&i.PositionLabel,
+			&i.Points,
+			&i.DriverID,
+			&i.Code,
+			&i.Name,
+			&i.Country,
+			&i.CountryCode,
+			&i.ConstructorID,
+			&i.ConstructorName,
+			&i.ConstructorColor,
+			&i.CarNumber,
+			&i.Wins,
+			&i.Podiums,
+			&i.Poles,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
 
 const listSeasons = `-- name: ListSeasons :many
 SELECT

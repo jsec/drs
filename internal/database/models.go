@@ -247,7 +247,9 @@ type EffoneDriverSeasonSummary struct {
 }
 
 type EffoneDriverStandingsSnapshot struct {
+	CarNumber          dbtypes.Int4
 	ChampionshipWon    bool
+	ConstructorID      pgtype.Text
 	DriverCode         string
 	DriverID           string
 	DriverName         string
@@ -255,6 +257,7 @@ type EffoneDriverStandingsSnapshot struct {
 	PointsGained       pgtype.Numeric
 	PointsGainedX100   dbtypes.Int4
 	PointsX100         int32
+	PodiumCount        int32
 	Position           dbtypes.Int4
 	PositionChange     dbtypes.Int4
 	PositionText       string
@@ -263,8 +266,10 @@ type EffoneDriverStandingsSnapshot struct {
 	PreviousPosition   dbtypes.Int4
 	RaceID             int32
 	RaceRound          int32
+	QualifyingP1Count  int32
 	RefreshID          int64
 	Season             int32
+	WinCount           int32
 }
 
 type EffoneFastestLap struct {
