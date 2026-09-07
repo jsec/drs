@@ -1477,11 +1477,23 @@ models:
             combination_of_columns:
               - race_id
               - driver_id
+      - driver_standings_snapshot_event_state
     columns:
+      - name: car_number
+        data_type: integer
+        description: Car number recorded for the driver in this race.
       - name: championship_won
         data_type: boolean
         constraints:
           - type: not_null
+      - name: constructor_id
+        data_type: text
+        description: Constructor recorded for the driver in this race.
+        tests:
+          - relationships:
+              arguments:
+                to: ref('constructors')
+                field: constructor_id
       - name: driver_code
         data_type: text
         constraints:
@@ -1519,6 +1531,11 @@ models:
               arguments:
                 min_value: 0
                 inclusive: true
+      - name: podium_count
+        data_type: integer
+        description: Cumulative race podiums through this snapshot's race.
+        constraints:
+          - type: not_null
       - name: position
         data_type: integer
       - name: position_change
@@ -1548,6 +1565,11 @@ models:
         data_type: integer
         constraints:
           - type: not_null
+      - name: qualifying_p1_count
+        data_type: integer
+        description: Cumulative pole positions through this snapshot's race.
+        constraints:
+          - type: not_null
       - name: refresh_id
         data_type: bigint
         description: Identifier for the refresh run that produced this row.
@@ -1558,6 +1580,11 @@ models:
 
       - name: season
         data_type: integer
+        constraints:
+          - type: not_null
+      - name: win_count
+        data_type: integer
+        description: Cumulative race wins through this snapshot's race.
         constraints:
           - type: not_null
 
