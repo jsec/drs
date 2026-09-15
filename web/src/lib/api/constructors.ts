@@ -1,17 +1,17 @@
-import * as v from 'valibot';
+import { z } from 'zod';
 
-export const ConstructorSchema = v.object({
-    championships: v.number(),
-    color: v.string(),
-    firstRaceDate: v.nullable(v.string()),
-    id: v.string(),
-    lastRaceDate: v.nullable(v.string()),
-    name: v.string(),
-    podiums: v.number(),
-    wins: v.number(),
+export const ConstructorSchema = z.object({
+    championships: z.number(),
+    color: z.string(),
+    firstRaceDate: z.string().nullable(),
+    id: z.string(),
+    lastRaceDate: z.string().nullable(),
+    name: z.string(),
+    podiums: z.number(),
+    wins: z.number(),
 });
 
-export const ConstructorListSchema = v.array(ConstructorSchema);
+export const ConstructorListSchema = z.array(ConstructorSchema);
 
-export type ConstructorResponse = v.InferOutput<typeof ConstructorSchema>;
-export type ListConstructorsResponse = v.InferOutput<typeof ConstructorListSchema>;
+export type ConstructorResponse = z.infer<typeof ConstructorSchema>;
+export type ListConstructorsResponse = z.infer<typeof ConstructorListSchema>;

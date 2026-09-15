@@ -1,47 +1,47 @@
-import * as v from 'valibot';
+import { z } from 'zod';
 
-export const CircuitListItemSchema = v.object({
-    circuitId: v.string(),
-    country: v.string(),
-    firstRaceYear: v.optional(v.number()),
-    lastRaceYear: v.optional(v.number()),
-    location: v.string(),
-    name: v.string(),
-    raceCount: v.number(),
+export const CircuitListItemSchema = z.object({
+    circuitId: z.string(),
+    country: z.string(),
+    firstRaceYear: z.number().optional(),
+    lastRaceYear: z.number().optional(),
+    location: z.string(),
+    name: z.string(),
+    raceCount: z.number(),
 });
 
-export const CircuitListSchema = v.array(CircuitListItemSchema);
+export const CircuitListSchema = z.array(CircuitListItemSchema);
 
-const CircuitRaceSummarySchema = v.object({
-    date: v.nullable(v.string()),
-    name: v.string(),
-    raceId: v.nullable(v.number()),
+const CircuitRaceSummarySchema = z.object({
+    date: z.string().nullable(),
+    name: z.string(),
+    raceId: z.number().nullable(),
 });
 
-const CircuitRaceSchema = v.object({
-    date: v.nullable(v.string()),
-    layoutId: v.string(),
-    name: v.string(),
-    raceId: v.number(),
-    winnerId: v.string(),
-    winnerName: v.string(),
+const CircuitRaceSchema = z.object({
+    date: z.string().nullable(),
+    layoutId: z.string(),
+    name: z.string(),
+    raceId: z.number(),
+    winnerId: z.string(),
+    winnerName: z.string(),
 });
 
-export const CircuitSummarySchema = v.object({
-    circuitId: v.string(),
-    circuitType: v.string(),
-    country: v.string(),
-    countryCode: v.string(),
-    countryId: v.string(),
+export const CircuitSummarySchema = z.object({
+    circuitId: z.string(),
+    circuitType: z.string(),
+    country: z.string(),
+    countryCode: z.string(),
+    countryId: z.string(),
     firstRace: CircuitRaceSummarySchema,
     lastRace: CircuitRaceSummarySchema,
-    layoutId: v.string(),
-    name: v.string(),
-    previousNames: v.array(v.string()),
-    raceCount: v.number(),
-    races: v.array(CircuitRaceSchema),
-    turns: v.number(),
+    layoutId: z.string(),
+    name: z.string(),
+    previousNames: z.array(z.string()),
+    raceCount: z.number(),
+    races: z.array(CircuitRaceSchema),
+    turns: z.number(),
 });
 
-export type CircuitSummaryResponse = v.InferOutput<typeof CircuitSummarySchema>;
-export type ListCircuitsResponse = v.InferOutput<typeof CircuitListItemSchema>;
+export type CircuitSummaryResponse = z.infer<typeof CircuitSummarySchema>;
+export type ListCircuitsResponse = z.infer<typeof CircuitListItemSchema>;

@@ -1,28 +1,28 @@
-import * as v from 'valibot';
+import { z } from 'zod';
 
-export const WDCSchema = v.object({
-    countryCode: v.string(),
-    id: v.string(),
-    name: v.string(),
+export const WDCSchema = z.object({
+    countryCode: z.string(),
+    id: z.string(),
+    name: z.string(),
 });
 
-export const WCCSchema = v.object({
-    color: v.string(),
-    id: v.string(),
-    name: v.string(),
+export const WCCSchema = z.object({
+    color: z.string(),
+    id: z.string(),
+    name: z.string(),
 });
 
-export const SeasonSchema = v.object({
-    constructorCount: v.number(),
-    raceCount: v.number(),
-    season: v.number(),
-    wcc: v.nullable(WCCSchema),
+export const SeasonSchema = z.object({
+    constructorCount: z.number(),
+    raceCount: z.number(),
+    season: z.number(),
+    wcc: WCCSchema.nullable(),
     wdc: WDCSchema,
 });
 
-export const SeasonListSchema = v.array(SeasonSchema);
+export const SeasonListSchema = z.array(SeasonSchema);
 
-export type ListSeasonsResponse = v.InferOutput<typeof SeasonListSchema>;
-export type SeasonResponse = v.InferOutput<typeof SeasonSchema>;
-export type WCC = v.InferOutput<typeof WCCSchema>;
-export type WDC = v.InferOutput<typeof WDCSchema>;
+export type ListSeasonsResponse = z.infer<typeof SeasonListSchema>;
+export type SeasonResponse = z.infer<typeof SeasonSchema>;
+export type WCC = z.infer<typeof WCCSchema>;
+export type WDC = z.infer<typeof WDCSchema>;

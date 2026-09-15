@@ -1,4 +1,3 @@
-import { safeParse } from 'valibot';
 import { describe, expect, it } from 'vitest';
 
 import { CircuitListSchema, CircuitSummarySchema } from './circuits';
@@ -15,7 +14,7 @@ describe('API response schemas', () => {
             wdc: { countryCode: 'NL', id: 'max-verstappen', name: 'Max Verstappen' },
         }];
 
-        expect(safeParse(SeasonListSchema, response).success).toBe(true);
+        expect(SeasonListSchema.safeParse(response).success).toBe(true);
     });
 
     it('accepts nullable constructor race dates', () => {
@@ -30,7 +29,7 @@ describe('API response schemas', () => {
             wins: 248,
         }];
 
-        expect(safeParse(ConstructorListSchema, response).success).toBe(true);
+        expect(ConstructorListSchema.safeParse(response).success).toBe(true);
     });
 
     it('accepts a circuit list response without optional race years', () => {
@@ -42,7 +41,7 @@ describe('API response schemas', () => {
             raceCount: 75,
         }];
 
-        expect(safeParse(CircuitListSchema, response).success).toBe(true);
+        expect(CircuitListSchema.safeParse(response).success).toBe(true);
     });
 
     it('accepts nullable dates in a circuit summary', () => {
@@ -62,6 +61,6 @@ describe('API response schemas', () => {
             turns: 11,
         };
 
-        expect(safeParse(CircuitSummarySchema, response).success).toBe(true);
+        expect(CircuitSummarySchema.safeParse(response).success).toBe(true);
     });
 });

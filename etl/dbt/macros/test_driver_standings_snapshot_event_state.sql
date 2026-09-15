@@ -7,7 +7,8 @@
         ),
 
         race_results as (
-            select distinct on (season, race_id, driver_id)
+            select distinct
+                on (season, race_id, driver_id)
                 season,
                 race_id,
                 race_round,
@@ -21,12 +22,7 @@
         ),
 
         qualifying_results as (
-            select distinct on (season, race_id, driver_id)
-                season,
-                race_id,
-                race_round,
-                driver_id,
-                is_qualifying_p1
+            select distinct on (season, race_id, driver_id) season, race_id, race_round, driver_id, is_qualifying_p1
             from {{ ref("qualifying_results") }}
             order by season, race_id, driver_id, qualifying_order
         ),
@@ -39,15 +35,18 @@
                 race_results.constructor_id,
                 race_results.car_number
             from standings
-            left join lateral (
-                select constructor_id, car_number
-                from race_results
-                where standings.season = race_results.season
-                    and standings.driver_id = race_results.driver_id
-                    and race_results.race_round <= standings.race_round
-                order by race_results.race_round desc, race_results.race_id desc
-                limit 1
-            ) as race_results on true
+            left join
+                lateral(
+                    select constructor_id, car_number
+                    from race_results
+                    where
+                        standings.season = race_results.season
+                        and standings.driver_id = race_results.driver_id
+                        and race_results.race_round <= standings.race_round
+                    order by race_results.race_round desc, race_results.race_id desc
+                    limit 1
+                ) as race_results
+                on true
         ),
 
         cumulative_race_stats as (
@@ -99,7 +98,8 @@
     select snapshots.*
     from {{ model }} as snapshots
     join expected using (season, race_id, driver_id)
-    where snapshots.constructor_id is distinct from expected.constructor_id
+    where
+        snapshots.constructor_id is distinct from expected.constructor_id
         or snapshots.car_number is distinct from expected.car_number
         or snapshots.win_count is distinct from expected.win_count
         or snapshots.podium_count is distinct from expected.podium_count

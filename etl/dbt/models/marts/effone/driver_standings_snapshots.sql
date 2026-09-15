@@ -6,7 +6,8 @@ with
     drivers as (select * from {{ ref("int_f1db__drivers_with_countries") }}),
 
     race_results as (
-        select distinct on (season, race_id, driver_id)
+        select distinct
+            on (season, race_id, driver_id)
             season,
             race_id,
             race_round,
@@ -25,30 +26,29 @@ with
             (sum(is_win::integer) over driver_order)::integer as win_count,
             (sum(is_podium::integer) over driver_order)::integer as podium_count
         from race_results
-        window driver_order as (
-            partition by driver_id, season
-            order by race_round, race_id
-            rows between unbounded preceding and current row
-        )
+        window
+            driver_order as (
+                partition by driver_id, season
+                order by race_round, race_id
+                rows between unbounded preceding and current row
+            )
     ),
 
     qualifying_results as (
-        select distinct on (season, race_id, driver_id)
-            season, race_id, race_round, driver_id, is_qualifying_p1
+        select distinct on (season, race_id, driver_id) season, race_id, race_round, driver_id, is_qualifying_p1
         from {{ ref("qualifying_results") }}
         order by season, race_id, driver_id, qualifying_order
     ),
 
     qualifying_cumulative_stats as (
-        select
-            qualifying_results.*,
-            (sum(is_qualifying_p1::integer) over driver_order)::integer as qualifying_p1_count
+        select qualifying_results.*, (sum(is_qualifying_p1::integer) over driver_order)::integer as qualifying_p1_count
         from qualifying_results
-        window driver_order as (
-            partition by driver_id, season
-            order by race_round, race_id
-            rows between unbounded preceding and current row
-        )
+        window
+            driver_order as (
+                partition by driver_id, season
+                order by race_round, race_id
+                rows between unbounded preceding and current row
+            )
     ),
 
     joined as (
@@ -69,24 +69,26 @@ with
         from standings
         join races on standings.race_id = races.race_id
         join drivers on standings.driver_id = drivers.driver_id
-        left join race_results on standings.race_id = race_results.race_id and standings.driver_id = race_results.driver_id
+        left join
+            race_results on standings.race_id = race_results.race_id and standings.driver_id = race_results.driver_id
         window driver_order as (partition by standings.driver_id, races.season order by races.race_round, races.race_id)
     ),
 
     standing_states as (
         select
-            joined.*,
-            max(race_round) filter (where constructor_id is not null) over driver_order as latest_entry_round
+            joined.*, max(race_round) filter (where constructor_id is not null) over driver_order as latest_entry_round
         from joined
-        window driver_order as (
-            partition by driver_id, season
-            order by race_round, race_id
-            rows between unbounded preceding and current row
-        )
+        window
+            driver_order as (
+                partition by driver_id, season
+                order by race_round, race_id
+                rows between unbounded preceding and current row
+            )
     ),
 
     standing_qualifying_states as (
-        select distinct on (standing_states.season, standing_states.race_id, standing_states.driver_id)
+        select distinct
+            on (standing_states.season, standing_states.race_id, standing_states.driver_id)
             standing_states.*,
             coalesce(qualifying_cumulative_stats.qualifying_p1_count, 0) as qualifying_p1_count
         from standing_states
@@ -117,7 +119,8 @@ select
     standing_qualifying_states.previous_points,
     (standing_qualifying_states.previous_points * 100)::integer as previous_points_x100,
     standing_qualifying_states.points - standing_qualifying_states.previous_points as points_gained,
-    ((standing_qualifying_states.points - standing_qualifying_states.previous_points) * 100)::integer as points_gained_x100,
+    ((standing_qualifying_states.points - standing_qualifying_states.previous_points) * 100)::integer
+    as points_gained_x100,
     standing_qualifying_states.position,
     standing_qualifying_states.position_text,
     standing_qualifying_states.previous_position,

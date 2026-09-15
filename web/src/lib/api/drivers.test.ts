@@ -1,4 +1,3 @@
-import { safeParse } from 'valibot';
 import { describe, expect, it } from 'vitest';
 
 import { DriverShortSummaryListSchema, DriverSummarySchema } from './drivers';
@@ -20,11 +19,11 @@ const driver = {
 
 describe('DriverShortSummaryListSchema', () => {
     it('accepts a driver response with nullable career years', () => {
-        expect(safeParse(DriverShortSummaryListSchema, [driver]).success).toBe(true);
+        expect(DriverShortSummaryListSchema.safeParse([driver]).success).toBe(true);
     });
 
     it('rejects a driver response with a non-numeric starts value', () => {
-        expect(safeParse(DriverShortSummaryListSchema, [{ ...driver, starts: '221' }]).success).toBe(false);
+        expect(DriverShortSummaryListSchema.safeParse([{ ...driver, starts: '221' }]).success).toBe(false);
     });
 });
 
@@ -47,11 +46,11 @@ describe('DriverSummarySchema', () => {
             wins: 53,
         };
 
-        const result = safeParse(DriverSummarySchema, response);
+        const result = DriverSummarySchema.safeParse(response);
 
         expect(result.success).toBe(true);
         if (result.success) {
-            expect(result.output).toMatchObject({
+            expect(result.data).toMatchObject({
                 constructorColor: '#3671C6',
                 firstYear: 2007,
                 isActive: false,
