@@ -241,7 +241,7 @@ func TestService_GetOverview(t *testing.T) {
 	require.NotNil(t, got.RunnerUp)
 	assert.Equal(t, "VER", got.Leader.Code)
 	assert.Equal(t, "PER", got.RunnerUp.Code)
-	assert.Equal(t, 463.5, got.MaxConstructorPoints)
+	assert.InEpsilon(t, 463.5, got.MaxConstructorPoints, 0.0001)
 	assert.Equal(t, seasons.Progression{
 		Data: []seasons.ProgressionDataRow{
 			{"round": 1, "VER": 25, "PER": 18},

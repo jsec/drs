@@ -9,18 +9,19 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { memo, useMemo } from 'react';
 
-import type { CalendarRound, SeasonDriver } from '#/data/types';
+import type { CalendarRound } from '#/data/types';
+import type { DriverStanding } from '#/lib/api/seasons';
 
 import { GridHeader, SectionCard, StatCard, TeamBar } from '#/components/f1-ui';
-import { LineChart, toChartData, toChartSeries } from '#/components/line-chart';
-import { seasonOverviewQuery } from '#/data/queries';
+import { LineChart } from '#/components/line-chart';
+import { calendarQuery, seasonOverviewQuery } from '#/data/queries';
 import { parseYear } from '#/lib/route-params';
 
 const DRIVER_COLS = '34px 1fr 64px 56px 70px';
 
 type MiniRaceCellProps = {
     completed: number;
-    driverByCode: Map<string, SeasonDriver>;
+    driverByCode: Map<string, DriverStanding>;
     r: CalendarRound;
     year: string;
 };
@@ -57,7 +58,7 @@ const MiniRaceCell = memo(function MiniRaceCell({ completed, driverByCode, r, ye
             <Box fw={700} fz={12.5} mt={2}>{r.code}</Box>
             <Box c="dimmed" fz={10.5} mt={1}>{r.date}</Box>
             <Box
-                bg={winner?.color ?? 'var(--mantine-color-default-border)'}
+                bg={winner?.constructor?.color ?? 'var(--mantine-color-default-border)'}
                 h={3}
                 mt={7}
                 style={{ borderRadius: 2 }}
@@ -85,16 +86,19 @@ const ACTION_LINK: React.CSSProperties = {
 
 const SeasonOverview = () => {
     const { year } = Route.useParams();
-    const { data } = useSuspenseQuery(seasonOverviewQuery(Number(year)));
-    const maxConstructor = data.constructors[0]?.points || 1;
-    const topDrivers = data.drivers.slice(0, 8);
+    const { data: overview } = useSuspenseQuery(seasonOverviewQuery(Number(year)));
+    const { data: calendar } = useSuspenseQuery(calendarQuery(Number(year)));
     const driverByCode = useMemo(
-        () => new Map(data.drivers.map(d => [d.code, d])),
-        [data.drivers],
+        () => new Map(overview.drivers.map(d => [d.code, d])),
+        [overview.drivers],
     );
 
-    const progressionSeries = toChartSeries(data.progression);
-    const progressionData = toChartData(data.progression, i => (i === 0 ? 'Start' : `R${i}`));
+    if (overview.leader === null || overview.runnerUp === null) {
+        return <SectionCard title="Championship Standings">No championship standings recorded.</SectionCard>;
+    }
+
+    const { leader, runnerUp } = overview;
+    const topDrivers = overview.drivers.slice(0, 8);
 
     return (
         <Stack gap={16}>
@@ -113,12 +117,12 @@ const SeasonOverview = () => {
                         mb={0}
                         mt={6}
                     >
-                        {`${data.year} Season Overview`}
+                        {`${year} Season Overview`}
                     </Box>
                 </div>
                 <Box ta="right">
                     <Box c="dimmed" fz={12}>Last round</Box>
-                    <Box fw={700} fz={15}>{data.lastRaceName}</Box>
+                    <Box fw={700} fz={15}>{calendar.lastRaceName}</Box>
                 </Box>
             </Group>
 
@@ -129,28 +133,28 @@ const SeasonOverview = () => {
                     icon={<FlagCheckeredIcon size={15} weight="fill" />}
                     label="Round"
                     sub="season progress"
-                    value={`${data.completed} / ${data.totalRounds}`}
+                    value={`${calendar.completed} / ${calendar.totalRounds}`}
                 />
                 <StatCard
                     accent="var(--gold-500)"
                     icon={<CrownIcon size={15} weight="fill" />}
                     label="Championship Leader"
-                    sub={`${data.leader.points} pts`}
-                    value={data.leader.short}
+                    sub={`${leader.points} pts`}
+                    value={leader.name}
                 />
                 <StatCard
                     accent="var(--mantine-primary-color-filled)"
                     icon={<GaugeIcon size={15} weight="fill" />}
                     label="Lead Margin"
-                    sub={`over ${data.runnerUp.short}`}
-                    value={`+${data.leader.points - data.runnerUp.points}`}
+                    sub={`over ${runnerUp.name}`}
+                    value={`+${leader.points - runnerUp.points}`}
                 />
                 <StatCard
                     accent="var(--teal-500)"
                     icon={<CalendarDotsIcon size={15} />}
                     label="Next Race"
-                    sub={data.nextRace.name}
-                    value={data.nextRace.code}
+                    sub={calendar.nextRace.name}
+                    value={calendar.nextRace.code}
                 />
             </SimpleGrid>
 
@@ -189,16 +193,16 @@ const SeasonOverview = () => {
                         >
                             <Text c="dimmed" className="f1-num" fw={700} inherit span>{i + 1}</Text>
                             <Group gap={11} wrap="nowrap">
-                                <TeamBar color={d.color} />
+                                <TeamBar color={d.constructor?.color ?? 'var(--neutral-500)'} />
                                 <Box miw={0}>
-                                    <Box fw={600} fz={13.5} style={{ whiteSpace: 'nowrap' }}>{d.short}</Box>
-                                    <Box c="dimmed" fz={11}>{d.teamName}</Box>
+                                    <Box fw={600} fz={13.5} style={{ whiteSpace: 'nowrap' }}>{d.name}</Box>
+                                    <Box c="dimmed" fz={11}>{d.constructor?.name ?? 'No constructor recorded'}</Box>
                                 </Box>
                             </Group>
                             <Text className="f1-num f1-display" fw={700} inherit span ta="right">{d.points}</Text>
                             <Text c="dimmed" className="f1-num" inherit span ta="center">{d.wins}</Text>
                             <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="right">
-                                {i === 0 ? '—' : `-${data.leader.points - d.points}`}
+                                {i === 0 ? '—' : `-${leader.points - d.points}`}
                             </Text>
                         </Link>
                     ))}
@@ -213,16 +217,16 @@ const SeasonOverview = () => {
                     padded={false}
                     title="Constructors"
                 >
-                    {data.constructors.map(c => (
+                    {overview.constructors.map(c => (
                         <Box
-                            key={c.key}
+                            key={c.id}
                             px={18}
                             py={8}
                             style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}
                         >
                             <Group justify="space-between" mb={5} wrap="nowrap">
                                 <Group gap={9} wrap="nowrap">
-                                    <Text c="dimmed" className="f1-num" fw={700} fz={11} inherit span ta="center" w={18}>{c.pos}</Text>
+                                    <Text c="dimmed" className="f1-num" fw={700} fz={11} inherit span ta="center" w={18}>{c.positionLabel}</Text>
                                     <Text fw={600} fz={13} inherit span>{c.name}</Text>
                                 </Group>
                                 <Text className="f1-num f1-display" fw={700} fz={13} inherit span>{c.points}</Text>
@@ -237,7 +241,7 @@ const SeasonOverview = () => {
                                         bg={c.color}
                                         h="100%"
                                         style={{ borderRadius: 9999 }}
-                                        w={`${(c.points / maxConstructor) * 100}%`}
+                                        w={`${(c.points / overview.maxConstructorPoints) * 100}%`}
                                     />
                                 </Box>
                             </Box>
@@ -256,21 +260,21 @@ const SeasonOverview = () => {
                         </Box>
                     </div>
                     <Group gap={14} wrap="nowrap">
-                        {data.progression.map(l => (
-                            <Group fw={600} fz={12} gap={6} key={l.code} wrap="nowrap">
-                                <Box bg={l.color} h={3} style={{ borderRadius: 2 }} w={11} />
-                                {l.code}
+                        {overview.progression.series.map(s => (
+                            <Group fw={600} fz={12} gap={6} key={s.name} wrap="nowrap">
+                                <Box bg={s.color} h={3} style={{ borderRadius: 2 }} w={11} />
+                                {s.name}
                             </Group>
                         ))}
                     </Group>
                 </Group>
                 <LineChart
-                    data={progressionData}
-                    dataKey="x"
+                    data={overview.progression.data}
+                    dataKey="round"
                     h={280}
-                    series={progressionSeries}
+                    series={overview.progression.series}
                     xAxisProps={{ interval: 1 }}
-                    yAxisProps={{ domain: [0, 250], tickCount: 6 }}
+                    yAxisProps={{ tickCount: 6 }}
                 />
             </Box>
 
@@ -280,12 +284,12 @@ const SeasonOverview = () => {
                         Full calendar →
                     </Link>
                 )}
-                title={`${data.year} Calendar`}
+                title={`${year} Calendar`}
             >
                 <SimpleGrid cols={8} spacing={9}>
-                    {data.calendar.map(r => (
+                    {calendar.calendar.map(r => (
                         <MiniRaceCell
-                            completed={data.completed}
+                            completed={calendar.completed}
                             driverByCode={driverByCode}
                             key={r.round}
                             r={r}
@@ -302,7 +306,10 @@ export const Route = createFileRoute('/seasons/$year/')({
     component: SeasonOverview,
     loader: async ({ context, params }) => {
         const year = parseYear(params.year);
-        await context.queryClient.ensureQueryData(seasonOverviewQuery(year));
+        await Promise.all([
+            context.queryClient.ensureQueryData(seasonOverviewQuery(year)),
+            context.queryClient.ensureQueryData(calendarQuery(year)),
+        ]);
         return { crumbs: [{ label: 'Season Overview' }] };
     },
 });

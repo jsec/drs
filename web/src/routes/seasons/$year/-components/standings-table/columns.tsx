@@ -1,4 +1,4 @@
-import type { SeasonConstructor, SeasonDriver } from '#/data/types';
+import type { ConstructorStanding, DriverStanding } from '#/lib/api/seasons';
 
 import { makeColumns } from '#/components/data-table';
 import { TeamBar, TeamSquare } from '#/components/f1-ui';
@@ -6,7 +6,7 @@ import { TeamBar, TeamSquare } from '#/components/f1-ui';
 const CODE_STYLE = { color: 'var(--mantine-color-dimmed)', fontSize: 11, fontWeight: 700, marginLeft: 8 } as const;
 
 export function makeConstructorColumns(maxConstructor: number) {
-    const col = makeColumns<SeasonConstructor>();
+    const col = makeColumns<ConstructorStanding>();
 
     return [
         col.ordinal({ header: 'POS', width: '46px' }),
@@ -33,7 +33,7 @@ export function makeConstructorColumns(maxConstructor: number) {
 }
 
 export function makeDriverColumns(year: string) {
-    const col = makeColumns<SeasonDriver>();
+    const col = makeColumns<DriverStanding>();
 
     return [
         col.ordinal({ header: 'POS', width: '46px' }),
@@ -46,9 +46,15 @@ export function makeDriverColumns(year: string) {
                 </>
             ),
             link: d => ({ params: { driverId: d.code, year }, to: '/seasons/$year/drivers/$driverId' }),
-            visual: d => <TeamBar color={d.color} size="md" />,
+            visual: d => <TeamBar color={d.constructor?.color ?? 'var(--neutral-500)'} size="md" />,
         }),
-        col.text('teamName', { header: 'TEAM', muted: true, size: 'sm', width: '130px' }),
+        col.custom({
+            cell: info => info.row.original.constructor?.name ?? '—',
+            header: 'TEAM',
+            id: 'constructor',
+            sortable: false,
+            width: '130px',
+        }),
         col.num('wins', { align: 'center', header: 'WINS', width: '70px' }),
         col.num('podiums', { align: 'center', header: 'PODIUMS', width: '80px' }),
         col.num('poles', { align: 'center', header: 'POLES', width: '80px' }),

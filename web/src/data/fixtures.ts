@@ -516,8 +516,14 @@ export function getAllTimeDrivers(): AllTimeDriver[] {
     return ALL_TIME_DRIVERS;
 }
 
-export function getCalendar(): { calendar: CalendarRound[]; completed: number } {
-    return { calendar: CALENDAR, completed: COMPLETED };
+export function getCalendar(): Pick<SeasonOverview, 'calendar' | 'completed' | 'lastRaceName' | 'nextRace' | 'totalRounds'> {
+    return {
+        calendar: CALENDAR,
+        completed: COMPLETED,
+        lastRaceName: CALENDAR[COMPLETED - 1].name,
+        nextRace: CALENDAR[COMPLETED],
+        totalRounds: TOTAL_ROUNDS,
+    };
 }
 
 export function getDriverSeason(code: string): DriverSeasonDetail | undefined {
