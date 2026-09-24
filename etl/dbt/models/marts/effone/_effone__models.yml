@@ -1477,6 +1477,7 @@ models:
             combination_of_columns:
               - race_id
               - driver_id
+      - driver_standings_snapshot_source_coverage
       - driver_standings_snapshot_event_state
     columns:
       - name: car_number

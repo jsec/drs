@@ -18,7 +18,7 @@ type Querier interface {
 	ListDriverSeasons(ctx context.Context, driverID string) ([]ListDriverSeasonsRow, error)
 	ListDrivers(ctx context.Context) ([]ListDriversRow, error)
 	ListSeasonConstructorStandings(ctx context.Context, season int32) ([]ListSeasonConstructorStandingsRow, error)
-	ListSeasonDriverProgression(ctx context.Context, season int32) ([]ListSeasonDriverProgressionRow, error)
+	ListSeasonDriverProgression(ctx context.Context, arg ListSeasonDriverProgressionParams) ([]ListSeasonDriverProgressionRow, error)
 	ListSeasonDriverStandings(ctx context.Context, season int32) ([]ListSeasonDriverStandingsRow, error)
 	ListSeasons(ctx context.Context) ([]ListSeasonsRow, error)
 	MarkRefreshFailed(ctx context.Context, arg MarkRefreshFailedParams) error

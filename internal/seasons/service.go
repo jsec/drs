@@ -10,7 +10,7 @@ import (
 type seasonQueries interface {
 	ListSeasons(ctx context.Context) ([]database.ListSeasonsRow, error)
 	ListSeasonConstructorStandings(ctx context.Context, season int32) ([]database.ListSeasonConstructorStandingsRow, error)
-	ListSeasonDriverProgression(ctx context.Context, season int32) ([]database.ListSeasonDriverProgressionRow, error)
+	ListSeasonDriverProgression(ctx context.Context, arg database.ListSeasonDriverProgressionParams) ([]database.ListSeasonDriverProgressionRow, error)
 	ListSeasonDriverStandings(ctx context.Context, season int32) ([]database.ListSeasonDriverStandingsRow, error)
 }
 
@@ -107,24 +107,80 @@ func (s *Service) GetStandings(ctx context.Context, season int32) (StandingsResp
 		})
 	}
 
-	return StandingsResponse{Drivers: drivers, Constructors: constructors}, nil
+	return StandingsResponse{
+		Drivers:              drivers,
+		Constructors:         constructors,
+		MaxConstructorPoints: maxConstructorPoints(constructors),
+	}, nil
 }
 
-func (s *Service) ListDriverProgression(ctx context.Context, season int32) ([]DriverProgression, error) {
-	rows, err := s.queries.ListSeasonDriverProgression(ctx, season)
+func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverviewResponse, error) {
+	standings, err := s.GetStandings(ctx, season)
 	if err != nil {
-		return nil, fmt.Errorf("listing season driver progression: %w", err)
+		return SeasonOverviewResponse{}, fmt.Errorf("getting season standings: %w", err)
 	}
 
-	out := make([]DriverProgression, 0, len(rows))
-	for _, row := range rows {
-		out = append(out, DriverProgression{
-			RaceRound: row.RaceRound,
-			DriverID:  row.DriverID,
-			Code:      row.Code,
-			Points:    row.Points,
+	overview := SeasonOverviewResponse{
+		Drivers:              standings.Drivers,
+		Constructors:         standings.Constructors,
+		MaxConstructorPoints: standings.MaxConstructorPoints,
+		Progression: Progression{
+			Data:   []ProgressionDataRow{},
+			Series: []ProgressionSeries{},
+		},
+	}
+	if len(standings.Drivers) == 0 {
+		return overview, nil
+	}
+
+	overview.Leader = &standings.Drivers[0]
+	if len(standings.Drivers) > 1 {
+		overview.RunnerUp = &standings.Drivers[1]
+	}
+
+	selectedDrivers := standings.Drivers
+	if len(selectedDrivers) > 6 {
+		selectedDrivers = selectedDrivers[:6]
+	}
+
+	driverIDs := make([]string, 0, len(selectedDrivers))
+	for _, driver := range selectedDrivers {
+		driverIDs = append(driverIDs, driver.ID)
+		overview.Progression.Series = append(overview.Progression.Series, ProgressionSeries{
+			Name:  driver.Code,
+			Color: driver.Constructor.Color,
 		})
 	}
 
-	return out, nil
+	rows, err := s.queries.ListSeasonDriverProgression(ctx, database.ListSeasonDriverProgressionParams{
+		Season:    season,
+		DriverIds: driverIDs,
+	})
+	if err != nil {
+		return SeasonOverviewResponse{}, fmt.Errorf("listing season driver progression: %w", err)
+	}
+
+	for _, row := range rows {
+		last := len(overview.Progression.Data) - 1
+		if last < 0 || overview.Progression.Data[last]["round"] != float64(row.RaceRound) {
+			overview.Progression.Data = append(overview.Progression.Data, ProgressionDataRow{
+				"round": float64(row.RaceRound),
+			})
+			last++
+		}
+		overview.Progression.Data[last][row.Code] = row.Points
+	}
+
+	return overview, nil
+}
+
+func maxConstructorPoints(constructors []ConstructorStanding) float64 {
+	var maximum float64
+	for _, constructor := range constructors {
+		if constructor.Points > maximum {
+			maximum = constructor.Points
+		}
+	}
+
+	return maximum
 }

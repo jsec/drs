@@ -9,8 +9,8 @@ func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	mux.Handle("GET /seasons", handle(app.logger, app.listSeasonsHandler))
+	mux.Handle("GET /seasons/{year}", handle(app.logger, app.getSeasonOverviewHandler))
 	mux.Handle("GET /seasons/{year}/standings", handle(app.logger, app.getSeasonStandingsHandler))
-	mux.Handle("GET /seasons/{year}/driver-progression", handle(app.logger, app.listSeasonDriverProgressionHandler))
 	mux.Handle("GET /constructors", handle(app.logger, app.listConstructorsHandler))
 	mux.Handle("GET /circuits", handle(app.logger, app.listCircuitsHandler))
 	mux.Handle("GET /circuits/{circuitID}", handle(app.logger, app.getCircuitSummaryHandler))

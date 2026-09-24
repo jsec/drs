@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/jsec/drs/internal/database"
@@ -32,7 +33,7 @@ func (s seasonStubQuerier) ListSeasonConstructorStandings(context.Context, int32
 	return s.constructorRows, nil
 }
 
-func (s seasonStubQuerier) ListSeasonDriverProgression(context.Context, int32) ([]database.ListSeasonDriverProgressionRow, error) {
+func (s seasonStubQuerier) ListSeasonDriverProgression(context.Context, database.ListSeasonDriverProgressionParams) ([]database.ListSeasonDriverProgressionRow, error) {
 	return s.progressionRows, nil
 }
 
@@ -66,18 +67,28 @@ func TestGetSeasonStandingsHandler(t *testing.T) {
 			"country":"","countryCode":"","constructor":null,"carNumber":null,
 			"wins":0,"podiums":0,"poles":0
 		}],
-		"constructors":[]
+		"constructors":[],
+		"maxConstructorPoints":0
 	}`, rec.Body.String())
 }
 
-func TestListSeasonDriverProgressionHandler(t *testing.T) {
+func TestGetSeasonOverviewHandler(t *testing.T) {
 	t.Parallel()
 
 	app := &application{
 		logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
 		seasons: seasons.NewService(seasonStubQuerier{
+			driverRows: []database.ListSeasonDriverStandingsRow{{
+				Points:           44,
+				DriverID:         "max-verstappen",
+				Code:             "VER",
+				Name:             "Max Verstappen",
+				ConstructorID:    pgtype.Text{String: "red-bull", Valid: true},
+				ConstructorName:  pgtype.Text{String: "Red Bull Racing", Valid: true},
+				ConstructorColor: pgtype.Text{String: "#3671C6", Valid: true},
+			}},
 			progressionRows: []database.ListSeasonDriverProgressionRow{{
-				RaceRound: 3,
+				RaceRound: 1,
 				DriverID:  "max-verstappen",
 				Code:      "VER",
 				Points:    44,
@@ -85,12 +96,28 @@ func TestListSeasonDriverProgressionHandler(t *testing.T) {
 		}),
 	}
 
-	req := httptest.NewRequest(http.MethodGet, "/seasons/2023/driver-progression", nil)
+	req := httptest.NewRequest(http.MethodGet, "/seasons/2023", nil)
 	req.SetPathValue("year", "2023")
 	rec := httptest.NewRecorder()
 
-	handle(app.logger, app.listSeasonDriverProgressionHandler).ServeHTTP(rec, req)
+	handle(app.logger, app.getSeasonOverviewHandler).ServeHTTP(rec, req)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
-	assert.JSONEq(t, `[{"raceRound":3,"driverId":"max-verstappen","code":"VER","points":44}]`, rec.Body.String())
+	assert.JSONEq(t, `{
+		"drivers":[{
+			"position":null,"positionLabel":"","points":44,
+			"id":"max-verstappen","code":"VER","name":"Max Verstappen",
+			"country":"","countryCode":"",
+			"constructor":{"id":"red-bull","name":"Red Bull Racing","color":"#3671C6"},
+			"carNumber":null,"wins":0,"podiums":0,"poles":0
+		}],
+		"constructors":[],
+		"maxConstructorPoints":0,
+		"leader":{"position":null,"positionLabel":"","points":44,"id":"max-verstappen","code":"VER","name":"Max Verstappen","country":"","countryCode":"","constructor":{"id":"red-bull","name":"Red Bull Racing","color":"#3671C6"},"carNumber":null,"wins":0,"podiums":0,"poles":0},
+		"runnerUp":null,
+		"progression":{
+			"data":[{"round":1,"VER":44}],
+			"series":[{"name":"VER","color":"#3671C6"}]
+		}
+	}`, rec.Body.String())
 }

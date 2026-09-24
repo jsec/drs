@@ -48,13 +48,28 @@ type ConstructorStanding struct {
 }
 
 type StandingsResponse struct {
-	Drivers      []DriverStanding      `json:"drivers"`
-	Constructors []ConstructorStanding `json:"constructors"`
+	Drivers              []DriverStanding      `json:"drivers"`
+	Constructors         []ConstructorStanding `json:"constructors"`
+	MaxConstructorPoints float64               `json:"maxConstructorPoints"`
 }
 
-type DriverProgression struct {
-	RaceRound int32   `json:"raceRound"`
-	DriverID  string  `json:"driverId"`
-	Code      string  `json:"code"`
-	Points    float64 `json:"points"`
+type ProgressionDataRow map[string]float64
+
+type ProgressionSeries struct {
+	Name  string `json:"name"`
+	Color string `json:"color"`
+}
+
+type Progression struct {
+	Data   []ProgressionDataRow `json:"data"`
+	Series []ProgressionSeries  `json:"series"`
+}
+
+type SeasonOverviewResponse struct {
+	Drivers              []DriverStanding      `json:"drivers"`
+	Constructors         []ConstructorStanding `json:"constructors"`
+	Leader               *DriverStanding       `json:"leader"`
+	RunnerUp             *DriverStanding       `json:"runnerUp"`
+	MaxConstructorPoints float64               `json:"maxConstructorPoints"`
+	Progression          Progression           `json:"progression"`
 }

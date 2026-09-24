@@ -78,8 +78,14 @@ SELECT
     dss.points::double precision AS points
 FROM effone.driver_standings_snapshots AS dss
 WHERE dss.season = $1
-ORDER BY dss.driver_id, dss.race_round
+    AND dss.driver_id = ANY($2::text[])
+ORDER BY dss.race_round, dss.driver_id
 `
+
+type ListSeasonDriverProgressionParams struct {
+	Season    int32
+	DriverIds []string
+}
 
 type ListSeasonDriverProgressionRow struct {
 	RaceRound int32
@@ -88,8 +94,8 @@ type ListSeasonDriverProgressionRow struct {
 	Points    float64
 }
 
-func (q *Queries) ListSeasonDriverProgression(ctx context.Context, season int32) ([]ListSeasonDriverProgressionRow, error) {
-	rows, err := q.db.Query(ctx, listSeasonDriverProgression, season)
+func (q *Queries) ListSeasonDriverProgression(ctx context.Context, arg ListSeasonDriverProgressionParams) ([]ListSeasonDriverProgressionRow, error) {
+	rows, err := q.db.Query(ctx, listSeasonDriverProgression, arg.Season, arg.DriverIds)
 	if err != nil {
 		return nil, err
 	}

@@ -74,5 +74,6 @@ SELECT
     dss.driver_code AS code,
     dss.points::double precision AS points
 FROM effone.driver_standings_snapshots AS dss
-WHERE dss.season = $1
-ORDER BY dss.driver_id, dss.race_round;
+WHERE dss.season = sqlc.arg(season)
+    AND dss.driver_id = ANY(sqlc.arg(driver_ids)::text[])
+ORDER BY dss.race_round, dss.driver_id;

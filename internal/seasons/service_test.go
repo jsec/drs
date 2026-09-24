@@ -36,7 +36,7 @@ func (s stubQuerier) ListSeasonConstructorStandings(context.Context, int32) ([]d
 	return s.constructorStandingsRows, s.constructorStandingsErr
 }
 
-func (s stubQuerier) ListSeasonDriverProgression(context.Context, int32) ([]database.ListSeasonDriverProgressionRow, error) {
+func (s stubQuerier) ListSeasonDriverProgression(context.Context, database.ListSeasonDriverProgressionParams) ([]database.ListSeasonDriverProgressionRow, error) {
 	return s.progressionRows, s.progressionErr
 }
 
@@ -197,23 +197,60 @@ func TestService_GetStandings(t *testing.T) {
 		Constructors: []seasons.ConstructorStanding{{
 			PositionLabel: "1", Points: 463.5, ID: "red-bull", Name: "Red Bull Racing", Color: "#3671C6",
 		}},
+		MaxConstructorPoints: 463.5,
 	}, got)
 }
 
-func TestService_ListDriverProgression(t *testing.T) {
+func TestService_GetOverview(t *testing.T) {
 	t.Parallel()
 
-	svc := seasons.NewService(stubQuerier{progressionRows: []database.ListSeasonDriverProgressionRow{{
-		RaceRound: 3,
-		DriverID:  "max-verstappen",
-		Code:      "VER",
-		Points:    44,
-	}}})
+	svc := seasons.NewService(stubQuerier{
+		driverStandingsRows: []database.ListSeasonDriverStandingsRow{
+			{
+				Points:           43,
+				DriverID:         "max-verstappen",
+				Code:             "VER",
+				Name:             "Max Verstappen",
+				ConstructorID:    text("red-bull"),
+				ConstructorName:  text("Red Bull Racing"),
+				ConstructorColor: text("#3671C6"),
+			},
+			{
+				Points:           33,
+				DriverID:         "sergio-perez",
+				Code:             "PER",
+				Name:             "Sergio Perez",
+				ConstructorID:    text("red-bull"),
+				ConstructorName:  text("Red Bull Racing"),
+				ConstructorColor: text("#3671C6"),
+			},
+		},
+		constructorStandingsRows: []database.ListSeasonConstructorStandingsRow{{Points: 463.5}},
+		progressionRows: []database.ListSeasonDriverProgressionRow{
+			{RaceRound: 1, DriverID: "max-verstappen", Code: "VER", Points: 25},
+			{RaceRound: 1, DriverID: "sergio-perez", Code: "PER", Points: 18},
+			{RaceRound: 2, DriverID: "sergio-perez", Code: "PER", Points: 33},
+			{RaceRound: 3, DriverID: "max-verstappen", Code: "VER", Points: 43},
+		},
+	})
 
-	got, err := svc.ListDriverProgression(context.Background(), 2023)
+	got, err := svc.GetOverview(context.Background(), 2023)
 
 	require.NoError(t, err)
-	assert.Equal(t, []seasons.DriverProgression{{
-		RaceRound: 3, DriverID: "max-verstappen", Code: "VER", Points: 44,
-	}}, got)
+	require.NotNil(t, got.Leader)
+	require.NotNil(t, got.RunnerUp)
+	assert.Equal(t, "VER", got.Leader.Code)
+	assert.Equal(t, "PER", got.RunnerUp.Code)
+	assert.Equal(t, 463.5, got.MaxConstructorPoints)
+	assert.Equal(t, seasons.Progression{
+		Data: []seasons.ProgressionDataRow{
+			{"round": 1, "VER": 25, "PER": 18},
+			{"round": 2, "PER": 33},
+			{"round": 3, "VER": 43},
+		},
+		Series: []seasons.ProgressionSeries{
+			{Name: "VER", Color: "#3671C6"},
+			{Name: "PER", Color: "#3671C6"},
+		},
+	}, got.Progression)
 }
