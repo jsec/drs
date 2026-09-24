@@ -14,12 +14,30 @@ import (
 )
 
 type stubQuerier struct {
-	rows []database.ListSeasonsRow
-	err  error
+	rows                     []database.ListSeasonsRow
+	err                      error
+	driverStandingsRows      []database.ListSeasonDriverStandingsRow
+	driverStandingsErr       error
+	constructorStandingsRows []database.ListSeasonConstructorStandingsRow
+	constructorStandingsErr  error
+	progressionRows          []database.ListSeasonDriverProgressionRow
+	progressionErr           error
 }
 
 func (s stubQuerier) ListSeasons(context.Context) ([]database.ListSeasonsRow, error) {
 	return s.rows, s.err
+}
+
+func (s stubQuerier) ListSeasonDriverStandings(context.Context, int32) ([]database.ListSeasonDriverStandingsRow, error) {
+	return s.driverStandingsRows, s.driverStandingsErr
+}
+
+func (s stubQuerier) ListSeasonConstructorStandings(context.Context, int32) ([]database.ListSeasonConstructorStandingsRow, error) {
+	return s.constructorStandingsRows, s.constructorStandingsErr
+}
+
+func (s stubQuerier) ListSeasonDriverProgression(context.Context, int32) ([]database.ListSeasonDriverProgressionRow, error) {
+	return s.progressionRows, s.progressionErr
 }
 
 func text(s string) pgtype.Text {
@@ -57,7 +75,7 @@ func TestService_ListSeasons(t *testing.T) {
 				RaceCount:        22,
 				ConstructorCount: 10,
 				Wdc:              seasons.WDC{ID: "max-verstappen", Name: "Max Verstappen", CountryCode: "NL"},
-				Wcc:              &seasons.WCC{ID: "red-bull", Name: "Red Bull", Color: "#3671C6"},
+				Wcc:              &seasons.Constructor{ID: "red-bull", Name: "Red Bull", Color: "#3671C6"},
 			}},
 		},
 		{
@@ -129,4 +147,73 @@ func TestService_ListSeasons(t *testing.T) {
 			assert.Equal(t, tt.want, got)
 		})
 	}
+}
+
+func TestService_GetStandings(t *testing.T) {
+	t.Parallel()
+
+	svc := seasons.NewService(stubQuerier{
+		driverStandingsRows: []database.ListSeasonDriverStandingsRow{{
+			PositionLabel:    "1",
+			Points:           251.5,
+			DriverID:         "max-verstappen",
+			Code:             "VER",
+			Name:             "Max Verstappen",
+			Country:          "Netherlands",
+			CountryCode:      "NL",
+			ConstructorID:    text("red-bull"),
+			ConstructorName:  text("Red Bull Racing"),
+			ConstructorColor: text("#3671C6"),
+			Wins:             8,
+			Podiums:          10,
+			Poles:            6,
+		}},
+		constructorStandingsRows: []database.ListSeasonConstructorStandingsRow{{
+			PositionLabel:    "1",
+			Points:           463.5,
+			ConstructorID:    "red-bull",
+			Name:             "Red Bull Racing",
+			ConstructorColor: "#3671C6",
+		}},
+	})
+
+	got, err := svc.GetStandings(context.Background(), 2023)
+
+	require.NoError(t, err)
+	assert.Equal(t, seasons.StandingsResponse{
+		Drivers: []seasons.DriverStanding{{
+			PositionLabel: "1",
+			Points:        251.5,
+			ID:            "max-verstappen",
+			Code:          "VER",
+			Name:          "Max Verstappen",
+			Country:       "Netherlands",
+			CountryCode:   "NL",
+			Constructor: &seasons.Constructor{
+				ID: "red-bull", Name: "Red Bull Racing", Color: "#3671C6",
+			},
+			Wins: 8, Podiums: 10, Poles: 6,
+		}},
+		Constructors: []seasons.ConstructorStanding{{
+			PositionLabel: "1", Points: 463.5, ID: "red-bull", Name: "Red Bull Racing", Color: "#3671C6",
+		}},
+	}, got)
+}
+
+func TestService_ListDriverProgression(t *testing.T) {
+	t.Parallel()
+
+	svc := seasons.NewService(stubQuerier{progressionRows: []database.ListSeasonDriverProgressionRow{{
+		RaceRound: 3,
+		DriverID:  "max-verstappen",
+		Code:      "VER",
+		Points:    44,
+	}}})
+
+	got, err := svc.ListDriverProgression(context.Background(), 2023)
+
+	require.NoError(t, err)
+	assert.Equal(t, []seasons.DriverProgression{{
+		RaceRound: 3, DriverID: "max-verstappen", Code: "VER", Points: 44,
+	}}, got)
 }

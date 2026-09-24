@@ -21,7 +21,7 @@ WITH latest_round AS (
 SELECT
     css.position,
     css.position_text AS position_label,
-    css.points,
+    css.points::double precision AS points,
     css.constructor_id,
     css.constructor_name AS name,
     c.primary_color_hex AS constructor_color
@@ -37,7 +37,7 @@ ORDER BY css.position NULLS LAST, css.constructor_name
 type ListSeasonConstructorStandingsRow struct {
 	Position         dbtypes.Int4
 	PositionLabel    string
-	Points           pgtype.Numeric
+	Points           float64
 	ConstructorID    string
 	Name             string
 	ConstructorColor string
@@ -75,7 +75,7 @@ SELECT
     dss.race_round,
     dss.driver_id,
     dss.driver_code AS code,
-    dss.points
+    dss.points::double precision AS points
 FROM effone.driver_standings_snapshots AS dss
 WHERE dss.season = $1
 ORDER BY dss.driver_id, dss.race_round
@@ -85,7 +85,7 @@ type ListSeasonDriverProgressionRow struct {
 	RaceRound int32
 	DriverID  string
 	Code      string
-	Points    pgtype.Numeric
+	Points    float64
 }
 
 func (q *Queries) ListSeasonDriverProgression(ctx context.Context, season int32) ([]ListSeasonDriverProgressionRow, error) {
@@ -122,7 +122,7 @@ WITH latest_round AS (
 SELECT
     dss.position,
     dss.position_text AS position_label,
-    dss.points,
+    dss.points::double precision AS points,
     dss.driver_id,
     dss.driver_code AS code,
     dss.driver_name AS name,
@@ -149,7 +149,7 @@ ORDER BY dss.position NULLS LAST, dss.driver_name
 type ListSeasonDriverStandingsRow struct {
 	Position         dbtypes.Int4
 	PositionLabel    string
-	Points           pgtype.Numeric
+	Points           float64
 	DriverID         string
 	Code             string
 	Name             string
