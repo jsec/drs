@@ -13,3 +13,8 @@ package = false
 [tool.sqlfmt]
 line_length = 120
 exclude = ["dbt/target/**/*", "dbt/dbt_packages/**/*", ".venv"]
+
+[dependency-groups]
+dev = [
+    "shandy-sqlfmt>=0.32.0",
+]
