@@ -182,3 +182,19 @@ func TestService_GetCircuitSummaryWrapsQueryErrors(t *testing.T) {
 		})
 	}
 }
+
+func TestService_GetCircuitSummaryNormalizesNullPreviousNames(t *testing.T) {
+	t.Parallel()
+
+	svc := circuits.NewService(stubQuerier{
+		circuit: database.GetCircuitInfoRow{
+			CircuitID: "lusail",
+		},
+	})
+
+	got, err := svc.GetCircuitSummary(context.Background(), "lusail")
+
+	require.NoError(t, err)
+	assert.NotNil(t, got.PreviousNames)
+	assert.Empty(t, got.PreviousNames)
+}

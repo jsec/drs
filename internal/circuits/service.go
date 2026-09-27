@@ -78,6 +78,11 @@ func (s *Service) GetCircuitSummary(ctx context.Context, circuitID string) (Circ
 		})
 	}
 
+	previousNames := circuit.PreviousNames
+	if previousNames == nil {
+		previousNames = []string{}
+	}
+
 	result := CircuitSummaryResponse{
 		CircuitID:   circuit.CircuitID,
 		Name:        circuit.Name,
@@ -96,7 +101,7 @@ func (s *Service) GetCircuitSummary(ctx context.Context, circuitID string) (Circ
 			Name:   circuit.LastRaceName.String,
 		},
 		CurrentLayoutId: circuit.CurrentLayoutID.String,
-		PreviousNames:   circuit.PreviousNames,
+		PreviousNames:   previousNames,
 		RaceCount:       int(circuit.RaceCount),
 		Turns:           int(circuit.Turns),
 		Races:           races,
