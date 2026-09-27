@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/jsec/drs/internal/database"
+	"github.com/jsec/drs/internal/dbtypes"
 	"github.com/jsec/drs/internal/seasons"
 )
 
@@ -22,6 +24,8 @@ type stubQuerier struct {
 	constructorStandingsErr  error
 	progressionRows          []database.ListSeasonDriverProgressionRow
 	progressionErr           error
+	calendarRows             []database.ListSeasonCalendarRow
+	calendarErr              error
 }
 
 func (s stubQuerier) ListSeasons(context.Context) ([]database.ListSeasonsRow, error) {
@@ -40,8 +44,19 @@ func (s stubQuerier) ListSeasonDriverProgression(context.Context, database.ListS
 	return s.progressionRows, s.progressionErr
 }
 
+func (s stubQuerier) ListSeasonCalendar(context.Context, int32) ([]database.ListSeasonCalendarRow, error) {
+	return s.calendarRows, s.calendarErr
+}
+
 func text(s string) pgtype.Text {
 	return pgtype.Text{String: s, Valid: true}
+}
+
+func date(year int, month time.Month, day int) dbtypes.Date {
+	return dbtypes.Date{Date: pgtype.Date{
+		Time:  time.Date(year, month, day, 0, 0, 0, 0, time.UTC),
+		Valid: true,
+	}}
 }
 
 func TestService_ListSeasons(t *testing.T) {
@@ -253,4 +268,55 @@ func TestService_GetOverview(t *testing.T) {
 			{Name: "PER", Color: "#3671C6"},
 		},
 	}, got.Progression)
+}
+
+func TestService_GetCalendar(t *testing.T) {
+	t.Parallel()
+
+	svc := seasons.NewService(stubQuerier{
+		calendarRows: []database.ListSeasonCalendarRow{
+			{
+				RaceID:                 1123,
+				RaceRound:              1,
+				RaceName:               "Australian Grand Prix",
+				GrandPrixCode:          text("AUS"),
+				RaceDate:               date(2026, time.March, 8),
+				CircuitID:              "albert_park",
+				CircuitName:            "Albert Park Grand Prix Circuit",
+				WinnerDriverID:         text("lando-norris"),
+				WinnerDriverName:       text("Lando Norris"),
+				WinnerDriverCode:       text("NOR"),
+				WinnerConstructorID:    text("mclaren"),
+				WinnerConstructorName:  text("McLaren"),
+				WinnerConstructorColor: text("#FF8000"),
+				Completed:              pgtype.Bool{Bool: true, Valid: true},
+			},
+			{
+				RaceID:      1124,
+				RaceRound:   2,
+				RaceName:    "Chinese Grand Prix",
+				RaceDate:    date(2026, time.March, 15),
+				CircuitID:   "shanghai",
+				CircuitName: "Shanghai International Circuit",
+				Completed:   pgtype.Bool{Bool: false, Valid: true},
+			},
+		},
+	})
+
+	got, err := svc.GetCalendar(context.Background(), 2026)
+
+	require.NoError(t, err)
+	require.Len(t, got.Races, 2)
+	assert.Equal(t, 1, got.RoundsCompleted)
+	assert.Equal(t, 2, got.TotalRounds)
+	assert.Equal(t, int32(1123), got.Races[0].RaceID)
+	assert.Equal(t, "AUS", *got.Races[0].Code)
+	assert.Equal(t, "albert_park", got.Races[0].Circuit.ID)
+	assert.True(t, got.Races[0].Completed)
+	require.NotNil(t, got.Races[0].Winner)
+	assert.Equal(t, "NOR", got.Races[0].Winner.Code)
+	require.NotNil(t, got.Races[0].Winner.Constructor)
+	assert.Equal(t, "#FF8000", got.Races[0].Winner.Constructor.Color)
+	assert.False(t, got.Races[1].Completed)
+	assert.Nil(t, got.Races[1].Winner)
 }

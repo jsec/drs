@@ -12,6 +12,81 @@ import (
 	"github.com/jsec/drs/internal/dbtypes"
 )
 
+const listSeasonCalendar = `-- name: ListSeasonCalendar :many
+SELECT
+    r.race_id,
+    r.race_round,
+    r.race_name,
+    r.grand_prix_code,
+    r.race_date,
+    r.circuit_id,
+    ci.circuit_name,
+    r.winner_driver_id,
+    r.winner_driver_name,
+    r.winner_driver_code,
+    r.winner_constructor_id,
+    r.winner_constructor_name,
+    c.primary_color_hex AS winner_constructor_color,
+    r.winner_driver_id IS NOT NULL AS completed
+FROM effone.races AS r
+    JOIN effone.circuits AS ci ON ci.circuit_id = r.circuit_id
+    LEFT JOIN effone.constructors AS c ON c.constructor_id = r.winner_constructor_id
+WHERE r.season = $1
+ORDER BY r.race_round
+`
+
+type ListSeasonCalendarRow struct {
+	RaceID                 int32
+	RaceRound              int32
+	RaceName               string
+	GrandPrixCode          pgtype.Text
+	RaceDate               dbtypes.Date
+	CircuitID              string
+	CircuitName            string
+	WinnerDriverID         pgtype.Text
+	WinnerDriverName       pgtype.Text
+	WinnerDriverCode       pgtype.Text
+	WinnerConstructorID    pgtype.Text
+	WinnerConstructorName  pgtype.Text
+	WinnerConstructorColor pgtype.Text
+	Completed              pgtype.Bool
+}
+
+func (q *Queries) ListSeasonCalendar(ctx context.Context, season int32) ([]ListSeasonCalendarRow, error) {
+	rows, err := q.db.Query(ctx, listSeasonCalendar, season)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSeasonCalendarRow
+	for rows.Next() {
+		var i ListSeasonCalendarRow
+		if err := rows.Scan(
+			&i.RaceID,
+			&i.RaceRound,
+			&i.RaceName,
+			&i.GrandPrixCode,
+			&i.RaceDate,
+			&i.CircuitID,
+			&i.CircuitName,
+			&i.WinnerDriverID,
+			&i.WinnerDriverName,
+			&i.WinnerDriverCode,
+			&i.WinnerConstructorID,
+			&i.WinnerConstructorName,
+			&i.WinnerConstructorColor,
+			&i.Completed,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listSeasonConstructorStandings = `-- name: ListSeasonConstructorStandings :many
 WITH latest_round AS (
     SELECT max(race_round) AS race_round

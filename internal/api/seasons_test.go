@@ -7,11 +7,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/jsec/drs/internal/database"
+	"github.com/jsec/drs/internal/dbtypes"
 	"github.com/jsec/drs/internal/seasons"
 )
 
@@ -19,6 +21,7 @@ type seasonStubQuerier struct {
 	driverRows      []database.ListSeasonDriverStandingsRow
 	constructorRows []database.ListSeasonConstructorStandingsRow
 	progressionRows []database.ListSeasonDriverProgressionRow
+	calendarRows    []database.ListSeasonCalendarRow
 }
 
 func (s seasonStubQuerier) ListSeasons(context.Context) ([]database.ListSeasonsRow, error) {
@@ -35,6 +38,17 @@ func (s seasonStubQuerier) ListSeasonConstructorStandings(context.Context, int32
 
 func (s seasonStubQuerier) ListSeasonDriverProgression(context.Context, database.ListSeasonDriverProgressionParams) ([]database.ListSeasonDriverProgressionRow, error) {
 	return s.progressionRows, nil
+}
+
+func (s seasonStubQuerier) ListSeasonCalendar(context.Context, int32) ([]database.ListSeasonCalendarRow, error) {
+	return s.calendarRows, nil
+}
+
+func seasonDate(year int, month time.Month, day int) dbtypes.Date {
+	return dbtypes.Date{Date: pgtype.Date{
+		Time:  time.Date(year, month, day, 0, 0, 0, 0, time.UTC),
+		Valid: true,
+	}}
 }
 
 func TestGetSeasonStandingsHandler(t *testing.T) {
@@ -119,5 +133,64 @@ func TestGetSeasonOverviewHandler(t *testing.T) {
 			"data":[{"round":1,"VER":44}],
 			"series":[{"name":"VER","color":"#3671C6"}]
 		}
+	}`, rec.Body.String())
+}
+
+func TestGetSeasonCalendarHandler(t *testing.T) {
+	t.Parallel()
+
+	app := &application{
+		logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
+		seasons: seasons.NewService(seasonStubQuerier{
+			calendarRows: []database.ListSeasonCalendarRow{
+				{
+					RaceID:                 1123,
+					RaceRound:              1,
+					RaceName:               "Australian Grand Prix",
+					GrandPrixCode:          pgtype.Text{String: "AUS", Valid: true},
+					RaceDate:               seasonDate(2026, time.March, 8),
+					CircuitID:              "albert_park",
+					CircuitName:            "Albert Park Grand Prix Circuit",
+					WinnerDriverID:         pgtype.Text{String: "lando-norris", Valid: true},
+					WinnerDriverName:       pgtype.Text{String: "Lando Norris", Valid: true},
+					WinnerDriverCode:       pgtype.Text{String: "NOR", Valid: true},
+					WinnerConstructorID:    pgtype.Text{String: "mclaren", Valid: true},
+					WinnerConstructorName:  pgtype.Text{String: "McLaren", Valid: true},
+					WinnerConstructorColor: pgtype.Text{String: "#FF8000", Valid: true},
+					Completed:              pgtype.Bool{Bool: true, Valid: true},
+				},
+				{
+					RaceID:      1124,
+					RaceRound:   2,
+					RaceName:    "Chinese Grand Prix",
+					RaceDate:    seasonDate(2026, time.March, 15),
+					CircuitID:   "shanghai",
+					CircuitName: "Shanghai International Circuit",
+					Completed:   pgtype.Bool{Bool: false, Valid: true},
+				},
+			},
+		}),
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/seasons/2026/calendar", nil)
+	req.SetPathValue("year", "2026")
+	rec := httptest.NewRecorder()
+
+	handle(app.logger, app.getSeasonCalendarHandler).ServeHTTP(rec, req)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.JSONEq(t, `{
+		"races":[
+			{
+				"raceId":1123,"round":1,"name":"Australian Grand Prix","code":"AUS","date":"2026-03-08",
+				"circuit":{"id":"albert_park","name":"Albert Park Grand Prix Circuit"},"completed":true,
+				"winner":{"id":"lando-norris","name":"Lando Norris","code":"NOR","constructor":{"id":"mclaren","name":"McLaren","color":"#FF8000"}}
+			},
+			{
+				"raceId":1124,"round":2,"name":"Chinese Grand Prix","code":"","date":"2026-03-15",
+				"circuit":{"id":"shanghai","name":"Shanghai International Circuit"},"completed":false,"winner":null
+			}
+		],
+		"roundsCompleted":1,"totalRounds":2
 	}`, rec.Body.String())
 }

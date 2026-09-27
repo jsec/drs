@@ -73,3 +73,32 @@ type SeasonOverviewResponse struct {
 	MaxConstructorPoints float64               `json:"maxConstructorPoints"`
 	Progression          Progression           `json:"progression"`
 }
+
+type calendarCircuit struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type calendarWinner struct {
+	ID          string       `json:"id"`
+	Name        string       `json:"name"`
+	Code        string       `json:"code"`
+	Constructor *Constructor `json:"constructor"`
+}
+
+type CalendarEntry struct {
+	RaceID    int32           `json:"raceId"`
+	Round     int32           `json:"round"`
+	Name      string          `json:"name"`
+	Code      *string         `json:"code"`
+	Date      dbtypes.Date    `json:"date"`
+	Circuit   calendarCircuit `json:"circuit"`
+	Completed bool            `json:"completed"`
+	Winner    *calendarWinner `json:"winner"`
+}
+
+type CalendarResponse struct {
+	Races           []CalendarEntry `json:"races"`
+	RoundsCompleted int             `json:"roundsCompleted"`
+	TotalRounds     int             `json:"totalRounds"`
+}

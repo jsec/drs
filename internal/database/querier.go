@@ -17,6 +17,7 @@ type Querier interface {
 	ListConstructors(ctx context.Context) ([]ListConstructorsRow, error)
 	ListDriverSeasons(ctx context.Context, driverID string) ([]ListDriverSeasonsRow, error)
 	ListDrivers(ctx context.Context) ([]ListDriversRow, error)
+	ListSeasonCalendar(ctx context.Context, season int32) ([]ListSeasonCalendarRow, error)
 	ListSeasonConstructorStandings(ctx context.Context, season int32) ([]ListSeasonConstructorStandingsRow, error)
 	ListSeasonDriverProgression(ctx context.Context, arg ListSeasonDriverProgressionParams) ([]ListSeasonDriverProgressionRow, error)
 	ListSeasonDriverStandings(ctx context.Context, season int32) ([]ListSeasonDriverStandingsRow, error)

@@ -9,6 +9,7 @@ import (
 
 type seasonQueries interface {
 	ListSeasons(ctx context.Context) ([]database.ListSeasonsRow, error)
+	ListSeasonCalendar(ctx context.Context, season int32) ([]database.ListSeasonCalendarRow, error)
 	ListSeasonConstructorStandings(ctx context.Context, season int32) ([]database.ListSeasonConstructorStandingsRow, error)
 	ListSeasonDriverProgression(ctx context.Context, arg database.ListSeasonDriverProgressionParams) ([]database.ListSeasonDriverProgressionRow, error)
 	ListSeasonDriverStandings(ctx context.Context, season int32) ([]database.ListSeasonDriverStandingsRow, error)
@@ -172,6 +173,59 @@ func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverview
 	}
 
 	return overview, nil
+}
+
+func (s *Service) GetCalendar(ctx context.Context, season int32) (CalendarResponse, error) {
+	raceRows, err := s.queries.ListSeasonCalendar(ctx, season)
+
+	if err != nil {
+		return CalendarResponse{}, err
+	}
+
+	totalRounds := len(raceRows)
+	completedRounds := 0
+
+	races := make([]CalendarEntry, 0, len(raceRows))
+
+	for _, race := range raceRows {
+		entry := CalendarEntry{
+			RaceID: race.RaceID,
+			Round:  race.RaceRound,
+			Name:   race.RaceName,
+			Code:   &race.GrandPrixCode.String,
+			Date:   race.RaceDate,
+			Circuit: calendarCircuit{
+				ID:   race.CircuitID,
+				Name: race.CircuitName,
+			},
+			Completed: race.Completed.Bool,
+		}
+
+		if race.WinnerDriverID.Valid {
+			completedRounds += 1
+
+			entry.Winner = &calendarWinner{
+				ID:   race.WinnerDriverID.String,
+				Name: race.WinnerDriverName.String,
+				Code: race.WinnerDriverCode.String,
+				Constructor: &Constructor{
+					ID:    race.WinnerConstructorID.String,
+					Name:  race.WinnerConstructorName.String,
+					Color: race.WinnerConstructorColor.String,
+				},
+			}
+		}
+
+		races = append(races, entry)
+	}
+
+	calendar := CalendarResponse{
+		Races:           races,
+		RoundsCompleted: completedRounds,
+		TotalRounds:     totalRounds,
+	}
+
+	return calendar, nil
 }
 
 func maxConstructorPoints(constructors []ConstructorStanding) float64 {

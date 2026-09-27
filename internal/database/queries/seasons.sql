@@ -77,3 +77,25 @@ FROM effone.driver_standings_snapshots AS dss
 WHERE dss.season = sqlc.arg(season)
     AND dss.driver_id = ANY(sqlc.arg(driver_ids)::text[])
 ORDER BY dss.race_round, dss.driver_id;
+
+-- name: ListSeasonCalendar :many
+SELECT
+    r.race_id,
+    r.race_round,
+    r.race_name,
+    r.grand_prix_code,
+    r.race_date,
+    r.circuit_id,
+    ci.circuit_name,
+    r.winner_driver_id,
+    r.winner_driver_name,
+    r.winner_driver_code,
+    r.winner_constructor_id,
+    r.winner_constructor_name,
+    c.primary_color_hex AS winner_constructor_color,
+    r.winner_driver_id IS NOT NULL AS completed
+FROM effone.races AS r
+    JOIN effone.circuits AS ci ON ci.circuit_id = r.circuit_id
+    LEFT JOIN effone.constructors AS c ON c.constructor_id = r.winner_constructor_id
+WHERE r.season = $1
+ORDER BY r.race_round;
