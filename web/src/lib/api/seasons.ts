@@ -70,6 +70,31 @@ export const SeasonOverviewSchema = SeasonStandingsSchema.extend({
     runnerUp: DriverStandingSchema.nullable(),
 });
 
+export const SeasonCalendarEntrySchema = z.object({
+    circuit: z.object({
+        id: z.string(),
+        name: z.string(),
+    }),
+    code: z.string().nullable(),
+    completed: z.boolean(),
+    date: z.string().nullable(),
+    name: z.string(),
+    raceId: z.number().int(),
+    round: z.number().int(),
+    winner: z.object({
+        code: z.string(),
+        constructor: ConstructorSchema.nullable(),
+        id: z.string(),
+        name: z.string(),
+    }).nullable(),
+});
+
+export const SeasonCalendarSchema = z.object({
+    races: z.array(SeasonCalendarEntrySchema),
+    roundsCompleted: z.number().int(),
+    totalRounds: z.number().int(),
+});
+
 export type Constructor = z.infer<typeof ConstructorSchema>;
 export type ConstructorStanding = z.infer<typeof ConstructorStandingSchema>;
 export type DriverStanding = z.infer<typeof DriverStandingSchema>;
@@ -77,6 +102,8 @@ export type ListSeasonsResponse = z.infer<typeof SeasonListSchema>;
 export type Progression = z.infer<typeof ProgressionSchema>;
 export type ProgressionDataRow = z.infer<typeof ProgressionDataRowSchema>;
 export type ProgressionSeries = z.infer<typeof ProgressionSeriesSchema>;
+export type SeasonCalendar = z.infer<typeof SeasonCalendarSchema>;
+export type SeasonCalendarEntry = z.infer<typeof SeasonCalendarEntrySchema>;
 export type SeasonOverview = z.infer<typeof SeasonOverviewSchema>;
 export type SeasonResponse = z.infer<typeof SeasonSchema>;
 export type SeasonStandings = z.infer<typeof SeasonStandingsSchema>;

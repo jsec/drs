@@ -5,31 +5,33 @@ import {
     FlagCheckeredIcon,
     GaugeIcon,
 } from '@phosphor-icons/react';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { memo, useMemo } from 'react';
-
-import type { CalendarRound } from '#/data/types';
-import type { DriverStanding } from '#/lib/api/seasons';
+import { memo } from 'react';
 
 import { GridHeader, SectionCard, StatCard, TeamBar } from '#/components/f1-ui';
 import { LineChart } from '#/components/line-chart';
-import { calendarQuery, seasonOverviewQuery } from '#/data/queries';
+import { seasonOverviewQuery } from '#/data/queries';
+import { type SeasonCalendarEntry, SeasonCalendarSchema } from '#/lib/api/seasons';
+import { api } from '#/lib/query/api';
 import { parseYear } from '#/lib/route-params';
+import { calendarRaceState } from '#/lib/season-calendar';
 
 const DRIVER_COLS = '34px 1fr 64px 56px 70px';
 
 type MiniRaceCellProps = {
-    completed: number;
-    driverByCode: Map<string, DriverStanding>;
-    r: CalendarRound;
+    isNext: boolean;
+    race: SeasonCalendarEntry;
     year: string;
 };
 
-const MiniRaceCell = memo(function MiniRaceCell({ completed, driverByCode, r, year }: MiniRaceCellProps) {
-    const isDone = r.round <= completed;
-    const isNext = r.round === completed + 1;
-    const winner = r.winner ? driverByCode.get(r.winner) : null;
+const calendarQuery = (year: number) => queryOptions({
+    queryFn: () => api.get(`seasons/${year}/calendar`).json(SeasonCalendarSchema),
+    queryKey: ['calendar', year],
+});
+
+const MiniRaceCell = memo(function MiniRaceCell({ isNext, race, year }: MiniRaceCellProps) {
+    const isDone = race.completed;
 
     let background: string;
     let border: string;
@@ -53,12 +55,12 @@ const MiniRaceCell = memo(function MiniRaceCell({ completed, driverByCode, r, ye
         >
             <Box c="dimmed" className="f1-num" fw={700} fz={10}>
                 R
-                {r.round}
+                {race.round}
             </Box>
-            <Box fw={700} fz={12.5} mt={2}>{r.code}</Box>
-            <Box c="dimmed" fz={10.5} mt={1}>{r.date}</Box>
+            <Box fw={700} fz={12.5} mt={2}>{race.code ?? '—'}</Box>
+            <Box c="dimmed" fz={10.5} mt={1}>{race.date ?? 'Date TBD'}</Box>
             <Box
-                bg={winner?.constructor?.color ?? 'var(--mantine-color-default-border)'}
+                bg={race.winner?.constructor?.color ?? 'var(--mantine-color-default-border)'}
                 h={3}
                 mt={7}
                 style={{ borderRadius: 2 }}
@@ -68,7 +70,7 @@ const MiniRaceCell = memo(function MiniRaceCell({ completed, driverByCode, r, ye
 
     if (isDone) {
         return (
-            <Link params={{ round: String(r.round), year }} style={{ textDecoration: 'none' }} to="/seasons/$year/races/$round">
+            <Link params={{ round: String(race.round), year }} style={{ textDecoration: 'none' }} to="/seasons/$year/races/$round">
                 {cell}
             </Link>
         );
@@ -88,10 +90,7 @@ const SeasonOverview = () => {
     const { year } = Route.useParams();
     const { data: overview } = useSuspenseQuery(seasonOverviewQuery(Number(year)));
     const { data: calendar } = useSuspenseQuery(calendarQuery(Number(year)));
-    const driverByCode = useMemo(
-        () => new Map(overview.drivers.map(d => [d.code, d])),
-        [overview.drivers],
-    );
+    const { lastCompletedRace, nextRace } = calendarRaceState(calendar.races);
 
     if (overview.leader === null || overview.runnerUp === null) {
         return <SectionCard title="Championship Standings">No championship standings recorded.</SectionCard>;
@@ -122,7 +121,7 @@ const SeasonOverview = () => {
                 </div>
                 <Box ta="right">
                     <Box c="dimmed" fz={12}>Last round</Box>
-                    <Box fw={700} fz={15}>{calendar.lastRaceName}</Box>
+                    <Box fw={700} fz={15}>{lastCompletedRace?.name ?? 'No completed rounds'}</Box>
                 </Box>
             </Group>
 
@@ -133,7 +132,7 @@ const SeasonOverview = () => {
                     icon={<FlagCheckeredIcon size={15} weight="fill" />}
                     label="Round"
                     sub="season progress"
-                    value={`${calendar.completed} / ${calendar.totalRounds}`}
+                    value={`${calendar.roundsCompleted} / ${calendar.totalRounds}`}
                 />
                 <StatCard
                     accent="var(--gold-500)"
@@ -153,8 +152,8 @@ const SeasonOverview = () => {
                     accent="var(--teal-500)"
                     icon={<CalendarDotsIcon size={15} />}
                     label="Next Race"
-                    sub={calendar.nextRace.name}
-                    value={calendar.nextRace.code}
+                    sub={nextRace?.name ?? 'Season complete'}
+                    value={nextRace?.code ?? '—'}
                 />
             </SimpleGrid>
 
@@ -278,21 +277,13 @@ const SeasonOverview = () => {
                 />
             </Box>
 
-            <SectionCard
-                action={(
-                    <Link params={{ year }} style={ACTION_LINK} to="/seasons/$year/calendar">
-                        Full calendar →
-                    </Link>
-                )}
-                title={`${year} Calendar`}
-            >
+            <SectionCard title={`${year} Calendar`}>
                 <SimpleGrid cols={8} spacing={9}>
-                    {calendar.calendar.map(r => (
+                    {calendar.races.map(race => (
                         <MiniRaceCell
-                            completed={calendar.completed}
-                            driverByCode={driverByCode}
-                            key={r.round}
-                            r={r}
+                            isNext={race.round === nextRace?.round}
+                            key={race.raceId}
+                            race={race}
                             year={year}
                         />
                     ))}

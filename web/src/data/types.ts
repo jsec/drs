@@ -1,30 +1,3 @@
-export type AllTimeConstructor = {
-    active: boolean;
-    color: string;
-    name: string;
-    podiums: number;
-    poles: number;
-    titles: number;
-    wins: number;
-    years: string;
-};
-
-export type AllTimeDriver = {
-    active: boolean;
-    code: string;
-    color: string;
-    countryCode?: string;
-    id: string;
-    name: string;
-    nat: string;
-    podiums: number;
-    poles: number;
-    starts: number;
-    titles: number;
-    wins: number;
-    years: string;
-};
-
 export type CalendarRound = {
     circuit: string;
     code: string;
@@ -119,20 +92,6 @@ export type SeasonDriver = {
     team: TeamKey;
     teamName: string;
     wins: number;
-};
-
-export type SeasonOverview = {
-    calendar: CalendarRound[];
-    completed: number;
-    constructors: SeasonConstructor[];
-    drivers: SeasonDriver[];
-    lastRaceName: string;
-    leader: SeasonDriver;
-    nextRace: CalendarRound;
-    progression: { code: string; color: string; values: number[] }[];
-    runnerUp: SeasonDriver;
-    totalRounds: number;
-    year: number;
 };
 
 export type Standings = {

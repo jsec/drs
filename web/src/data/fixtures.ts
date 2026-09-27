@@ -1,6 +1,4 @@
 import type {
-    AllTimeConstructor,
-    AllTimeDriver,
     CalendarRound,
     DriverRaceRow,
     DriverSeasonDetail,
@@ -8,7 +6,6 @@ import type {
     RaceDetail,
     SeasonConstructor,
     SeasonDriver,
-    SeasonOverview,
     Standings,
     Team,
     TeamKey,
@@ -17,7 +14,6 @@ import type {
 export const TOTAL_ROUNDS = 24;
 export const COMPLETED = 10;
 export const CURRENT_YEAR = 2026;
-export const GRAY_FALLBACK = 'var(--neutral-500)';
 
 export const TEAMS: Record<TeamKey, Team> = {
     alp: { color: '#0093CC', dark: '#006a94', key: 'alp', name: 'Alpine' },
@@ -204,8 +200,6 @@ export const PROGRESSION: Record<string, number[]> = {
     RUS: [0, 10, 20, 33, 45, 60, 75, 90, 108, 127, 146],
     VER: [0, 15, 40, 55, 73, 88, 106, 131, 149, 175, 201],
 };
-const PROGRESSION_ORDER = ['NOR', 'PIA', 'VER', 'LEC', 'RUS', 'HAM'];
-
 const CALENDAR_RAW: [
     round: number,
     name: string,
@@ -289,243 +283,6 @@ const PACE_LINES: Record<string, number[]> = (() => {
     return out;
 })();
 
-const ALL_TIME_RAW: [
-    name: string,
-    nat: string,
-    years: string,
-    starts: number,
-    wins: number,
-    poles: number,
-    podiums: number,
-    titles: number,
-][] = [
-    ['Lewis Hamilton', 'GBR', '2007–', 356, 105, 104, 202, 7],
-    ['Michael Schumacher', 'GER', '1991–2012', 308, 91, 68, 155, 7],
-    ['Juan Manuel Fangio', 'ARG', '1950–1958', 51, 24, 29, 35, 5],
-    ['Sebastian Vettel', 'GER', '2007–2022', 300, 53, 57, 122, 4],
-    ['Alain Prost', 'FRA', '1980–1993', 199, 51, 33, 106, 4],
-    ['Max Verstappen', 'NED', '2015–', 221, 65, 44, 116, 4],
-    ['Niki Lauda', 'AUT', '1971–1985', 171, 25, 24, 54, 3],
-    ['Nelson Piquet', 'BRA', '1978–1991', 204, 23, 24, 60, 3],
-    ['Ayrton Senna', 'BRA', '1984–1994', 161, 41, 65, 80, 3],
-    ['Jackie Stewart', 'GBR', '1965–1973', 99, 27, 17, 43, 3],
-    ['Jack Brabham', 'AUS', '1955–1970', 126, 14, 13, 31, 3],
-    ['Alberto Ascari', 'ITA', '1950–1955', 32, 13, 14, 17, 2],
-    ['Jim Clark', 'GBR', '1960–1968', 72, 25, 33, 32, 2],
-    ['Graham Hill', 'GBR', '1958–1975', 176, 14, 13, 36, 2],
-    ['Emerson Fittipaldi', 'BRA', '1970–1980', 144, 14, 6, 35, 2],
-    ['Mika Häkkinen', 'FIN', '1991–2001', 161, 20, 26, 51, 2],
-    ['Fernando Alonso', 'ESP', '2001–', 416, 32, 22, 106, 2],
-    ['Giuseppe Farina', 'ITA', '1950–1955', 33, 5, 5, 20, 1],
-    ['Mike Hawthorn', 'GBR', '1952–1958', 45, 3, 4, 18, 1],
-    ['Phil Hill', 'USA', '1958–1966', 48, 3, 6, 16, 1],
-    ['John Surtees', 'GBR', '1960–1972', 111, 6, 8, 24, 1],
-    ['Denny Hulme', 'NZL', '1965–1974', 112, 8, 1, 33, 1],
-    ['Jochen Rindt', 'AUT', '1965–1970', 60, 6, 10, 13, 1],
-    ['Mario Andretti', 'USA', '1968–1982', 128, 12, 18, 19, 1],
-    ['Jody Scheckter', 'RSA', '1972–1980', 112, 10, 3, 33, 1],
-    ['Alan Jones', 'AUS', '1975–1986', 116, 12, 6, 24, 1],
-    ['Keke Rosberg', 'FIN', '1978–1986', 114, 5, 5, 17, 1],
-    ['Nigel Mansell', 'GBR', '1980–1995', 187, 31, 32, 59, 1],
-    ['Damon Hill', 'GBR', '1992–1999', 115, 22, 20, 42, 1],
-    ['Jacques Villeneuve', 'CAN', '1996–2006', 163, 11, 13, 23, 1],
-    ['Kimi Räikkönen', 'FIN', '2001–2021', 349, 21, 18, 103, 1],
-    ['Jenson Button', 'GBR', '2000–2017', 306, 15, 8, 50, 1],
-    ['Nico Rosberg', 'GER', '2006–2016', 206, 23, 30, 57, 1],
-    ['Stirling Moss', 'GBR', '1951–1961', 66, 16, 16, 24, 0],
-    ['Gilles Villeneuve', 'CAN', '1977–1982', 67, 6, 2, 13, 0],
-    ['Carlos Reutemann', 'ARG', '1972–1982', 146, 12, 6, 45, 0],
-    ['Ronnie Peterson', 'SWE', '1970–1978', 123, 10, 14, 26, 0],
-    ['Rubens Barrichello', 'BRA', '1993–2011', 322, 11, 14, 68, 0],
-    ['David Coulthard', 'GBR', '1994–2008', 246, 13, 12, 62, 0],
-    ['Felipe Massa', 'BRA', '2002–2017', 269, 11, 16, 41, 0],
-    ['Mark Webber', 'AUS', '2002–2013', 215, 9, 13, 42, 0],
-    ['Valtteri Bottas', 'FIN', '2013–', 243, 10, 20, 67, 0],
-    ['Sergio Pérez', 'MEX', '2011–2024', 281, 6, 3, 39, 0],
-    ['Daniel Ricciardo', 'AUS', '2011–2024', 257, 8, 3, 32, 0],
-    ['Juan Pablo Montoya', 'COL', '2001–2006', 94, 7, 13, 30, 0],
-    ['Ralf Schumacher', 'GER', '1997–2007', 180, 6, 6, 27, 0],
-    ['Gerhard Berger', 'AUT', '1984–1997', 210, 10, 12, 48, 0],
-    ['Riccardo Patrese', 'ITA', '1977–1993', 256, 6, 8, 37, 0],
-    ['Jean Alesi', 'FRA', '1989–2001', 201, 1, 2, 32, 0],
-    ['Heinz-Harald Frentzen', 'GER', '1994–2003', 156, 3, 2, 18, 0],
-    ['Eddie Irvine', 'GBR', '1993–2002', 146, 4, 0, 26, 0],
-    ['Clay Regazzoni', 'SUI', '1970–1980', 132, 5, 5, 28, 0],
-    ['Jacky Ickx', 'BEL', '1966–1979', 116, 8, 13, 25, 0],
-    ['Bruce McLaren', 'NZL', '1958–1970', 100, 4, 0, 27, 0],
-    ['Dan Gurney', 'USA', '1959–1970', 86, 4, 3, 19, 0],
-    ['Tony Brooks', 'GBR', '1956–1961', 38, 6, 3, 10, 0],
-    ['Carlos Pace', 'BRA', '1972–1977', 72, 1, 1, 6, 0],
-    ['Patrick Depailler', 'FRA', '1972–1980', 95, 2, 1, 19, 0],
-    ['Michele Alboreto', 'ITA', '1981–1994', 194, 5, 2, 23, 0],
-    ['Elio de Angelis', 'ITA', '1979–1986', 108, 2, 3, 9, 0],
-    ['Thierry Boutsen', 'BEL', '1983–1993', 163, 3, 1, 15, 0],
-    ['René Arnoux', 'FRA', '1978–1989', 149, 7, 18, 22, 0],
-    ['Jacques Laffite', 'FRA', '1974–1986', 176, 6, 7, 32, 0],
-    ['Didier Pironi', 'FRA', '1978–1982', 70, 3, 4, 13, 0],
-    ['John Watson', 'GBR', '1973–1985', 152, 5, 2, 20, 0],
-    ['Romain Grosjean', 'FRA', '2009–2020', 179, 0, 0, 10, 0],
-    ['Nico Hülkenberg', 'GER', '2010–', 230, 0, 1, 1, 0],
-    ['Charles Leclerc', 'MON', '2018–', 166, 8, 26, 48, 0],
-    ['Lando Norris', 'GBR', '2019–', 150, 9, 12, 40, 0],
-    ['Oscar Piastri', 'AUS', '2023–', 71, 5, 4, 22, 0],
-    ['George Russell', 'GBR', '2019–', 145, 4, 5, 21, 0],
-    ['Carlos Sainz', 'ESP', '2015–', 221, 4, 6, 27, 0],
-    ['Pierre Gasly', 'FRA', '2017–', 166, 1, 0, 5, 0],
-    ['Esteban Ocon', 'FRA', '2016–', 166, 1, 0, 4, 0],
-    ['Alex Albon', 'THA', '2019–', 111, 0, 0, 2, 0],
-    ['Lance Stroll', 'CAN', '2017–', 185, 0, 1, 3, 0],
-    ['Yuki Tsunoda', 'JPN', '2021–', 105, 0, 0, 0, 0],
-    ['Kimi Antonelli', 'ITA', '2025–', 28, 0, 0, 2, 0],
-    ['Isack Hadjar', 'FRA', '2025–', 28, 0, 0, 0, 0],
-    ['Gabriel Bortoleto', 'BRA', '2025–', 28, 0, 0, 0, 0],
-    ['Oliver Bearman', 'GBR', '2024–', 33, 0, 0, 0, 0],
-    ['Liam Lawson', 'NZL', '2023–', 39, 0, 0, 0, 0],
-    ['Franco Colapinto', 'ARG', '2024–', 31, 0, 0, 0, 0],
-];
-
-function initials(name: string): string {
-    const ascii = name.replaceAll(/[äöüéíáàë]/gi, (c) => {
-        const map: Record<string, string> = {
-            á: 'a', à: 'a', ä: 'a', é: 'e', ë: 'e', í: 'i', ö: 'o', ü: 'u',
-        };
-        return map[c.toLowerCase()] ?? c;
-    });
-    const last = ascii.split(' ').pop() ?? ascii;
-    return last.slice(0, 3).toUpperCase();
-}
-
-/** Driver names are unique in ALL_TIME_RAW, so the slug is a stable id. */
-function slugify(name: string): string {
-    return name
-        .normalize('NFD')
-        .replaceAll(/\p{Diacritic}/gu, '')
-        .toLowerCase()
-        .replaceAll(/[^a-z0-9]+/g, '-')
-        .replaceAll(/^-|-$/g, '');
-}
-
-const activeByName: Partial<Record<string, { code: string; color: string }>> = {};
-for (const d of SEASON_DRIVERS) {
-    activeByName[d.name] = { code: d.code, color: d.color };
-}
-
-const nationalityToCountryCode: Record<string, string> = {
-    ARG: 'AR',
-    AUS: 'AU',
-    AUT: 'AT',
-    BEL: 'BE',
-    BRA: 'BR',
-    CAN: 'CA',
-    COL: 'CO',
-    ESP: 'ES',
-    FIN: 'FI',
-    FRA: 'FR',
-    GBR: 'GB',
-    GER: 'DE',
-    ITA: 'IT',
-    JPN: 'JP',
-    MEX: 'MX',
-    MON: 'MC',
-    NED: 'NL',
-    NZL: 'NZ',
-    RSA: 'ZA',
-    SUI: 'CH',
-    SWE: 'SE',
-    THA: 'TH',
-    USA: 'US',
-};
-
-export const ALL_TIME_DRIVERS: AllTimeDriver[] = ALL_TIME_RAW.map((row) => {
-    const [name, nat, years, starts, wins, poles, podiums, titles] = row;
-    const active = activeByName[name];
-
-    return {
-        active: !!active,
-        code: active ? active.code : initials(name),
-        color: active ? active.color : (titles > 0 ? '#c79100' : GRAY_FALLBACK),
-        countryCode: nationalityToCountryCode[nat],
-        id: slugify(name),
-        name,
-        nat,
-        podiums,
-        poles,
-        starts,
-        titles,
-        wins,
-        years,
-    };
-});
-
-const driverBySlug: Partial<Record<string, AllTimeDriver>> = {};
-for (const driver of ALL_TIME_DRIVERS) {
-    driverBySlug[driver.id] = driver;
-}
-
-const ALL_TIME_CONSTRUCTORS_RAW: [
-    name: string,
-    color: string,
-    years: string,
-    titles: number,
-    wins: number,
-    poles: number,
-    podiums: number,
-    active: boolean,
-][] = [
-    ['Ferrari', '#E8002D', '1950–', 16, 248, 253, 812, true],
-    ['McLaren', '#FF8000', '1966–', 8, 200, 165, 524, true],
-    ['Williams', '#3B9BD8', '1977–', 9, 114, 128, 313, true],
-    ['Mercedes', '#00B39B', '1954–', 8, 125, 140, 293, true],
-    ['Red Bull', '#3671C6', '2005–', 6, 122, 103, 290, true],
-    ['Team Lotus', '#177E3E', '1958–1994', 7, 79, 107, 172, false],
-    ['Renault / Alpine', '#0093CC', '1977–', 2, 36, 51, 110, true],
-    ['Brabham', '#5C5F66', '1962–1992', 2, 35, 39, 124, false],
-    ['Benetton', '#00A859', '1986–2001', 1, 27, 15, 102, false],
-    ['Tyrrell', '#5C5F66', '1970–1998', 1, 23, 14, 77, false],
-    ['Cooper', '#5C5F66', '1950–1969', 2, 16, 11, 45, false],
-    ['BRM', '#5C5F66', '1951–1977', 1, 17, 11, 62, false],
-    ['Matra', '#5C5F66', '1967–1972', 1, 9, 4, 22, false],
-    ['Vanwall', '#5C5F66', '1954–1960', 1, 9, 7, 18, false],
-    ['Brawn GP', '#9FD300', '2009', 1, 8, 5, 15, false],
-    ['Aston Martin', '#229971', '2021–', 0, 0, 1, 9, true],
-    ['Racing Bulls', '#6692FF', '2006–', 0, 2, 1, 5, true],
-    ['Sauber / Audi', '#52E252', '1993–', 0, 1, 1, 27, true],
-    ['Haas', '#8B8D90', '2016–', 0, 0, 1, 2, true],
-    ['Jordan', '#5C5F66', '1991–2005', 0, 4, 2, 19, false],
-];
-
-export const ALL_TIME_CONSTRUCTORS: AllTimeConstructor[] = ALL_TIME_CONSTRUCTORS_RAW.map(
-    ([name, color, years, titles, wins, poles, podiums, active]) => ({
-        active,
-        color,
-        name,
-        podiums,
-        poles,
-        titles,
-        wins,
-        years,
-    }),
-);
-
-/** Cheap existence check for route guards; does not build the career series. */
-export function getAllTimeDriver(id: string): AllTimeDriver | undefined {
-    return driverBySlug[id];
-}
-
-export function getAllTimeDrivers(): AllTimeDriver[] {
-    return ALL_TIME_DRIVERS;
-}
-
-export function getCalendar(): Pick<SeasonOverview, 'calendar' | 'completed' | 'lastRaceName' | 'nextRace' | 'totalRounds'> {
-    return {
-        calendar: CALENDAR,
-        completed: COMPLETED,
-        lastRaceName: CALENDAR[COMPLETED - 1].name,
-        nextRace: CALENDAR[COMPLETED],
-        totalRounds: TOTAL_ROUNDS,
-    };
-}
-
 export function getDriverSeason(code: string): DriverSeasonDetail | undefined {
     const driver = driverByCode[code];
     if (!driver) return undefined;
@@ -601,26 +358,6 @@ export function getRaceDetail(round: number): RaceDetail | undefined {
         })),
         round: cal.round,
         winner: driverByCode.NOR,
-        year: CURRENT_YEAR,
-    };
-}
-
-export function getSeasonOverview(): SeasonOverview {
-    return {
-        calendar: CALENDAR,
-        completed: COMPLETED,
-        constructors: SEASON_CONSTRUCTORS,
-        drivers: SEASON_DRIVERS,
-        lastRaceName: CALENDAR[COMPLETED - 1].name,
-        leader: SEASON_DRIVERS[0],
-        nextRace: CALENDAR[COMPLETED],
-        progression: PROGRESSION_ORDER.map(code => ({
-            code,
-            color: driverByCode[code].color,
-            values: PROGRESSION[code],
-        })),
-        runnerUp: SEASON_DRIVERS[1],
-        totalRounds: TOTAL_ROUNDS,
         year: CURRENT_YEAR,
     };
 }

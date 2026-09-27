@@ -4,8 +4,6 @@ import { SeasonOverviewSchema, SeasonStandingsSchema } from '#/lib/api/seasons';
 import { api } from '#/lib/query/api';
 
 import {
-    getAllTimeDrivers,
-    getCalendar,
     getDriverSeason,
     getRaceDetail,
     getStandings,
@@ -26,12 +24,6 @@ export const seasonStandingsQuery = (year: number) =>
         queryKey: ['season-standings', year],
     });
 
-export const allTimeDriversQuery = () =>
-    queryOptions({
-        queryFn: () => getAllTimeDrivers(),
-        queryKey: ['all-time-drivers'],
-    });
-
 export const raceDetailQuery = (year: number, round: number) =>
     queryOptions({
         queryFn: () => {
@@ -46,12 +38,6 @@ export const standingsQuery = (year: number) =>
     queryOptions({
         queryFn: () => getStandings(),
         queryKey: ['standings', year],
-    });
-
-export const calendarQuery = (year: number) =>
-    queryOptions({
-        queryFn: () => getCalendar(),
-        queryKey: ['calendar', year],
     });
 
 export const driverSeasonQuery = (year: number, code: string) =>

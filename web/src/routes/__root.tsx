@@ -28,7 +28,6 @@ import {
 } from '@tanstack/react-router';
 
 import { Breadcrumbs } from '#/components/breadcrumbs';
-import { COMPLETED, CURRENT_YEAR, TOTAL_ROUNDS } from '#/data/fixtures';
 
 type MyRouterContext = {
     queryClient: QueryClient;
@@ -67,8 +66,6 @@ const navItems: NavItem[] = [
         to: '/circuits',
     },
 ];
-
-const progressPct = Math.round((COMPLETED / TOTAL_ROUNDS) * 100);
 
 const NAV_CLASS_NAMES = { body: 'f1-nav-body', label: 'f1-nav-label', root: 'f1-nav-item' };
 
@@ -128,22 +125,6 @@ const RootLayout = () => {
                     })}
                 </AppShell.Section>
 
-                <div className="f1-season-progress">
-                    <div className="f1-season-progress-label">
-                        {`${CURRENT_YEAR} SEASON`}
-                    </div>
-                    <div className="f1-season-progress-value">
-                        <span className="f1-num f1-display f1-season-progress-count">
-                            {COMPLETED}
-                        </span>
-                        <span className="f1-season-progress-total">
-                            {`/ ${TOTAL_ROUNDS} rounds`}
-                        </span>
-                    </div>
-                    <div className="f1-progress-track">
-                        <div className="f1-progress-fill" style={{ width: `${progressPct}%` }} />
-                    </div>
-                </div>
             </AppShell.Navbar>
 
             <AppShell.Header className="f1-header">

@@ -1,14 +1,21 @@
 import { Card, Group, Stack } from '@mantine/core';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 
 import { DataTable, useDataTable } from '#/components/data-table';
 import { Pill } from '#/components/f1-ui';
-import { calendarQuery, seasonStandingsQuery } from '#/data/queries';
+import { seasonStandingsQuery } from '#/data/queries';
+import { SeasonCalendarSchema } from '#/lib/api/seasons';
+import { api } from '#/lib/query/api';
 import { parseYear } from '#/lib/route-params';
 
 import { makeConstructorColumns, makeDriverColumns } from './-components/standings-table/columns';
+
+const calendarQuery = (year: number) => queryOptions({
+    queryFn: () => api.get(`seasons/${year}/calendar`).json(SeasonCalendarSchema),
+    queryKey: ['calendar', year],
+});
 
 const Standings = () => {
     const { year } = Route.useParams();
@@ -30,7 +37,7 @@ const Standings = () => {
             <div>
                 <h1 className="f1-page-title">Championship Standings</h1>
                 <div className="f1-page-description">
-                    {`After Round ${calendar.completed} of ${calendar.calendar.length} · ${year} season`}
+                    {`After Round ${calendar.roundsCompleted} of ${calendar.totalRounds} · ${year} season`}
                 </div>
             </div>
 

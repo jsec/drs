@@ -17,7 +17,6 @@ import { Route as DriversIndexRouteImport } from './routes/drivers/index'
 import { Route as DriversDriverIdRouteImport } from './routes/drivers/$driverId'
 import { Route as SeasonsIndexRouteImport } from './routes/seasons/index'
 import { Route as SeasonsYearIndexRouteImport } from './routes/seasons/$year/index'
-import { Route as SeasonsYearCalendarRouteImport } from './routes/seasons/$year/calendar'
 import { Route as SeasonsYearStandingsRouteImport } from './routes/seasons/$year/standings'
 import { Route as SeasonsYearDriversDriverIdRouteImport } from './routes/seasons/$year/drivers/$driverId'
 import { Route as SeasonsYearRacesRoundRouteImport } from './routes/seasons/$year/races/$round'
@@ -62,11 +61,6 @@ const SeasonsYearIndexRoute = SeasonsYearIndexRouteImport.update({
   path: '/seasons/$year/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SeasonsYearCalendarRoute = SeasonsYearCalendarRouteImport.update({
-  id: '/seasons/$year/calendar',
-  path: '/seasons/$year/calendar',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SeasonsYearStandingsRoute = SeasonsYearStandingsRouteImport.update({
   id: '/seasons/$year/standings',
   path: '/seasons/$year/standings',
@@ -92,7 +86,6 @@ export interface FileRoutesByFullPath {
   '/constructors/': typeof ConstructorsIndexRoute
   '/drivers/': typeof DriversIndexRoute
   '/seasons/': typeof SeasonsIndexRoute
-  '/seasons/$year/calendar': typeof SeasonsYearCalendarRoute
   '/seasons/$year/standings': typeof SeasonsYearStandingsRoute
   '/seasons/$year/': typeof SeasonsYearIndexRoute
   '/seasons/$year/drivers/$driverId': typeof SeasonsYearDriversDriverIdRoute
@@ -106,7 +99,6 @@ export interface FileRoutesByTo {
   '/constructors': typeof ConstructorsIndexRoute
   '/drivers': typeof DriversIndexRoute
   '/seasons': typeof SeasonsIndexRoute
-  '/seasons/$year/calendar': typeof SeasonsYearCalendarRoute
   '/seasons/$year/standings': typeof SeasonsYearStandingsRoute
   '/seasons/$year': typeof SeasonsYearIndexRoute
   '/seasons/$year/drivers/$driverId': typeof SeasonsYearDriversDriverIdRoute
@@ -121,7 +113,6 @@ export interface FileRoutesById {
   '/constructors/': typeof ConstructorsIndexRoute
   '/drivers/': typeof DriversIndexRoute
   '/seasons/': typeof SeasonsIndexRoute
-  '/seasons/$year/calendar': typeof SeasonsYearCalendarRoute
   '/seasons/$year/standings': typeof SeasonsYearStandingsRoute
   '/seasons/$year/': typeof SeasonsYearIndexRoute
   '/seasons/$year/drivers/$driverId': typeof SeasonsYearDriversDriverIdRoute
@@ -137,7 +128,6 @@ export interface FileRouteTypes {
     | '/constructors/'
     | '/drivers/'
     | '/seasons/'
-    | '/seasons/$year/calendar'
     | '/seasons/$year/standings'
     | '/seasons/$year/'
     | '/seasons/$year/drivers/$driverId'
@@ -151,7 +141,6 @@ export interface FileRouteTypes {
     | '/constructors'
     | '/drivers'
     | '/seasons'
-    | '/seasons/$year/calendar'
     | '/seasons/$year/standings'
     | '/seasons/$year'
     | '/seasons/$year/drivers/$driverId'
@@ -165,7 +154,6 @@ export interface FileRouteTypes {
     | '/constructors/'
     | '/drivers/'
     | '/seasons/'
-    | '/seasons/$year/calendar'
     | '/seasons/$year/standings'
     | '/seasons/$year/'
     | '/seasons/$year/drivers/$driverId'
@@ -180,7 +168,6 @@ export interface RootRouteChildren {
   ConstructorsIndexRoute: typeof ConstructorsIndexRoute
   DriversIndexRoute: typeof DriversIndexRoute
   SeasonsIndexRoute: typeof SeasonsIndexRoute
-  SeasonsYearCalendarRoute: typeof SeasonsYearCalendarRoute
   SeasonsYearStandingsRoute: typeof SeasonsYearStandingsRoute
   SeasonsYearIndexRoute: typeof SeasonsYearIndexRoute
   SeasonsYearDriversDriverIdRoute: typeof SeasonsYearDriversDriverIdRoute
@@ -245,13 +232,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SeasonsYearIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/seasons/$year/calendar': {
-      id: '/seasons/$year/calendar'
-      path: '/seasons/$year/calendar'
-      fullPath: '/seasons/$year/calendar'
-      preLoaderRoute: typeof SeasonsYearCalendarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/seasons/$year/standings': {
       id: '/seasons/$year/standings'
       path: '/seasons/$year/standings'
@@ -284,7 +264,6 @@ const rootRouteChildren: RootRouteChildren = {
   ConstructorsIndexRoute: ConstructorsIndexRoute,
   DriversIndexRoute: DriversIndexRoute,
   SeasonsIndexRoute: SeasonsIndexRoute,
-  SeasonsYearCalendarRoute: SeasonsYearCalendarRoute,
   SeasonsYearStandingsRoute: SeasonsYearStandingsRoute,
   SeasonsYearIndexRoute: SeasonsYearIndexRoute,
   SeasonsYearDriversDriverIdRoute: SeasonsYearDriversDriverIdRoute,
