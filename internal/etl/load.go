@@ -1,9 +1,7 @@
 package etl
 
 import (
-	"archive/zip"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -11,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"time"
 )
 
@@ -26,106 +23,46 @@ type release struct {
 }
 
 const (
-	assetName  = "f1db-sql-postgresql.zip"
-	fileName   = "f1db-sql-postgresql.sql"
-	releaseURL = "https://api.github.com/repos/f1db/f1db/releases/latest"
+	assetName = "f1db-sql-postgresql.zip"
+	fileName  = "f1db-sql-postgresql.sql"
+	f1dbURL   = "https://api.github.com/repos/f1db/f1db/releases/latest"
 )
 
 var httpClient = &http.Client{Timeout: 30 * time.Second}
 
 func Load(ctx context.Context, logger *slog.Logger, databaseURL, token string) error {
-	if token == "" {
-		return errors.New("GITHUB_TOKEN is required")
-	}
-
 	if databaseURL == "" {
 		return errors.New("DATABASE_URL is required")
 	}
 
-	logger.Info("getting latest f1db release")
-	version, downloadURL, err := getLatestRelease(ctx, token)
-	if err != nil {
-		return fmt.Errorf("getting latest f1db release: %w", err)
+	if err := loadF1DB(ctx, logger, databaseURL, token); err != nil {
+		return fmt.Errorf("loading F1DB: %w", err)
 	}
 
-	logger.Info("found latest f1db release", "version", version)
-
-	logger.Info("downloading dump file")
-	dumpPath, cleanup, err := downloadDumpFile(ctx, downloadURL)
-	if err != nil {
-		return fmt.Errorf("downloading f1db dump: %w", err)
+	if err := loadJolpica(ctx, logger, databaseURL); err != nil {
+		return fmt.Errorf("loading Jolpica: %w", err)
 	}
-	defer cleanup()
-
-	logger.Info("loading dump file")
-	if err := loadDumpFile(ctx, databaseURL, dumpPath); err != nil {
-		return fmt.Errorf("loading f1db dump: %w", err)
-	}
-	logger.Info("loaded dump file")
 
 	return nil
 }
 
-func getLatestRelease(ctx context.Context, token string) (version, downloadURL string, err error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, releaseURL, nil)
-	if err != nil {
-		return "", "", err
-	}
-
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Accept", "application/vnd.github+json")
-
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return "", "", err
-	}
-	defer func() { _ = resp.Body.Close() }()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", "", fmt.Errorf("fetching latest release failed: %s", resp.Status)
-	}
-
-	var r release
-	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
-		return "", "", err
-	}
-
-	for _, asset := range r.Assets {
-		if asset.Name == assetName {
-			return r.TagName, asset.BrowserDownloadURL, nil
-		}
-	}
-
-	return "", "", fmt.Errorf("could not find %s in release assets", assetName)
-}
-
-func downloadDumpFile(ctx context.Context, url string) (dumpPath string, cleanup func(), err error) {
-	tmpDir, err := os.MkdirTemp("", "f1db-*")
-	if err != nil {
-		return "", nil, err
-	}
-	cleanup = func() { _ = os.RemoveAll(tmpDir) }
-
-	zipPath := filepath.Join(tmpDir, assetName)
-	if err := downloadFile(ctx, url, zipPath); err != nil {
-		cleanup()
-		return "", nil, fmt.Errorf("downloading dump file: %w", err)
-	}
-
-	dumpPath = filepath.Join(tmpDir, fileName)
-	if err := extractDump(zipPath, dumpPath); err != nil {
-		cleanup()
-		return "", nil, fmt.Errorf("extracting dump file: %w", err)
-	}
-
-	return dumpPath, cleanup, nil
-}
-
 func downloadFile(ctx context.Context, url, dest string) error {
+	output, err := os.Create(dest)
+	if err != nil {
+		return err
+	}
+
+	downloadErr := download(ctx, url, output)
+	closeErr := output.Close()
+	return errors.Join(downloadErr, closeErr)
+}
+
+func download(ctx context.Context, url string, w io.Writer) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
+	req.Header.Set("User-Agent", "drs-etl")
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
@@ -134,79 +71,23 @@ func downloadFile(ctx context.Context, url, dest string) error {
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("downloading dump file failed: %s", resp.Status)
+		return fmt.Errorf("downloading %s failed: %s", url, resp.Status)
 	}
 
-	out, err := os.Create(dest)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = out.Close() }()
-
-	if _, err := io.Copy(out, resp.Body); err != nil {
-		return err
-	}
-
-	return nil
+	_, err = io.Copy(w, resp.Body)
+	return err
 }
 
-func extractDump(zipPath, dest string) error {
-	reader, err := zip.OpenReader(zipPath)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = reader.Close() }()
-
-	for _, file := range reader.File {
-		if file.Name != fileName {
-			continue
-		}
-
-		return writeZipEntry(file, dest)
-	}
-
-	return fmt.Errorf("could not find %s in downloaded archive", fileName)
-}
-
-func writeZipEntry(file *zip.File, dest string) error {
-	rc, err := file.Open()
-	if err != nil {
-		return err
-	}
-	defer func() { _ = rc.Close() }()
-
-	out, err := os.Create(dest)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = out.Close() }()
-
-	if _, err := io.Copy(out, rc); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func loadDumpFile(ctx context.Context, databaseURL, dumpPath string) error {
+func execSQL(ctx context.Context, databaseURL string, stdin io.Reader, args ...string) error {
 	cmd := exec.CommandContext(
 		ctx,
 		"psql",
-		databaseURL,
-		"-q",
-		"-v", "ON_ERROR_STOP=1",
-		"-c", "drop schema if exists f1db cascade",
-		"-c", "create schema f1db",
-		"-c", "set search_path to f1db",
-		"-f", dumpPath,
+		append([]string{databaseURL, "-q", "-v", "ON_ERROR_STOP=1"}, args...)...,
 	)
 	cmd.Env = append(os.Environ(), "PGOPTIONS=-c client_min_messages=warning")
+	cmd.Stdin = stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("restoring from dump file failed: %w", err)
-	}
-
-	return nil
+	return cmd.Run()
 }

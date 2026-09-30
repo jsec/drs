@@ -16,7 +16,7 @@ func etlCommand(logger *slog.Logger, config config) *cli.Command {
 		Commands: []*cli.Command{
 			{
 				Name:  "load",
-				Usage: "load the latest f1db dump",
+				Usage: "load the latest source data dumps",
 				Action: func(ctx context.Context, _ *cli.Command) error {
 					return etl.Load(ctx, logger, config.databaseURL, config.githubToken)
 				},
@@ -37,7 +37,7 @@ func etlCommand(logger *slog.Logger, config config) *cli.Command {
 			},
 			{
 				Name:  "refresh",
-				Usage: "load the latest dump, then rebuild the effone database",
+				Usage: "load the latest source dumps, then rebuild the effone database",
 				Flags: etlFlags(),
 				Action: func(ctx context.Context, cmd *cli.Command) error {
 					pool, err := openPool(ctx, config.databaseURL)
