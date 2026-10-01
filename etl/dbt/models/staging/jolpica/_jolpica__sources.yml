@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: jolpica
+    schema: jolpica
+    tables:
+      - name: formula_one_driver
+      - name: formula_one_teamdriver
+      - name: formula_one_roundentry
+      - name: formula_one_sessionentry
+      - name: formula_one_session
+      - name: formula_one_round
+      - name: formula_one_season
+      - name: formula_one_lap

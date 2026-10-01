@@ -1,6 +1,61 @@
 version: 2
 
 models:
+  - name: int_jolpica__race_lap_entries
+    columns:
+      - name: external_race_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('int_jolpica__race_identities')
+                field: external_race_id
+      - name: external_driver_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('int_jolpica__driver_identities')
+                field: external_driver_id
+  - name: int_jolpica__race_identities
+    tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "abs(external_race_date - race_date) <= 1"
+          config:
+            severity: warn
+    columns:
+      - name: source
+        tests:
+          - not_null
+      - name: external_race_id
+        tests:
+          - not_null
+          - unique
+      - name: race_id
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('races')
+                field: race_id
+  - name: int_jolpica__driver_identities
+    columns:
+      - name: source
+        tests:
+          - not_null
+      - name: external_driver_id
+        tests:
+          - not_null
+          - unique
+      - name: driver_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('drivers')
+                field: driver_id
   - name: int_f1db__drivers_with_countries
     columns:
       - name: driver_id
@@ -89,4 +144,3 @@ models:
       - name: constructor_id
         tests:
           - not_null
-
