@@ -27,81 +27,60 @@
             order by season, race_id, driver_id, qualifying_order
         ),
 
-        latest_entries as (
+        timeline as (
             select
-                standings.season,
-                standings.race_id,
-                standings.driver_id,
+                season,
+                race_round,
+                race_id,
+                driver_id,
+                standings.driver_id is not null as has_standing,
                 race_results.constructor_id,
-                race_results.car_number
+                race_results.car_number,
+                coalesce(race_results.is_win::integer, 0) as win,
+                coalesce(race_results.is_podium::integer, 0) as podium,
+                coalesce(qualifying_results.is_qualifying_p1::integer, 0) as qualifying_p1
             from standings
-            left join
-                lateral(
-                    select constructor_id, car_number
-                    from race_results
-                    where
-                        standings.season = race_results.season
-                        and standings.driver_id = race_results.driver_id
-                        and race_results.race_round <= standings.race_round
-                    order by race_results.race_round desc, race_results.race_id desc
-                    limit 1
-                ) as race_results
-                on true
+            full join race_results using (season, race_id, race_round, driver_id)
+            full join qualifying_results using (season, race_id, race_round, driver_id)
         ),
 
-        cumulative_race_stats as (
+        running as (
             select
-                standings.season,
-                standings.race_id,
-                standings.driver_id,
-                coalesce(sum(race_results.is_win::integer), 0)::integer as win_count,
-                coalesce(sum(race_results.is_podium::integer), 0)::integer as podium_count
-            from standings
-            left join
-                race_results
-                on standings.season = race_results.season
-                and standings.driver_id = race_results.driver_id
-                and race_results.race_round <= standings.race_round
-            group by standings.season, standings.race_id, standings.driver_id
-        ),
-
-        cumulative_qualifying_stats as (
-            select
-                standings.season,
-                standings.race_id,
-                standings.driver_id,
-                coalesce(sum(qualifying_results.is_qualifying_p1::integer), 0)::integer as qualifying_p1_count
-            from standings
-            left join
-                qualifying_results
-                on standings.season = qualifying_results.season
-                and standings.driver_id = qualifying_results.driver_id
-                and qualifying_results.race_round <= standings.race_round
-            group by standings.season, standings.race_id, standings.driver_id
+                *,
+                sum(win) over driver_season as win_count,
+                sum(podium) over driver_season as podium_count,
+                sum(qualifying_p1) over driver_season as qualifying_p1_count,
+                -- increments at each race result, grouping later rows with the latest entry
+                count(constructor_id) over driver_season as entry_group
+            from timeline
+            window driver_season as (partition by season, driver_id order by race_round, race_id)
         ),
 
         expected as (
             select
-                latest_entries.season,
-                latest_entries.race_id,
-                latest_entries.driver_id,
-                latest_entries.constructor_id,
-                latest_entries.car_number,
-                cumulative_race_stats.win_count,
-                cumulative_race_stats.podium_count,
-                cumulative_qualifying_stats.qualifying_p1_count
-            from latest_entries
-            join cumulative_race_stats using (season, race_id, driver_id)
-            join cumulative_qualifying_stats using (season, race_id, driver_id)
+                season,
+                race_id,
+                driver_id,
+                has_standing,
+                win_count::integer as win_count,
+                podium_count::integer as podium_count,
+                qualifying_p1_count::integer as qualifying_p1_count,
+                first_value(constructor_id) over latest_entry as constructor_id,
+                first_value(car_number) over latest_entry as car_number
+            from running
+            window latest_entry as (partition by season, driver_id, entry_group order by race_round, race_id)
         )
 
     select snapshots.*
     from {{ model }} as snapshots
     join expected using (season, race_id, driver_id)
     where
-        snapshots.constructor_id is distinct from expected.constructor_id
-        or snapshots.car_number is distinct from expected.car_number
-        or snapshots.win_count is distinct from expected.win_count
-        or snapshots.podium_count is distinct from expected.podium_count
-        or snapshots.qualifying_p1_count is distinct from expected.qualifying_p1_count
+        expected.has_standing
+        and (
+            snapshots.constructor_id is distinct from expected.constructor_id
+            or snapshots.car_number is distinct from expected.car_number
+            or snapshots.win_count is distinct from expected.win_count
+            or snapshots.podium_count is distinct from expected.podium_count
+            or snapshots.qualifying_p1_count is distinct from expected.qualifying_p1_count
+        )
 {% endtest %}

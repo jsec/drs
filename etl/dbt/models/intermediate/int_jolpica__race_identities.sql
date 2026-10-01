@@ -6,7 +6,4 @@ select
     races.race_date
 from {{ ref("stg_jolpica__round") }} as round
 inner join {{ ref("stg_jolpica__season") }} as season using (season_id)
-inner join
-    {{ ref("races") }} as races
-    on season.season = races.season
-    and round.round_number = races.race_round
+inner join {{ ref("races") }} as races on season.season = races.season and round.round_number = races.race_round
