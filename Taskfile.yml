@@ -125,7 +125,16 @@ tasks:
     cmds:
       - go run {{.APP_PKG}} serve
 
-
   test:
     cmds:
       - go test ./...
+
+  web:lint:
+    dir: web
+    cmds:
+      - pnpm lint
+
+  web:build:
+    dir: web
+    cmds:
+      - pnpm build
