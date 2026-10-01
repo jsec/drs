@@ -313,7 +313,7 @@ export function getDriverSeason(code: string): DriverSeasonDetail | undefined {
     const races: DriverRaceRow[] = CALENDAR.slice(0, COMPLETED).map((rc, i) => {
         const fin = Math.max(1, Math.round(baseP + Math.sin(i * 1.3) * 2));
         const isDnf = code === 'COL' && i === 4;
-        const pp = fin <= 10 && !isDnf ? ptsTable[fin - 1] : 0;
+        const pp = !isDnf && fin <= 10 ? ptsTable[fin - 1] : 0;
         return {
             finish: isDnf ? 'DNF' : fin,
             gp: rc.name,

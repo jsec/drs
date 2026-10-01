@@ -23,7 +23,7 @@ export const Breadcrumbs = () => {
                 const isLast = i === crumbs.length - 1;
                 return (
                     <div key={c.to ?? c.label} style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 8 }}>
-                        {c.to && !isLast
+                        {!isLast && c.to
                             ? (
                                     <Link
                                         params={c.params}

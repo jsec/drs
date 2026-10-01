@@ -22,6 +22,7 @@ export default [
         rules: {
             '@typescript-eslint/array-type': 'off',
             '@typescript-eslint/require-await': 'off',
+            'package-json/dependency-version-range': 'off',
             'unicorn/filename-case': 'off',
         },
     },

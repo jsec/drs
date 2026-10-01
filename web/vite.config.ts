@@ -15,11 +15,6 @@ const config = defineConfig({
         dedupe: ['react', 'react-dom'],
         tsconfigPaths: true,
     },
-    test: {
-        environment: 'jsdom',
-        globals: true,
-        setupFiles: './src/test/setup.ts',
-    },
     server: {
         proxy: {
             '/api': {
@@ -28,6 +23,11 @@ const config = defineConfig({
                 target: 'http://localhost:3000',
             },
         },
+    },
+    test: {
+        environment: 'jsdom',
+        globals: true,
+        setupFiles: './src/test/setup.ts',
     },
 });
 
