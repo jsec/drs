@@ -76,6 +76,10 @@ models:
           +post-hook:
             - "{{ create_index('fastest_laps_race_driver_uidx', ['race_id', 'driver_id'], unique=true) }}"
             - "{{ create_index('fastest_laps_season_driver_idx', ['season', 'driver_id']) }}"
+        lap_times:
+          +post-hook:
+            - "{{ create_index('lap_times_race_driver_lap_uidx', ['race_id', 'driver_id', 'lap_number'], unique=true) }}"
+            - "{{ create_index('lap_times_driver_race_idx', ['driver_id', 'race_id']) }}"
         pit_stops:
           +post-hook:
             - "{{ create_index('pit_stops_race_stop_order_uidx', ['race_id', 'stop_order'], unique=true) }}"

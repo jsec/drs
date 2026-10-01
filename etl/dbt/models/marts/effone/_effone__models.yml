@@ -1349,8 +1349,67 @@ models:
         constraints:
           - type: not_null
 
+  - name: lap_times
+    description: One row per driver per race lap from Jolpica, mapped to F1DB races and drivers.
+    config:
+      contract:
+        enforced: true
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - race_id
+              - driver_id
+              - lap_number
+    columns:
+      - name: driver_id
+        data_type: text
+        constraints:
+          - type: not_null
+        tests:
+          - relationships:
+              arguments:
+                to: ref('drivers')
+                field: driver_id
+      - name: lap_number
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: lap_time
+        data_type: text
+        constraints:
+          - type: not_null
+      - name: lap_time_ms
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: position
+        data_type: integer
+        description: Position at the end of the lap. Null when Jolpica only has the driver's fastest lap.
+      - name: race_id
+        data_type: integer
+        constraints:
+          - type: not_null
+        tests:
+          - relationships:
+              arguments:
+                to: ref('races')
+                field: race_id
+      - name: race_round
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: refresh_id
+        data_type: bigint
+        description: Identifier for the refresh run that produced this row.
+        constraints:
+          - type: not_null
+      - name: season
+        data_type: integer
+        constraints:
+          - type: not_null
   - name: pit_stops
-    description: One row per pit stop event from F1DB. The grain is race plus source stop order.
+    description: One row per pit stop event from F1DB.
     config:
       contract:
         enforced: true
