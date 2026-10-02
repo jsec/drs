@@ -28,6 +28,7 @@ select
     constructors.constructor_name,
     constructors.constructor_full_name,
     constructors.country_id,
+    constructors.constructor_country_code as country_code,
     constructors.constructor_nationality as nationality,
     constructors.total_race_entries as entry_count,
     constructors.total_race_starts as start_count,

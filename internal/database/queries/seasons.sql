@@ -58,7 +58,8 @@ SELECT
     css.points::double precision AS points,
     css.constructor_id,
     css.constructor_name AS name,
-    c.primary_color_hex AS constructor_color
+    c.primary_color_hex AS constructor_color,
+    c.country_code
 FROM effone.constructor_standings_snapshots AS css
 JOIN latest_round
     ON css.race_round = latest_round.race_round

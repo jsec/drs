@@ -59,6 +59,7 @@ type EffoneConstructor struct {
 	ConstructorID        string
 	ConstructorName      string
 	CountryID            string
+	CountryCode          string
 	EntryCount           int32
 	FastestLapCount      int32
 	FirstRaceDate        dbtypes.Date

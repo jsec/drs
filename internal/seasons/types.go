@@ -45,6 +45,7 @@ type ConstructorStanding struct {
 	ID            string       `json:"id"`
 	Name          string       `json:"name"`
 	Color         string       `json:"color"`
+	CountryCode   string       `json:"countryCode"`
 }
 
 type StandingsResponse struct {

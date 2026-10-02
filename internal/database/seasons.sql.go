@@ -99,7 +99,8 @@ SELECT
     css.points::double precision AS points,
     css.constructor_id,
     css.constructor_name AS name,
-    c.primary_color_hex AS constructor_color
+    c.primary_color_hex AS constructor_color,
+    c.country_code
 FROM effone.constructor_standings_snapshots AS css
 JOIN latest_round
     ON css.race_round = latest_round.race_round
@@ -116,6 +117,7 @@ type ListSeasonConstructorStandingsRow struct {
 	ConstructorID    string
 	Name             string
 	ConstructorColor string
+	CountryCode      string
 }
 
 func (q *Queries) ListSeasonConstructorStandings(ctx context.Context, season int32) ([]ListSeasonConstructorStandingsRow, error) {
@@ -134,6 +136,7 @@ func (q *Queries) ListSeasonConstructorStandings(ctx context.Context, season int
 			&i.ConstructorID,
 			&i.Name,
 			&i.ConstructorColor,
+			&i.CountryCode,
 		); err != nil {
 			return nil, err
 		}

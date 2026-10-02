@@ -105,6 +105,7 @@ func (s *Service) GetStandings(ctx context.Context, season int32) (StandingsResp
 			ID:            row.ConstructorID,
 			Name:          row.Name,
 			Color:         row.ConstructorColor,
+			CountryCode:   row.CountryCode,
 		})
 	}
 
