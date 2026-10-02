@@ -2,13 +2,11 @@ package api
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/jsec/drs/internal/database"
-	"golang.org/x/sync/errgroup"
 )
 
 func Serve(ctx context.Context, logger *slog.Logger, db *database.Queries, port string) error {
@@ -22,23 +20,21 @@ func Serve(ctx context.Context, logger *slog.Logger, db *database.Queries, port 
 		ErrorLog:          slog.NewLogLogger(logger.Handler(), slog.LevelError),
 	}
 
-	g, gCtx := errgroup.WithContext(ctx)
-
-	g.Go(func() error {
+	errCh := make(chan error, 1)
+	go func() {
 		logger.Info("server listening", "addr", srv.Addr)
-		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			return err
-		}
-		return nil
-	})
+		errCh <- srv.ListenAndServe()
+	}()
 
-	g.Go(func() error {
-		<-gCtx.Done()
-		logger.Info("shutdown signal received")
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		return srv.Shutdown(shutdownCtx)
-	})
+	select {
+	case err := <-errCh:
+		return err
+	case <-ctx.Done():
+	}
 
-	return g.Wait()
+	logger.Info("shutdown signal received")
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	return srv.Shutdown(shutdownCtx)
 }

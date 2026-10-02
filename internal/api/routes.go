@@ -21,10 +21,9 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /drivers", handle(app.logger, app.listDriversHandler))
 	mux.Handle("GET /drivers/{driverID}", handle(app.logger, app.getDriverSummaryHandler))
 
-	return chainMiddleware(
-		mux,
-		recoverMiddleware(app.logger),
-		loggingMiddleware(app.logger),
-		timeoutMiddleware(5*time.Second),
+	return recoverMiddleware(app.logger,
+		loggingMiddleware(app.logger,
+			http.TimeoutHandler(mux, 5*time.Second, "request timed out"),
+		),
 	)
 }
