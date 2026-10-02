@@ -300,6 +300,18 @@ type EffoneFastestLap struct {
 	TyreManufacturerID   string
 }
 
+type EffoneLapTime struct {
+	DriverID  string
+	LapNumber int32
+	LapTime   string
+	LapTimeMs int32
+	Position  dbtypes.Int4
+	RaceID    int32
+	RaceRound int32
+	RefreshID int64
+	Season    int32
+}
+
 type EffonePitStop struct {
 	CarNumber            dbtypes.Int4
 	CircuitID            string
