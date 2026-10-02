@@ -84,8 +84,47 @@ export const DriverSeasonSchema = z.object({
     wins: z.number(),
 });
 
+const PitStopSchema = z.object({
+    duration: z.string(),
+    durationMs: z.number().nullable(),
+    lap: z.number(),
+    stop: z.number(),
+});
+
+export const DriverRaceSchema = z.object({
+    bestQualifyingTime: z.string(),
+    carNumber: z.number().nullable(),
+    code: z.string(),
+    constructor: z.object({
+        color: z.string(),
+        name: z.string(),
+    }),
+    fastestLapRank: z.number().nullable(),
+    gap: z.string(),
+    grid: z.number().nullable(),
+    isDriverOfTheDay: z.boolean(),
+    isFastestLap: z.boolean(),
+    isGrandSlam: z.boolean(),
+    isPole: z.boolean(),
+    isWin: z.boolean(),
+    lapsCompleted: z.number().nullable(),
+    name: z.string(),
+    pitStopCount: z.number().nullable(),
+    pitStops: z.array(PitStopSchema),
+    points: z.number(),
+    position: z.number().nullable(),
+    positionLabel: z.string(),
+    positionsGained: z.number().nullable(),
+    qualifyingPositionLabel: z.string(),
+    raceName: z.string(),
+    statusCategory: z.string(),
+    time: z.string(),
+    timePenalty: z.string(),
+});
+
 export const DriverShortSummaryListSchema = z.array(DriverShortSummarySchema);
 
+export type DriverRace = z.infer<typeof DriverRaceSchema>;
 export type DriverSeason = z.infer<typeof DriverSeasonSchema>;
 export type DriverSeasonRace = z.infer<typeof DriverSeasonRaceSchema>;
 export type DriverShortSummary = z.infer<typeof DriverShortSummarySchema>;

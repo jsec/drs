@@ -1,8 +1,5 @@
 import type { DriverLaps, RaceLaps } from '#/lib/api/races';
 
-export const CHART_DRIVER_COUNT = 5;
-export const POSITION_LAP_STEP = 5;
-
 const PACE_OUTLIER_RATIO = 1.07;
 
 type LapRow = Record<string, number | string>;
@@ -19,17 +16,18 @@ const chartSeries = (drivers: DriverLaps[]) =>
 export const hasLaps = (raceLaps: RaceLaps) =>
     raceLaps.drivers.some(driver => driver.laps.length > 0);
 
-export const positionChart = (raceLaps: RaceLaps) => {
-    const drivers = raceLaps.drivers.slice(0, CHART_DRIVER_COUNT);
+export const lapLabel = (lap: number) => `L${lap}`;
+
+export const positionChart = (drivers: DriverLaps[], lapStep: number) => {
     const rows = new Map<number, LapRow>();
 
     for (const { driver, laps } of drivers) {
         for (const { lap, position } of laps) {
-            if (position !== null && lap % POSITION_LAP_STEP === 1) {
+            if (position !== null && (lap - 1) % lapStep === 0) {
                 rows.set(lap, {
                     ...rows.get(lap),
                     [driver.code]: position,
-                    lap: `L${lap}`,
+                    lap: lapLabel(lap),
                 });
             }
         }
@@ -38,20 +36,20 @@ export const positionChart = (raceLaps: RaceLaps) => {
     return { data: sortedRows(rows), series: chartSeries(drivers) };
 };
 
-export const paceChart = (raceLaps: RaceLaps) => {
-    const drivers = raceLaps.drivers.slice(0, CHART_DRIVER_COUNT);
+export const paceChart = (drivers: DriverLaps[], shouldHideOutliers: boolean) => {
     const fastestMs = Math.min(...drivers.flatMap(({ laps }) => laps.map(lap => lap.timeMs)));
     const rows = new Map<number, LapRow>();
 
     for (const { driver, laps } of drivers) {
         for (const { lap, timeMs } of laps) {
-            if (lap > 1 && timeMs <= fastestMs * PACE_OUTLIER_RATIO) {
-                rows.set(lap, {
-                    ...rows.get(lap),
-                    [driver.code]: timeMs / 1000,
-                    lap: `L${lap}`,
-                });
+            const row: LapRow = { ...rows.get(lap), lap: lapLabel(lap) };
+            const isOutlier = lap === 1 || timeMs > fastestMs * PACE_OUTLIER_RATIO;
+
+            if (!shouldHideOutliers || !isOutlier) {
+                row[driver.code] = timeMs / 1000;
             }
+
+            rows.set(lap, row);
         }
     }
 

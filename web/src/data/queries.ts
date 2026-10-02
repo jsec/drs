@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 
-import { DriverSeasonSchema } from '#/lib/api/drivers';
+import { DriverRaceSchema, DriverSeasonSchema } from '#/lib/api/drivers';
 import { RaceDetailSchema, RaceLapsSchema } from '#/lib/api/races';
 import { SeasonCalendarSchema, SeasonOverviewSchema, SeasonStandingsSchema } from '#/lib/api/seasons';
 import { api } from '#/lib/query/api';
@@ -39,4 +39,10 @@ export const driverSeasonQuery = (year: number, driverId: string) =>
     queryOptions({
         queryFn: () => api.get(`seasons/${year}/drivers/${driverId}`).json(DriverSeasonSchema),
         queryKey: ['driver-season', year, driverId],
+    });
+
+export const driverRaceQuery = (year: number, round: number, driverId: string) =>
+    queryOptions({
+        queryFn: () => api.get(`seasons/${year}/drivers/${driverId}/races/${round}`).json(DriverRaceSchema),
+        queryKey: ['driver-race', year, round, driverId],
     });

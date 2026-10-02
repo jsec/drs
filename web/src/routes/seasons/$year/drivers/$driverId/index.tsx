@@ -8,6 +8,7 @@ import type { DriverSeason as DriverSeasonData, DriverSeasonRace } from '#/lib/a
 import { GridHeader, MiniStat } from '#/components/f1-ui';
 import { LineChart } from '#/components/line-chart';
 import { driverSeasonQuery } from '#/data/queries';
+import { formatPosition, isNumericPosition } from '#/lib/format';
 import { parseYear } from '#/lib/route-params';
 
 const COLS = '44px 1fr 70px 70px 70px 60px';
@@ -23,18 +24,6 @@ function finishColor(position: number, teamColor: string): string {
     }
 
     return 'var(--neutral-300)';
-}
-
-function formatPosition(label: string): string {
-    if (isNumericPosition(label)) {
-        return `P${label}`;
-    }
-
-    return label;
-}
-
-function isNumericPosition(label: string): boolean {
-    return !Number.isNaN(Number(label));
 }
 
 function raceStatus(race: DriverSeasonRace): [label: string, color: string] {
@@ -161,26 +150,31 @@ const DriverSeason = () => {
                     <Box fw={700} fz={15} mb={10}>Finishing Positions</Box>
                     <Group align="flex-end" gap={6} h={180} wrap="nowrap">
                         {driver.races.map(r => (
-                            <Stack
-                                align="center"
-                                gap={0}
-                                h="100%"
-                                justify="flex-end"
+                            <Link
                                 key={r.round}
-                                style={{ flex: 1 }}
+                                params={{ driverId, round: String(r.round), year }}
+                                style={{ color: 'inherit', flex: 1, height: '100%', textDecoration: 'none' }}
+                                to="/seasons/$year/drivers/$driverId/races/$round"
                             >
-                                <Text c="var(--neutral-700)" className="f1-num" fw={700} fz={10} inherit mb={3} span>{r.positionLabel}</Text>
-                                {r.position !== null && (
-                                    <Box
-                                        bg={finishColor(r.position, color)}
-                                        h={`${Math.max(4, (100 - ((r.position - 1) / 19) * 100) * 0.9)}%`}
-                                        maw={26}
-                                        style={{ borderRadius: '4px 4px 0 0' }}
-                                        w="100%"
-                                    />
-                                )}
-                                <Text c="dimmed" fz={9.5} inherit mt={4} span>{`R${r.round}`}</Text>
-                            </Stack>
+                                <Stack
+                                    align="center"
+                                    gap={0}
+                                    h="100%"
+                                    justify="flex-end"
+                                >
+                                    <Text c="var(--neutral-700)" className="f1-num" fw={700} fz={10} inherit mb={3} span>{r.positionLabel}</Text>
+                                    {r.position !== null && (
+                                        <Box
+                                            bg={finishColor(r.position, color)}
+                                            h={`${Math.max(4, (100 - ((r.position - 1) / 19) * 100) * 0.9)}%`}
+                                            maw={26}
+                                            style={{ borderRadius: '4px 4px 0 0' }}
+                                            w="100%"
+                                        />
+                                    )}
+                                    <Text c="dimmed" fz={9.5} inherit mt={4} span>{`R${r.round}`}</Text>
+                                </Stack>
+                            </Link>
                         ))}
                     </Group>
                 </Box>
@@ -204,7 +198,7 @@ const DriverSeason = () => {
                         <Link
                             className="f1-row"
                             key={r.round}
-                            params={{ round: String(r.round), year }}
+                            params={{ driverId, round: String(r.round), year }}
                             style={{
                                 alignItems: 'center',
                                 borderTop: '1px solid var(--mantine-color-default-border)',
@@ -214,7 +208,7 @@ const DriverSeason = () => {
                                 padding: '9px 18px',
                                 textDecoration: 'none',
                             }}
-                            to="/seasons/$year/races/$round"
+                            to="/seasons/$year/drivers/$driverId/races/$round"
                         >
                             <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.round}</Text>
                             <Text fw={600} fz={13} inherit span>{r.name}</Text>
@@ -235,7 +229,7 @@ const DriverSeason = () => {
     );
 };
 
-export const Route = createFileRoute('/seasons/$year/drivers/$driverId')({
+export const Route = createFileRoute('/seasons/$year/drivers/$driverId/')({
     component: DriverSeason,
     loader: async ({ context, params }) => {
         const year = parseYear(params.year);

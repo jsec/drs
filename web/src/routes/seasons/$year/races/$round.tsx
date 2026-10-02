@@ -9,15 +9,11 @@ import type { DriverRef, RaceDetail as RaceDetailData, RaceResult } from '#/lib/
 import { DriverAvatar, GridHeader, SectionCard, TeamBar } from '#/components/f1-ui';
 import { LineChart } from '#/components/line-chart';
 import { raceDetailQuery, raceLapsQuery } from '#/data/queries';
-import {
-    CHART_DRIVER_COUNT,
-    hasLaps,
-    paceChart,
-    POSITION_LAP_STEP,
-    positionChart,
-} from '#/lib/race-charts';
+import { hasLaps, paceChart, positionChart } from '#/lib/race-charts';
 import { parseRound, parseYear } from '#/lib/route-params';
 
+const CHART_DRIVER_COUNT = 5;
+const POSITION_LAP_STEP = 5;
 const MEDALS = ['#f59f00', '#adb5bd', '#e8590c'];
 const RESULT_COLS = '36px 1fr 72px 90px 48px';
 
@@ -89,8 +85,9 @@ const RaceCharts = ({ round, year }: { round: number; year: number }) => {
         );
     }
 
-    const position = positionChart(laps);
-    const pace = paceChart(laps);
+    const topDrivers = laps.drivers.slice(0, CHART_DRIVER_COUNT);
+    const position = positionChart(topDrivers, POSITION_LAP_STEP);
+    const pace = paceChart(topDrivers, true);
 
     return (
         <>
@@ -135,9 +132,9 @@ const RaceDetail = () => {
     const { data } = useSuspenseQuery(raceDetailQuery(Number(year), Number(round)));
 
     const headStats = [
-        { label: 'POLE', value: shortNameFor(data.results, data.pole) },
-        { label: 'FASTEST LAP', value: shortNameFor(data.results, data.fastestLap?.driver ?? null) },
-        { label: 'WINNER', value: shortNameFor(data.results, data.winner) },
+        { driver: data.pole, label: 'POLE' },
+        { driver: data.fastestLap?.driver ?? null, label: 'FASTEST LAP' },
+        { driver: data.winner, label: 'WINNER' },
     ];
 
     return (
@@ -160,7 +157,17 @@ const RaceDetail = () => {
                         <Box key={s.label} ta="center">
                             <Box c="var(--color-sidebar-muted)" fw={600} fz={11}>{s.label}</Box>
                             <Box className="f1-display" ff="var(--font-display)" fw={700} fz={16} mt={3}>
-                                {s.value}
+                                {s.driver
+                                    ? (
+                                            <Link
+                                                params={{ driverId: s.driver.id, round, year }}
+                                                style={{ color: 'inherit', textDecoration: 'none' }}
+                                                to="/seasons/$year/drivers/$driverId/races/$round"
+                                            >
+                                                {shortNameFor(data.results, s.driver)}
+                                            </Link>
+                                        )
+                                    : '—'}
                             </Box>
                         </Box>
                     ))}
@@ -172,9 +179,9 @@ const RaceDetail = () => {
                 {data.results.slice(0, 3).map((r, i) => (
                     <Link
                         key={r.driver.id}
-                        params={{ driverId: r.driver.id, year }}
+                        params={{ driverId: r.driver.id, round, year }}
                         style={{ color: 'inherit', textDecoration: 'none' }}
-                        to="/seasons/$year/drivers/$driverId"
+                        to="/seasons/$year/drivers/$driverId/races/$round"
                     >
                         <Box
                             className="f1-card f1-lift"
@@ -219,9 +226,9 @@ const RaceDetail = () => {
                             <Link
                                 className="f1-row"
                                 key={r.driver.id}
-                                params={{ driverId: r.driver.id, year }}
+                                params={{ driverId: r.driver.id, round, year }}
                                 style={RESULT_ROW_STYLE}
-                                to="/seasons/$year/drivers/$driverId"
+                                to="/seasons/$year/drivers/$driverId/races/$round"
                             >
                                 <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.positionLabel}</Text>
                                 <Group gap={9} wrap="nowrap">
