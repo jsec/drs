@@ -1,12 +1,12 @@
 import { notFound } from '@tanstack/react-router';
 
-import { CURRENT_YEAR, TOTAL_ROUNDS } from '#/data/fixtures';
+export const CURRENT_YEAR = new Date().getFullYear();
 
 const FIRST_SEASON = 1950;
 
 export function parseRound(raw: string): number {
     const round = Number(raw);
-    if (!Number.isSafeInteger(round) || round < 1 || round > TOTAL_ROUNDS) {
+    if (!Number.isSafeInteger(round) || round < 1) {
         throw notFound();
     }
     return round;

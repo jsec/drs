@@ -1,26 +1,19 @@
 import { Card, Group, Stack } from '@mantine/core';
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 
 import { DataTable, useDataTable } from '#/components/data-table';
 import { Pill } from '#/components/f1-ui';
-import { seasonStandingsQuery } from '#/data/queries';
-import { SeasonCalendarSchema } from '#/lib/api/seasons';
-import { api } from '#/lib/query/api';
+import { seasonCalendarQuery, seasonStandingsQuery } from '#/data/queries';
 import { parseYear } from '#/lib/route-params';
 
 import { makeConstructorColumns, makeDriverColumns } from './-components/standings-table/columns';
 
-const calendarQuery = (year: number) => queryOptions({
-    queryFn: () => api.get(`seasons/${year}/calendar`).json(SeasonCalendarSchema),
-    queryKey: ['calendar', year],
-});
-
 const Standings = () => {
     const { year } = Route.useParams();
     const { data } = useSuspenseQuery(seasonStandingsQuery(Number(year)));
-    const { data: calendar } = useSuspenseQuery(calendarQuery(Number(year)));
+    const { data: calendar } = useSuspenseQuery(seasonCalendarQuery(Number(year)));
     const [tab, setTab] = useState<'constructors' | 'drivers'>('drivers');
 
     const driverColumns = useMemo(() => makeDriverColumns(year), [year]);
@@ -61,7 +54,7 @@ export const Route = createFileRoute('/seasons/$year/standings')({
         const year = parseYear(params.year);
         await Promise.all([
             context.queryClient.ensureQueryData(seasonStandingsQuery(year)),
-            context.queryClient.ensureQueryData(calendarQuery(year)),
+            context.queryClient.ensureQueryData(seasonCalendarQuery(year)),
         ]);
         return {
             crumbs: [

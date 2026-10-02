@@ -2,10 +2,8 @@ import { queryOptions } from '@tanstack/react-query';
 
 import { DriverSeasonSchema } from '#/lib/api/drivers';
 import { RaceDetailSchema, RaceLapsSchema } from '#/lib/api/races';
-import { SeasonOverviewSchema, SeasonStandingsSchema } from '#/lib/api/seasons';
+import { SeasonCalendarSchema, SeasonOverviewSchema, SeasonStandingsSchema } from '#/lib/api/seasons';
 import { api } from '#/lib/query/api';
-
-import { getStandings } from './fixtures';
 
 export const seasonOverviewQuery = (year: number) =>
     queryOptions({
@@ -31,10 +29,10 @@ export const raceLapsQuery = (year: number, round: number) =>
         queryKey: ['race-laps', year, round],
     });
 
-export const standingsQuery = (year: number) =>
+export const seasonCalendarQuery = (year: number) =>
     queryOptions({
-        queryFn: () => getStandings(),
-        queryKey: ['standings', year],
+        queryFn: () => api.get(`seasons/${year}/calendar`).json(SeasonCalendarSchema),
+        queryKey: ['calendar', year],
     });
 
 export const driverSeasonQuery = (year: number, driverId: string) =>

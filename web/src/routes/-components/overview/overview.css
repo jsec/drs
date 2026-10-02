@@ -193,9 +193,11 @@
         width: 3px;
         border-radius: 2px;
     }
-    .overview-row-flag {
-        font-size: 16px;
-        line-height: 1;
+    .overview-row-flag svg {
+        display: block;
+        width: 24px;
+        height: 16px;
+        border-radius: 2px;
     }
     .overview-row-name {
         display: flex;

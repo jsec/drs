@@ -8,11 +8,11 @@ import { HTTPError } from 'ky';
 
 import { CountryFlag } from '#/components/country-flag';
 import { GOLD, GridHeader, MiniStat } from '#/components/f1-ui';
-import { CURRENT_YEAR } from '#/data/fixtures';
 
 import './driver-hero.css';
 import { DriverSummarySchema } from '#/lib/api/drivers';
 import { api } from '#/lib/query/api';
+import { CURRENT_YEAR } from '#/lib/route-params';
 
 import {
     championshipPositionColor,
