@@ -1357,7 +1357,7 @@ models:
           - type: not_null
 
   - name: lap_times
-    description: One row per driver per race lap from Jolpica, mapped to F1DB races and drivers.
+    description: One row per driver per lap of the Grand Prix or sprint from Jolpica, mapped to F1DB races and drivers.
     config:
       contract:
         enforced: true
@@ -1366,6 +1366,7 @@ models:
           arguments:
             combination_of_columns:
               - race_id
+              - session
               - driver_id
               - lap_number
     columns:
@@ -1411,6 +1412,17 @@ models:
         description: Identifier for the refresh run that produced this row.
         constraints:
           - type: not_null
+      - name: session
+        data_type: text
+        description: Which race the lap belongs to, the Grand Prix (race) or the sprint.
+        constraints:
+          - type: not_null
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - race
+                  - sprint
       - name: season
         data_type: integer
         constraints:

@@ -2,6 +2,7 @@ with
     laps as (
         select
             race_identities.race_id,
+            race_laps.session,
             driver_identities.driver_id,
             race_laps.lap_number,
             race_laps.lap_position,
@@ -16,6 +17,7 @@ select
     races.season,
     races.race_round,
     laps.race_id,
+    laps.session,
     laps.driver_id,
     laps.lap_number::integer as lap_number,
     laps.lap_position::integer as position,
