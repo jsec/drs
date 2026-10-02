@@ -28,3 +28,21 @@ func (app *application) listDriversHandler(w http.ResponseWriter, r *http.Reques
 
 	return respondJSON(app.logger, w, http.StatusOK, drivers)
 }
+
+func (app *application) getDriverSeasonHandler(w http.ResponseWriter, r *http.Request) error {
+	year, err := parseYear(r)
+	if err != nil {
+		return err
+	}
+
+	season, err := app.drivers.GetSeason(r.Context(), r.PathValue("driverID"), year)
+	if err != nil {
+		if errors.Is(err, drivers.ErrNotFound) {
+			return errNotFound
+		}
+
+		return err
+	}
+
+	return respondJSON(app.logger, w, http.StatusOK, season)
+}

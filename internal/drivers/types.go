@@ -1,5 +1,7 @@
 package drivers
 
+import "github.com/jsec/drs/internal/dbtypes"
+
 type constructor struct {
 	Name  string `json:"name"`
 	Color string `json:"color"`
@@ -45,4 +47,41 @@ type DriverShortSummary struct {
 	ConstructorColor string `json:"constructorColor"`
 	FirstYear        *int32 `json:"firstYear"`
 	LastYear         *int32 `json:"lastYear"`
+}
+
+type sprintResult struct {
+	PositionLabel string  `json:"positionLabel"`
+	Points        float64 `json:"points"`
+}
+
+type seasonRace struct {
+	Round          int32         `json:"round"`
+	Name           string        `json:"name"`
+	Grid           dbtypes.Int4  `json:"grid"`
+	Position       dbtypes.Int4  `json:"position"`
+	PositionLabel  string        `json:"positionLabel"`
+	StatusCategory string        `json:"statusCategory"`
+	Points         float64       `json:"points"`
+	Sprint         *sprintResult `json:"sprint"`
+}
+
+type progressionPoint struct {
+	Round  int32   `json:"round"`
+	Points float64 `json:"points"`
+}
+
+type DriverSeason struct {
+	Code        string             `json:"code"`
+	Name        string             `json:"name"`
+	Country     string             `json:"country"`
+	CountryCode string             `json:"countryCode"`
+	Constructor constructor        `json:"constructor"`
+	CarNumber   dbtypes.Int4       `json:"carNumber"`
+	Points      float64            `json:"points"`
+	Position    string             `json:"position"`
+	Wins        int32              `json:"wins"`
+	Podiums     int32              `json:"podiums"`
+	Poles       int32              `json:"poles"`
+	Progression []progressionPoint `json:"progression"`
+	Races       []seasonRace       `json:"races"`
 }

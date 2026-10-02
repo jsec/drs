@@ -5,15 +5,20 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/jackc/pgx/v5"
+
 	"github.com/jsec/drs/internal/database"
 )
 
 var ErrNotFound = errors.New("driver not found")
 
 type driverQueries interface {
+	GetDriverSeason(ctx context.Context, arg database.GetDriverSeasonParams) (database.GetDriverSeasonRow, error)
 	GetDriverSummary(ctx context.Context, driverID string) (database.GetDriverSummaryRow, error)
+	ListDriverSeasonRaces(ctx context.Context, arg database.ListDriverSeasonRacesParams) ([]database.ListDriverSeasonRacesRow, error)
 	ListDriverSeasons(ctx context.Context, driverID string) ([]database.ListDriverSeasonsRow, error)
 	ListDrivers(ctx context.Context) ([]database.ListDriversRow, error)
+	ListSeasonDriverProgression(ctx context.Context, arg database.ListSeasonDriverProgressionParams) ([]database.ListSeasonDriverProgressionRow, error)
 }
 
 type Service struct {
@@ -105,4 +110,79 @@ func (s *Service) GetSummary(ctx context.Context, driverId string) (DriverSummar
 	}
 
 	return response, nil
+}
+
+func (s *Service) GetSeason(ctx context.Context, driverID string, season int32) (DriverSeason, error) {
+	summary, err := s.queries.GetDriverSeason(ctx, database.GetDriverSeasonParams{Season: season, DriverID: driverID})
+	if errors.Is(err, pgx.ErrNoRows) {
+		return DriverSeason{}, ErrNotFound
+	}
+	if err != nil {
+		return DriverSeason{}, fmt.Errorf("getting driver season: %w", err)
+	}
+
+	progressionRows, err := s.queries.ListSeasonDriverProgression(ctx, database.ListSeasonDriverProgressionParams{
+		Season:    season,
+		DriverIds: []string{driverID},
+	})
+	if err != nil {
+		return DriverSeason{}, fmt.Errorf("listing driver season progression: %w", err)
+	}
+
+	raceRows, err := s.queries.ListDriverSeasonRaces(ctx, database.ListDriverSeasonRacesParams{
+		Season:   season,
+		DriverID: driverID,
+	})
+	if err != nil {
+		return DriverSeason{}, fmt.Errorf("listing driver season races: %w", err)
+	}
+
+	progression := make([]progressionPoint, 0, len(progressionRows))
+	for _, row := range progressionRows {
+		progression = append(progression, progressionPoint{
+			Round:  row.RaceRound,
+			Points: row.Points,
+		})
+	}
+
+	races := make([]seasonRace, 0, len(raceRows))
+	for _, row := range raceRows {
+		race := seasonRace{
+			Round:          row.RaceRound,
+			Name:           row.RaceName,
+			Grid:           row.GridPosition,
+			Position:       row.Position,
+			PositionLabel:  row.PositionLabel,
+			StatusCategory: row.StatusCategory,
+			Points:         row.Points,
+		}
+
+		if row.SprintPositionLabel.Valid {
+			race.Sprint = &sprintResult{
+				PositionLabel: row.SprintPositionLabel.String,
+				Points:        row.SprintPoints,
+			}
+		}
+
+		races = append(races, race)
+	}
+
+	return DriverSeason{
+		Code:        summary.Code,
+		Name:        summary.Name,
+		Country:     summary.Country,
+		CountryCode: summary.CountryCode,
+		Constructor: constructor{
+			Name:  summary.ConstructorName,
+			Color: summary.ConstructorColor,
+		},
+		CarNumber:   summary.CarNumber,
+		Points:      summary.Points,
+		Position:    summary.Position.String,
+		Wins:        summary.Wins,
+		Podiums:     summary.Podiums,
+		Poles:       summary.Poles,
+		Progression: progression,
+		Races:       races,
+	}, nil
 }

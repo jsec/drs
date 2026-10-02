@@ -12,6 +12,74 @@ import (
 	"github.com/jsec/drs/internal/dbtypes"
 )
 
+const getDriverSeason = `-- name: GetDriverSeason :one
+SELECT
+    d.driver_code AS code,
+    d.driver_name AS name,
+    d.nationality AS country,
+    d.nationality_country_code AS country_code,
+    c.constructor_name,
+    c.primary_color_hex AS constructor_color,
+    (
+        SELECT rr.car_number
+        FROM effone.race_results rr
+        WHERE rr.season = dss.season
+            AND rr.driver_id = dss.driver_id
+        ORDER BY rr.race_round DESC
+        LIMIT 1
+    ) AS car_number,
+    coalesce(dss.final_points, dss.total_points)::double precision AS points,
+    dss.final_position_text AS position,
+    dss.win_count AS wins,
+    dss.podium_count AS podiums,
+    dss.qualifying_p1_count AS poles
+FROM effone.driver_season_summaries dss
+    JOIN effone.drivers d ON dss.driver_id = d.driver_id
+    JOIN effone.constructors c ON dss.constructor_id = c.constructor_id
+WHERE dss.season = $1
+    AND dss.driver_id = $2
+`
+
+type GetDriverSeasonParams struct {
+	Season   int32
+	DriverID string
+}
+
+type GetDriverSeasonRow struct {
+	Code             string
+	Name             string
+	Country          string
+	CountryCode      string
+	ConstructorName  string
+	ConstructorColor string
+	CarNumber        dbtypes.Int4
+	Points           float64
+	Position         pgtype.Text
+	Wins             int32
+	Podiums          int32
+	Poles            int32
+}
+
+func (q *Queries) GetDriverSeason(ctx context.Context, arg GetDriverSeasonParams) (GetDriverSeasonRow, error) {
+	row := q.db.QueryRow(ctx, getDriverSeason, arg.Season, arg.DriverID)
+	var i GetDriverSeasonRow
+	err := row.Scan(
+		&i.Code,
+		&i.Name,
+		&i.Country,
+		&i.CountryCode,
+		&i.ConstructorName,
+		&i.ConstructorColor,
+		&i.CarNumber,
+		&i.Points,
+		&i.Position,
+		&i.Wins,
+		&i.Podiums,
+		&i.Poles,
+	)
+	return i, err
+}
+
 const getDriverSummary = `-- name: GetDriverSummary :one
 WITH current_season AS (
     SELECT max(season) AS season
@@ -80,6 +148,74 @@ func (q *Queries) GetDriverSummary(ctx context.Context, driverID string) (GetDri
 		&i.ConstructorColor,
 	)
 	return i, err
+}
+
+const listDriverSeasonRaces = `-- name: ListDriverSeasonRaces :many
+SELECT DISTINCT ON (rr.race_round)
+    rr.race_round,
+    r.race_name,
+    rr.grid_position,
+    rr.position_text AS position_label,
+    rr.finish_position AS position,
+    rr.status_category,
+    rr.points::double precision AS points,
+    sr.position_text AS sprint_position_label,
+    coalesce(sr.points, 0)::double precision AS sprint_points
+FROM effone.race_results rr
+    JOIN effone.races r ON rr.race_id = r.race_id
+    LEFT JOIN effone.sprint_results sr
+        ON rr.race_id = sr.race_id
+        AND rr.driver_id = sr.driver_id
+WHERE rr.season = $1
+    AND rr.driver_id = $2
+ORDER BY rr.race_round, rr.finish_order
+`
+
+type ListDriverSeasonRacesParams struct {
+	Season   int32
+	DriverID string
+}
+
+type ListDriverSeasonRacesRow struct {
+	RaceRound           int32
+	RaceName            string
+	GridPosition        dbtypes.Int4
+	PositionLabel       string
+	Position            dbtypes.Int4
+	StatusCategory      string
+	Points              float64
+	SprintPositionLabel pgtype.Text
+	SprintPoints        float64
+}
+
+func (q *Queries) ListDriverSeasonRaces(ctx context.Context, arg ListDriverSeasonRacesParams) ([]ListDriverSeasonRacesRow, error) {
+	rows, err := q.db.Query(ctx, listDriverSeasonRaces, arg.Season, arg.DriverID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListDriverSeasonRacesRow
+	for rows.Next() {
+		var i ListDriverSeasonRacesRow
+		if err := rows.Scan(
+			&i.RaceRound,
+			&i.RaceName,
+			&i.GridPosition,
+			&i.PositionLabel,
+			&i.Position,
+			&i.StatusCategory,
+			&i.Points,
+			&i.SprintPositionLabel,
+			&i.SprintPoints,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listDriverSeasons = `-- name: ListDriverSeasons :many
