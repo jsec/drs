@@ -218,7 +218,7 @@ const SeasonOverview = () => {
                 >
                     {overview.constructors.map(c => (
                         <Box
-                            key={c.id}
+                            key={`${c.id}-${c.engineId}`}
                             px={18}
                             py={8}
                             style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}

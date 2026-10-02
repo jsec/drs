@@ -125,7 +125,7 @@ export const Overview = () => {
                         <span className="overview-pts-label">PTS</span>
                     </div>
                     {constructors.map((c, i) => (
-                        <div className="overview-row" key={c.id}>
+                        <div className="overview-row" key={`${c.id}-${c.engineId}`}>
                             <span className="overview-row-pos" style={{ color: i === 0 ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-dimmed)' }}>{c.positionLabel}</span>
                             <span className="overview-row-team" style={{ background: c.color }} />
                             <span className="overview-row-flag">

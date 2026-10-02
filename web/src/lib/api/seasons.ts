@@ -40,6 +40,7 @@ export const DriverStandingSchema = z.object({
 
 export const ConstructorStandingSchema = ConstructorSchema.extend({
     countryCode: z.string(),
+    engineId: z.string(),
     points: z.number(),
     position: z.number().nullable(),
     positionLabel: z.string(),
