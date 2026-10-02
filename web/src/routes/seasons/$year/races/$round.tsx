@@ -1,10 +1,21 @@
 import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, notFound } from '@tanstack/react-router';
+import { HTTPError } from 'ky';
+import { Suspense } from 'react';
+
+import type { DriverRef, RaceDetail as RaceDetailData, RaceResult } from '#/lib/api/races';
 
 import { DriverAvatar, GridHeader, SectionCard, TeamBar } from '#/components/f1-ui';
-import { LineChart, toChartData, toChartSeries } from '#/components/line-chart';
-import { raceDetailQuery } from '#/data/queries';
+import { LineChart } from '#/components/line-chart';
+import { raceDetailQuery, raceLapsQuery } from '#/data/queries';
+import {
+    CHART_DRIVER_COUNT,
+    hasLaps,
+    paceChart,
+    POSITION_LAP_STEP,
+    positionChart,
+} from '#/lib/race-charts';
 import { parseRound, parseYear } from '#/lib/route-params';
 
 const MEDALS = ['#f59f00', '#adb5bd', '#e8590c'];
@@ -32,19 +43,101 @@ const getDeltaColor = (delta: number): string => {
     return 'var(--neutral-300)';
 };
 
+const resultGap = (result: RaceResult) => result.gap ?? result.time ?? result.positionLabel;
+
+const shortNameFor = (results: RaceResult[], ref: DriverRef | null) => {
+    if (!ref) {
+        return '—';
+    }
+    return results.find(result => result.driver.id === ref.id)?.driver.shortName ?? ref.code;
+};
+
+const ChartCard = ({ children, subtitle, title }: { children: React.ReactNode; subtitle: string; title: string }) => (
+    <Box className="f1-card" p={16}>
+        <Box fw={700} fz={15}>{title}</Box>
+        <Box c="dimmed" fz={12} mb={8}>
+            {subtitle}
+        </Box>
+        {children}
+    </Box>
+);
+
+const ChartPlaceholder = ({ text }: { text: string }) => (
+    <Box c="dimmed" fz={13} h={240} style={{ alignItems: 'center', display: 'flex', justifyContent: 'center' }}>
+        {text}
+    </Box>
+);
+
+const POSITION_TITLE = 'Position Changes';
+const POSITION_SUBTITLE = `Track position every ${POSITION_LAP_STEP} laps · top ${CHART_DRIVER_COUNT} finishers`;
+const PACE_TITLE = 'Race Pace';
+const PACE_SUBTITLE = 'Lap time (s) · lower is faster · pit and safety car laps hidden';
+
+const RaceCharts = ({ round, year }: { round: number; year: number }) => {
+    const { data: laps } = useSuspenseQuery(raceLapsQuery(year, round));
+
+    if (!hasLaps(laps)) {
+        return (
+            <>
+                <ChartCard subtitle={POSITION_SUBTITLE} title={POSITION_TITLE}>
+                    <ChartPlaceholder text="No lap data for this race" />
+                </ChartCard>
+                <ChartCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
+                    <ChartPlaceholder text="No lap data for this race" />
+                </ChartCard>
+            </>
+        );
+    }
+
+    const position = positionChart(laps);
+    const pace = paceChart(laps);
+
+    return (
+        <>
+            <ChartCard subtitle={POSITION_SUBTITLE} title={POSITION_TITLE}>
+                <LineChart
+                    data={position.data}
+                    dataKey="lap"
+                    h={240}
+                    series={position.series}
+                    xAxisProps={{ interval: 'preserveStartEnd' }}
+                    yAxisProps={{ allowDecimals: false, domain: [1, 'dataMax'], reversed: true }}
+                />
+            </ChartCard>
+            <ChartCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
+                <LineChart
+                    data={pace.data}
+                    dataKey="lap"
+                    h={240}
+                    series={pace.series}
+                    valueFormatter={v => v.toFixed(1)}
+                    xAxisProps={{ interval: 'preserveStartEnd' }}
+                    yAxisProps={{ domain: ['auto', 'auto'], tickCount: 5 }}
+                />
+            </ChartCard>
+        </>
+    );
+};
+
+const ChartsFallback = () => (
+    <>
+        <ChartCard subtitle={POSITION_SUBTITLE} title={POSITION_TITLE}>
+            <ChartPlaceholder text="Loading laps…" />
+        </ChartCard>
+        <ChartCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
+            <ChartPlaceholder text="Loading laps…" />
+        </ChartCard>
+    </>
+);
+
 const RaceDetail = () => {
     const { round, year } = Route.useParams();
     const { data } = useSuspenseQuery(raceDetailQuery(Number(year), Number(round)));
 
-    const positionSeries = toChartSeries(data.positionLines);
-    const positionData = toChartData(data.positionLines, i => `L${i * 5 + 1}`);
-    const paceSeries = toChartSeries(data.paceLines);
-    const paceData = toChartData(data.paceLines, i => `L${i + 1}`);
-
     const headStats = [
-        { label: 'POLE', value: data.pole.short },
-        { label: 'FASTEST LAP', value: data.fastestLap.short },
-        { label: 'WINNER', value: data.winner.short },
+        { label: 'POLE', value: shortNameFor(data.results, data.pole) },
+        { label: 'FASTEST LAP', value: shortNameFor(data.results, data.fastestLap?.driver ?? null) },
+        { label: 'WINNER', value: shortNameFor(data.results, data.winner) },
     ];
 
     return (
@@ -53,13 +146,13 @@ const RaceDetail = () => {
             <Group gap={0} justify="space-between" px={26} py={22} style={HERO_STYLE} wrap="nowrap">
                 <div>
                     <Box c="var(--color-sidebar-muted)" fw={700} fz={12} lts="1px">
-                        {`ROUND ${data.round} · ${data.year}`}
+                        {`ROUND ${data.round} · ${data.season}`}
                     </Box>
                     <Box className="f1-display" ff="var(--font-display)" fw={700} fz={28} lts="-0.02em" my={6}>
                         {data.name}
                     </Box>
                     <Box c="var(--neutral-300)" fz={13}>
-                        {`${data.circuit} · ${data.date} · ${data.laps} laps`}
+                        {`${data.circuit} · ${data.date ?? 'Date TBD'} · ${data.laps} laps`}
                     </Box>
                 </div>
                 <Group gap={26} wrap="nowrap">
@@ -78,24 +171,24 @@ const RaceDetail = () => {
             <SimpleGrid cols={3} spacing={16}>
                 {data.results.slice(0, 3).map((r, i) => (
                     <Link
-                        key={r.code}
-                        params={{ driverId: r.code, year }}
+                        key={r.driver.id}
+                        params={{ driverId: r.driver.code, year }}
                         style={{ color: 'inherit', textDecoration: 'none' }}
                         to="/seasons/$year/drivers/$driverId"
                     >
                         <Box
                             className="f1-card f1-lift"
                             p={16}
-                            style={{ borderTop: `4px solid ${r.driver.color}`, cursor: 'pointer' }}
+                            style={{ borderTop: `4px solid ${r.constructor.color}`, cursor: 'pointer' }}
                         >
                             <Group gap={14} wrap="nowrap">
                                 <Text c={MEDALS[i]} className="f1-display" ff="var(--font-display)" fw={700} fz={30} inherit span>{i + 1}</Text>
-                                <DriverAvatar code={r.code} color={r.driver.color} size="lg" />
+                                <DriverAvatar code={r.driver.code} color={r.constructor.color} size="lg" />
                                 <div>
                                     <Box fw={700} fz={15}>{r.driver.name}</Box>
-                                    <Box c="dimmed" fz={12}>{r.driver.teamName}</Box>
+                                    <Box c="dimmed" fz={12}>{r.constructor.name}</Box>
                                     <Box className="f1-num" fw={600} fz={12} mt={2}>
-                                        {i === 0 ? '1:32:14.882' : r.gap}
+                                        {resultGap(r)}
                                     </Box>
                                 </div>
                             </Group>
@@ -106,35 +199,9 @@ const RaceDetail = () => {
 
             {/* Charts */}
             <SimpleGrid cols={2} spacing={16}>
-                <Box className="f1-card" p={16}>
-                    <Box fw={700} fz={15}>Position Changes</Box>
-                    <Box c="dimmed" fz={12} mb={8}>
-                        Track position lap-by-lap · top 5
-                    </Box>
-                    <LineChart
-                        data={positionData}
-                        dataKey="x"
-                        h={240}
-                        series={positionSeries}
-                        xAxisProps={{ interval: 3 }}
-                        yAxisProps={{ domain: [1, 10], reversed: true, tickCount: 5 }}
-                    />
-                </Box>
-                <Box className="f1-card" p={16}>
-                    <Box fw={700} fz={15}>Race Pace</Box>
-                    <Box c="dimmed" fz={12} mb={8}>
-                        Lap time (s) · lower is faster
-                    </Box>
-                    <LineChart
-                        data={paceData}
-                        dataKey="x"
-                        h={240}
-                        series={paceSeries}
-                        valueFormatter={v => v.toFixed(1)}
-                        xAxisProps={{ interval: 5 }}
-                        yAxisProps={{ domain: [77.5, 82], tickCount: 5 }}
-                    />
-                </Box>
+                <Suspense fallback={<ChartsFallback />}>
+                    <RaceCharts round={Number(round)} year={Number(year)} />
+                </Suspense>
             </SimpleGrid>
 
             {/* Results + Qual vs Race */}
@@ -151,20 +218,20 @@ const RaceDetail = () => {
                         {data.results.map(r => (
                             <Link
                                 className="f1-row"
-                                key={r.code}
-                                params={{ driverId: r.code, year }}
+                                key={r.driver.id}
+                                params={{ driverId: r.driver.code, year }}
                                 style={RESULT_ROW_STYLE}
                                 to="/seasons/$year/drivers/$driverId"
                             >
-                                <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.pos}</Text>
+                                <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.positionLabel}</Text>
                                 <Group gap={9} wrap="nowrap">
-                                    <TeamBar color={r.driver.color} size="sm" />
-                                    <Text fw={600} fz={13} inherit span>{r.driver.short}</Text>
+                                    <TeamBar color={r.constructor.color} size="sm" />
+                                    <Text fw={600} fz={13} inherit span>{r.driver.shortName}</Text>
                                 </Group>
-                                <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="center">{r.grid}</Text>
-                                <Text className="f1-num" fz={12.5} inherit span ta="right">{r.gap}</Text>
-                                <Text c={r.pts > 0 ? 'inherit' : 'var(--neutral-300)'} className="f1-num" fw={700} inherit span ta="right">
-                                    {r.pts > 0 ? r.pts : '–'}
+                                <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="center">{r.grid ?? 'PL'}</Text>
+                                <Text className="f1-num" fz={12.5} inherit span ta="right">{resultGap(r)}</Text>
+                                <Text c={r.points > 0 ? 'inherit' : 'var(--neutral-300)'} className="f1-num" fw={700} inherit span ta="right">
+                                    {r.points > 0 ? r.points : '–'}
                                 </Text>
                             </Link>
                         ))}
@@ -177,17 +244,16 @@ const RaceDetail = () => {
                         Positions gained or lost on Sunday
                     </Box>
                     {data.results.slice(0, 10).map((r) => {
-                        const delta = r.grid - r.pos;
+                        const delta = (r.grid ?? data.results.length) - r.position;
                         const mag = (Math.min(Math.abs(delta), 8) / 8) * 45;
                         const color = getDeltaColor(delta);
                         return (
-                            <Group gap={10} key={r.code} mb={11} wrap="nowrap">
-                                <Text fw={700} fz={12} inherit span w={40}>{r.code}</Text>
+                            <Group gap={10} key={r.driver.id} mb={11} wrap="nowrap">
+                                <Text fw={700} fz={12} inherit span w={40}>{r.driver.code}</Text>
                                 <Text c="dimmed" className="f1-num" fz={11} inherit span w={62}>
-                                    P
-                                    {r.grid}
+                                    {r.grid === null ? 'PL' : `P${r.grid}`}
                                     →P
-                                    {r.pos}
+                                    {r.position}
                                 </Text>
                                 <Box flex={1} h={14} pos="relative">
                                     <Box
@@ -224,9 +290,21 @@ export const Route = createFileRoute('/seasons/$year/races/$round')({
     component: RaceDetail,
     loader: async ({ context, params }) => {
         const year = parseYear(params.year);
-        const race = await context.queryClient.ensureQueryData(
-            raceDetailQuery(year, parseRound(params.round)),
-        );
+        const round = parseRound(params.round);
+        let race: RaceDetailData;
+
+        void context.queryClient.prefetchQuery(raceLapsQuery(year, round));
+
+        try {
+            race = await context.queryClient.ensureQueryData(raceDetailQuery(year, round));
+        } catch (error) {
+            if (error instanceof HTTPError && error.response.status === 404) {
+                throw notFound();
+            }
+
+            throw error;
+        }
+
         return {
             crumbs: [
                 { label: params.year, params: { year: params.year }, to: '/seasons/$year' },

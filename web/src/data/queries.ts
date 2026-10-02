@@ -1,13 +1,10 @@
 import { queryOptions } from '@tanstack/react-query';
 
+import { RaceDetailSchema, RaceLapsSchema } from '#/lib/api/races';
 import { SeasonOverviewSchema, SeasonStandingsSchema } from '#/lib/api/seasons';
 import { api } from '#/lib/query/api';
 
-import {
-    getDriverSeason,
-    getRaceDetail,
-    getStandings,
-} from './fixtures';
+import { getDriverSeason, getStandings } from './fixtures';
 
 const getSeasonStandings = (year: number) =>
     api.get(`seasons/${year}/standings`).json(SeasonStandingsSchema);
@@ -26,12 +23,14 @@ export const seasonStandingsQuery = (year: number) =>
 
 export const raceDetailQuery = (year: number, round: number) =>
     queryOptions({
-        queryFn: () => {
-            const race = getRaceDetail(round);
-            if (!race) throw new Error(`Unknown round ${round}`);
-            return race;
-        },
+        queryFn: () => api.get(`seasons/${year}/races/${round}`).json(RaceDetailSchema),
         queryKey: ['race-detail', year, round],
+    });
+
+export const raceLapsQuery = (year: number, round: number) =>
+    queryOptions({
+        queryFn: () => api.get(`seasons/${year}/races/${round}/laps`).json(RaceLapsSchema),
+        queryKey: ['race-laps', year, round],
     });
 
 export const standingsQuery = (year: number) =>

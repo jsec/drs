@@ -3,7 +3,6 @@ import type {
     DriverRaceRow,
     DriverSeasonDetail,
     FinishBar,
-    RaceDetail,
     SeasonConstructor,
     SeasonDriver,
     Standings,
@@ -245,44 +244,6 @@ export const CALENDAR: CalendarRound[] = CALENDAR_RAW.map(
     }),
 );
 
-const RACE_ORDER = [
-    'NOR', 'PIA', 'VER', 'LEC', 'RUS', 'HAM', 'ANT', 'ALB', 'ALO', 'GAS',
-    'SAI', 'HAD', 'TSU', 'HUL', 'BOR', 'OCO', 'BEA', 'STR', 'LAW', 'COL',
-];
-const RACE_GRIDS = [1, 3, 2, 4, 6, 5, 8, 7, 11, 9, 10, 12, 14, 13, 16, 15, 18, 17, 19, 20];
-const RACE_GAPS = [
-    'WINNER', '+4.821', '+12.044', '+24.115', '+38.902', '+45.330', '+61.882',
-    '+72.450', '+1 LAP', '+1 LAP', '+1 LAP', '+1 LAP', '+1 LAP', '+1 LAP',
-    '+1 LAP', '+1 LAP', '+1 LAP', '+1 LAP', '+2 LAPS', 'DNF',
-];
-const RACE_PTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-const POSITION_LINES: Record<string, number[]> = {
-    LEC: [4, 4, 4, 4, 5, 5, 4, 4, 3, 4, 4, 4, 4, 4, 4],
-    NOR: [1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    PIA: [3, 3, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-    RUS: [6, 5, 5, 5, 4, 4, 5, 5, 5, 5, 5, 5, 6, 5, 5],
-    VER: [2, 2, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3],
-};
-
-const PACE_LINES: Record<string, number[]> = (() => {
-    const base: Record<string, number> = { LEC: 79, NOR: 78.2, PIA: 78.4, VER: 78.6 };
-    const out: Record<string, number[]> = {};
-    for (const [ki, k] of Object.keys(base).entries()) {
-        const arr: number[] = [];
-        for (let l = 0; l < 24; l++) {
-            const t
-                = base[k]
-                    + Math.sin(l * 0.6 + ki) * 0.22
-                    + (l < 2 ? 0.6 : 0)
-                    + (l > 21 ? 0.35 : 0);
-            arr.push(+t.toFixed(2));
-        }
-        out[k] = arr;
-    }
-    return out;
-})();
-
 export function getDriverSeason(code: string): DriverSeasonDetail | undefined {
     const driver = driverByCode[code];
     if (!driver) return undefined;
@@ -326,40 +287,6 @@ export function getDriverSeason(code: string): DriverSeasonDetail | undefined {
     });
 
     return { driver, finishes, pointsMax, pos, progression, races };
-}
-
-export function getRaceDetail(round: number): RaceDetail | undefined {
-    const cal = CALENDAR[round - 1];
-    if (!cal) return undefined;
-    return {
-        circuit: cal.circuit,
-        date: cal.date,
-        fastestLap: driverByCode.VER,
-        laps: 70,
-        name: cal.name,
-        paceLines: Object.entries(PACE_LINES).map(([code, value]) => ({
-            code,
-            color: driverByCode[code].color,
-            values: value,
-        })),
-        pole: driverByCode.NOR,
-        positionLines: Object.entries(POSITION_LINES).map(([code, value]) => ({
-            code,
-            color: driverByCode[code].color,
-            values: value,
-        })),
-        results: RACE_ORDER.map((code, i) => ({
-            code,
-            driver: driverByCode[code],
-            gap: RACE_GAPS[i],
-            grid: RACE_GRIDS[i],
-            pos: i + 1,
-            pts: RACE_PTS[i],
-        })),
-        round: cal.round,
-        winner: driverByCode.NOR,
-        year: CURRENT_YEAR,
-    };
 }
 
 export function getStandings(): Standings {

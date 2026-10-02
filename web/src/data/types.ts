@@ -41,29 +41,6 @@ export type FinishBar = {
     round: string;
 };
 
-export type RaceDetail = {
-    circuit: string;
-    date: string;
-    fastestLap: SeasonDriver;
-    laps: number;
-    name: string;
-    paceLines: { code: string; color: string; values: number[] }[];
-    pole: SeasonDriver;
-    positionLines: { code: string; color: string; values: number[] }[];
-    results: (RaceResult & { driver: SeasonDriver })[];
-    round: number;
-    winner: SeasonDriver;
-    year: number;
-};
-
-export type RaceResult = {
-    code: string;
-    gap: string;
-    grid: number;
-    pos: number;
-    pts: number;
-};
-
 export type SeasonConstructor = {
     color: string;
     flag: string;
