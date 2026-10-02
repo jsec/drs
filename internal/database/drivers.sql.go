@@ -39,7 +39,13 @@ SELECT
     rr.is_grand_slam,
     q.position_text AS qualifying_position_label,
     coalesce(q.q3, q.q2, q.q1, q.best_qualifying_time) AS best_qualifying_time,
-    fl.fastest_lap_position
+    fl.fastest_lap_position,
+    EXISTS (
+        SELECT 1
+        FROM effone.sprint_results sr
+        WHERE sr.race_id = rr.race_id
+            AND sr.driver_id = rr.driver_id
+    ) AS has_sprint
 FROM effone.race_results rr
     JOIN effone.races r ON rr.race_id = r.race_id
     LEFT JOIN effone.constructors c ON rr.constructor_id = c.constructor_id
@@ -89,6 +95,7 @@ type GetDriverRaceRow struct {
 	QualifyingPositionLabel pgtype.Text
 	BestQualifyingTime      pgtype.Text
 	FastestLapPosition      dbtypes.Int4
+	HasSprint               bool
 }
 
 func (q *Queries) GetDriverRace(ctx context.Context, arg GetDriverRaceParams) (GetDriverRaceRow, error) {
@@ -121,6 +128,7 @@ func (q *Queries) GetDriverRace(ctx context.Context, arg GetDriverRaceParams) (G
 		&i.QualifyingPositionLabel,
 		&i.BestQualifyingTime,
 		&i.FastestLapPosition,
+		&i.HasSprint,
 	)
 	return i, err
 }
@@ -189,6 +197,87 @@ func (q *Queries) GetDriverSeason(ctx context.Context, arg GetDriverSeasonParams
 		&i.Wins,
 		&i.Podiums,
 		&i.Poles,
+	)
+	return i, err
+}
+
+const getDriverSprint = `-- name: GetDriverSprint :one
+SELECT
+    r.race_name,
+    sr.driver_code AS code,
+    sr.driver_name AS name,
+    sr.constructor_name,
+    c.primary_color_hex AS constructor_color,
+    sr.car_number,
+    sr.position_text AS position_label,
+    sr.finish_position AS position,
+    sr.grid_position,
+    sr.positions_gained,
+    sr.elapsed_time,
+    sr.gap,
+    sr.status_category,
+    sr.laps_completed,
+    sr.points::double precision AS points,
+    sr.time_penalty,
+    sr.is_win,
+    sr.is_grid_p1
+FROM effone.sprint_results sr
+    JOIN effone.races r ON sr.race_id = r.race_id
+    LEFT JOIN effone.constructors c ON sr.constructor_id = c.constructor_id
+WHERE sr.season = $1
+    AND sr.race_round = $2
+    AND sr.driver_id = $3
+`
+
+type GetDriverSprintParams struct {
+	Season    int32
+	RaceRound int32
+	DriverID  string
+}
+
+type GetDriverSprintRow struct {
+	RaceName         string
+	Code             string
+	Name             string
+	ConstructorName  string
+	ConstructorColor pgtype.Text
+	CarNumber        dbtypes.Int4
+	PositionLabel    string
+	Position         dbtypes.Int4
+	GridPosition     dbtypes.Int4
+	PositionsGained  dbtypes.Int4
+	ElapsedTime      pgtype.Text
+	Gap              pgtype.Text
+	StatusCategory   string
+	LapsCompleted    dbtypes.Int4
+	Points           float64
+	TimePenalty      pgtype.Text
+	IsWin            bool
+	IsGridP1         bool
+}
+
+func (q *Queries) GetDriverSprint(ctx context.Context, arg GetDriverSprintParams) (GetDriverSprintRow, error) {
+	row := q.db.QueryRow(ctx, getDriverSprint, arg.Season, arg.RaceRound, arg.DriverID)
+	var i GetDriverSprintRow
+	err := row.Scan(
+		&i.RaceName,
+		&i.Code,
+		&i.Name,
+		&i.ConstructorName,
+		&i.ConstructorColor,
+		&i.CarNumber,
+		&i.PositionLabel,
+		&i.Position,
+		&i.GridPosition,
+		&i.PositionsGained,
+		&i.ElapsedTime,
+		&i.Gap,
+		&i.StatusCategory,
+		&i.LapsCompleted,
+		&i.Points,
+		&i.TimePenalty,
+		&i.IsWin,
+		&i.IsGridP1,
 	)
 	return i, err
 }

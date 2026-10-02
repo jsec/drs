@@ -56,5 +56,6 @@ SELECT
     lt.position,
     lt.lap_time_ms
 FROM effone.lap_times AS lt
-WHERE lt.race_id = $1
+WHERE lt.race_id = sqlc.arg(race_id)
+    AND lt.session = sqlc.arg(session)
 ORDER BY lt.driver_id, lt.lap_number;

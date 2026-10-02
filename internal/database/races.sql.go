@@ -92,8 +92,14 @@ SELECT
     lt.lap_time_ms
 FROM effone.lap_times AS lt
 WHERE lt.race_id = $1
+    AND lt.session = $2
 ORDER BY lt.driver_id, lt.lap_number
 `
+
+type ListRaceLapTimesParams struct {
+	RaceID  int32
+	Session string
+}
 
 type ListRaceLapTimesRow struct {
 	DriverID  string
@@ -102,8 +108,8 @@ type ListRaceLapTimesRow struct {
 	LapTimeMs int32
 }
 
-func (q *Queries) ListRaceLapTimes(ctx context.Context, raceID int32) ([]ListRaceLapTimesRow, error) {
-	rows, err := q.db.Query(ctx, listRaceLapTimes, raceID)
+func (q *Queries) ListRaceLapTimes(ctx context.Context, arg ListRaceLapTimesParams) ([]ListRaceLapTimesRow, error) {
+	rows, err := q.db.Query(ctx, listRaceLapTimes, arg.RaceID, arg.Session)
 	if err != nil {
 		return nil, err
 	}

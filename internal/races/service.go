@@ -16,7 +16,7 @@ var ErrNotFound = errors.New("race not found")
 type raceQueries interface {
 	GetRaceDetail(ctx context.Context, arg database.GetRaceDetailParams) (database.GetRaceDetailRow, error)
 	ListRaceResults(ctx context.Context, raceID int32) ([]database.ListRaceResultsRow, error)
-	ListRaceLapTimes(ctx context.Context, raceID int32) ([]database.ListRaceLapTimesRow, error)
+	ListRaceLapTimes(ctx context.Context, arg database.ListRaceLapTimesParams) ([]database.ListRaceLapTimesRow, error)
 }
 
 type Service struct {
@@ -100,7 +100,7 @@ func (s *Service) GetRaceDetail(ctx context.Context, season, round int32) (RaceD
 	return resp, nil
 }
 
-func (s *Service) GetRaceLaps(ctx context.Context, season, round int32) (RaceLapsResponse, error) {
+func (s *Service) GetRaceLaps(ctx context.Context, season, round int32, session string) (RaceLapsResponse, error) {
 	race, err := s.getCompletedRace(ctx, season, round)
 	if err != nil {
 		return RaceLapsResponse{}, err
@@ -111,7 +111,7 @@ func (s *Service) GetRaceLaps(ctx context.Context, season, round int32) (RaceLap
 		return RaceLapsResponse{}, fmt.Errorf("listing race results: %w", err)
 	}
 
-	lapRows, err := s.queries.ListRaceLapTimes(ctx, race.RaceID)
+	lapRows, err := s.queries.ListRaceLapTimes(ctx, database.ListRaceLapTimesParams{RaceID: race.RaceID, Session: session})
 	if err != nil {
 		return RaceLapsResponse{}, fmt.Errorf("listing race lap times: %w", err)
 	}

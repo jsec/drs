@@ -391,6 +391,7 @@ CREATE TABLE effone.lap_times (
     race_id integer NOT NULL,
     race_round integer NOT NULL,
     refresh_id bigint NOT NULL,
+    session text NOT NULL,
     season integer NOT NULL
 );
 
@@ -726,6 +727,27 @@ CREATE UNIQUE INDEX circuits_circuit_id_uidx ON effone.circuits USING btree (cir
 
 
 --
+-- Name: constructor_season_summaries_constructor_season_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX constructor_season_summaries_constructor_season_idx ON effone.constructor_season_summaries USING btree (constructor_id, season);
+
+
+--
+-- Name: constructor_season_summaries_season_final_order_uidx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE UNIQUE INDEX constructor_season_summaries_season_final_order_uidx ON effone.constructor_season_summaries USING btree (season, final_order);
+
+
+--
+-- Name: constructor_season_summaries_season_position_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX constructor_season_summaries_season_position_idx ON effone.constructor_season_summaries USING btree (season, final_position);
+
+
+--
 -- Name: constructor_standings_race_constructor_engine_uidx; Type: INDEX; Schema: effone; Owner: -
 --
 
@@ -744,6 +766,13 @@ CREATE INDEX constructor_standings_race_position_idx ON effone.constructor_stand
 --
 
 CREATE INDEX constructor_standings_season_constructor_idx ON effone.constructor_standings_snapshots USING btree (season, constructor_id);
+
+
+--
+-- Name: constructors_constructor_id_uidx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE UNIQUE INDEX constructors_constructor_id_uidx ON effone.constructors USING btree (constructor_id);
 
 
 --
@@ -803,6 +832,20 @@ CREATE INDEX driver_standings_season_driver_idx ON effone.driver_standings_snaps
 
 
 --
+-- Name: drivers_driver_code_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX drivers_driver_code_idx ON effone.drivers USING btree (driver_code);
+
+
+--
+-- Name: drivers_driver_id_uidx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE UNIQUE INDEX drivers_driver_id_uidx ON effone.drivers USING btree (driver_id);
+
+
+--
 -- Name: fastest_laps_race_driver_uidx; Type: INDEX; Schema: effone; Owner: -
 --
 
@@ -824,10 +867,10 @@ CREATE INDEX lap_times_driver_race_idx ON effone.lap_times USING btree (driver_i
 
 
 --
--- Name: lap_times_race_driver_lap_uidx; Type: INDEX; Schema: effone; Owner: -
+-- Name: lap_times_race_session_driver_lap_uidx; Type: INDEX; Schema: effone; Owner: -
 --
 
-CREATE UNIQUE INDEX lap_times_race_driver_lap_uidx ON effone.lap_times USING btree (race_id, driver_id, lap_number);
+CREATE UNIQUE INDEX lap_times_race_session_driver_lap_uidx ON effone.lap_times USING btree (race_id, session, driver_id, lap_number);
 
 
 --
@@ -873,6 +916,41 @@ CREATE INDEX qualifying_results_season_driver_idx ON effone.qualifying_results U
 
 
 --
+-- Name: race_results_constructor_race_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX race_results_constructor_race_idx ON effone.race_results USING btree (constructor_id, race_id);
+
+
+--
+-- Name: race_results_driver_race_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX race_results_driver_race_idx ON effone.race_results USING btree (driver_id, race_id);
+
+
+--
+-- Name: race_results_race_finish_order_uidx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE UNIQUE INDEX race_results_race_finish_order_uidx ON effone.race_results USING btree (race_id, finish_order);
+
+
+--
+-- Name: race_results_season_constructor_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX race_results_season_constructor_idx ON effone.race_results USING btree (season, constructor_id);
+
+
+--
+-- Name: race_results_season_driver_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX race_results_season_driver_idx ON effone.race_results USING btree (season, driver_id);
+
+
+--
 -- Name: races_circuit_id_idx; Type: INDEX; Schema: effone; Owner: -
 --
 
@@ -898,6 +976,34 @@ CREATE INDEX races_season_round_idx ON effone.races USING btree (season, race_ro
 --
 
 CREATE UNIQUE INDEX seasons_season_uidx ON effone.seasons USING btree (season);
+
+
+--
+-- Name: sprint_results_race_driver_uidx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE UNIQUE INDEX sprint_results_race_driver_uidx ON effone.sprint_results USING btree (race_id, driver_id);
+
+
+--
+-- Name: sprint_results_race_finish_order_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX sprint_results_race_finish_order_idx ON effone.sprint_results USING btree (race_id, finish_order);
+
+
+--
+-- Name: sprint_results_season_constructor_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX sprint_results_season_constructor_idx ON effone.sprint_results USING btree (season, constructor_id);
+
+
+--
+-- Name: sprint_results_season_driver_idx; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX sprint_results_season_driver_idx ON effone.sprint_results USING btree (season, driver_id);
 
 
 --

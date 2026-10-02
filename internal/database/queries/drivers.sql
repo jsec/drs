@@ -153,7 +153,13 @@ SELECT
     rr.is_grand_slam,
     q.position_text AS qualifying_position_label,
     coalesce(q.q3, q.q2, q.q1, q.best_qualifying_time) AS best_qualifying_time,
-    fl.fastest_lap_position
+    fl.fastest_lap_position,
+    EXISTS (
+        SELECT 1
+        FROM effone.sprint_results sr
+        WHERE sr.race_id = rr.race_id
+            AND sr.driver_id = rr.driver_id
+    ) AS has_sprint
 FROM effone.race_results rr
     JOIN effone.races r ON rr.race_id = r.race_id
     LEFT JOIN effone.constructors c ON rr.constructor_id = c.constructor_id
@@ -179,3 +185,30 @@ FROM effone.pit_stops ps
 WHERE ps.race_id = sqlc.arg(race_id)
     AND ps.driver_id = sqlc.arg(driver_id)
 ORDER BY ps.stop_number;
+
+-- name: GetDriverSprint :one
+SELECT
+    r.race_name,
+    sr.driver_code AS code,
+    sr.driver_name AS name,
+    sr.constructor_name,
+    c.primary_color_hex AS constructor_color,
+    sr.car_number,
+    sr.position_text AS position_label,
+    sr.finish_position AS position,
+    sr.grid_position,
+    sr.positions_gained,
+    sr.elapsed_time,
+    sr.gap,
+    sr.status_category,
+    sr.laps_completed,
+    sr.points::double precision AS points,
+    sr.time_penalty,
+    sr.is_win,
+    sr.is_grid_p1
+FROM effone.sprint_results sr
+    JOIN effone.races r ON sr.race_id = r.race_id
+    LEFT JOIN effone.constructors c ON sr.constructor_id = c.constructor_id
+WHERE sr.season = sqlc.arg(season)
+    AND sr.race_round = sqlc.arg(race_round)
+    AND sr.driver_id = sqlc.arg(driver_id);

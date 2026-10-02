@@ -102,6 +102,7 @@ export const DriverRaceSchema = z.object({
     fastestLapRank: z.number().nullable(),
     gap: z.string(),
     grid: z.number().nullable(),
+    hasSprint: z.boolean(),
     isDriverOfTheDay: z.boolean(),
     isFastestLap: z.boolean(),
     isGrandSlam: z.boolean(),

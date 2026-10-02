@@ -310,6 +310,7 @@ type EffoneLapTime struct {
 	RaceID    int32
 	RaceRound int32
 	RefreshID int64
+	Session   string
 	Season    int32
 }
 

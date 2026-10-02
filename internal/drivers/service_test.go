@@ -30,6 +30,10 @@ func (s stubQuerier) ListDriverRacePitStops(context.Context, database.ListDriver
 	return s.pitStops, nil
 }
 
+func (stubQuerier) GetDriverSprint(context.Context, database.GetDriverSprintParams) (database.GetDriverSprintRow, error) {
+	return database.GetDriverSprintRow{}, pgx.ErrNoRows
+}
+
 func (s stubQuerier) GetDriverSeason(context.Context, database.GetDriverSeasonParams) (database.GetDriverSeasonRow, error) {
 	return s.season, s.seasonErr
 }
@@ -108,4 +112,14 @@ func TestService_GetRace_NoPitStopsIsEmptyList(t *testing.T) {
 	assert.Equal(t, "1", got.PositionLabel)
 	assert.NotNil(t, got.PitStops)
 	assert.Empty(t, got.PitStops)
+}
+
+func TestService_GetSprint_NotFound(t *testing.T) {
+	t.Parallel()
+
+	svc := drivers.NewService(stubQuerier{})
+
+	_, err := svc.GetSprint(context.Background(), "lando-norris", 2025, 1)
+
+	require.ErrorIs(t, err, drivers.ErrNotFound)
 }

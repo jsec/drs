@@ -1,6 +1,6 @@
 import type { ChartReferenceLineProps, LineChartSeries } from '@mantine/charts';
 
-import { Badge, Box, Group, Select, SimpleGrid, Stack, Switch, Text } from '@mantine/core';
+import { Badge, Box, Group, SegmentedControl, Select, SimpleGrid, Stack, Switch, Text } from '@mantine/core';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { HTTPError } from 'ky';
@@ -8,11 +8,12 @@ import { useState } from 'react';
 import { z } from 'zod';
 
 import type { DriverRace } from '#/lib/api/drivers';
-import type { DriverLaps } from '#/lib/api/races';
+import type { DriverLaps, Session } from '#/lib/api/races';
 
 import { GridHeader, MiniStat, SectionCard } from '#/components/f1-ui';
 import { LineChart } from '#/components/line-chart';
 import { driverRaceQuery, raceDetailQuery, raceLapsQuery } from '#/data/queries';
+import { SessionSchema } from '#/lib/api/races';
 import { formatLapTime, formatPosition } from '#/lib/format';
 import { lapLabel, paceChart, positionChart } from '#/lib/race-charts';
 import { parseRound, parseYear } from '#/lib/route-params';
@@ -21,10 +22,23 @@ const LAP_COLS = '70px 1fr 60px';
 const RIVAL_LAP_COLS = `${LAP_COLS} 90px`;
 const PIT_COLS = '60px 60px 1fr';
 const RIVAL_DASH = '6 4';
+const SESSION_OPTIONS = [
+    { label: 'Grand Prix', value: 'race' },
+    { label: 'Sprint', value: 'sprint' },
+];
 
 const SearchSchema = z.object({
+    session: SessionSchema.optional().catch(undefined),
     vs: z.string().optional().catch(undefined),
 });
+
+function crumbLabel(race: DriverRace, session: Session): string {
+    if (session === 'sprint') {
+        return `${race.raceName} Sprint`;
+    }
+
+    return race.raceName;
+}
 
 function dashRival(series: LineChartSeries[], isDashed: boolean): LineChartSeries[] {
     if (!isDashed || series.length < 2) {
@@ -273,15 +287,16 @@ const PitStops = ({ race }: { race: DriverRace }) => {
 
 const DriverRacePage = () => {
     const { driverId, round, year } = Route.useParams();
-    const { vs } = Route.useSearch();
+    const { session = 'race', vs } = Route.useSearch();
+    const isSprint = session === 'sprint';
     const navigate = Route.useNavigate();
     const [showAllLaps, setShowAllLaps] = useState(false);
 
-    const { data: race } = useSuspenseQuery(driverRaceQuery(Number(year), Number(round), driverId));
+    const { data: race } = useSuspenseQuery(driverRaceQuery(Number(year), Number(round), driverId, session));
     const { data: raceDetail } = useSuspenseQuery(raceDetailQuery(Number(year), Number(round)));
-    const { data: raceLaps } = useSuspenseQuery(raceLapsQuery(Number(year), Number(round)));
+    const { data: raceLaps } = useSuspenseQuery(raceLapsQuery(Number(year), Number(round), session));
     const { data: rivalRace } = useQuery({
-        ...driverRaceQuery(Number(year), Number(round), vs ?? ''),
+        ...driverRaceQuery(Number(year), Number(round), vs ?? '', session),
         enabled: vs !== undefined,
     });
 
@@ -324,13 +339,22 @@ const DriverRacePage = () => {
         <Stack gap={16}>
             <Hero race={race} round={round} year={year} />
 
-            <SimpleGrid cols={6} spacing={8}>
+            {race.hasSprint && (
+                <SegmentedControl
+                    data={SESSION_OPTIONS}
+                    onChange={value => void navigate({ search: prev => ({ ...prev, session: value === 'sprint' ? 'sprint' : undefined }) })}
+                    style={{ alignSelf: 'flex-start' }}
+                    value={session}
+                />
+            )}
+
+            <SimpleGrid cols={isSprint ? 4 : 6} spacing={8}>
                 <MiniStat label="RESULT" value={formatPosition(race.positionLabel)} />
                 <MiniStat label="GRID → RESULT" value={<span style={{ whiteSpace: 'nowrap' }}>{`${gridText(race.grid)} → ${formatPosition(race.positionLabel)}`}</span>} />
                 <MiniStat label="GAP" value={gapText(race)} />
                 <MiniStat label="POINTS" value={race.points} />
-                <MiniStat label="PIT STOPS" value={race.pitStopCount ?? '–'} />
-                <MiniStat label="FASTEST LAP" value={race.fastestLapRank === null ? '–' : `P${race.fastestLapRank}`} />
+                {!isSprint && <MiniStat label="PIT STOPS" value={race.pitStopCount ?? '–'} />}
+                {!isSprint && <MiniStat label="FASTEST LAP" value={race.fastestLapRank === null ? '–' : `P${race.fastestLapRank}`} />}
             </SimpleGrid>
 
             {hasLapData
@@ -340,7 +364,7 @@ const DriverRacePage = () => {
                                 <Select
                                     clearable
                                     data={rivalOptions}
-                                    onChange={value => void navigate({ search: { vs: value ?? undefined } })}
+                                    onChange={value => void navigate({ search: prev => ({ ...prev, vs: value ?? undefined }) })}
                                     placeholder="Compare with…"
                                     searchable
                                     value={vs ?? null}
@@ -381,10 +405,13 @@ const DriverRacePage = () => {
                                 </Box>
                             </SimpleGrid>
 
-                            <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '7fr 5fr' }}>
-                                <LapTable driver={driverLaps} raceFastestMs={raceFastestMs} rival={rivalLaps} stopLaps={stopLaps} />
-                                <PitStops race={race} />
-                            </div>
+                            {isSprint && <LapTable driver={driverLaps} raceFastestMs={raceFastestMs} rival={rivalLaps} stopLaps={stopLaps} />}
+                            {!isSprint && (
+                                <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '7fr 5fr' }}>
+                                    <LapTable driver={driverLaps} raceFastestMs={raceFastestMs} rival={rivalLaps} stopLaps={stopLaps} />
+                                    <PitStops race={race} />
+                                </div>
+                            )}
                         </>
                     )
                 : (
@@ -392,7 +419,7 @@ const DriverRacePage = () => {
                             <SectionCard title="Lap Times">
                                 <Text c="dimmed" fz={13}>Lap data isn&apos;t available for this race.</Text>
                             </SectionCard>
-                            <PitStops race={race} />
+                            {!isSprint && <PitStops race={race} />}
                         </>
                     )}
         </Stack>
@@ -402,17 +429,19 @@ const DriverRacePage = () => {
 export const Route = createFileRoute('/seasons/$year/drivers/$driverId/races/$round')({
     component: DriverRacePage,
     validateSearch: SearchSchema,
-    // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
-    loader: async ({ context, params }) => {
+    // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch, loaderDeps, loader)
+    loaderDeps: ({ search }): { session: Session } => ({ session: search.session ?? 'race' }),
+    // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch, loaderDeps, loader)
+    loader: async ({ context, deps, params }) => {
         const year = parseYear(params.year);
         const round = parseRound(params.round);
         let race: DriverRace;
 
-        void context.queryClient.prefetchQuery(raceLapsQuery(year, round));
+        void context.queryClient.prefetchQuery(raceLapsQuery(year, round, deps.session));
         void context.queryClient.prefetchQuery(raceDetailQuery(year, round));
 
         try {
-            race = await context.queryClient.ensureQueryData(driverRaceQuery(year, round, params.driverId));
+            race = await context.queryClient.ensureQueryData(driverRaceQuery(year, round, params.driverId, deps.session));
         } catch (error) {
             if (error instanceof HTTPError && error.response.status === 404) {
                 throw notFound();
@@ -425,7 +454,7 @@ export const Route = createFileRoute('/seasons/$year/drivers/$driverId/races/$ro
             crumbs: [
                 { label: params.year, params: { year: params.year }, to: '/seasons/$year' },
                 { label: race.name, params: { driverId: params.driverId, year: params.year }, to: '/seasons/$year/drivers/$driverId' },
-                { label: race.raceName },
+                { label: crumbLabel(race, deps.session) },
             ],
         };
     },

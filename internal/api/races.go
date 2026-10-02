@@ -31,7 +31,12 @@ func (app *application) getRaceLapsHandler(w http.ResponseWriter, r *http.Reques
 		return err
 	}
 
-	laps, err := app.races.GetRaceLaps(r.Context(), year, round)
+	session, err := parseSession(r)
+	if err != nil {
+		return err
+	}
+
+	laps, err := app.races.GetRaceLaps(r.Context(), year, round, session)
 	if err != nil {
 		if errors.Is(err, races.ErrNotFound) {
 			return errNotFound
@@ -54,4 +59,15 @@ func parseYearRound(r *http.Request) (int32, int32, error) {
 	}
 
 	return year, int32(round), nil
+}
+
+func parseSession(r *http.Request) (string, error) {
+	switch r.URL.Query().Get("session") {
+	case "", "race":
+		return "race", nil
+	case "sprint":
+		return "sprint", nil
+	default:
+		return "", errNotFound
+	}
 }

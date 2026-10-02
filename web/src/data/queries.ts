@@ -1,5 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 
+import type { Session } from '#/lib/api/races';
+
 import { DriverRaceSchema, DriverSeasonSchema } from '#/lib/api/drivers';
 import { RaceDetailSchema, RaceLapsSchema } from '#/lib/api/races';
 import { SeasonCalendarSchema, SeasonOverviewSchema, SeasonStandingsSchema } from '#/lib/api/seasons';
@@ -23,10 +25,10 @@ export const raceDetailQuery = (year: number, round: number) =>
         queryKey: ['race-detail', year, round],
     });
 
-export const raceLapsQuery = (year: number, round: number) =>
+export const raceLapsQuery = (year: number, round: number, session: Session = 'race') =>
     queryOptions({
-        queryFn: () => api.get(`seasons/${year}/races/${round}/laps`).json(RaceLapsSchema),
-        queryKey: ['race-laps', year, round],
+        queryFn: () => api.get(`seasons/${year}/races/${round}/laps`, { searchParams: { session } }).json(RaceLapsSchema),
+        queryKey: ['race-laps', year, round, session],
     });
 
 export const seasonCalendarQuery = (year: number) =>
@@ -41,8 +43,8 @@ export const driverSeasonQuery = (year: number, driverId: string) =>
         queryKey: ['driver-season', year, driverId],
     });
 
-export const driverRaceQuery = (year: number, round: number, driverId: string) =>
+export const driverRaceQuery = (year: number, round: number, driverId: string, session: Session) =>
     queryOptions({
-        queryFn: () => api.get(`seasons/${year}/drivers/${driverId}/races/${round}`).json(DriverRaceSchema),
-        queryKey: ['driver-race', year, round, driverId],
+        queryFn: () => api.get(`seasons/${year}/drivers/${driverId}/races/${round}`, { searchParams: { session } }).json(DriverRaceSchema),
+        queryKey: ['driver-race', year, round, driverId, session],
     });

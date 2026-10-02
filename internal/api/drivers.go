@@ -53,7 +53,17 @@ func (app *application) getDriverRaceHandler(w http.ResponseWriter, r *http.Requ
 		return err
 	}
 
-	race, err := app.drivers.GetRace(r.Context(), r.PathValue("driverID"), year, round)
+	session, err := parseSession(r)
+	if err != nil {
+		return err
+	}
+
+	var race drivers.DriverRace
+	if session == "sprint" {
+		race, err = app.drivers.GetSprint(r.Context(), r.PathValue("driverID"), year, round)
+	} else {
+		race, err = app.drivers.GetRace(r.Context(), r.PathValue("driverID"), year, round)
+	}
 	if err != nil {
 		if errors.Is(err, drivers.ErrNotFound) {
 			return errNotFound

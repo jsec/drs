@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import { ConstructorSchema } from './seasons';
 
+export const SessionSchema = z.enum(['race', 'sprint']);
+
 export const DriverRefSchema = z.object({
     code: z.string(),
     id: z.string(),
@@ -61,3 +63,4 @@ export type RaceDetail = z.infer<typeof RaceDetailSchema>;
 export type RaceLap = z.infer<typeof RaceLapSchema>;
 export type RaceLaps = z.infer<typeof RaceLapsSchema>;
 export type RaceResult = z.infer<typeof RaceResultSchema>;
+export type Session = z.infer<typeof SessionSchema>;

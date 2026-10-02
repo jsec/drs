@@ -14,6 +14,7 @@ var ErrNotFound = errors.New("driver not found")
 
 type driverQueries interface {
 	GetDriverRace(ctx context.Context, arg database.GetDriverRaceParams) (database.GetDriverRaceRow, error)
+	GetDriverSprint(ctx context.Context, arg database.GetDriverSprintParams) (database.GetDriverSprintRow, error)
 	GetDriverSeason(ctx context.Context, arg database.GetDriverSeasonParams) (database.GetDriverSeasonRow, error)
 	GetDriverSummary(ctx context.Context, driverID string) (database.GetDriverSummaryRow, error)
 	ListDriverRacePitStops(ctx context.Context, arg database.ListDriverRacePitStopsParams) ([]database.ListDriverRacePitStopsRow, error)
@@ -248,6 +249,42 @@ func (s *Service) GetRace(ctx context.Context, driverID string, season, round in
 		QualifyingPositionLabel: race.QualifyingPositionLabel.String,
 		BestQualifyingTime:      race.BestQualifyingTime.String,
 		FastestLapRank:          race.FastestLapPosition,
+		HasSprint:               race.HasSprint,
 		PitStops:                stops,
+	}, nil
+}
+
+func (s *Service) GetSprint(ctx context.Context, driverID string, season, round int32) (DriverRace, error) {
+	sprint, err := s.queries.GetDriverSprint(ctx, database.GetDriverSprintParams{Season: season, RaceRound: round, DriverID: driverID})
+	if errors.Is(err, pgx.ErrNoRows) {
+		return DriverRace{}, ErrNotFound
+	}
+	if err != nil {
+		return DriverRace{}, fmt.Errorf("getting driver sprint: %w", err)
+	}
+
+	return DriverRace{
+		RaceName: sprint.RaceName,
+		Code:     sprint.Code,
+		Name:     sprint.Name,
+		Constructor: constructor{
+			Name:  sprint.ConstructorName,
+			Color: sprint.ConstructorColor.String,
+		},
+		CarNumber:       sprint.CarNumber,
+		PositionLabel:   sprint.PositionLabel,
+		Position:        sprint.Position,
+		Grid:            sprint.GridPosition,
+		PositionsGained: sprint.PositionsGained,
+		Time:            sprint.ElapsedTime.String,
+		Gap:             sprint.Gap.String,
+		StatusCategory:  sprint.StatusCategory,
+		LapsCompleted:   sprint.LapsCompleted,
+		Points:          sprint.Points,
+		TimePenalty:     sprint.TimePenalty.String,
+		IsWin:           sprint.IsWin,
+		IsPole:          sprint.IsGridP1,
+		HasSprint:       true,
+		PitStops:        []pitStop{},
 	}, nil
 }

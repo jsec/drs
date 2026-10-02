@@ -118,5 +118,6 @@ type DriverRace struct {
 	QualifyingPositionLabel string       `json:"qualifyingPositionLabel"`
 	BestQualifyingTime      string       `json:"bestQualifyingTime"`
 	FastestLapRank          dbtypes.Int4 `json:"fastestLapRank"`
+	HasSprint               bool         `json:"hasSprint"`
 	PitStops                []pitStop    `json:"pitStops"`
 }
