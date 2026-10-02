@@ -43,8 +43,12 @@ function raceStatus(race: DriverSeasonRace): [label: string, color: string] {
         return [label, 'var(--mantine-primary-color-filled)'];
     }
 
+    if (race.position === 1) {
+        return ['WIN', 'var(--gold-500)'];
+    }
+
     if (race.position <= 3) {
-        return ['PODIUM', 'var(--gold-500)'];
+        return ['PODIUM', 'var(--silver-500)'];
     }
 
     if (race.points > 0) {
