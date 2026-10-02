@@ -85,3 +85,38 @@ type DriverSeason struct {
 	Progression []progressionPoint `json:"progression"`
 	Races       []seasonRace       `json:"races"`
 }
+
+type pitStop struct {
+	Stop       int32        `json:"stop"`
+	Lap        int32        `json:"lap"`
+	Duration   string       `json:"duration"`
+	DurationMs dbtypes.Int4 `json:"durationMs"`
+}
+
+type DriverRace struct {
+	RaceName                string       `json:"raceName"`
+	Code                    string       `json:"code"`
+	Name                    string       `json:"name"`
+	Constructor             constructor  `json:"constructor"`
+	CarNumber               dbtypes.Int4 `json:"carNumber"`
+	PositionLabel           string       `json:"positionLabel"`
+	Position                dbtypes.Int4 `json:"position"`
+	Grid                    dbtypes.Int4 `json:"grid"`
+	PositionsGained         dbtypes.Int4 `json:"positionsGained"`
+	Time                    string       `json:"time"`
+	Gap                     string       `json:"gap"`
+	StatusCategory          string       `json:"statusCategory"`
+	LapsCompleted           dbtypes.Int4 `json:"lapsCompleted"`
+	Points                  float64      `json:"points"`
+	PitStopCount            dbtypes.Int4 `json:"pitStopCount"`
+	TimePenalty             string       `json:"timePenalty"`
+	IsWin                   bool         `json:"isWin"`
+	IsPole                  bool         `json:"isPole"`
+	IsFastestLap            bool         `json:"isFastestLap"`
+	IsDriverOfTheDay        bool         `json:"isDriverOfTheDay"`
+	IsGrandSlam             bool         `json:"isGrandSlam"`
+	QualifyingPositionLabel string       `json:"qualifyingPositionLabel"`
+	BestQualifyingTime      string       `json:"bestQualifyingTime"`
+	FastestLapRank          dbtypes.Int4 `json:"fastestLapRank"`
+	PitStops                []pitStop    `json:"pitStops"`
+}

@@ -125,3 +125,57 @@ FROM effone.race_results rr
 WHERE rr.season = sqlc.arg(season)
     AND rr.driver_id = sqlc.arg(driver_id)
 ORDER BY rr.race_round, rr.finish_order;
+
+-- name: GetDriverRace :one
+SELECT
+    rr.race_id,
+    r.race_name,
+    rr.driver_code AS code,
+    rr.driver_name AS name,
+    rr.constructor_name,
+    c.primary_color_hex AS constructor_color,
+    rr.car_number,
+    rr.position_text AS position_label,
+    rr.finish_position AS position,
+    rr.grid_position,
+    rr.positions_gained,
+    rr.elapsed_time,
+    rr.gap,
+    rr.status_category,
+    rr.laps_completed,
+    rr.points::double precision AS points,
+    rr.pit_stop_count,
+    rr.time_penalty,
+    rr.is_win,
+    rr.is_pole_position,
+    rr.is_fastest_lap,
+    rr.is_driver_of_the_day,
+    rr.is_grand_slam,
+    q.position_text AS qualifying_position_label,
+    coalesce(q.q3, q.q2, q.q1, q.best_qualifying_time) AS best_qualifying_time,
+    fl.fastest_lap_position
+FROM effone.race_results rr
+    JOIN effone.races r ON rr.race_id = r.race_id
+    LEFT JOIN effone.constructors c ON rr.constructor_id = c.constructor_id
+    LEFT JOIN effone.qualifying_results q
+        ON rr.race_id = q.race_id
+        AND rr.driver_id = q.driver_id
+    LEFT JOIN effone.fastest_laps fl
+        ON rr.race_id = fl.race_id
+        AND rr.driver_id = fl.driver_id
+WHERE rr.season = sqlc.arg(season)
+    AND rr.race_round = sqlc.arg(race_round)
+    AND rr.driver_id = sqlc.arg(driver_id)
+ORDER BY rr.finish_order
+LIMIT 1;
+
+-- name: ListDriverRacePitStops :many
+SELECT
+    ps.stop_number,
+    ps.lap_number,
+    ps.duration,
+    ps.duration_ms
+FROM effone.pit_stops ps
+WHERE ps.race_id = sqlc.arg(race_id)
+    AND ps.driver_id = sqlc.arg(driver_id)
+ORDER BY ps.stop_number;

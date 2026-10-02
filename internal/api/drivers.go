@@ -46,3 +46,21 @@ func (app *application) getDriverSeasonHandler(w http.ResponseWriter, r *http.Re
 
 	return respondJSON(app.logger, w, http.StatusOK, season)
 }
+
+func (app *application) getDriverRaceHandler(w http.ResponseWriter, r *http.Request) error {
+	year, round, err := parseYearRound(r)
+	if err != nil {
+		return err
+	}
+
+	race, err := app.drivers.GetRace(r.Context(), r.PathValue("driverID"), year, round)
+	if err != nil {
+		if errors.Is(err, drivers.ErrNotFound) {
+			return errNotFound
+		}
+
+		return err
+	}
+
+	return respondJSON(app.logger, w, http.StatusOK, race)
+}

@@ -13,8 +13,10 @@ import (
 var ErrNotFound = errors.New("driver not found")
 
 type driverQueries interface {
+	GetDriverRace(ctx context.Context, arg database.GetDriverRaceParams) (database.GetDriverRaceRow, error)
 	GetDriverSeason(ctx context.Context, arg database.GetDriverSeasonParams) (database.GetDriverSeasonRow, error)
 	GetDriverSummary(ctx context.Context, driverID string) (database.GetDriverSummaryRow, error)
+	ListDriverRacePitStops(ctx context.Context, arg database.ListDriverRacePitStopsParams) ([]database.ListDriverRacePitStopsRow, error)
 	ListDriverSeasonRaces(ctx context.Context, arg database.ListDriverSeasonRacesParams) ([]database.ListDriverSeasonRacesRow, error)
 	ListDriverSeasons(ctx context.Context, driverID string) ([]database.ListDriverSeasonsRow, error)
 	ListDrivers(ctx context.Context) ([]database.ListDriversRow, error)
@@ -184,5 +186,68 @@ func (s *Service) GetSeason(ctx context.Context, driverID string, season int32) 
 		Poles:       summary.Poles,
 		Progression: progression,
 		Races:       races,
+	}, nil
+}
+
+func (s *Service) GetRace(ctx context.Context, driverID string, season, round int32) (DriverRace, error) {
+	race, err := s.queries.GetDriverRace(ctx, database.GetDriverRaceParams{
+		Season:    season,
+		RaceRound: round,
+		DriverID:  driverID,
+	})
+	if errors.Is(err, pgx.ErrNoRows) {
+		return DriverRace{}, ErrNotFound
+	}
+	if err != nil {
+		return DriverRace{}, fmt.Errorf("getting driver race: %w", err)
+	}
+
+	stopRows, err := s.queries.ListDriverRacePitStops(ctx, database.ListDriverRacePitStopsParams{
+		RaceID:   race.RaceID,
+		DriverID: driverID,
+	})
+	if err != nil {
+		return DriverRace{}, fmt.Errorf("listing driver race pit stops: %w", err)
+	}
+
+	stops := make([]pitStop, 0, len(stopRows))
+	for _, row := range stopRows {
+		stops = append(stops, pitStop{
+			Stop:       row.StopNumber,
+			Lap:        row.LapNumber,
+			Duration:   row.Duration.String,
+			DurationMs: row.DurationMs,
+		})
+	}
+
+	return DriverRace{
+		RaceName: race.RaceName,
+		Code:     race.Code,
+		Name:     race.Name,
+		Constructor: constructor{
+			Name:  race.ConstructorName,
+			Color: race.ConstructorColor.String,
+		},
+		CarNumber:               race.CarNumber,
+		PositionLabel:           race.PositionLabel,
+		Position:                race.Position,
+		Grid:                    race.GridPosition,
+		PositionsGained:         race.PositionsGained,
+		Time:                    race.ElapsedTime.String,
+		Gap:                     race.Gap.String,
+		StatusCategory:          race.StatusCategory,
+		LapsCompleted:           race.LapsCompleted,
+		Points:                  race.Points,
+		PitStopCount:            race.PitStopCount,
+		TimePenalty:             race.TimePenalty.String,
+		IsWin:                   race.IsWin,
+		IsPole:                  race.IsPolePosition,
+		IsFastestLap:            race.IsFastestLap,
+		IsDriverOfTheDay:        race.IsDriverOfTheDay,
+		IsGrandSlam:             race.IsGrandSlam,
+		QualifyingPositionLabel: race.QualifyingPositionLabel.String,
+		BestQualifyingTime:      race.BestQualifyingTime.String,
+		FastestLapRank:          race.FastestLapPosition,
+		PitStops:                stops,
 	}, nil
 }

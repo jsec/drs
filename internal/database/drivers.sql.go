@@ -12,6 +12,119 @@ import (
 	"github.com/jsec/drs/internal/dbtypes"
 )
 
+const getDriverRace = `-- name: GetDriverRace :one
+SELECT
+    rr.race_id,
+    r.race_name,
+    rr.driver_code AS code,
+    rr.driver_name AS name,
+    rr.constructor_name,
+    c.primary_color_hex AS constructor_color,
+    rr.car_number,
+    rr.position_text AS position_label,
+    rr.finish_position AS position,
+    rr.grid_position,
+    rr.positions_gained,
+    rr.elapsed_time,
+    rr.gap,
+    rr.status_category,
+    rr.laps_completed,
+    rr.points::double precision AS points,
+    rr.pit_stop_count,
+    rr.time_penalty,
+    rr.is_win,
+    rr.is_pole_position,
+    rr.is_fastest_lap,
+    rr.is_driver_of_the_day,
+    rr.is_grand_slam,
+    q.position_text AS qualifying_position_label,
+    coalesce(q.q3, q.q2, q.q1, q.best_qualifying_time) AS best_qualifying_time,
+    fl.fastest_lap_position
+FROM effone.race_results rr
+    JOIN effone.races r ON rr.race_id = r.race_id
+    LEFT JOIN effone.constructors c ON rr.constructor_id = c.constructor_id
+    LEFT JOIN effone.qualifying_results q
+        ON rr.race_id = q.race_id
+        AND rr.driver_id = q.driver_id
+    LEFT JOIN effone.fastest_laps fl
+        ON rr.race_id = fl.race_id
+        AND rr.driver_id = fl.driver_id
+WHERE rr.season = $1
+    AND rr.race_round = $2
+    AND rr.driver_id = $3
+ORDER BY rr.finish_order
+LIMIT 1
+`
+
+type GetDriverRaceParams struct {
+	Season    int32
+	RaceRound int32
+	DriverID  string
+}
+
+type GetDriverRaceRow struct {
+	RaceID                  int32
+	RaceName                string
+	Code                    string
+	Name                    string
+	ConstructorName         string
+	ConstructorColor        pgtype.Text
+	CarNumber               dbtypes.Int4
+	PositionLabel           string
+	Position                dbtypes.Int4
+	GridPosition            dbtypes.Int4
+	PositionsGained         dbtypes.Int4
+	ElapsedTime             pgtype.Text
+	Gap                     pgtype.Text
+	StatusCategory          string
+	LapsCompleted           dbtypes.Int4
+	Points                  float64
+	PitStopCount            dbtypes.Int4
+	TimePenalty             pgtype.Text
+	IsWin                   bool
+	IsPolePosition          bool
+	IsFastestLap            bool
+	IsDriverOfTheDay        bool
+	IsGrandSlam             bool
+	QualifyingPositionLabel pgtype.Text
+	BestQualifyingTime      pgtype.Text
+	FastestLapPosition      dbtypes.Int4
+}
+
+func (q *Queries) GetDriverRace(ctx context.Context, arg GetDriverRaceParams) (GetDriverRaceRow, error) {
+	row := q.db.QueryRow(ctx, getDriverRace, arg.Season, arg.RaceRound, arg.DriverID)
+	var i GetDriverRaceRow
+	err := row.Scan(
+		&i.RaceID,
+		&i.RaceName,
+		&i.Code,
+		&i.Name,
+		&i.ConstructorName,
+		&i.ConstructorColor,
+		&i.CarNumber,
+		&i.PositionLabel,
+		&i.Position,
+		&i.GridPosition,
+		&i.PositionsGained,
+		&i.ElapsedTime,
+		&i.Gap,
+		&i.StatusCategory,
+		&i.LapsCompleted,
+		&i.Points,
+		&i.PitStopCount,
+		&i.TimePenalty,
+		&i.IsWin,
+		&i.IsPolePosition,
+		&i.IsFastestLap,
+		&i.IsDriverOfTheDay,
+		&i.IsGrandSlam,
+		&i.QualifyingPositionLabel,
+		&i.BestQualifyingTime,
+		&i.FastestLapPosition,
+	)
+	return i, err
+}
+
 const getDriverSeason = `-- name: GetDriverSeason :one
 SELECT
     d.driver_code AS code,
@@ -148,6 +261,55 @@ func (q *Queries) GetDriverSummary(ctx context.Context, driverID string) (GetDri
 		&i.ConstructorColor,
 	)
 	return i, err
+}
+
+const listDriverRacePitStops = `-- name: ListDriverRacePitStops :many
+SELECT
+    ps.stop_number,
+    ps.lap_number,
+    ps.duration,
+    ps.duration_ms
+FROM effone.pit_stops ps
+WHERE ps.race_id = $1
+    AND ps.driver_id = $2
+ORDER BY ps.stop_number
+`
+
+type ListDriverRacePitStopsParams struct {
+	RaceID   int32
+	DriverID string
+}
+
+type ListDriverRacePitStopsRow struct {
+	StopNumber int32
+	LapNumber  int32
+	Duration   pgtype.Text
+	DurationMs dbtypes.Int4
+}
+
+func (q *Queries) ListDriverRacePitStops(ctx context.Context, arg ListDriverRacePitStopsParams) ([]ListDriverRacePitStopsRow, error) {
+	rows, err := q.db.Query(ctx, listDriverRacePitStops, arg.RaceID, arg.DriverID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListDriverRacePitStopsRow
+	for rows.Next() {
+		var i ListDriverRacePitStopsRow
+		if err := rows.Scan(
+			&i.StopNumber,
+			&i.LapNumber,
+			&i.Duration,
+			&i.DurationMs,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listDriverSeasonRaces = `-- name: ListDriverSeasonRaces :many
