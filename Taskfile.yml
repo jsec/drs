@@ -110,6 +110,7 @@ tasks:
       - >-
         pg_dump "$DATABASE_URL" -n effone --schema-only --no-owner --no-privileges
         | grep -vE '^\\'
+        | sed -E 's/ CONSTRAINT [a-z0-9_]+_not_null[0-9]* NOT NULL/ NOT NULL/'
         > internal/database/schema.sql
 
   gen:sqlc:
