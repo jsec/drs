@@ -9,7 +9,6 @@
         "node": ">=26.8.1"
     },
     "scripts": {
-        "predev": "tsr generate",
         "dev": "vite dev --port 4200",
         "build": "vite build",
         "preview": "vite preview",
@@ -21,7 +20,6 @@
         "@mantine/core": "9.6.1",
         "@mantine/hooks": "9.6.1",
         "@phosphor-icons/react": "2.1.10",
-        "@tanstack/match-sorter-utils": "8.19.4",
         "@tanstack/react-devtools": "0.10.12",
         "@tanstack/react-query": "5.102.8",
         "@tanstack/react-query-devtools": "5.102.8",
@@ -38,7 +36,6 @@
     "devDependencies": {
         "@jarsec/eslint-config": "7.5.0",
         "@tanstack/devtools-vite": "0.8.5",
-        "@tanstack/router-cli": "1.167.33",
         "@testing-library/dom": "10.4.1",
         "@testing-library/react": "16.3.3",
         "@types/node": "26.2.0",
@@ -50,7 +47,6 @@
         "jsdom": "30.0.1",
         "postcss": "8.5.26",
         "postcss-preset-mantine": "1.18.0",
-        "postcss-simple-vars": "7.0.1",
         "typescript": "6.0.3",
         "vite": "8.2.2",
         "vitest": "4.1.11"

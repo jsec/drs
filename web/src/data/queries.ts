@@ -6,9 +6,6 @@ import { api } from '#/lib/query/api';
 
 import { getDriverSeason, getStandings } from './fixtures';
 
-const getSeasonStandings = (year: number) =>
-    api.get(`seasons/${year}/standings`).json(SeasonStandingsSchema);
-
 export const seasonOverviewQuery = (year: number) =>
     queryOptions({
         queryFn: () => api.get(`seasons/${year}`).json(SeasonOverviewSchema),
@@ -17,7 +14,7 @@ export const seasonOverviewQuery = (year: number) =>
 
 export const seasonStandingsQuery = (year: number) =>
     queryOptions({
-        queryFn: () => getSeasonStandings(year),
+        queryFn: () => api.get(`seasons/${year}/standings`).json(SeasonStandingsSchema),
         queryKey: ['season-standings', year],
     });
 

@@ -47,13 +47,11 @@ const SortCaret = ({ direction }: { direction: 'asc' | 'desc' | false }) => {
 };
 
 type DataTableProps<T> = {
-    headerPy?: number;
     px?: number;
-    rowPy?: number;
     table: Table<T>;
 };
 
-export function DataTable<T>({ headerPy = 14, px = 18, rowPy = 14, table }: DataTableProps<T>) {
+export function DataTable<T>({ px = 18, table }: DataTableProps<T>) {
     const navigate = useNavigate();
     const columns = table.getVisibleLeafColumns();
     const headers = table.getHeaderGroups()[0]?.headers ?? [];
@@ -88,7 +86,7 @@ export function DataTable<T>({ headerPy = 14, px = 18, rowPy = 14, table }: Data
                                     key={h.id}
                                     scope="col"
                                     style={{
-                                        paddingBlock: headerPy,
+                                        paddingBlock: 14,
                                         paddingInline: px,
                                         textAlign: h.column.columnDef.meta?.align ?? 'left',
                                     }}
@@ -149,7 +147,7 @@ export function DataTable<T>({ headerPy = 14, px = 18, rowPy = 14, table }: Data
                                     return (
                                         <TablePrimitive.Td
                                             key={cell.id}
-                                            style={{ paddingBlock: rowPy, paddingInline: px, textAlign: align }}
+                                            style={{ paddingBlock: 14, paddingInline: px, textAlign: align }}
                                         >
                                             {isLinkCell
                                                 ? (

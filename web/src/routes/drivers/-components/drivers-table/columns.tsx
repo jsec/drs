@@ -1,7 +1,5 @@
 import type { FilterFn, SortingFn } from '@tanstack/react-table';
 
-import { rankItem } from '@tanstack/match-sorter-utils';
-
 import type { DriverShortSummary } from '#/lib/api/drivers';
 
 import { makeColumns } from '#/components/data-table';
@@ -22,11 +20,8 @@ const byWins: SortingFn<DriverShortSummary> = (a, b) =>
 export const formatYears = formatDriverYears;
 export const driverBadgeColor = driverSummaryColor;
 
-export const fuzzy: FilterFn<DriverShortSummary> = (row, _columnId, value, addMeta) => {
-    const ranked = rankItem(`${row.original.name} ${row.original.code}`, value as string);
-    addMeta({ itemRank: ranked });
-    return ranked.passed;
-};
+export const matchesSearch: FilterFn<DriverShortSummary> = (row, _columnId, value: string) =>
+    `${row.original.name} ${row.original.code}`.toLowerCase().includes(value.toLowerCase());
 
 export const columns = [
     col.ordinal(),

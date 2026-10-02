@@ -8,7 +8,7 @@ import type { DriverShortSummary } from '#/lib/api/drivers';
 import { DataTable, useDataTable, useUrlSorting } from '#/components/data-table';
 import { Pill } from '#/components/f1-ui';
 
-import { columns, fuzzy } from './columns';
+import { columns, matchesSearch } from './columns';
 
 export type Category = 'active' | 'all' | 'champions';
 
@@ -49,7 +49,7 @@ export const DriversTable = ({ drivers }: Props) => {
     const { search, setSearch, table } = useDataTable({
         columns,
         data,
-        filter: fuzzy,
+        filter: matchesSearch,
         onSortingChange,
         sorting,
     });

@@ -6,7 +6,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import { useDeferredValue, useMemo, useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 
 type UseDataTableOptions<T> = {
     columns: ColumnDef<T, unknown>[];
@@ -26,18 +26,14 @@ export function useDataTable<T>({
     const [search, setSearch] = useState('');
     const deferredSearch = useDeferredValue(search);
 
-    const coreRowModel = useMemo(() => getCoreRowModel<T>(), []);
-    const filteredRowModel = useMemo(() => getFilteredRowModel<T>(), []);
-    const sortedRowModel = useMemo(() => getSortedRowModel<T>(), []);
-
     const table = useReactTable<T>({
         columns,
         data,
         enableMultiSort: false,
         enableSortingRemoval: true,
-        getCoreRowModel: coreRowModel,
-        getFilteredRowModel: filter ? filteredRowModel : undefined,
-        getSortedRowModel: sortedRowModel,
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: filter ? getFilteredRowModel() : undefined,
+        getSortedRowModel: getSortedRowModel(),
         globalFilterFn: filter,
         ...(onSortingChange && { onSortingChange }),
         state: {
