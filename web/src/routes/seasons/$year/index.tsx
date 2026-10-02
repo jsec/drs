@@ -178,7 +178,7 @@ const SeasonOverview = () => {
                         <Link
                             className="f1-row"
                             key={d.code}
-                            params={{ driverId: d.code, year }}
+                            params={{ driverId: d.id, year }}
                             style={{
                                 alignItems: 'center',
                                 borderTop: '1px solid var(--mantine-color-default-border)',

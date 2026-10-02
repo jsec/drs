@@ -1,12 +1,3 @@
-export type CalendarRound = {
-    circuit: string;
-    code: string;
-    date: string;
-    name: string;
-    round: number;
-    winner: null | string;
-};
-
 export type CareerTotals = {
     debut: number;
     podiums: number;
@@ -14,31 +5,6 @@ export type CareerTotals = {
     races: number;
     titles: number;
     wins: number;
-};
-
-export type DriverRaceRow = {
-    finish: 'DNF' | number;
-    gp: string;
-    grid: number;
-    pts: number;
-    round: number;
-    status: string;
-    statusColor: string;
-};
-
-export type DriverSeasonDetail = {
-    driver: SeasonDriver;
-    finishes: FinishBar[];
-    pointsMax: number;
-    pos: number;
-    progression: number[];
-    races: DriverRaceRow[];
-};
-
-export type FinishBar = {
-    color: string;
-    pos: number;
-    round: string;
 };
 
 export type SeasonConstructor = {

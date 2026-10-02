@@ -45,7 +45,7 @@ export function makeDriverColumns(year: string) {
                     <span style={CODE_STYLE}>{d.code}</span>
                 </>
             ),
-            link: d => ({ params: { driverId: d.code, year }, to: '/seasons/$year/drivers/$driverId' }),
+            link: d => ({ params: { driverId: d.id, year }, to: '/seasons/$year/drivers/$driverId' }),
             visual: d => <TeamBar color={d.constructor?.color ?? 'var(--neutral-500)'} size="md" />,
         }),
         col.custom({

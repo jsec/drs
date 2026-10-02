@@ -1,20 +1,71 @@
 import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
+import { HTTPError } from 'ky';
+
+import type { DriverSeason as DriverSeasonData, DriverSeasonRace } from '#/lib/api/drivers';
 
 import { GridHeader, MiniStat } from '#/components/f1-ui';
-import { LineChart, toChartData, toChartSeries } from '#/components/line-chart';
-import { getSeasonDriver } from '#/data/fixtures';
+import { LineChart } from '#/components/line-chart';
 import { driverSeasonQuery } from '#/data/queries';
 import { parseYear } from '#/lib/route-params';
 
 const COLS = '44px 1fr 70px 70px 70px 60px';
+const SPRINT_COLS = `${COLS} 80px`;
+
+function finishColor(position: number, teamColor: string): string {
+    if (position <= 3) {
+        return 'var(--gold-500)';
+    }
+
+    if (position <= 10) {
+        return teamColor;
+    }
+
+    return 'var(--neutral-300)';
+}
+
+function formatPosition(label: string): string {
+    if (isNumericPosition(label)) {
+        return `P${label}`;
+    }
+
+    return label;
+}
+
+function isNumericPosition(label: string): boolean {
+    return !Number.isNaN(Number(label));
+}
+
+function raceStatus(race: DriverSeasonRace): [label: string, color: string] {
+    if (race.statusCategory !== 'finished' || race.position === null) {
+        const label = isNumericPosition(race.positionLabel) ? 'DNF' : race.positionLabel;
+        return [label, 'var(--mantine-primary-color-filled)'];
+    }
+
+    if (race.position <= 3) {
+        return ['PODIUM', 'var(--gold-500)'];
+    }
+
+    if (race.points > 0) {
+        return ['POINTS', 'var(--green-500)'];
+    }
+
+    return ['—', 'var(--neutral-400)'];
+}
 
 const DriverSeason = () => {
     const { driverId, year } = Route.useParams();
-    const { data } = useSuspenseQuery(driverSeasonQuery(Number(year), driverId));
-    const { driver, pos } = data;
-    const progressionLines = [{ code: driver.code, color: driver.color, values: data.progression }];
+    const { data: driver } = useSuspenseQuery(driverSeasonQuery(Number(year), driverId));
+    const color = driver.constructor.color;
+    const pointsMax = Math.max(50, Math.ceil(driver.points / 50) * 50);
+    const hasSprints = driver.races.some(r => r.sprint !== null);
+    const cols = hasSprints ? SPRINT_COLS : COLS;
+    const carNumber = driver.carNumber === null ? '–' : `#${driver.carNumber}`;
+    const progression = [
+        { [driver.code]: 0, x: 'R0' },
+        ...driver.progression.map(p => ({ [driver.code]: p.points, x: `R${p.round}` })),
+    ];
 
     return (
         <Stack gap={16}>
@@ -24,7 +75,7 @@ const DriverSeason = () => {
                 px={28}
                 py={24}
                 style={{
-                    background: `linear-gradient(110deg, ${driver.color}, ${driver.colorDark})`,
+                    background: `linear-gradient(110deg, ${color}, color-mix(in srgb, ${color}, black 30%))`,
                     borderRadius: 'var(--radius-lg)',
                     color: '#fff',
                     overflow: 'hidden',
@@ -41,7 +92,7 @@ const DriverSeason = () => {
                     style={{ lineHeight: 0.8, transform: 'translateY(-50%)' }}
                     top="50%"
                 >
-                    {driver.number}
+                    {driver.carNumber}
                 </Box>
                 <Group
                     fw={700}
@@ -61,7 +112,7 @@ const DriverSeason = () => {
                 </Group>
                 <Box pr={130} style={{ zIndex: 1 }}>
                     <Box fw={700} fz={12} lts="1px" opacity={0.85}>
-                        {`${driver.teamName} · #${driver.number}`}
+                        {`${driver.constructor.name} · ${carNumber}`}
                     </Box>
                     <Box
                         className="f1-display"
@@ -74,7 +125,7 @@ const DriverSeason = () => {
                         {driver.name}
                     </Box>
                     <Box fz={13} opacity={0.9}>
-                        {`${driver.country} · Championship P${pos}`}
+                        {`${driver.country} · Championship P${driver.position}`}
                     </Box>
                 </Box>
             </Group>
@@ -85,8 +136,8 @@ const DriverSeason = () => {
                 <MiniStat label="WINS" value={driver.wins} />
                 <MiniStat label="PODIUMS" value={driver.podiums} />
                 <MiniStat label="POLES" value={driver.poles} />
-                <MiniStat label="STANDING" value={`P${pos}`} />
-                <MiniStat label="CAR NO." value={`#${driver.number}`} />
+                <MiniStat label="STANDING" value={`P${driver.position}`} />
+                <MiniStat label="CAR NO." value={carNumber} />
             </SimpleGrid>
 
             {/* Charts */}
@@ -94,35 +145,37 @@ const DriverSeason = () => {
                 <Box className="f1-card" p={16}>
                     <Box fw={700} fz={15} mb={8}>Points Progression</Box>
                     <LineChart
-                        data={toChartData(progressionLines, i => `R${i}`)}
+                        data={progression}
                         dataKey="x"
                         h={200}
-                        series={toChartSeries(progressionLines)}
+                        series={[{ color, name: driver.code }]}
                         xAxisProps={{ interval: 1 }}
-                        yAxisProps={{ domain: [0, data.pointsMax], tickCount: 5 }}
+                        yAxisProps={{ domain: [0, pointsMax], tickCount: 5 }}
                     />
                 </Box>
                 <Box className="f1-card" p={16}>
                     <Box fw={700} fz={15} mb={10}>Finishing Positions</Box>
                     <Group align="flex-end" gap={6} h={180} wrap="nowrap">
-                        {data.finishes.map(f => (
+                        {driver.races.map(r => (
                             <Stack
                                 align="center"
                                 gap={0}
                                 h="100%"
                                 justify="flex-end"
-                                key={f.round}
+                                key={r.round}
                                 style={{ flex: 1 }}
                             >
-                                <Text c="var(--neutral-700)" className="f1-num" fw={700} fz={10} inherit mb={3} span>{f.pos}</Text>
-                                <Box
-                                    bg={f.color}
-                                    h={`${(100 - ((f.pos - 1) / 19) * 100) * 0.9}%`}
-                                    maw={26}
-                                    style={{ borderRadius: '4px 4px 0 0' }}
-                                    w="100%"
-                                />
-                                <Text c="dimmed" fz={9.5} inherit mt={4} span>{f.round}</Text>
+                                <Text c="var(--neutral-700)" className="f1-num" fw={700} fz={10} inherit mb={3} span>{r.positionLabel}</Text>
+                                {r.position !== null && (
+                                    <Box
+                                        bg={finishColor(r.position, color)}
+                                        h={`${Math.max(4, (100 - ((r.position - 1) / 19) * 100) * 0.9)}%`}
+                                        maw={26}
+                                        style={{ borderRadius: '4px 4px 0 0' }}
+                                        w="100%"
+                                    />
+                                )}
+                                <Text c="dimmed" fz={9.5} inherit mt={4} span>{`R${r.round}`}</Text>
                             </Stack>
                         ))}
                     </Group>
@@ -131,38 +184,48 @@ const DriverSeason = () => {
 
             <Box className="f1-card" p={0}>
                 <Box fw={700} fz={15} px={18} py={15}>Race-by-Race Results</Box>
-                <GridHeader columns={COLS}>
+                <GridHeader columns={cols}>
                     <span>RND</span>
                     <span>GRAND PRIX</span>
                     <span style={{ textAlign: 'center' }}>GRID</span>
                     <span style={{ textAlign: 'center' }}>FINISH</span>
                     <span style={{ textAlign: 'center' }}>STATUS</span>
                     <span style={{ textAlign: 'right' }}>PTS</span>
+                    {hasSprints && <span style={{ textAlign: 'right' }}>SPR</span>}
                 </GridHeader>
-                {data.races.map(r => (
-                    <Link
-                        className="f1-row"
-                        key={r.round}
-                        params={{ round: String(r.round), year }}
-                        style={{
-                            alignItems: 'center',
-                            borderTop: '1px solid var(--mantine-color-default-border)',
-                            color: 'inherit',
-                            display: 'grid',
-                            gridTemplateColumns: COLS,
-                            padding: '9px 18px',
-                            textDecoration: 'none',
-                        }}
-                        to="/seasons/$year/races/$round"
-                    >
-                        <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.round}</Text>
-                        <Text fw={600} fz={13} inherit span>{r.gp}</Text>
-                        <Text c="dimmed" className="f1-num" inherit span ta="center">{r.grid}</Text>
-                        <Text className="f1-num f1-display" fw={700} inherit span ta="center">{r.finish}</Text>
-                        <Text c={r.statusColor} fw={700} fz={11} inherit span ta="center">{r.status}</Text>
-                        <Text className="f1-num" fw={700} inherit span ta="right">{r.pts > 0 ? r.pts : '–'}</Text>
-                    </Link>
-                ))}
+                {driver.races.map((r) => {
+                    const [status, statusColor] = raceStatus(r);
+
+                    return (
+                        <Link
+                            className="f1-row"
+                            key={r.round}
+                            params={{ round: String(r.round), year }}
+                            style={{
+                                alignItems: 'center',
+                                borderTop: '1px solid var(--mantine-color-default-border)',
+                                color: 'inherit',
+                                display: 'grid',
+                                gridTemplateColumns: cols,
+                                padding: '9px 18px',
+                                textDecoration: 'none',
+                            }}
+                            to="/seasons/$year/races/$round"
+                        >
+                            <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.round}</Text>
+                            <Text fw={600} fz={13} inherit span>{r.name}</Text>
+                            <Text c="dimmed" className="f1-num" inherit span ta="center">{r.grid ?? '–'}</Text>
+                            <Text className="f1-num f1-display" fw={700} inherit span ta="center">{r.positionLabel}</Text>
+                            <Text c={statusColor} fw={700} fz={11} inherit span ta="center">{status}</Text>
+                            <Text className="f1-num" fw={700} inherit span ta="right">{r.points > 0 ? r.points : '–'}</Text>
+                            {hasSprints && (
+                                <Text c="dimmed" className="f1-num" inherit span ta="right">
+                                    {r.sprint ? `${formatPosition(r.sprint.positionLabel)} · ${r.sprint.points}` : '–'}
+                                </Text>
+                            )}
+                        </Link>
+                    );
+                })}
             </Box>
         </Stack>
     );
@@ -172,16 +235,22 @@ export const Route = createFileRoute('/seasons/$year/drivers/$driverId')({
     component: DriverSeason,
     loader: async ({ context, params }) => {
         const year = parseYear(params.year);
-        if (!getSeasonDriver(params.driverId)) {
-            throw notFound();
+        let driver: DriverSeasonData;
+
+        try {
+            driver = await context.queryClient.ensureQueryData(driverSeasonQuery(year, params.driverId));
+        } catch (error) {
+            if (error instanceof HTTPError && error.response.status === 404) {
+                throw notFound();
+            }
+
+            throw error;
         }
-        const detail = await context.queryClient.ensureQueryData(
-            driverSeasonQuery(year, params.driverId),
-        );
+
         return {
             crumbs: [
                 { label: params.year, params: { year: params.year }, to: '/seasons/$year' },
-                { label: detail.driver.name },
+                { label: driver.name },
             ],
         };
     },

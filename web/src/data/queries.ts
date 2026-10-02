@@ -1,10 +1,11 @@
 import { queryOptions } from '@tanstack/react-query';
 
+import { DriverSeasonSchema } from '#/lib/api/drivers';
 import { RaceDetailSchema, RaceLapsSchema } from '#/lib/api/races';
 import { SeasonOverviewSchema, SeasonStandingsSchema } from '#/lib/api/seasons';
 import { api } from '#/lib/query/api';
 
-import { getDriverSeason, getStandings } from './fixtures';
+import { getStandings } from './fixtures';
 
 export const seasonOverviewQuery = (year: number) =>
     queryOptions({
@@ -36,12 +37,8 @@ export const standingsQuery = (year: number) =>
         queryKey: ['standings', year],
     });
 
-export const driverSeasonQuery = (year: number, code: string) =>
+export const driverSeasonQuery = (year: number, driverId: string) =>
     queryOptions({
-        queryFn: () => {
-            const detail = getDriverSeason(code);
-            if (!detail) throw new Error(`Unknown driver ${code}`);
-            return detail;
-        },
-        queryKey: ['driver-season', year, code],
+        queryFn: () => api.get(`seasons/${year}/drivers/${driverId}`).json(DriverSeasonSchema),
+        queryKey: ['driver-season', year, driverId],
     });

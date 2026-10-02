@@ -172,7 +172,7 @@ const RaceDetail = () => {
                 {data.results.slice(0, 3).map((r, i) => (
                     <Link
                         key={r.driver.id}
-                        params={{ driverId: r.driver.code, year }}
+                        params={{ driverId: r.driver.id, year }}
                         style={{ color: 'inherit', textDecoration: 'none' }}
                         to="/seasons/$year/drivers/$driverId"
                     >
@@ -219,7 +219,7 @@ const RaceDetail = () => {
                             <Link
                                 className="f1-row"
                                 key={r.driver.id}
-                                params={{ driverId: r.driver.code, year }}
+                                params={{ driverId: r.driver.id, year }}
                                 style={RESULT_ROW_STYLE}
                                 to="/seasons/$year/drivers/$driverId"
                             >
