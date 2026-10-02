@@ -10,19 +10,15 @@ type config struct {
 }
 
 func loadConfig() config {
-	return loadConfigFromEnv(os.Getenv)
-}
-
-func loadConfigFromEnv(getenv func(string) string) config {
-	port := getenv("PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
 	}
 
 	return config{
-		appEnv:      getenv("APP_ENV"),
-		databaseURL: getenv("DATABASE_URL"),
-		githubToken: getenv("GITHUB_TOKEN"),
+		appEnv:      os.Getenv("APP_ENV"),
+		databaseURL: os.Getenv("DATABASE_URL"),
+		githubToken: os.Getenv("GITHUB_TOKEN"),
 		port:        port,
 	}
 }

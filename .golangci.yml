@@ -12,7 +12,7 @@ linters:
     - testifylint
   exclusions:
     rules:
-      - path: (\.sql\.go|db\.go|models\.go|querier\.go)$
+      - path: (\.sql\.go|db\.go|models\.go)$
         linters:
           - all
 

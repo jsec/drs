@@ -52,7 +52,7 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 
 	defer func() {
 		if err != nil {
-			cleanupCtx, cancel := failureCleanupContext(ctx)
+			cleanupCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
 			defer cancel()
 
 			markErr := queries.MarkRefreshFailed(cleanupCtx, database.MarkRefreshFailedParams{
@@ -66,8 +66,8 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 	}()
 
 	logger.Info("rebuilding database")
-	if err = runDBT(ctx, refreshID, schema, target); err != nil {
-		return err
+	if err = runDBT(ctx, refreshID, schema, target, "build"); err != nil {
+		return fmt.Errorf("dbt build failed: %w", err)
 	}
 
 	logger.Info("getting row counts")
@@ -90,7 +90,7 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 	}
 
 	logger.Info("generating docs")
-	if err = generateDocs(ctx, refreshID, schema, target); err != nil {
+	if err = runDBT(ctx, refreshID, schema, target, "docs", "generate"); err != nil {
 		logger.Error("dbt docs generate failed",
 			"err", err,
 		)
@@ -99,33 +99,26 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 	return nil
 }
 
-func failureCleanupContext(ctx context.Context) (context.Context, context.CancelFunc) {
-	return context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
-}
-
-func runDBT(ctx context.Context, refreshID int64, schema, target string) error {
+func runDBT(ctx context.Context, refreshID int64, schema, target string, command ...string) error {
 	vars, err := json.Marshal(dbtVars{RefreshID: refreshID, F1dbSchema: schema})
 	if err != nil {
 		return err
 	}
 
-	cmd := exec.CommandContext(
-		ctx,
-		"uv", "run", "dbt", "build",
+	args := append([]string{"run", "dbt"}, command...)
+	args = append(args,
 		"--project-dir", "./dbt",
 		"--profiles-dir", "./dbt",
 		"--target", target,
 		"--vars", string(vars),
 	)
+
+	cmd := exec.CommandContext(ctx, "uv", args...)
 	cmd.Dir = "etl"
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("dbt build failed: %w", err)
-	}
-
-	return nil
+	return cmd.Run()
 }
 
 func rowCounts(ctx context.Context, pool *pgxpool.Pool) (map[string]int64, error) {
@@ -146,34 +139,4 @@ func rowCounts(ctx context.Context, pool *pgxpool.Pool) (map[string]int64, error
 	}
 
 	return counts, nil
-}
-
-func generateDocs(ctx context.Context, refreshId int64, schema, target string) error {
-	vars, err := json.Marshal(dbtVars{
-		RefreshID:  refreshId,
-		F1dbSchema: schema,
-	})
-
-	if err != nil {
-		return err
-	}
-
-	cmd := exec.CommandContext(
-		ctx,
-		"uv", "run", "dbt", "docs", "generate",
-		"--project-dir", "./dbt",
-		"--profiles-dir", "./dbt",
-		"--target", target,
-		"--vars", string(vars),
-	)
-
-	cmd.Dir = "etl"
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		return err
-	}
-
-	return nil
 }

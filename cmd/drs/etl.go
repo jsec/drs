@@ -46,7 +46,11 @@ func etlCommand(logger *slog.Logger, config config) *cli.Command {
 					}
 					defer pool.Close()
 
-					return etl.Refresh(ctx, logger, pool, config.databaseURL, config.githubToken, cmd.String("schema"), cmd.String("target"))
+					if err := etl.Load(ctx, logger, config.databaseURL, config.githubToken); err != nil {
+						return err
+					}
+
+					return etl.Build(ctx, logger, pool, cmd.String("schema"), cmd.String("target"))
 				},
 			},
 		},

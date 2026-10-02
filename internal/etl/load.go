@@ -46,17 +46,6 @@ func Load(ctx context.Context, logger *slog.Logger, databaseURL, token string) e
 	return nil
 }
 
-func downloadFile(ctx context.Context, url, dest string) error {
-	output, err := os.Create(dest)
-	if err != nil {
-		return err
-	}
-
-	downloadErr := download(ctx, url, output)
-	closeErr := output.Close()
-	return errors.Join(downloadErr, closeErr)
-}
-
 func download(ctx context.Context, url string, w io.Writer) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
