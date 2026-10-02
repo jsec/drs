@@ -1706,6 +1706,10 @@ models:
           - type: not_null
         tests:
           - not_null
+      - name: engine_manufacturer_name
+        data_type: text
+        constraints:
+          - type: not_null
       - name: points
         data_type: numeric(8, 2)
         constraints:

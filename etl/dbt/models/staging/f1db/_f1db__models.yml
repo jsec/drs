@@ -1,6 +1,15 @@
 version: 2
 
 models:
+  - name: stg_f1db__engine_manufacturer
+    columns:
+      - name: engine_manufacturer_id
+        tests:
+          - not_null
+          - unique
+      - name: engine_manufacturer_name
+        tests:
+          - not_null
   - name: stg_f1db__driver
     columns:
       - name: driver_id

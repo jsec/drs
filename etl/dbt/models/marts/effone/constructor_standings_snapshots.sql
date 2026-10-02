@@ -5,6 +5,8 @@ with
 
     constructors as (select * from {{ ref("int_f1db__constructors_with_countries") }}),
 
+    engine_manufacturers as (select * from {{ ref("stg_f1db__engine_manufacturer") }}),
+
     joined as (
         select
             races.season,
@@ -13,6 +15,7 @@ with
             standings.constructor_id,
             constructors.constructor_name,
             standings.engine_manufacturer_id,
+            engine_manufacturers.engine_manufacturer_name,
             standings.points,
             standings.position_number as position,
             standings.position_text,
@@ -22,6 +25,7 @@ with
         from standings
         join races on standings.race_id = races.race_id
         join constructors on standings.constructor_id = constructors.constructor_id
+        join engine_manufacturers on standings.engine_manufacturer_id = engine_manufacturers.engine_manufacturer_id
         window
             constructor_order as (
                 partition by standings.constructor_id, standings.engine_manufacturer_id, races.season
@@ -36,6 +40,7 @@ select
     constructor_id,
     constructor_name,
     engine_manufacturer_id,
+    engine_manufacturer_name,
     points,
     (points * 100)::integer as points_x100,
     previous_points,
