@@ -121,24 +121,25 @@ type EffoneConstructorSeasonSummary struct {
 }
 
 type EffoneConstructorStandingsSnapshot struct {
-	ChampionshipWon      bool
-	ConstructorID        string
-	ConstructorName      string
-	EngineManufacturerID string
-	Points               pgtype.Numeric
-	PointsGained         pgtype.Numeric
-	PointsGainedX100     dbtypes.Int4
-	PointsX100           int32
-	Position             dbtypes.Int4
-	PositionChange       dbtypes.Int4
-	PositionText         string
-	PreviousPoints       pgtype.Numeric
-	PreviousPointsX100   dbtypes.Int4
-	PreviousPosition     dbtypes.Int4
-	RaceID               int32
-	RaceRound            int32
-	RefreshID            int64
-	Season               int32
+	ChampionshipWon        bool
+	ConstructorID          string
+	ConstructorName        string
+	EngineManufacturerID   string
+	EngineManufacturerName string
+	Points                 pgtype.Numeric
+	PointsGained           pgtype.Numeric
+	PointsGainedX100       dbtypes.Int4
+	PointsX100             int32
+	Position               dbtypes.Int4
+	PositionChange         dbtypes.Int4
+	PositionText           string
+	PreviousPoints         pgtype.Numeric
+	PreviousPointsX100     dbtypes.Int4
+	PreviousPosition       dbtypes.Int4
+	RaceID                 int32
+	RaceRound              int32
+	RefreshID              int64
+	Season                 int32
 }
 
 type EffoneDriver struct {

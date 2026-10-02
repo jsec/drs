@@ -139,6 +139,7 @@ CREATE TABLE effone.constructor_standings_snapshots (
     constructor_id text NOT NULL,
     constructor_name text NOT NULL,
     engine_manufacturer_id text NOT NULL,
+    engine_manufacturer_name text NOT NULL,
     points numeric(8,2) NOT NULL,
     points_gained numeric(8,2),
     points_gained_x100 integer,

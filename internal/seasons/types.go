@@ -43,6 +43,7 @@ type ConstructorStanding struct {
 	PositionLabel string       `json:"positionLabel"`
 	Points        float64      `json:"points"`
 	ID            string       `json:"id"`
+	EngineID      string       `json:"engineId"`
 	Name          string       `json:"name"`
 	Color         string       `json:"color"`
 	CountryCode   string       `json:"countryCode"`

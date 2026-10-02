@@ -98,7 +98,12 @@ SELECT
     css.position_text AS position_label,
     css.points::double precision AS points,
     css.constructor_id,
-    css.constructor_name AS name,
+    css.engine_manufacturer_id AS engine_id,
+    CASE
+        WHEN count(*) OVER (PARTITION BY css.constructor_id) > 1
+        THEN css.constructor_name || ' (' || css.engine_manufacturer_name || ')'
+        ELSE css.constructor_name
+    END::text AS name,
     c.primary_color_hex AS constructor_color,
     c.country_code
 FROM effone.constructor_standings_snapshots AS css
@@ -115,6 +120,7 @@ type ListSeasonConstructorStandingsRow struct {
 	PositionLabel    string
 	Points           float64
 	ConstructorID    string
+	EngineID         string
 	Name             string
 	ConstructorColor string
 	CountryCode      string
@@ -134,6 +140,7 @@ func (q *Queries) ListSeasonConstructorStandings(ctx context.Context, season int
 			&i.PositionLabel,
 			&i.Points,
 			&i.ConstructorID,
+			&i.EngineID,
 			&i.Name,
 			&i.ConstructorColor,
 			&i.CountryCode,
