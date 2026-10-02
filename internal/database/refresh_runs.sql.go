@@ -17,13 +17,8 @@ VALUES ($1, $2)
 RETURNING refresh_id
 `
 
-type CreateRefreshRunParams struct {
-	Status        string
-	SourceVersion pgtype.Text
-}
-
-func (q *Queries) CreateRefreshRun(ctx context.Context, arg CreateRefreshRunParams) (int64, error) {
-	row := q.db.QueryRow(ctx, createRefreshRun, arg.Status, arg.SourceVersion)
+func (q *Queries) CreateRefreshRun(ctx context.Context, status string, sourceVersion pgtype.Text) (int64, error) {
+	row := q.db.QueryRow(ctx, createRefreshRun, status, sourceVersion)
 	var refresh_id int64
 	err := row.Scan(&refresh_id)
 	return refresh_id, err
@@ -40,13 +35,8 @@ SET
 WHERE refresh_id = $1
 `
 
-type MarkRefreshFailedParams struct {
-	RefreshID    int64
-	ErrorMessage pgtype.Text
-}
-
-func (q *Queries) MarkRefreshFailed(ctx context.Context, arg MarkRefreshFailedParams) error {
-	_, err := q.db.Exec(ctx, markRefreshFailed, arg.RefreshID, arg.ErrorMessage)
+func (q *Queries) MarkRefreshFailed(ctx context.Context, refreshID int64, errorMessage pgtype.Text) error {
+	_, err := q.db.Exec(ctx, markRefreshFailed, refreshID, errorMessage)
 	return err
 }
 
@@ -60,12 +50,7 @@ SET
 WHERE refresh_id = $1
 `
 
-type MarkRefreshSucceededParams struct {
-	RefreshID int64
-	RowCounts []byte
-}
-
-func (q *Queries) MarkRefreshSucceeded(ctx context.Context, arg MarkRefreshSucceededParams) error {
-	_, err := q.db.Exec(ctx, markRefreshSucceeded, arg.RefreshID, arg.RowCounts)
+func (q *Queries) MarkRefreshSucceeded(ctx context.Context, refreshID int64, rowCounts []byte) error {
+	_, err := q.db.Exec(ctx, markRefreshSucceeded, refreshID, rowCounts)
 	return err
 }

@@ -22,19 +22,19 @@ type stubQuerier struct {
 	pitStops  []database.ListDriverRacePitStopsRow
 }
 
-func (s stubQuerier) GetDriverRace(context.Context, database.GetDriverRaceParams) (database.GetDriverRaceRow, error) {
+func (s stubQuerier) GetDriverRace(context.Context, int32, int32, string) (database.GetDriverRaceRow, error) {
 	return s.race, s.raceErr
 }
 
-func (s stubQuerier) ListDriverRacePitStops(context.Context, database.ListDriverRacePitStopsParams) ([]database.ListDriverRacePitStopsRow, error) {
+func (s stubQuerier) ListDriverRacePitStops(context.Context, int32, string) ([]database.ListDriverRacePitStopsRow, error) {
 	return s.pitStops, nil
 }
 
-func (stubQuerier) GetDriverSprint(context.Context, database.GetDriverSprintParams) (database.GetDriverSprintRow, error) {
+func (stubQuerier) GetDriverSprint(context.Context, int32, int32, string) (database.GetDriverSprintRow, error) {
 	return database.GetDriverSprintRow{}, pgx.ErrNoRows
 }
 
-func (s stubQuerier) GetDriverSeason(context.Context, database.GetDriverSeasonParams) (database.GetDriverSeasonRow, error) {
+func (s stubQuerier) GetDriverSeason(context.Context, int32, string) (database.GetDriverSeasonRow, error) {
 	return s.season, s.seasonErr
 }
 
@@ -42,7 +42,7 @@ func (stubQuerier) GetDriverSummary(context.Context, string) (database.GetDriver
 	return database.GetDriverSummaryRow{}, nil
 }
 
-func (s stubQuerier) ListDriverSeasonRaces(context.Context, database.ListDriverSeasonRacesParams) ([]database.ListDriverSeasonRacesRow, error) {
+func (s stubQuerier) ListDriverSeasonRaces(context.Context, int32, string) ([]database.ListDriverSeasonRacesRow, error) {
 	return s.races, nil
 }
 
@@ -54,7 +54,7 @@ func (stubQuerier) ListDrivers(context.Context) ([]database.ListDriversRow, erro
 	return nil, nil
 }
 
-func (stubQuerier) ListSeasonDriverProgression(context.Context, database.ListSeasonDriverProgressionParams) ([]database.ListSeasonDriverProgressionRow, error) {
+func (stubQuerier) ListSeasonDriverProgression(context.Context, int32, []string) ([]database.ListSeasonDriverProgressionRow, error) {
 	return []database.ListSeasonDriverProgressionRow{{RaceRound: 1, Points: 25}}, nil
 }
 

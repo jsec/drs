@@ -42,10 +42,7 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 
 	logger.Info("creating refresh record")
 
-	refreshID, err := queries.CreateRefreshRun(ctx, database.CreateRefreshRunParams{
-		Status:        "running",
-		SourceVersion: pgtype.Text{String: "f1db", Valid: true},
-	})
+	refreshID, err := queries.CreateRefreshRun(ctx, "running", pgtype.Text{String: "f1db", Valid: true})
 	if err != nil {
 		return err
 	}
@@ -55,10 +52,7 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 			cleanupCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
 			defer cancel()
 
-			markErr := queries.MarkRefreshFailed(cleanupCtx, database.MarkRefreshFailedParams{
-				RefreshID:    refreshID,
-				ErrorMessage: pgtype.Text{String: err.Error(), Valid: true},
-			})
+			markErr := queries.MarkRefreshFailed(cleanupCtx, refreshID, pgtype.Text{String: err.Error(), Valid: true})
 			if markErr != nil {
 				logger.Error("could not mark refresh record as failed", "err", markErr)
 			}
@@ -82,10 +76,7 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 	}
 
 	logger.Info("finalizing refresh record")
-	if err = queries.MarkRefreshSucceeded(ctx, database.MarkRefreshSucceededParams{
-		RefreshID: refreshID,
-		RowCounts: countsJSON,
-	}); err != nil {
+	if err = queries.MarkRefreshSucceeded(ctx, refreshID, countsJSON); err != nil {
 		return err
 	}
 

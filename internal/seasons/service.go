@@ -11,7 +11,7 @@ type seasonQueries interface {
 	ListSeasons(ctx context.Context) ([]database.ListSeasonsRow, error)
 	ListSeasonCalendar(ctx context.Context, season int32) ([]database.ListSeasonCalendarRow, error)
 	ListSeasonConstructorStandings(ctx context.Context, season int32) ([]database.ListSeasonConstructorStandingsRow, error)
-	ListSeasonDriverProgression(ctx context.Context, arg database.ListSeasonDriverProgressionParams) ([]database.ListSeasonDriverProgressionRow, error)
+	ListSeasonDriverProgression(ctx context.Context, season int32, driverIds []string) ([]database.ListSeasonDriverProgressionRow, error)
 	ListSeasonDriverStandings(ctx context.Context, season int32) ([]database.ListSeasonDriverStandingsRow, error)
 }
 
@@ -155,10 +155,7 @@ func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverview
 		})
 	}
 
-	rows, err := s.queries.ListSeasonDriverProgression(ctx, database.ListSeasonDriverProgressionParams{
-		Season:    season,
-		DriverIds: driverIDs,
-	})
+	rows, err := s.queries.ListSeasonDriverProgression(ctx, season, driverIDs)
 	if err != nil {
 		return SeasonOverviewResponse{}, fmt.Errorf("listing season driver progression: %w", err)
 	}

@@ -62,12 +62,6 @@ ORDER BY rr.finish_order
 LIMIT 1
 `
 
-type GetDriverRaceParams struct {
-	Season    int32
-	RaceRound int32
-	DriverID  string
-}
-
 type GetDriverRaceRow struct {
 	RaceID                  int32
 	RaceName                string
@@ -98,8 +92,8 @@ type GetDriverRaceRow struct {
 	HasSprint               bool
 }
 
-func (q *Queries) GetDriverRace(ctx context.Context, arg GetDriverRaceParams) (GetDriverRaceRow, error) {
-	row := q.db.QueryRow(ctx, getDriverRace, arg.Season, arg.RaceRound, arg.DriverID)
+func (q *Queries) GetDriverRace(ctx context.Context, season int32, raceRound int32, driverID string) (GetDriverRaceRow, error) {
+	row := q.db.QueryRow(ctx, getDriverRace, season, raceRound, driverID)
 	var i GetDriverRaceRow
 	err := row.Scan(
 		&i.RaceID,
@@ -161,11 +155,6 @@ WHERE dss.season = $1
     AND dss.driver_id = $2
 `
 
-type GetDriverSeasonParams struct {
-	Season   int32
-	DriverID string
-}
-
 type GetDriverSeasonRow struct {
 	Code             string
 	Name             string
@@ -181,8 +170,8 @@ type GetDriverSeasonRow struct {
 	Poles            int32
 }
 
-func (q *Queries) GetDriverSeason(ctx context.Context, arg GetDriverSeasonParams) (GetDriverSeasonRow, error) {
-	row := q.db.QueryRow(ctx, getDriverSeason, arg.Season, arg.DriverID)
+func (q *Queries) GetDriverSeason(ctx context.Context, season int32, driverID string) (GetDriverSeasonRow, error) {
+	row := q.db.QueryRow(ctx, getDriverSeason, season, driverID)
 	var i GetDriverSeasonRow
 	err := row.Scan(
 		&i.Code,
@@ -229,12 +218,6 @@ WHERE sr.season = $1
     AND sr.driver_id = $3
 `
 
-type GetDriverSprintParams struct {
-	Season    int32
-	RaceRound int32
-	DriverID  string
-}
-
 type GetDriverSprintRow struct {
 	RaceName         string
 	Code             string
@@ -256,8 +239,8 @@ type GetDriverSprintRow struct {
 	IsGridP1         bool
 }
 
-func (q *Queries) GetDriverSprint(ctx context.Context, arg GetDriverSprintParams) (GetDriverSprintRow, error) {
-	row := q.db.QueryRow(ctx, getDriverSprint, arg.Season, arg.RaceRound, arg.DriverID)
+func (q *Queries) GetDriverSprint(ctx context.Context, season int32, raceRound int32, driverID string) (GetDriverSprintRow, error) {
+	row := q.db.QueryRow(ctx, getDriverSprint, season, raceRound, driverID)
 	var i GetDriverSprintRow
 	err := row.Scan(
 		&i.RaceName,
@@ -364,11 +347,6 @@ WHERE ps.race_id = $1
 ORDER BY ps.stop_number
 `
 
-type ListDriverRacePitStopsParams struct {
-	RaceID   int32
-	DriverID string
-}
-
 type ListDriverRacePitStopsRow struct {
 	StopNumber int32
 	LapNumber  int32
@@ -376,8 +354,8 @@ type ListDriverRacePitStopsRow struct {
 	DurationMs dbtypes.Int4
 }
 
-func (q *Queries) ListDriverRacePitStops(ctx context.Context, arg ListDriverRacePitStopsParams) ([]ListDriverRacePitStopsRow, error) {
-	rows, err := q.db.Query(ctx, listDriverRacePitStops, arg.RaceID, arg.DriverID)
+func (q *Queries) ListDriverRacePitStops(ctx context.Context, raceID int32, driverID string) ([]ListDriverRacePitStopsRow, error) {
+	rows, err := q.db.Query(ctx, listDriverRacePitStops, raceID, driverID)
 	if err != nil {
 		return nil, err
 	}
@@ -422,11 +400,6 @@ WHERE rr.season = $1
 ORDER BY rr.race_round, rr.finish_order
 `
 
-type ListDriverSeasonRacesParams struct {
-	Season   int32
-	DriverID string
-}
-
 type ListDriverSeasonRacesRow struct {
 	RaceRound           int32
 	RaceName            string
@@ -439,8 +412,8 @@ type ListDriverSeasonRacesRow struct {
 	SprintPoints        float64
 }
 
-func (q *Queries) ListDriverSeasonRaces(ctx context.Context, arg ListDriverSeasonRacesParams) ([]ListDriverSeasonRacesRow, error) {
-	rows, err := q.db.Query(ctx, listDriverSeasonRaces, arg.Season, arg.DriverID)
+func (q *Queries) ListDriverSeasonRaces(ctx context.Context, season int32, driverID string) ([]ListDriverSeasonRacesRow, error) {
+	rows, err := q.db.Query(ctx, listDriverSeasonRaces, season, driverID)
 	if err != nil {
 		return nil, err
 	}

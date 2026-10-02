@@ -36,7 +36,7 @@ func (s seasonStubQuerier) ListSeasonConstructorStandings(context.Context, int32
 	return s.constructorRows, nil
 }
 
-func (s seasonStubQuerier) ListSeasonDriverProgression(context.Context, database.ListSeasonDriverProgressionParams) ([]database.ListSeasonDriverProgressionRow, error) {
+func (s seasonStubQuerier) ListSeasonDriverProgression(context.Context, int32, []string) ([]database.ListSeasonDriverProgressionRow, error) {
 	return s.progressionRows, nil
 }
 

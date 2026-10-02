@@ -40,11 +40,6 @@ WHERE r.season = $1
     AND r.race_round = $2
 `
 
-type GetRaceDetailParams struct {
-	Season    int32
-	RaceRound int32
-}
-
 type GetRaceDetailRow struct {
 	RaceID             int32
 	Season             int32
@@ -62,8 +57,8 @@ type GetRaceDetailRow struct {
 	FastestLapTime     pgtype.Text
 }
 
-func (q *Queries) GetRaceDetail(ctx context.Context, arg GetRaceDetailParams) (GetRaceDetailRow, error) {
-	row := q.db.QueryRow(ctx, getRaceDetail, arg.Season, arg.RaceRound)
+func (q *Queries) GetRaceDetail(ctx context.Context, season int32, raceRound int32) (GetRaceDetailRow, error) {
+	row := q.db.QueryRow(ctx, getRaceDetail, season, raceRound)
 	var i GetRaceDetailRow
 	err := row.Scan(
 		&i.RaceID,
@@ -96,11 +91,6 @@ WHERE lt.race_id = $1
 ORDER BY lt.driver_id, lt.lap_number
 `
 
-type ListRaceLapTimesParams struct {
-	RaceID  int32
-	Session string
-}
-
 type ListRaceLapTimesRow struct {
 	DriverID  string
 	LapNumber int32
@@ -108,8 +98,8 @@ type ListRaceLapTimesRow struct {
 	LapTimeMs int32
 }
 
-func (q *Queries) ListRaceLapTimes(ctx context.Context, arg ListRaceLapTimesParams) ([]ListRaceLapTimesRow, error) {
-	rows, err := q.db.Query(ctx, listRaceLapTimes, arg.RaceID, arg.Session)
+func (q *Queries) ListRaceLapTimes(ctx context.Context, raceID int32, session string) ([]ListRaceLapTimesRow, error) {
+	rows, err := q.db.Query(ctx, listRaceLapTimes, raceID, session)
 	if err != nil {
 		return nil, err
 	}

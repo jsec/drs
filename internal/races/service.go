@@ -14,9 +14,9 @@ import (
 var ErrNotFound = errors.New("race not found")
 
 type raceQueries interface {
-	GetRaceDetail(ctx context.Context, arg database.GetRaceDetailParams) (database.GetRaceDetailRow, error)
+	GetRaceDetail(ctx context.Context, season int32, raceRound int32) (database.GetRaceDetailRow, error)
 	ListRaceResults(ctx context.Context, raceID int32) ([]database.ListRaceResultsRow, error)
-	ListRaceLapTimes(ctx context.Context, arg database.ListRaceLapTimesParams) ([]database.ListRaceLapTimesRow, error)
+	ListRaceLapTimes(ctx context.Context, raceID int32, session string) ([]database.ListRaceLapTimesRow, error)
 }
 
 type Service struct {
@@ -111,7 +111,7 @@ func (s *Service) GetRaceLaps(ctx context.Context, season, round int32, session 
 		return RaceLapsResponse{}, fmt.Errorf("listing race results: %w", err)
 	}
 
-	lapRows, err := s.queries.ListRaceLapTimes(ctx, database.ListRaceLapTimesParams{RaceID: race.RaceID, Session: session})
+	lapRows, err := s.queries.ListRaceLapTimes(ctx, race.RaceID, session)
 	if err != nil {
 		return RaceLapsResponse{}, fmt.Errorf("listing race lap times: %w", err)
 	}
@@ -148,7 +148,7 @@ func (s *Service) GetRaceLaps(ctx context.Context, season, round int32, session 
 }
 
 func (s *Service) getCompletedRace(ctx context.Context, season, round int32) (database.GetRaceDetailRow, error) {
-	race, err := s.queries.GetRaceDetail(ctx, database.GetRaceDetailParams{Season: season, RaceRound: round})
+	race, err := s.queries.GetRaceDetail(ctx, season, round)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return database.GetRaceDetailRow{}, ErrNotFound
 	}

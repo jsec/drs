@@ -13,6 +13,8 @@ sql:
         emit_json_tags: false
         emit_pointers_for_null_types: false
         emit_interface: false
+        omit_unused_structs: true
+        query_parameter_limit: 4
         overrides:
           - db_type: "date"
             go_type: "github.com/jsec/drs/internal/dbtypes.Date"

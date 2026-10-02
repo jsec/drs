@@ -24,7 +24,7 @@ type stubQuerier struct {
 	lapsErr    error
 }
 
-func (s stubQuerier) GetRaceDetail(context.Context, database.GetRaceDetailParams) (database.GetRaceDetailRow, error) {
+func (s stubQuerier) GetRaceDetail(context.Context, int32, int32) (database.GetRaceDetailRow, error) {
 	return s.race, s.raceErr
 }
 
@@ -32,7 +32,7 @@ func (s stubQuerier) ListRaceResults(context.Context, int32) ([]database.ListRac
 	return s.results, s.resultsErr
 }
 
-func (s stubQuerier) ListRaceLapTimes(context.Context, database.ListRaceLapTimesParams) ([]database.ListRaceLapTimesRow, error) {
+func (s stubQuerier) ListRaceLapTimes(context.Context, int32, string) ([]database.ListRaceLapTimesRow, error) {
 	return s.laps, s.lapsErr
 }
 

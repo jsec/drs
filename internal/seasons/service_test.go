@@ -40,7 +40,7 @@ func (s stubQuerier) ListSeasonConstructorStandings(context.Context, int32) ([]d
 	return s.constructorStandingsRows, s.constructorStandingsErr
 }
 
-func (s stubQuerier) ListSeasonDriverProgression(context.Context, database.ListSeasonDriverProgressionParams) ([]database.ListSeasonDriverProgressionRow, error) {
+func (s stubQuerier) ListSeasonDriverProgression(context.Context, int32, []string) ([]database.ListSeasonDriverProgressionRow, error) {
 	return s.progressionRows, s.progressionErr
 }
 

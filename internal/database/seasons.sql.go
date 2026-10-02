@@ -167,11 +167,6 @@ WHERE dss.season = $1
 ORDER BY dss.race_round, dss.driver_id
 `
 
-type ListSeasonDriverProgressionParams struct {
-	Season    int32
-	DriverIds []string
-}
-
 type ListSeasonDriverProgressionRow struct {
 	RaceRound int32
 	DriverID  string
@@ -179,8 +174,8 @@ type ListSeasonDriverProgressionRow struct {
 	Points    float64
 }
 
-func (q *Queries) ListSeasonDriverProgression(ctx context.Context, arg ListSeasonDriverProgressionParams) ([]ListSeasonDriverProgressionRow, error) {
-	rows, err := q.db.Query(ctx, listSeasonDriverProgression, arg.Season, arg.DriverIds)
+func (q *Queries) ListSeasonDriverProgression(ctx context.Context, season int32, driverIds []string) ([]ListSeasonDriverProgressionRow, error) {
+	rows, err := q.db.Query(ctx, listSeasonDriverProgression, season, driverIds)
 	if err != nil {
 		return nil, err
 	}
