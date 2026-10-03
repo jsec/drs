@@ -35,7 +35,7 @@ export async function renderWithRouter(ui: ReactNode, initialUrl = '/') {
 
     const result = render(
         <MantineProvider env="test" theme={theme}>
-            <RouterProvider router={router as never} />
+            <RouterProvider router={router} />
         </MantineProvider>,
     );
 
@@ -47,6 +47,9 @@ export function searchOf(router: { state: { location: { searchStr: string } } })
 }
 
 export const testRoute: SortingRoute = {
-    useNavigate: () => useNavigate() as ReturnType<SortingRoute['useNavigate']>,
-    useSearch: () => useSearch({ strict: false }) as ReturnType<SortingRoute['useSearch']>,
+    useNavigate: () => {
+        const navigate = useNavigate();
+        return ({ search }) => navigate({ search: prev => search(prev), to: '.' });
+    },
+    useSearch: () => useSearch({ strict: false }),
 };

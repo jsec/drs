@@ -1,50 +1,22 @@
 :root {
-  --red-50:  #fff1f0;
-  --red-100: #ffdedc;
-  --red-200: #ffc2be;
-  --red-300: #ff958d;
-  --red-400: #fb5b50;
   --red-500: #e10600;
-  --red-600: #c10500;
-  --red-700: #a00400;
-  --red-800: #840a06;
-  --red-900: #6e0f0c;
-  --red-950: #3c0301;
 
   --neutral-0:    #ffffff;
-  --neutral-50:   #fafafa;
   --neutral-100:  #f4f4f5;
-  --neutral-200:  #e4e4e7;
   --neutral-300:  #d4d4d8;
   --neutral-400:  #a1a1aa;
   --neutral-500:  #71717a;
-  --neutral-600:  #52525b;
   --neutral-700:  #3f3f46;
   --neutral-800:  #27272a;
-  --neutral-900:  #18181b;
   --neutral-950:  #15151e;
   --neutral-1000: #0b0b10;
 
   --teal-500:   #00b3a4;
-  --teal-600:   #009a8e;
-  --orange-500: #ff8000;
-  --orange-600: #e36f00;
   --blue-500:   #3671c6;
-  --blue-600:   #2c5ea8;
   --gold-500:   #ffb800;
-  --gold-600:   #e0a000;
   --silver-500: #b9c0ca;
   --purple-500: #a855f7;
   --green-500:  #16a34a;
-  --green-600:  #15803d;
-  --amber-500:  #d97706;
-  --sky-500:    #0284c7;
-
-  --tyre-soft:   #e10600;
-  --tyre-medium: #ffb800;
-  --tyre-hard:   #f4f4f5;
-  --tyre-inter:  #16a34a;
-  --tyre-wet:    #2563eb;
 }
 
 :root {
@@ -72,19 +44,10 @@
 
   --text-xs:   12px;
   --text-sm:   14px;
-  --text-md:   15px;
   --text-base: 16px;
-  --text-lg:   18px;
-  --text-xl:   20px;
   --text-2xl:  24px;
-  --text-3xl:  30px;
-  --text-4xl:  36px;
-  --text-5xl:  48px;
 
   --tracking-tight:  -0.02em;
-  --tracking-normal: 0em;
-  --tracking-wide:   0.04em;
-  --tracking-caps:   0.08em;
 }
 
 :root {
@@ -93,27 +56,17 @@
   --space-3:  12px;
   --space-4:  16px;
   --space-5:  20px;
-  --space-6:  24px;
-  --space-8:  32px;
   --space-10: 40px;
 
-  --radius-xs:   2px;
   --radius-sm:   6px;
-  --radius-md:   8px;
   --radius-lg:   10px;
   --radius-xl:   14px;
-  --radius-2xl:  18px;
-  --radius-full: 9999px;
-  --radius:      var(--radius-md);
 
-  --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.05);
   --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.10), 0 1px 2px -1px rgba(0,0,0,0.10);
   --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.10), 0 2px 4px -2px rgba(0,0,0,0.10);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.10), 0 4px 6px -4px rgba(0,0,0,0.10);
 
   --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
   --dur-fast:  120ms;
-  --dur-base:  180ms;
   --dur-slow:  280ms;
 }
 

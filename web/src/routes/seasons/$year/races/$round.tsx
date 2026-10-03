@@ -1,10 +1,9 @@
 import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { HTTPError } from 'ky';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { Suspense } from 'react';
 
-import type { DriverRef, RaceDetail as RaceDetailData, RaceResult } from '#/lib/api/races';
+import type { DriverRef, RaceResult } from '#/lib/api/races';
 
 import { DriverAvatar, GridHeader, SectionCard, TeamBar } from '#/components/f1-ui';
 import { LineChart } from '#/components/line-chart';
@@ -23,19 +22,15 @@ const HERO_STYLE: React.CSSProperties = {
     color: '#fff',
 };
 
-const RESULT_ROW_STYLE: React.CSSProperties = {
-    alignItems: 'center',
-    borderTop: '1px solid var(--mantine-color-default-border)',
-    color: 'inherit',
-    display: 'grid',
-    gridTemplateColumns: RESULT_COLS,
-    padding: '8px 18px',
-    textDecoration: 'none',
-};
-
 const getDeltaColor = (delta: number): string => {
-    if (delta > 0) return 'var(--green-500)';
-    if (delta < 0) return 'var(--mantine-primary-color-filled)';
+    if (delta > 0) {
+        return 'var(--green-500)';
+    }
+
+    if (delta < 0) {
+        return 'var(--mantine-primary-color-filled)';
+    }
+
     return 'var(--neutral-300)';
 };
 
@@ -224,10 +219,10 @@ const RaceDetail = () => {
                     <Box className="f1-scroll" mah={430} style={{ overflowY: 'auto' }}>
                         {data.results.map(r => (
                             <Link
-                                className="f1-row"
+                                className="f1-row f1-grid-row"
                                 key={r.driver.id}
                                 params={{ driverId: r.driver.id, round, year }}
-                                style={RESULT_ROW_STYLE}
+                                style={{ '--cols': RESULT_COLS, 'padding': '8px 18px' }}
                                 to="/seasons/$year/drivers/$driverId/races/$round"
                             >
                                 <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.positionLabel}</Text>
@@ -298,19 +293,10 @@ export const Route = createFileRoute('/seasons/$year/races/$round')({
     loader: async ({ context, params }) => {
         const year = parseYear(params.year);
         const round = parseRound(params.round);
-        let race: RaceDetailData;
 
         void context.queryClient.prefetchQuery(raceLapsQuery(year, round));
 
-        try {
-            race = await context.queryClient.ensureQueryData(raceDetailQuery(year, round));
-        } catch (error) {
-            if (error instanceof HTTPError && error.response.status === 404) {
-                throw notFound();
-            }
-
-            throw error;
-        }
+        const race = await context.queryClient.ensureQueryData(raceDetailQuery(year, round));
 
         return {
             crumbs: [

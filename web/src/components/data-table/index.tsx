@@ -1,5 +1,5 @@
 import type { LinkProps } from '@tanstack/react-router';
-import type { RowData, Table } from '@tanstack/react-table';
+import type { Cell, RowData, Table } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 
 import { Table as TablePrimitive } from '@mantine/core';
@@ -13,7 +13,7 @@ import './data-table.css';
 
 export { makeColumns } from './columns';
 export { useDataTable } from './use-data-table';
-export { readSortSearch, type SortDirection, type SortingRoute, type SortSearch, useUrlSorting } from './use-url-sorting';
+export { type SortingRoute, type SortSearch, SortSearchSchema, useUrlSorting } from './use-url-sorting';
 
 declare module '@tanstack/react-table' {
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-unused-vars
@@ -46,6 +46,12 @@ const SortCaret = ({ direction }: { direction: 'asc' | 'desc' | false }) => {
     return <CaretUpDownIcon className="table-head-caret table-head-caret--idle" size={12} weight="bold" />;
 };
 
+type CellBodyProps<T> = {
+    align: 'center' | 'left' | 'right';
+    cell: Cell<T, unknown>;
+    rank: number;
+};
+
 type DataTableProps<T> = {
     px?: number;
     table: Table<T>;
@@ -57,11 +63,7 @@ export function DataTable<T>({ px = 18, table }: DataTableProps<T>) {
     const headers = table.getHeaderGroups()[0]?.headers ?? [];
     const rows = table.getRowModel().rows;
 
-    const linkColumns = columns.filter(column => column.columnDef.meta?.link);
-    if (import.meta.env.DEV && linkColumns.length > 1) {
-        throw new Error('DataTable: only one column may declare a `link`.');
-    }
-    const linkColumn = linkColumns[0];
+    const linkColumn = columns.find(column => column.columnDef.meta?.link);
     const hasCaret = linkColumn?.columnDef.meta?.trailing === 'caret';
 
     return (
@@ -123,17 +125,7 @@ export function DataTable<T>({ px = 18, table }: DataTableProps<T>) {
                                     const align = meta?.align ?? 'left';
                                     const isLinkCell = link != null && cell.column.id === linkColumn?.id;
 
-                                    let content: ReactNode = meta?.ordinal
-                                        ? (
-                                                <span className="table-cell-rank" style={{ display: 'block', textAlign: align }}>
-                                                    {i + 1}
-                                                </span>
-                                            )
-                                        : (
-                                                <div style={{ minWidth: 0, textAlign: align }}>
-                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                </div>
-                                            );
+                                    let content: ReactNode = <CellBody align={align} cell={cell} rank={i + 1} />;
 
                                     if (isLinkCell && hasCaret) {
                                         content = (
@@ -170,5 +162,21 @@ export function DataTable<T>({ px = 18, table }: DataTableProps<T>) {
                 </TablePrimitive.Tbody>
             </TablePrimitive>
         </TablePrimitive.ScrollContainer>
+    );
+}
+
+function CellBody<T>({ align, cell, rank }: CellBodyProps<T>) {
+    if (cell.column.columnDef.meta?.ordinal) {
+        return (
+            <span className="table-cell-rank" style={{ display: 'block', textAlign: align }}>
+                {rank}
+            </span>
+        );
+    }
+
+    return (
+        <div style={{ minWidth: 0, textAlign: align }}>
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </div>
     );
 }

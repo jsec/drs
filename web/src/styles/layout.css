@@ -78,52 +78,6 @@
   padding: 0 12px;
 }
 
-.f1-season-progress {
-  margin: 12px;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.f1-season-progress-label {
-  color: var(--color-sidebar-muted);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 1px;
-}
-
-.f1-season-progress-value {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-top: 5px;
-}
-
-.f1-season-progress-count {
-  color: #fff;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.f1-season-progress-total {
-  color: #8b919a;
-  font-size: 13px;
-}
-
-.f1-progress-track {
-  height: 5px;
-  margin-top: 9px;
-  overflow: hidden;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.f1-progress-fill {
-  height: 100%;
-  border-radius: var(--radius-full);
-  background: linear-gradient(90deg, var(--mantine-primary-color-filled), #ff5a3c);
-}
-
 .f1-page-stack {
   display: flex;
   flex-direction: column;
@@ -214,10 +168,16 @@
   width: 0;
 }
 
-.f1-sidebar[data-collapsed="true"] .f1-season-progress {
-  display: none;
-}
 
+.f1-grid-row {
+  display: grid;
+  grid-template-columns: var(--cols);
+  align-items: center;
+  padding: 9px 18px;
+  border-top: 1px solid var(--mantine-color-default-border);
+  color: inherit;
+  text-decoration: none;
+}
 
 /* Card base */
 .f1-card {

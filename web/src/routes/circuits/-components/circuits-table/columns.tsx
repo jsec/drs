@@ -6,15 +6,6 @@ type Circuit = ListCircuitsResponse;
 
 const col = makeColumns<Circuit>();
 
-export const SORT_IDS = [
-    'name',
-    'location',
-    'country',
-    'firstRaceYear',
-    'lastRaceYear',
-    'raceCount',
-] as const;
-
 export const columns = [
     col.ordinal(),
     col.text('name', {

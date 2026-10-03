@@ -2,8 +2,7 @@ import type { ChartReferenceLineProps, LineChartSeries } from '@mantine/charts';
 
 import { Badge, Box, Group, SegmentedControl, Select, SimpleGrid, Stack, Switch, Text } from '@mantine/core';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { HTTPError } from 'ky';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { z } from 'zod';
 
@@ -102,14 +101,12 @@ function lapTimeColor(timeMs: number, personalBestMs: number, raceFastestMs: num
 }
 
 function pitLines(race: DriverRace, color: string, isDashed: boolean): ChartReferenceLineProps[] {
-    const lines: ChartReferenceLineProps[] = Array.from(race.pitStops, stop => ({
+    return race.pitStops.map(stop => ({
         color,
         label: 'PIT',
         strokeDasharray: isDashed ? RIVAL_DASH : undefined,
         x: lapLabel(stop.lap),
     }));
-
-    return lines;
 }
 
 const Hero = ({ race, round, year }: { race: DriverRace; round: string; year: string }) => {
@@ -212,14 +209,10 @@ const LapTable = ({ driver, raceFastestMs, rival, stopLaps }: {
 
                     return (
                         <Box
+                            className="f1-grid-row"
                             key={lap.lap}
-                            style={{
-                                alignItems: 'center',
-                                borderTop: '1px solid var(--mantine-color-default-border)',
-                                display: 'grid',
-                                gridTemplateColumns: cols,
-                                padding: '7px 18px',
-                            }}
+                            py={7}
+                            style={{ '--cols': cols }}
                         >
                             <Group gap={6} wrap="nowrap">
                                 <Text c="dimmed" className="f1-num" fw={700} inherit span>{lap.lap}</Text>
@@ -268,13 +261,10 @@ const PitStops = ({ race }: { race: DriverRace }) => {
             </GridHeader>
             {race.pitStops.map(stop => (
                 <Box
+                    className="f1-grid-row"
                     key={stop.stop}
-                    style={{
-                        borderTop: '1px solid var(--mantine-color-default-border)',
-                        display: 'grid',
-                        gridTemplateColumns: PIT_COLS,
-                        padding: '8px 18px',
-                    }}
+                    py={8}
+                    style={{ '--cols': PIT_COLS }}
                 >
                     <Text className="f1-num" fw={700} inherit span>{stop.stop}</Text>
                     <Text className="f1-num" inherit span>{stop.lap}</Text>
@@ -435,20 +425,11 @@ export const Route = createFileRoute('/seasons/$year/drivers/$driverId/races/$ro
     loader: async ({ context, deps, params }) => {
         const year = parseYear(params.year);
         const round = parseRound(params.round);
-        let race: DriverRace;
 
         void context.queryClient.prefetchQuery(raceLapsQuery(year, round, deps.session));
         void context.queryClient.prefetchQuery(raceDetailQuery(year, round));
 
-        try {
-            race = await context.queryClient.ensureQueryData(driverRaceQuery(year, round, params.driverId, deps.session));
-        } catch (error) {
-            if (error instanceof HTTPError && error.response.status === 404) {
-                throw notFound();
-            }
-
-            throw error;
-        }
+        const race = await context.queryClient.ensureQueryData(driverRaceQuery(year, round, params.driverId, deps.session));
 
         return {
             crumbs: [

@@ -25,6 +25,7 @@ export function useDataTable<T>({
 }: UseDataTableOptions<T>) {
     const [search, setSearch] = useState('');
     const deferredSearch = useDeferredValue(search);
+    const [localSorting, setLocalSorting] = useState<SortingState>([]);
 
     const table = useReactTable<T>({
         columns,
@@ -35,10 +36,10 @@ export function useDataTable<T>({
         getFilteredRowModel: filter ? getFilteredRowModel() : undefined,
         getSortedRowModel: getSortedRowModel(),
         globalFilterFn: filter,
-        ...(onSortingChange && { onSortingChange }),
+        onSortingChange: onSortingChange ?? setLocalSorting,
         state: {
             globalFilter: filter ? deferredSearch : undefined,
-            ...(sorting && { sorting }),
+            sorting: sorting ?? localSorting,
         },
     });
 

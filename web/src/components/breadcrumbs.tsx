@@ -3,23 +3,23 @@ import { Link, useMatches } from '@tanstack/react-router';
 
 export type Crumb = {
     label: string;
-    params?: Record<string, string>;
+    params?: Record<string, string | undefined>;
     to?: string;
 };
 
 export const Breadcrumbs = () => {
     const matches = useMatches();
 
-    const deepest = matches.findLast(
-        (m): m is typeof m & { loaderData: { crumbs: Crumb[] } } =>
-            !!(m.loaderData as undefined | { crumbs?: Crumb[] })?.crumbs,
-    );
-
-    const crumbs = deepest?.loaderData.crumbs ?? [];
+    let crumbs: Crumb[] = [];
+    for (const m of matches) {
+        if (m.loaderData && 'crumbs' in m.loaderData) {
+            crumbs = m.loaderData.crumbs;
+        }
+    }
 
     return (
         <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', fontSize: 13.5, gap: 8, minWidth: 0 }}>
-            {crumbs.map((c: Crumb, i: number) => {
+            {crumbs.map((c, i) => {
                 const isLast = i === crumbs.length - 1;
                 return (
                     <div key={c.to ?? c.label} style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 8 }}>

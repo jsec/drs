@@ -46,12 +46,6 @@ export const ConstructorStandingSchema = ConstructorSchema.extend({
     positionLabel: z.string(),
 });
 
-export const SeasonStandingsSchema = z.object({
-    constructors: z.array(ConstructorStandingSchema),
-    drivers: z.array(DriverStandingSchema),
-    maxConstructorPoints: z.number(),
-});
-
 export const ProgressionSeriesSchema = z.object({
     color: z.string(),
     name: z.string(),
@@ -66,8 +60,11 @@ export const ProgressionSchema = z.object({
     series: z.array(ProgressionSeriesSchema),
 });
 
-export const SeasonOverviewSchema = SeasonStandingsSchema.extend({
+export const SeasonOverviewSchema = z.object({
+    constructors: z.array(ConstructorStandingSchema),
+    drivers: z.array(DriverStandingSchema),
     leader: DriverStandingSchema.nullable(),
+    maxConstructorPoints: z.number(),
     progression: ProgressionSchema,
     runnerUp: DriverStandingSchema.nullable(),
 });
@@ -108,5 +105,4 @@ export type SeasonCalendar = z.infer<typeof SeasonCalendarSchema>;
 export type SeasonCalendarEntry = z.infer<typeof SeasonCalendarEntrySchema>;
 export type SeasonOverview = z.infer<typeof SeasonOverviewSchema>;
 export type SeasonResponse = z.infer<typeof SeasonSchema>;
-export type SeasonStandings = z.infer<typeof SeasonStandingsSchema>;
 export type WDC = z.infer<typeof WDCSchema>;

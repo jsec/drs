@@ -1,8 +1,11 @@
 import type { OnChangeFn, SortingState } from '@tanstack/react-table';
 
-import { useCallback, useMemo } from 'react';
+import { z } from 'zod';
 
-export type SortDirection = 'asc' | 'desc';
+export const SortSearchSchema = z.object({
+    dir: z.enum(['asc', 'desc']).optional().catch(undefined),
+    sort: z.string().optional().catch(undefined),
+});
 
 export type SortingRoute = {
     useNavigate: () => (opts: {
@@ -11,51 +14,26 @@ export type SortingRoute = {
     useSearch: () => SortSearch;
 };
 
-export type SortSearch = {
-    dir?: SortDirection;
-    sort?: string;
-};
-
-export function readSortSearch(ids: readonly string[]) {
-    const allowed = new Set(ids);
-
-    return (search: Record<string, unknown>): SortSearch => {
-        const sort = typeof search.sort === 'string' && allowed.has(search.sort)
-            ? search.sort
-            : undefined;
-
-        if (sort == null) {
-            return {};
-        }
-
-        return { dir: search.dir === 'desc' ? 'desc' : 'asc', sort };
-    };
-}
+export type SortSearch = z.infer<typeof SortSearchSchema>;
 
 export function useUrlSorting(route: SortingRoute) {
     const { dir, sort } = route.useSearch();
     const navigate = route.useNavigate();
 
-    const sorting = useMemo<SortingState>(
-        () => (sort ? [{ desc: dir === 'desc', id: sort }] : []),
-        [dir, sort],
-    );
+    const sorting: SortingState = sort ? [{ desc: dir === 'desc', id: sort }] : [];
 
-    const onSortingChange = useCallback<OnChangeFn<SortingState>>(
-        (updater) => {
-            const next = typeof updater === 'function' ? updater(sorting) : updater;
-            const entry = next[0];
+    const onSortingChange: OnChangeFn<SortingState> = (updater) => {
+        const next = typeof updater === 'function' ? updater(sorting) : updater;
+        const entry = next[0];
 
-            void navigate({
-                search: prev => ({
-                    ...prev,
-                    dir: entry && (entry.desc ? 'desc' : 'asc'),
-                    sort: entry?.id,
-                }),
-            });
-        },
-        [navigate, sorting],
-    );
+        void navigate({
+            search: prev => ({
+                ...prev,
+                dir: entry && (entry.desc ? 'desc' : 'asc'),
+                sort: entry?.id,
+            }),
+        });
+    };
 
     return { onSortingChange, sorting };
 }

@@ -1,5 +1,3 @@
-import type { CSSProperties } from 'react';
-
 import { cn } from '#/lib/utils';
 
 import './circuit-layout.css';
@@ -20,7 +18,7 @@ export const CircuitLayout = ({ className, layoutId, name, size = 160 }: Props) 
             style={{
                 '--circuit-layout-size': `${size}px`,
                 '--circuit-layout-src': `url(/circuits/${layoutId}.svg)`,
-            } as CSSProperties}
+            }}
         />
     );
 };

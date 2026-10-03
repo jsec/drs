@@ -24,14 +24,15 @@ type Shared<T> = {
 
 type Size = 'lg' | 'sm';
 
+type SortValue = null | number | string;
+
 const SIZE_CLASS = { lg: 'table-cell-lg', sm: 'table-cell-sm' } as const;
-const sizeClass = (size?: Size) => (size ? SIZE_CLASS[size] : undefined);
 
 export function makeColumns<T>() {
     const competitor = (
         key: keyof T & string,
         opts: Shared<T> & {
-            accessor?: (row: T) => unknown;
+            accessor?: (row: T) => SortValue;
             label: (row: T) => ReactNode;
             visual: (row: T) => ReactNode;
         },
@@ -48,12 +49,12 @@ export function makeColumns<T>() {
         id: opts.id ?? key,
         meta: buildMeta(opts),
         sortDescFirst: false,
-        ...(opts.sort && { sortingFn: opts.sort }),
+        sortingFn: opts.sort ?? 'auto',
     });
 
     const custom = (
         opts: Shared<T> & {
-            accessor?: (row: T) => unknown;
+            accessor?: (row: T) => SortValue;
             cell: (info: CellContext<T, unknown>) => ReactNode;
             descFirst?: boolean;
             id: string;
@@ -66,7 +67,7 @@ export function makeColumns<T>() {
         id: opts.id,
         meta: buildMeta(opts),
         sortDescFirst: opts.descFirst ?? false,
-        ...(opts.sort && { sortingFn: opts.sort }),
+        sortingFn: opts.sort ?? 'auto',
     });
 
     const num = <K extends KeysMatching<T, ReactNode>>(
@@ -74,23 +75,27 @@ export function makeColumns<T>() {
         opts: Shared<T> & { size?: Size; variant?: 'display' | 'muted' } = {},
     ): ColumnDef<T, unknown> => ({
         accessorKey: key,
-        cell: info => (
-            <span
-                className={cn(
-                    'table-cell-num',
-                    opts.variant === 'display' && 'table-cell-num-display',
-                    sizeClass(opts.size),
-                )}
-            >
-                {info.row.original[key] as ReactNode}
-            </span>
-        ),
+        cell: (info) => {
+            // SAFETY: K extends KeysMatching<T, ReactNode>, so T[K] is ReactNode; TS can't resolve that for a generic T.
+            const value = info.row.original[key] as ReactNode;
+            return (
+                <span
+                    className={cn(
+                        'table-cell-num',
+                        opts.variant === 'display' && 'table-cell-num-display',
+                        opts.size !== undefined && SIZE_CLASS[opts.size],
+                    )}
+                >
+                    {value}
+                </span>
+            );
+        },
         enableSorting: canSort(opts),
         header: opts.header,
         id: opts.id ?? key,
         meta: buildMeta(opts),
         sortDescFirst: true,
-        ...(opts.sort && { sortingFn: opts.sort }),
+        sortingFn: opts.sort ?? 'auto',
     });
 
     const ordinal = (
@@ -108,6 +113,7 @@ export function makeColumns<T>() {
     ): ColumnDef<T, unknown> => ({
         accessorKey: key,
         cell: (info) => {
+            // SAFETY: K extends KeysMatching<T, ReactNode>, so T[K] is ReactNode; TS can't resolve that for a generic T.
             const value = info.row.original[key] as ReactNode;
             return (
                 <span
@@ -115,7 +121,7 @@ export function makeColumns<T>() {
                         'table-cell-text',
                         opts.bold && 'table-cell-text-bold',
                         opts.muted && 'table-cell-text-muted',
-                        sizeClass(opts.size),
+                        opts.size !== undefined && SIZE_CLASS[opts.size],
                     )}
                 >
                     {value ?? opts.fallback}
@@ -127,7 +133,7 @@ export function makeColumns<T>() {
         id: opts.id ?? key,
         meta: buildMeta(opts),
         sortDescFirst: false,
-        ...(opts.sort && { sortingFn: opts.sort }),
+        sortingFn: opts.sort ?? 'auto',
     });
 
     const trophy = <K extends KeysMatching<T, number>>(
@@ -135,17 +141,21 @@ export function makeColumns<T>() {
         opts: Shared<T> = {},
     ): ColumnDef<T, unknown> => ({
         accessorKey: key,
-        cell: info => (
-            <span className="table-cell-trophy">
-                <TrophyCount count={info.row.original[key] as number} />
-            </span>
-        ),
+        cell: (info) => {
+            // SAFETY: K extends KeysMatching<T, number>, so T[K] is number; TS can't resolve that for a generic T.
+            const count = info.row.original[key] as number;
+            return (
+                <span className="table-cell-trophy">
+                    <TrophyCount count={count} />
+                </span>
+            );
+        },
         enableSorting: canSort(opts),
         header: opts.header,
         id: opts.id ?? key,
         meta: buildMeta({ align: 'center', ...opts }),
         sortDescFirst: true,
-        ...(opts.sort && { sortingFn: opts.sort }),
+        sortingFn: opts.sort ?? 'auto',
     });
 
     return { competitor, custom, num, ordinal, text, trophy };

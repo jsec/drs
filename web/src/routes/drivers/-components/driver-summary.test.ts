@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { driverSummaryColor, formatChampionshipPosition, formatDriverYears } from './driver-summary';
+import { driverSummaryColor, formatDriverYears } from './driver-summary';
 
 describe('formatDriverYears', () => {
     it('keeps an active driver career open', () => {
@@ -23,15 +23,5 @@ describe('driverSummaryColor', () => {
 
     it('uses grey for another retired driver', () => {
         expect(driverSummaryColor({ championships: 0, constructorColor: '', isActive: false })).toBe('var(--neutral-500)');
-    });
-});
-
-describe('formatChampionshipPosition', () => {
-    it('prefixes numeric standings with P', () => {
-        expect(formatChampionshipPosition('2')).toBe('P2');
-    });
-
-    it('preserves a textual standing', () => {
-        expect(formatChampionshipPosition('DSQ')).toBe('DSQ');
     });
 });

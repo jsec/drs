@@ -5,17 +5,15 @@ import {
     FlagCheckeredIcon,
     GaugeIcon,
 } from '@phosphor-icons/react';
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { memo } from 'react';
+
+import type { SeasonCalendarEntry } from '#/lib/api/seasons';
 
 import { GridHeader, SectionCard, StatCard, TeamBar } from '#/components/f1-ui';
 import { LineChart } from '#/components/line-chart';
-import { seasonOverviewQuery } from '#/data/queries';
-import { type SeasonCalendarEntry, SeasonCalendarSchema } from '#/lib/api/seasons';
-import { api } from '#/lib/query/api';
+import { seasonCalendarQuery, seasonOverviewQuery } from '#/data/queries';
 import { parseYear } from '#/lib/route-params';
-import { calendarRaceState } from '#/lib/season-calendar';
 
 const DRIVER_COLS = '34px 1fr 64px 56px 70px';
 
@@ -25,12 +23,7 @@ type MiniRaceCellProps = {
     year: string;
 };
 
-const calendarQuery = (year: number) => queryOptions({
-    queryFn: () => api.get(`seasons/${year}/calendar`).json(SeasonCalendarSchema),
-    queryKey: ['calendar', year],
-});
-
-const MiniRaceCell = memo(function MiniRaceCell({ isNext, race, year }: MiniRaceCellProps) {
+const MiniRaceCell = ({ isNext, race, year }: MiniRaceCellProps) => {
     const isDone = race.completed;
 
     let background: string;
@@ -77,7 +70,7 @@ const MiniRaceCell = memo(function MiniRaceCell({ isNext, race, year }: MiniRace
     }
 
     return cell;
-});
+};
 
 const ACTION_LINK: React.CSSProperties = {
     color: 'var(--mantine-primary-color-filled)',
@@ -89,14 +82,15 @@ const ACTION_LINK: React.CSSProperties = {
 const SeasonOverview = () => {
     const { year } = Route.useParams();
     const { data: overview } = useSuspenseQuery(seasonOverviewQuery(Number(year)));
-    const { data: calendar } = useSuspenseQuery(calendarQuery(Number(year)));
-    const { lastCompletedRace, nextRace } = calendarRaceState(calendar.races);
+    const { data: calendar } = useSuspenseQuery(seasonCalendarQuery(Number(year)));
 
     if (overview.leader === null || overview.runnerUp === null) {
         return <SectionCard title="Championship Standings">No championship standings recorded.</SectionCard>;
     }
 
     const { leader, runnerUp } = overview;
+    const lastCompletedRace = calendar.races.findLast(race => race.completed);
+    const nextRace = calendar.races.find(race => !race.completed);
     const topDrivers = overview.drivers.slice(0, 8);
 
     return (
@@ -176,18 +170,10 @@ const SeasonOverview = () => {
                     </GridHeader>
                     {topDrivers.map((d, i) => (
                         <Link
-                            className="f1-row"
+                            className="f1-row f1-grid-row"
                             key={d.code}
                             params={{ driverId: d.id, year }}
-                            style={{
-                                alignItems: 'center',
-                                borderTop: '1px solid var(--mantine-color-default-border)',
-                                color: 'inherit',
-                                display: 'grid',
-                                gridTemplateColumns: DRIVER_COLS,
-                                padding: '9px 18px',
-                                textDecoration: 'none',
-                            }}
+                            style={{ '--cols': DRIVER_COLS }}
                             to="/seasons/$year/drivers/$driverId"
                         >
                             <Text c="dimmed" className="f1-num" fw={700} inherit span>{i + 1}</Text>
@@ -299,7 +285,7 @@ export const Route = createFileRoute('/seasons/$year/')({
         const year = parseYear(params.year);
         await Promise.all([
             context.queryClient.ensureQueryData(seasonOverviewQuery(year)),
-            context.queryClient.ensureQueryData(calendarQuery(year)),
+            context.queryClient.ensureQueryData(seasonCalendarQuery(year)),
         ]);
         return { crumbs: [{ label: 'Season Overview' }] };
     },

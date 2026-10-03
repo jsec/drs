@@ -9,16 +9,11 @@ import { driverSummaryColor, formatDriverYears } from '../driver-summary';
 
 const col = makeColumns<DriverShortSummary>();
 
-export const SORT_IDS = ['name', 'years', 'starts', 'wins', 'poles', 'podiums', 'titles'] as const;
-
 const byTitles: SortingFn<DriverShortSummary> = (a, b) =>
     a.original.championships - b.original.championships || a.original.wins - b.original.wins;
 
 const byWins: SortingFn<DriverShortSummary> = (a, b) =>
     a.original.wins - b.original.wins || a.original.podiums - b.original.podiums;
-
-export const formatYears = formatDriverYears;
-export const driverBadgeColor = driverSummaryColor;
 
 export const matchesSearch: FilterFn<DriverShortSummary> = (row, _columnId, value: string) =>
     `${row.original.name} ${row.original.code}`.toLowerCase().includes(value.toLowerCase());
@@ -34,14 +29,14 @@ export const columns = [
         }),
         sort: 'text',
         trailing: 'caret',
-        visual: d => <DriverAvatar code={d.code} color={driverBadgeColor(d)} />,
+        visual: d => <DriverAvatar code={d.code} color={driverSummaryColor(d)} />,
         width: '45%',
     }),
     col.custom({
         accessor: d => d.firstYear,
         cell: info => (
             <span className="table-cell-num table-cell-sm">
-                {formatYears(info.row.original)}
+                {formatDriverYears(info.row.original)}
             </span>
         ),
         header: 'YEARS',

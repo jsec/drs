@@ -1,9 +1,8 @@
 import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { HTTPError } from 'ky';
+import { createFileRoute, Link } from '@tanstack/react-router';
 
-import type { DriverSeason as DriverSeasonData, DriverSeasonRace } from '#/lib/api/drivers';
+import type { DriverSeasonRace } from '#/lib/api/drivers';
 
 import { GridHeader, MiniStat } from '#/components/f1-ui';
 import { LineChart } from '#/components/line-chart';
@@ -196,18 +195,10 @@ const DriverSeason = () => {
 
                     return (
                         <Link
-                            className="f1-row"
+                            className="f1-row f1-grid-row"
                             key={r.round}
                             params={{ driverId, round: String(r.round), year }}
-                            style={{
-                                alignItems: 'center',
-                                borderTop: '1px solid var(--mantine-color-default-border)',
-                                color: 'inherit',
-                                display: 'grid',
-                                gridTemplateColumns: cols,
-                                padding: '9px 18px',
-                                textDecoration: 'none',
-                            }}
+                            style={{ '--cols': cols }}
                             to="/seasons/$year/drivers/$driverId/races/$round"
                         >
                             <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.round}</Text>
@@ -233,17 +224,7 @@ export const Route = createFileRoute('/seasons/$year/drivers/$driverId/')({
     component: DriverSeason,
     loader: async ({ context, params }) => {
         const year = parseYear(params.year);
-        let driver: DriverSeasonData;
-
-        try {
-            driver = await context.queryClient.ensureQueryData(driverSeasonQuery(year, params.driverId));
-        } catch (error) {
-            if (error instanceof HTTPError && error.response.status === 404) {
-                throw notFound();
-            }
-
-            throw error;
-        }
+        const driver = await context.queryClient.ensureQueryData(driverSeasonQuery(year, params.driverId));
 
         return {
             crumbs: [

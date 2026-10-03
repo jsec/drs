@@ -5,12 +5,21 @@ import { CrownIcon, FlagCheckeredIcon, TimerIcon, TrophyIcon, WrenchIcon } from 
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 import { CountryFlag } from '#/components/country-flag';
-import { seasonCalendarQuery, seasonStandingsQuery } from '#/data/queries';
+import { seasonCalendarQuery, seasonOverviewQuery } from '#/data/queries';
 import { CURRENT_YEAR } from '#/lib/route-params';
 
 import './overview.css';
 
 type RecordStat = { icon: ReactNode; label: string; sub: string; value: number };
+type StandingsRow = {
+    code?: string;
+    color: string;
+    countryCode: string;
+    key: string;
+    name: string;
+    points: number;
+    positionLabel: string;
+};
 type Total = { label: string; meta: string; value: number };
 
 const TOTALS: Total[] = [
@@ -29,7 +38,7 @@ const RECORDS: RecordStat[] = [
 ];
 
 export const Overview = () => {
-    const { data } = useSuspenseQuery(seasonStandingsQuery(CURRENT_YEAR));
+    const { data } = useSuspenseQuery(seasonOverviewQuery(CURRENT_YEAR));
     const { data: calendar } = useSuspenseQuery(seasonCalendarQuery(CURRENT_YEAR));
     const drivers = data.drivers.slice(0, 10);
     const constructors = data.constructors.slice(0, 10);
@@ -85,63 +94,70 @@ export const Overview = () => {
             </Card>
 
             <div className="overview-standings">
-                <Card className="overview-card">
-                    <div className="overview-standings-head">
-                        <div>
-                            <div className="overview-standings-title">Drivers&apos; championship</div>
-                            <div className="overview-standings-sub">{subtitle}</div>
-                        </div>
-                        <span className="overview-pts-label">PTS</span>
-                    </div>
-                    {drivers.map((d, i) => {
-                        const color = d.constructor?.color ?? 'var(--neutral-400)';
-
-                        return (
-                            <div className="overview-row" key={d.id}>
-                                <span className="overview-row-pos" style={{ color: i === 0 ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-dimmed)' }}>{d.positionLabel}</span>
-                                <span className="overview-row-team" style={{ background: color }} />
-                                <span className="overview-row-flag">
-                                    <CountryFlag aria-hidden code={d.countryCode} />
-                                </span>
-                                <div className="overview-row-name">
-                                    <span className="overview-row-driver">{d.name}</span>
-                                    <span className="overview-row-code">{d.code}</span>
-                                </div>
-                                <div className="overview-bar">
-                                    <div style={{ background: color, width: `${(d.points / leaderPoints) * 100}%` }} />
-                                </div>
-                                <span className="overview-row-pts">{d.points}</span>
-                            </div>
-                        );
-                    })}
-                </Card>
-
-                <Card className="overview-card">
-                    <div className="overview-standings-head">
-                        <div>
-                            <div className="overview-standings-title">Constructors&apos; championship</div>
-                            <div className="overview-standings-sub">{subtitle}</div>
-                        </div>
-                        <span className="overview-pts-label">PTS</span>
-                    </div>
-                    {constructors.map((c, i) => (
-                        <div className="overview-row" key={`${c.id}-${c.engineId}`}>
-                            <span className="overview-row-pos" style={{ color: i === 0 ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-dimmed)' }}>{c.positionLabel}</span>
-                            <span className="overview-row-team" style={{ background: c.color }} />
-                            <span className="overview-row-flag">
-                                <CountryFlag aria-hidden code={c.countryCode} />
-                            </span>
-                            <div className="overview-row-name">
-                                <span className="overview-row-driver">{c.name}</span>
-                            </div>
-                            <div className="overview-bar">
-                                <div style={{ background: c.color, width: `${(c.points / data.maxConstructorPoints) * 100}%` }} />
-                            </div>
-                            <span className="overview-row-pts">{c.points}</span>
-                        </div>
-                    ))}
-                </Card>
+                <StandingsCard
+                    maxPoints={leaderPoints}
+                    rows={drivers.map(d => ({
+                        code: d.code,
+                        color: d.constructor?.color ?? 'var(--neutral-400)',
+                        countryCode: d.countryCode,
+                        key: d.id,
+                        name: d.name,
+                        points: d.points,
+                        positionLabel: d.positionLabel,
+                    }))}
+                    subtitle={subtitle}
+                    title="Drivers' championship"
+                />
+                <StandingsCard
+                    maxPoints={data.maxConstructorPoints}
+                    rows={constructors.map(c => ({
+                        color: c.color,
+                        countryCode: c.countryCode,
+                        key: `${c.id}-${c.engineId}`,
+                        name: c.name,
+                        points: c.points,
+                        positionLabel: c.positionLabel,
+                    }))}
+                    subtitle={subtitle}
+                    title="Constructors' championship"
+                />
             </div>
         </div>
     );
 };
+
+type StandingsCardProps = {
+    maxPoints: number;
+    rows: StandingsRow[];
+    subtitle: string;
+    title: string;
+};
+
+const StandingsCard = ({ maxPoints, rows, subtitle, title }: StandingsCardProps) => (
+    <Card className="overview-card">
+        <div className="overview-standings-head">
+            <div>
+                <div className="overview-standings-title">{title}</div>
+                <div className="overview-standings-sub">{subtitle}</div>
+            </div>
+            <span className="overview-pts-label">PTS</span>
+        </div>
+        {rows.map((r, i) => (
+            <div className="overview-row" key={r.key}>
+                <span className="overview-row-pos" style={{ color: i === 0 ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-dimmed)' }}>{r.positionLabel}</span>
+                <span className="overview-row-team" style={{ background: r.color }} />
+                <span className="overview-row-flag">
+                    <CountryFlag aria-hidden code={r.countryCode} />
+                </span>
+                <div className="overview-row-name">
+                    <span className="overview-row-driver">{r.name}</span>
+                    {r.code && <span className="overview-row-code">{r.code}</span>}
+                </div>
+                <div className="overview-bar">
+                    <div style={{ background: r.color, width: `${(r.points / maxPoints) * 100}%` }} />
+                </div>
+                <span className="overview-row-pts">{r.points}</span>
+            </div>
+        ))}
+    </Card>
+);

@@ -1,16 +1,12 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
 
-import type { SortSearch } from '#/components/data-table';
-
-import { readSortSearch } from '#/components/data-table';
+import { SortSearchSchema } from '#/components/data-table';
 import { DriverShortSummaryListSchema } from '#/lib/api/drivers';
 import { api } from '#/lib/query/api';
 
-import type { Category } from './-components/drivers-table';
-
-import { CATEGORIES, DriversTable } from './-components/drivers-table';
-import { SORT_IDS } from './-components/drivers-table/columns';
+import { DriversTable } from './-components/drivers-table';
 
 const listDriversQuery = queryOptions({
     queryFn: () => api.get('drivers').json(DriverShortSummaryListSchema),
@@ -24,9 +20,8 @@ const DriversIndex = () => {
 
 export const Route = createFileRoute('/drivers/')({
     component: DriversIndex,
-    validateSearch: (s: Record<string, unknown>): SortSearch & { category?: Category } => ({
-        category: CATEGORIES.some(c => c.key === s.category) ? (s.category as Category) : undefined,
-        ...readSortSearch(SORT_IDS)(s),
+    validateSearch: SortSearchSchema.extend({
+        category: z.enum(['active', 'all', 'champions']).optional().catch(undefined),
     }),
     // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
     loader: async ({ context }) => {

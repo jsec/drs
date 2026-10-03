@@ -1,6 +1,5 @@
 import { Card } from '@mantine/core';
 import { getRouteApi } from '@tanstack/react-router';
-import { useMemo } from 'react';
 
 import type { ListConstructorsResponse } from '#/lib/api/constructors';
 
@@ -15,8 +14,8 @@ type Props = {
 };
 
 export const ConstructorsTable = ({ constructors }: Props) => {
-    const maxWins = useMemo(() => Math.max(...constructors.map(c => c.wins)), [constructors]);
-    const columns = useMemo(() => makeConstructorColumns(maxWins), [maxWins]);
+    const maxWins = Math.max(...constructors.map(c => c.wins));
+    const columns = makeConstructorColumns(maxWins);
 
     const { onSortingChange, sorting } = useUrlSorting(route);
 

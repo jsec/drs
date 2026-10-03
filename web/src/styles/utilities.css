@@ -45,13 +45,3 @@
   align-items: center;
   gap: 6px;
 }
-
-.f1-text-muted {
-  color: var(--mantine-color-dimmed);
-}
-
-.f1-truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}

@@ -1,26 +1,23 @@
 import { Card, Group, Stack } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { DataTable, useDataTable } from '#/components/data-table';
 import { Pill } from '#/components/f1-ui';
-import { seasonCalendarQuery, seasonStandingsQuery } from '#/data/queries';
+import { seasonCalendarQuery, seasonOverviewQuery } from '#/data/queries';
 import { parseYear } from '#/lib/route-params';
 
 import { makeConstructorColumns, makeDriverColumns } from './-components/standings-table/columns';
 
 const Standings = () => {
     const { year } = Route.useParams();
-    const { data } = useSuspenseQuery(seasonStandingsQuery(Number(year)));
+    const { data } = useSuspenseQuery(seasonOverviewQuery(Number(year)));
     const { data: calendar } = useSuspenseQuery(seasonCalendarQuery(Number(year)));
     const [tab, setTab] = useState<'constructors' | 'drivers'>('drivers');
 
-    const driverColumns = useMemo(() => makeDriverColumns(year), [year]);
-    const constructorColumns = useMemo(
-        () => makeConstructorColumns(data.maxConstructorPoints),
-        [data.maxConstructorPoints],
-    );
+    const driverColumns = makeDriverColumns(year);
+    const constructorColumns = makeConstructorColumns(data.maxConstructorPoints);
 
     const driverTable = useDataTable({ columns: driverColumns, data: data.drivers });
     const constructorTable = useDataTable({ columns: constructorColumns, data: data.constructors });
@@ -53,7 +50,7 @@ export const Route = createFileRoute('/seasons/$year/standings')({
     loader: async ({ context, params }) => {
         const year = parseYear(params.year);
         await Promise.all([
-            context.queryClient.ensureQueryData(seasonStandingsQuery(year)),
+            context.queryClient.ensureQueryData(seasonOverviewQuery(year)),
             context.queryClient.ensureQueryData(seasonCalendarQuery(year)),
         ]);
         return {

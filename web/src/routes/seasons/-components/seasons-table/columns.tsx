@@ -8,8 +8,6 @@ export type Season = ListSeasonsResponse[number];
 
 const col = makeColumns<Season>();
 
-export const SORT_IDS = ['season', 'raceCount', 'wdc', 'wcc'] as const;
-
 export const columns = [
     col.num('season', {
         header: 'SEASON',

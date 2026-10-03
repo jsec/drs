@@ -2,12 +2,11 @@ import { Card } from '@mantine/core';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
-import { readSortSearch } from '#/components/data-table';
+import { SortSearchSchema } from '#/components/data-table';
 import { SeasonListSchema } from '#/lib/api/seasons';
 import { api } from '#/lib/query/api';
 
 import { SeasonsTable } from './-components/seasons-table';
-import { SORT_IDS } from './-components/seasons-table/columns';
 
 const seasonsQuery = queryOptions({
     queryFn: () => api.get('seasons').json(SeasonListSchema),
@@ -33,7 +32,7 @@ const Seasons = () => {
 
 export const Route = createFileRoute('/seasons/')({
     component: Seasons,
-    validateSearch: readSortSearch(SORT_IDS),
+    validateSearch: SortSearchSchema,
     // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData(seasonsQuery);

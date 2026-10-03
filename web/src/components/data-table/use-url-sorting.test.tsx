@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { renderWithRouter, searchOf, testRoute } from '#/test/router';
 
-import { DataTable, makeColumns, readSortSearch, useDataTable, useUrlSorting } from './index';
+import { DataTable, makeColumns, SortSearchSchema, useDataTable, useUrlSorting } from './index';
 
 type Row = {
     name: string;
@@ -79,23 +79,12 @@ describe('useUrlSorting', () => {
     });
 });
 
-describe('readSortSearch', () => {
-    const read = readSortSearch(['name', 'wins']);
-
-    it('keeps a known id and its direction', () => {
-        expect(read({ dir: 'desc', sort: 'wins' })).toEqual({ dir: 'desc', sort: 'wins' });
+describe('SortSearchSchema', () => {
+    it('keeps a sort id and its direction', () => {
+        expect(SortSearchSchema.parse({ dir: 'desc', sort: 'wins' })).toEqual({ dir: 'desc', sort: 'wins' });
     });
 
-    it('drops an id no column claims', () => {
-        expect(read({ dir: 'desc', sort: 'bogus' })).toEqual({});
-    });
-
-    it('drops a non-string sort', () => {
-        expect(read({ sort: 7 })).toEqual({});
-    });
-
-    it('falls back to ascending when dir is missing or junk', () => {
-        expect(read({ sort: 'wins' })).toEqual({ dir: 'asc', sort: 'wins' });
-        expect(read({ dir: 'sideways', sort: 'wins' })).toEqual({ dir: 'asc', sort: 'wins' });
+    it('drops a non-string sort and a junk dir instead of throwing', () => {
+        expect(SortSearchSchema.parse({ dir: 'sideways', sort: 7 })).toEqual({});
     });
 });

@@ -70,15 +70,11 @@ const CircuitDetail = () => {
                 </GridHeader>
                 {data.races.map(race => (
                     <Box
+                        className="f1-grid-row"
                         key={race.raceId}
                         px={20}
                         py={11}
-                        style={{
-                            alignItems: 'center',
-                            borderTop: '1px solid var(--mantine-color-default-border)',
-                            display: 'grid',
-                            gridTemplateColumns: RACE_COLS,
-                        }}
+                        style={{ '--cols': RACE_COLS }}
                     >
                         <Text c="dimmed" className="f1-num" fz={12.5} inherit span>
                             {race.date ?? '—'}

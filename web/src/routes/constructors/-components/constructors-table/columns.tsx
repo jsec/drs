@@ -9,8 +9,6 @@ type Constructor = ListConstructorsResponse[number];
 
 const col = makeColumns<Constructor>();
 
-export const SORT_IDS = ['name', 'years', 'titles', 'wins', 'podiums'] as const;
-
 const byTitles: SortingFn<Constructor> = (a, b) =>
     a.original.championships - b.original.championships || a.original.wins - b.original.wins;
 

@@ -1,23 +1,20 @@
-import type { CSSProperties } from 'react';
-
 import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { CaretRightIcon, TrophyIcon } from '@phosphor-icons/react';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { HTTPError } from 'ky';
+import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { CountryFlag } from '#/components/country-flag';
 import { GOLD, GridHeader, MiniStat } from '#/components/f1-ui';
 
 import './driver-hero.css';
 import { DriverSummarySchema } from '#/lib/api/drivers';
+import { formatPosition } from '#/lib/format';
 import { api } from '#/lib/query/api';
 import { CURRENT_YEAR } from '#/lib/route-params';
 
 import {
     championshipPositionColor,
     driverSummaryColor,
-    formatChampionshipPosition,
     formatDriverYears,
     isChampionshipWinner,
 } from './-components/driver-summary';
@@ -34,15 +31,14 @@ const DriverCareer = () => {
     const { driverId } = Route.useParams();
     const { data } = useSuspenseQuery(driverCareerQuery(driverId));
     const { seasons, ...driver } = data;
-    const countryCode = driver.countryCode;
 
     return (
         <Stack gap={16}>
             <div
                 className="driver-hero"
-                style={{ '--driver-color': driverSummaryColor(driver) } as CSSProperties}
+                style={{ '--driver-color': driverSummaryColor(driver) }}
             >
-                {countryCode ? <CountryFlag aria-hidden className="driver-hero-flag" code={countryCode} /> : null}
+                <CountryFlag aria-hidden className="driver-hero-flag" code={driver.countryCode} />
                 <div className="driver-hero-content">
                     <div className="driver-hero-code">
                         {driver.code}
@@ -98,25 +94,20 @@ const DriverCareer = () => {
                     const isChampion = isChampionshipWinner(s.position);
                     return (
                         <Link
-                            className="f1-row"
+                            className="f1-row f1-grid-row"
                             key={`${s.season}-${s.constructor.name}`}
                             params={{ year: String(Math.min(s.season, CURRENT_YEAR)) }}
                             style={{
-                                alignItems: 'center',
-                                background: isChampion ? 'color-mix(in srgb, var(--gold-500) 7%, transparent)' : undefined,
-                                borderTop: '1px solid var(--mantine-color-default-border)',
-                                color: 'inherit',
-                                display: 'grid',
-                                gridTemplateColumns: COLS,
-                                padding: '11px 20px',
-                                textDecoration: 'none',
+                                '--cols': COLS,
+                                'background': isChampion ? 'color-mix(in srgb, var(--gold-500) 7%, transparent)' : undefined,
+                                'padding': '11px 20px',
                             }}
                             to="/seasons/$year"
                         >
                             <Text className="f1-num f1-display" fw={700} fz={16} inherit lts="-0.4px" span>{s.season}</Text>
                             <Group gap={9} wrap="nowrap">
                                 <Text c={championshipPositionColor(s.position)} className="f1-num" fw={700} fz={13.5} inherit span>
-                                    {formatChampionshipPosition(s.position)}
+                                    {formatPosition(s.position)}
                                 </Text>
                                 {isChampion ? <TrophyIcon color={GOLD} size={12} weight="fill" /> : null}
                                 <Text c="dimmed" fw={600} fz={12} inherit span>{s.constructor.name}</Text>
@@ -138,19 +129,7 @@ const DriverCareer = () => {
 export const Route = createFileRoute('/drivers/$driverId')({
     component: DriverCareer,
     loader: async ({ context, params }) => {
-        let name: string;
-
-        try {
-            ({ name } = await context.queryClient.ensureQueryData(
-                driverCareerQuery(params.driverId),
-            ));
-        } catch (error) {
-            if (error instanceof HTTPError && error.response.status === 404) {
-                throw notFound();
-            }
-
-            throw error;
-        }
+        const { name } = await context.queryClient.ensureQueryData(driverCareerQuery(params.driverId));
 
         return {
             crumbs: [{ label: 'Drivers', to: '/drivers' }, { label: name }],

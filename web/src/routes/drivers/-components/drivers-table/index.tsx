@@ -1,7 +1,6 @@
 import { Card, TextInput } from '@mantine/core';
 import { MagnifyingGlassIcon } from '@phosphor-icons/react';
 import { getRouteApi } from '@tanstack/react-router';
-import { useMemo } from 'react';
 
 import type { DriverShortSummary } from '#/lib/api/drivers';
 
@@ -10,15 +9,27 @@ import { Pill } from '#/components/f1-ui';
 
 import { columns, matchesSearch } from './columns';
 
-export type Category = 'active' | 'all' | 'champions';
+type Category = 'active' | 'all' | 'champions';
 
-export const CATEGORIES: { key: Category; label: string }[] = [
+const CATEGORIES: { key: Category; label: string }[] = [
     { key: 'all', label: 'All drivers' },
     { key: 'champions', label: 'World Champions' },
     { key: 'active', label: 'Active' },
 ];
 
 const route = getRouteApi('/drivers/');
+
+const filterByCategory = (drivers: DriverShortSummary[], category: Category) => {
+    if (category === 'active') {
+        return drivers.filter(d => d.isActive);
+    }
+
+    if (category === 'champions') {
+        return drivers.filter(d => d.championships > 0);
+    }
+
+    return drivers;
+};
 
 type Props = {
     drivers: DriverShortSummary[];
@@ -31,24 +42,13 @@ export const DriversTable = ({ drivers }: Props) => {
     const setCategory = (next: Category) =>
         void navigate({ search: prev => ({ ...prev, category: next }) });
 
-    const data = useMemo(() => {
-        if (category === 'active') {
-            return drivers.filter(d => d.isActive);
-        }
-
-        if (category === 'champions') {
-            return drivers.filter(d => d.championships > 0);
-        }
-
-        return drivers;
-    }, [drivers, category],
-    );
+    const categoryDrivers = filterByCategory(drivers, category);
 
     const { onSortingChange, sorting } = useUrlSorting(route);
 
     const { search, setSearch, table } = useDataTable({
         columns,
-        data,
+        data: categoryDrivers,
         filter: matchesSearch,
         onSortingChange,
         sorting,
