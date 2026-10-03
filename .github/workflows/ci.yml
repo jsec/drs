@@ -23,7 +23,7 @@ jobs:
       web: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.filter.outputs.web }}
       etl: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.filter.outputs.etl }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - id: filter
         if: github.event_name != 'workflow_dispatch'
@@ -64,7 +64,7 @@ jobs:
       (github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/') && needs.changes.outputs.go == 'true')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - uses: actions/setup-go@v6
         with:
@@ -97,7 +97,7 @@ jobs:
       (github.event_name == 'pull_request' && startsWith(github.head_ref, 'renovate/') && needs.changes.outputs.web == 'true')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
@@ -131,7 +131,7 @@ jobs:
     env:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - uses: actions/setup-python@v5
         with:
