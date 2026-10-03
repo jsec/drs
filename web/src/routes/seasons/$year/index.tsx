@@ -84,13 +84,34 @@ const SeasonOverview = () => {
     const { data: overview } = useSuspenseQuery(seasonOverviewQuery(Number(year)));
     const { data: calendar } = useSuspenseQuery(seasonCalendarQuery(Number(year)));
 
+    const nextRace = calendar.races.find(race => !race.completed);
+
+    const calendarCard = (
+        <SectionCard title={`${year} Calendar`}>
+            <SimpleGrid cols={8} spacing={9}>
+                {calendar.races.map(race => (
+                    <MiniRaceCell
+                        isNext={race.round === nextRace?.round}
+                        key={race.raceId}
+                        race={race}
+                        year={year}
+                    />
+                ))}
+            </SimpleGrid>
+        </SectionCard>
+    );
+
     if (overview.leader === null || overview.runnerUp === null) {
-        return <SectionCard title="Championship Standings">No championship standings recorded.</SectionCard>;
+        return (
+            <Stack gap={16}>
+                <SectionCard title="Championship Standings">No championship standings recorded.</SectionCard>
+                {calendarCard}
+            </Stack>
+        );
     }
 
     const { leader, runnerUp } = overview;
     const lastCompletedRace = calendar.races.findLast(race => race.completed);
-    const nextRace = calendar.races.find(race => !race.completed);
     const topDrivers = overview.drivers.slice(0, 8);
 
     return (
@@ -263,18 +284,7 @@ const SeasonOverview = () => {
                 />
             </Box>
 
-            <SectionCard title={`${year} Calendar`}>
-                <SimpleGrid cols={8} spacing={9}>
-                    {calendar.races.map(race => (
-                        <MiniRaceCell
-                            isNext={race.round === nextRace?.round}
-                            key={race.raceId}
-                            race={race}
-                            year={year}
-                        />
-                    ))}
-                </SimpleGrid>
-            </SectionCard>
+            {calendarCard}
         </Stack>
     );
 };
