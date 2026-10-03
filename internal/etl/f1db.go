@@ -34,6 +34,7 @@ func loadF1DB(ctx context.Context, logger *slog.Logger, databaseURL, token strin
 		ctx,
 		databaseURL,
 		dump,
+		"--single-transaction",
 		"-c", "drop schema if exists f1db cascade",
 		"-c", "create schema f1db",
 		"-c", "set search_path to f1db",
