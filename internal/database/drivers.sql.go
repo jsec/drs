@@ -9,7 +9,6 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/jsec/drs/internal/dbtypes"
 )
 
 const getDriverRace = `-- name: GetDriverRace :one
@@ -29,7 +28,7 @@ SELECT
     rr.gap,
     rr.status_category,
     rr.laps_completed,
-    rr.points::double precision AS points,
+    rr.points AS points,
     rr.pit_stop_count,
     rr.time_penalty,
     rr.is_win,
@@ -69,17 +68,17 @@ type GetDriverRaceRow struct {
 	Name                    string
 	ConstructorName         string
 	ConstructorColor        pgtype.Text
-	CarNumber               dbtypes.Int4
+	CarNumber               pgtype.Int4
 	PositionLabel           string
-	Position                dbtypes.Int4
-	GridPosition            dbtypes.Int4
-	PositionsGained         dbtypes.Int4
+	Position                pgtype.Int4
+	GridPosition            pgtype.Int4
+	PositionsGained         pgtype.Int4
 	ElapsedTime             pgtype.Text
 	Gap                     pgtype.Text
 	StatusCategory          string
-	LapsCompleted           dbtypes.Int4
+	LapsCompleted           pgtype.Int4
 	Points                  float64
-	PitStopCount            dbtypes.Int4
+	PitStopCount            pgtype.Int4
 	TimePenalty             pgtype.Text
 	IsWin                   bool
 	IsPolePosition          bool
@@ -88,7 +87,7 @@ type GetDriverRaceRow struct {
 	IsGrandSlam             bool
 	QualifyingPositionLabel pgtype.Text
 	BestQualifyingTime      pgtype.Text
-	FastestLapPosition      dbtypes.Int4
+	FastestLapPosition      pgtype.Int4
 	HasSprint               bool
 }
 
@@ -143,7 +142,7 @@ SELECT
         ORDER BY rr.race_round DESC
         LIMIT 1
     ) AS car_number,
-    coalesce(dss.final_points, dss.total_points)::double precision AS points,
+    coalesce(dss.final_points, dss.total_points) AS points,
     dss.final_position_text AS position,
     dss.win_count AS wins,
     dss.podium_count AS podiums,
@@ -162,7 +161,7 @@ type GetDriverSeasonRow struct {
 	CountryCode      string
 	ConstructorName  string
 	ConstructorColor string
-	CarNumber        dbtypes.Int4
+	CarNumber        pgtype.Int4
 	Points           float64
 	Position         pgtype.Text
 	Wins             int32
@@ -206,7 +205,7 @@ SELECT
     sr.gap,
     sr.status_category,
     sr.laps_completed,
-    sr.points::double precision AS points,
+    sr.points AS points,
     sr.time_penalty,
     sr.is_win,
     sr.is_grid_p1
@@ -224,15 +223,15 @@ type GetDriverSprintRow struct {
 	Name             string
 	ConstructorName  string
 	ConstructorColor pgtype.Text
-	CarNumber        dbtypes.Int4
+	CarNumber        pgtype.Int4
 	PositionLabel    string
-	Position         dbtypes.Int4
-	GridPosition     dbtypes.Int4
-	PositionsGained  dbtypes.Int4
+	Position         pgtype.Int4
+	GridPosition     pgtype.Int4
+	PositionsGained  pgtype.Int4
 	ElapsedTime      pgtype.Text
 	Gap              pgtype.Text
 	StatusCategory   string
-	LapsCompleted    dbtypes.Int4
+	LapsCompleted    pgtype.Int4
 	Points           float64
 	TimePenalty      pgtype.Text
 	IsWin            bool
@@ -308,8 +307,8 @@ type GetDriverSummaryRow struct {
 	Podiums          int32
 	Poles            int32
 	Championships    int32
-	FirstRaceDate    dbtypes.Date
-	LastRaceDate     dbtypes.Date
+	FirstRaceDate    pgtype.Date
+	LastRaceDate     pgtype.Date
 	IsActive         pgtype.Bool
 	ConstructorColor pgtype.Text
 }
@@ -351,7 +350,7 @@ type ListDriverRacePitStopsRow struct {
 	StopNumber int32
 	LapNumber  int32
 	Duration   pgtype.Text
-	DurationMs dbtypes.Int4
+	DurationMs pgtype.Int4
 }
 
 func (q *Queries) ListDriverRacePitStops(ctx context.Context, raceID int32, driverID string) ([]ListDriverRacePitStopsRow, error) {
@@ -387,9 +386,9 @@ SELECT DISTINCT ON (rr.race_round)
     rr.position_text AS position_label,
     rr.finish_position AS position,
     rr.status_category,
-    rr.points::double precision AS points,
+    rr.points AS points,
     sr.position_text AS sprint_position_label,
-    coalesce(sr.points, 0)::double precision AS sprint_points
+    coalesce(sr.points, 0) AS sprint_points
 FROM effone.race_results rr
     JOIN effone.races r ON rr.race_id = r.race_id
     LEFT JOIN effone.sprint_results sr
@@ -403,9 +402,9 @@ ORDER BY rr.race_round, rr.finish_order
 type ListDriverSeasonRacesRow struct {
 	RaceRound           int32
 	RaceName            string
-	GridPosition        dbtypes.Int4
+	GridPosition        pgtype.Int4
 	PositionLabel       string
-	Position            dbtypes.Int4
+	Position            pgtype.Int4
 	StatusCategory      string
 	Points              float64
 	SprintPositionLabel pgtype.Text
@@ -544,8 +543,8 @@ type ListDriversRow struct {
 	Podiums          int32
 	Poles            int32
 	Championships    int32
-	FirstRaceDate    dbtypes.Date
-	LastRaceDate     dbtypes.Date
+	FirstRaceDate    pgtype.Date
+	LastRaceDate     pgtype.Date
 	IsActive         pgtype.Bool
 	ConstructorColor pgtype.Text
 }

@@ -40,7 +40,7 @@ SELECT
     rr.elapsed_time,
     rr.gap,
     rr.status,
-    rr.points::double precision AS points
+    rr.points AS points
 FROM effone.race_results AS rr
 JOIN effone.drivers AS d
     ON rr.driver_id = d.driver_id

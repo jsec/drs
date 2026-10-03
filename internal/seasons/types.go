@@ -1,6 +1,6 @@
 package seasons
 
-import "github.com/jsec/drs/internal/dbtypes"
+import "github.com/jackc/pgx/v5/pgtype"
 
 type SeasonResponse struct {
 	Season           int32        `json:"season"`
@@ -23,7 +23,7 @@ type Constructor struct {
 }
 
 type DriverStanding struct {
-	Position      dbtypes.Int4 `json:"position"`
+	Position      pgtype.Int4  `json:"position"`
 	PositionLabel string       `json:"positionLabel"`
 	Points        float64      `json:"points"`
 	ID            string       `json:"id"`
@@ -32,27 +32,21 @@ type DriverStanding struct {
 	Country       string       `json:"country"`
 	CountryCode   string       `json:"countryCode"`
 	Constructor   *Constructor `json:"constructor"`
-	CarNumber     dbtypes.Int4 `json:"carNumber"`
+	CarNumber     pgtype.Int4  `json:"carNumber"`
 	Wins          int32        `json:"wins"`
 	Podiums       int32        `json:"podiums"`
 	Poles         int32        `json:"poles"`
 }
 
 type ConstructorStanding struct {
-	Position      dbtypes.Int4 `json:"position"`
-	PositionLabel string       `json:"positionLabel"`
-	Points        float64      `json:"points"`
-	ID            string       `json:"id"`
-	EngineID      string       `json:"engineId"`
-	Name          string       `json:"name"`
-	Color         string       `json:"color"`
-	CountryCode   string       `json:"countryCode"`
-}
-
-type StandingsResponse struct {
-	Drivers              []DriverStanding      `json:"drivers"`
-	Constructors         []ConstructorStanding `json:"constructors"`
-	MaxConstructorPoints float64               `json:"maxConstructorPoints"`
+	Position      pgtype.Int4 `json:"position"`
+	PositionLabel string      `json:"positionLabel"`
+	Points        float64     `json:"points"`
+	ID            string      `json:"id"`
+	EngineID      string      `json:"engineId"`
+	Name          string      `json:"name"`
+	Color         string      `json:"color"`
+	CountryCode   string      `json:"countryCode"`
 }
 
 type ProgressionDataRow map[string]float64
@@ -93,7 +87,7 @@ type CalendarEntry struct {
 	Round     int32           `json:"round"`
 	Name      string          `json:"name"`
 	Code      *string         `json:"code"`
-	Date      dbtypes.Date    `json:"date"`
+	Date      pgtype.Date     `json:"date"`
 	Circuit   calendarCircuit `json:"circuit"`
 	Completed bool            `json:"completed"`
 	Winner    *calendarWinner `json:"winner"`

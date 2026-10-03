@@ -1,6 +1,12 @@
 package main
 
-import "os"
+import (
+	"context"
+	"errors"
+	"os"
+
+	"github.com/urfave/cli/v3"
+)
 
 type config struct {
 	appEnv      string
@@ -21,4 +27,12 @@ func loadConfig() config {
 		githubToken: os.Getenv("GITHUB_TOKEN"),
 		port:        port,
 	}
+}
+
+func (c config) requireDatabaseURL(ctx context.Context, _ *cli.Command) (context.Context, error) {
+	if c.databaseURL == "" {
+		return ctx, errors.New("DATABASE_URL is required")
+	}
+
+	return ctx, nil
 }

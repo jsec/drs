@@ -1,7 +1,6 @@
 package etl
 
 import (
-	"archive/zip"
 	"bufio"
 	"bytes"
 	"context"
@@ -42,18 +41,7 @@ func loadJolpica(ctx context.Context, logger *slog.Logger, databaseURL string) e
 }
 
 func downloadJolpicaDump(ctx context.Context) (io.Reader, error) {
-	var archive bytes.Buffer
-
-	if err := download(ctx, jolpicaDumpURL, &archive); err != nil {
-		return nil, fmt.Errorf("downloading Jolpica dump: %w", err)
-	}
-
-	reader, err := zip.NewReader(bytes.NewReader(archive.Bytes()), int64(archive.Len()))
-	if err != nil {
-		return nil, fmt.Errorf("opening Jolpica dump: %w", err)
-	}
-
-	file, err := reader.Open(jolpicaDumpFileName)
+	file, err := openZipEntry(ctx, jolpicaDumpURL, jolpicaDumpFileName)
 	if err != nil {
 		return nil, fmt.Errorf("opening Jolpica dump: %w", err)
 	}

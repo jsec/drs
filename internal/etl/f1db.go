@@ -1,8 +1,6 @@
 package etl
 
 import (
-	"archive/zip"
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -25,17 +23,7 @@ func loadF1DB(ctx context.Context, logger *slog.Logger, databaseURL, token strin
 	logger.Info("found latest f1db release", "version", version)
 
 	logger.Info("downloading dump file")
-	var archive bytes.Buffer
-	if err := download(ctx, downloadURL, &archive); err != nil {
-		return fmt.Errorf("downloading f1db dump: %w", err)
-	}
-
-	reader, err := zip.NewReader(bytes.NewReader(archive.Bytes()), int64(archive.Len()))
-	if err != nil {
-		return fmt.Errorf("opening f1db dump: %w", err)
-	}
-
-	dump, err := reader.Open(fileName)
+	dump, err := openZipEntry(ctx, downloadURL, fileName)
 	if err != nil {
 		return fmt.Errorf("opening f1db dump: %w", err)
 	}

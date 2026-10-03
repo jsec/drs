@@ -2,15 +2,12 @@ package circuits
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jsec/drs/internal/database"
 )
-
-var ErrNotFound = errors.New("circuit not found")
 
 type circuitQueries interface {
 	ListCircuits(context.Context) ([]database.ListCircuitsRow, error)
@@ -41,8 +38,8 @@ func (s *Service) ListCircuits(ctx context.Context) ([]ListCircuitsResponse, err
 			CircuitID:     row.CircuitID,
 			Name:          row.Name,
 			Country:       row.Country,
-			FirstRaceYear: row.FirstRaceDate.Year(),
-			LastRaceYear:  row.LastRaceDate.Year(),
+			FirstRaceYear: year(row.FirstRaceDate),
+			LastRaceYear:  year(row.LastRaceDate),
 			Location:      row.Location,
 			RaceCount:     int(row.RaceCount),
 		})
@@ -53,9 +50,6 @@ func (s *Service) ListCircuits(ctx context.Context) ([]ListCircuitsResponse, err
 
 func (s *Service) GetCircuitSummary(ctx context.Context, circuitID string) (CircuitSummaryResponse, error) {
 	circuit, err := s.queries.GetCircuitInfo(ctx, circuitID)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return CircuitSummaryResponse{}, ErrNotFound
-	}
 	if err != nil {
 		return CircuitSummaryResponse{}, fmt.Errorf("getting circuit info: %w", err)
 	}
@@ -108,4 +102,12 @@ func (s *Service) GetCircuitSummary(ctx context.Context, circuitID string) (Circ
 	}
 
 	return result, nil
+}
+
+func year(d pgtype.Date) *int32 {
+	if !d.Valid {
+		return nil
+	}
+	y := int32(d.Time.Year())
+	return &y
 }

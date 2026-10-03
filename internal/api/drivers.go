@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/jsec/drs/internal/drivers"
@@ -10,14 +9,10 @@ import (
 func (app *application) getDriverSummaryHandler(w http.ResponseWriter, r *http.Request) error {
 	summary, err := app.drivers.GetSummary(r.Context(), r.PathValue("driverID"))
 	if err != nil {
-		if errors.Is(err, drivers.ErrNotFound) {
-			return errNotFound
-		}
-
 		return err
 	}
 
-	return respondJSON(app.logger, w, http.StatusOK, summary)
+	return respondJSON(app.logger, w, summary)
 }
 
 func (app *application) listDriversHandler(w http.ResponseWriter, r *http.Request) error {
@@ -26,7 +21,7 @@ func (app *application) listDriversHandler(w http.ResponseWriter, r *http.Reques
 		return err
 	}
 
-	return respondJSON(app.logger, w, http.StatusOK, drivers)
+	return respondJSON(app.logger, w, drivers)
 }
 
 func (app *application) getDriverSeasonHandler(w http.ResponseWriter, r *http.Request) error {
@@ -37,14 +32,10 @@ func (app *application) getDriverSeasonHandler(w http.ResponseWriter, r *http.Re
 
 	season, err := app.drivers.GetSeason(r.Context(), r.PathValue("driverID"), year)
 	if err != nil {
-		if errors.Is(err, drivers.ErrNotFound) {
-			return errNotFound
-		}
-
 		return err
 	}
 
-	return respondJSON(app.logger, w, http.StatusOK, season)
+	return respondJSON(app.logger, w, season)
 }
 
 func (app *application) getDriverRaceHandler(w http.ResponseWriter, r *http.Request) error {
@@ -65,12 +56,8 @@ func (app *application) getDriverRaceHandler(w http.ResponseWriter, r *http.Requ
 		race, err = app.drivers.GetRace(r.Context(), r.PathValue("driverID"), year, round)
 	}
 	if err != nil {
-		if errors.Is(err, drivers.ErrNotFound) {
-			return errNotFound
-		}
-
 		return err
 	}
 
-	return respondJSON(app.logger, w, http.StatusOK, race)
+	return respondJSON(app.logger, w, race)
 }

@@ -1,6 +1,6 @@
 package circuits
 
-import "github.com/jsec/drs/internal/dbtypes"
+import "github.com/jackc/pgx/v5/pgtype"
 
 type ListCircuitsResponse struct {
 	CircuitID     string `json:"circuitId"`
@@ -13,18 +13,18 @@ type ListCircuitsResponse struct {
 }
 
 type CircuitRaceSummary struct {
-	RaceID dbtypes.Int4 `json:"raceId"`
-	Date   dbtypes.Date `json:"date,omitempty"`
-	Name   string       `json:"name"`
+	RaceID pgtype.Int4 `json:"raceId"`
+	Date   pgtype.Date `json:"date"`
+	Name   string      `json:"name"`
 }
 
 type CircuitRace struct {
-	RaceID     int          `json:"raceId"`
-	Date       dbtypes.Date `json:"date"`
-	LayoutID   string       `json:"layoutId"`
-	Name       string       `json:"name"`
-	WinnerID   string       `json:"winnerId"`
-	WinnerName string       `json:"winnerName"`
+	RaceID     int         `json:"raceId"`
+	Date       pgtype.Date `json:"date"`
+	LayoutID   string      `json:"layoutId"`
+	Name       string      `json:"name"`
+	WinnerID   string      `json:"winnerId"`
+	WinnerName string      `json:"winnerName"`
 }
 
 type CircuitSummaryResponse struct {

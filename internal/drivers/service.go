@@ -2,15 +2,12 @@ package drivers
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jsec/drs/internal/database"
 )
-
-var ErrNotFound = errors.New("driver not found")
 
 type driverQueries interface {
 	GetDriverRace(ctx context.Context, season int32, raceRound int32, driverID string) (database.GetDriverRaceRow, error)
@@ -54,8 +51,8 @@ func (s *Service) ListDrivers(ctx context.Context) ([]DriverShortSummary, error)
 			Championships:    d.Championships,
 			IsActive:         d.IsActive.Bool,
 			ConstructorColor: d.ConstructorColor.String,
-			FirstYear:        d.FirstRaceDate.Year(),
-			LastYear:         d.LastRaceDate.Year(),
+			FirstYear:        year(d.FirstRaceDate),
+			LastYear:         year(d.LastRaceDate),
 		}
 
 		response = append(response, driver)
@@ -107,8 +104,8 @@ func (s *Service) GetSummary(ctx context.Context, driverId string) (DriverSummar
 		Championships:    summary.Championships,
 		IsActive:         summary.IsActive.Bool,
 		ConstructorColor: summary.ConstructorColor.String,
-		FirstYear:        summary.FirstRaceDate.Year(),
-		LastYear:         summary.LastRaceDate.Year(),
+		FirstYear:        year(summary.FirstRaceDate),
+		LastYear:         year(summary.LastRaceDate),
 		Seasons:          seasons,
 	}
 
@@ -117,9 +114,6 @@ func (s *Service) GetSummary(ctx context.Context, driverId string) (DriverSummar
 
 func (s *Service) GetSeason(ctx context.Context, driverID string, season int32) (DriverSeason, error) {
 	summary, err := s.queries.GetDriverSeason(ctx, season, driverID)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return DriverSeason{}, ErrNotFound
-	}
 	if err != nil {
 		return DriverSeason{}, fmt.Errorf("getting driver season: %w", err)
 	}
@@ -186,9 +180,6 @@ func (s *Service) GetSeason(ctx context.Context, driverID string, season int32) 
 
 func (s *Service) GetRace(ctx context.Context, driverID string, season, round int32) (DriverRace, error) {
 	race, err := s.queries.GetDriverRace(ctx, season, round, driverID)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return DriverRace{}, ErrNotFound
-	}
 	if err != nil {
 		return DriverRace{}, fmt.Errorf("getting driver race: %w", err)
 	}
@@ -243,9 +234,6 @@ func (s *Service) GetRace(ctx context.Context, driverID string, season, round in
 
 func (s *Service) GetSprint(ctx context.Context, driverID string, season, round int32) (DriverRace, error) {
 	sprint, err := s.queries.GetDriverSprint(ctx, season, round, driverID)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return DriverRace{}, ErrNotFound
-	}
 	if err != nil {
 		return DriverRace{}, fmt.Errorf("getting driver sprint: %w", err)
 	}
@@ -274,4 +262,12 @@ func (s *Service) GetSprint(ctx context.Context, driverID string, season, round 
 		HasSprint:       true,
 		PitStops:        []pitStop{},
 	}, nil
+}
+
+func year(d pgtype.Date) *int32 {
+	if !d.Valid {
+		return nil
+	}
+	y := int32(d.Time.Year())
+	return &y
 }

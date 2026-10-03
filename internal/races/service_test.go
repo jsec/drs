@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/jsec/drs/internal/database"
-	"github.com/jsec/drs/internal/dbtypes"
 	"github.com/jsec/drs/internal/races"
 )
 
@@ -40,8 +39,8 @@ func text(s string) pgtype.Text {
 	return pgtype.Text{String: s, Valid: true}
 }
 
-func int4(i int32) dbtypes.Int4 {
-	return dbtypes.Int4{Int4: pgtype.Int4{Int32: i, Valid: true}}
+func int4(i int32) pgtype.Int4 {
+	return pgtype.Int4{Int32: i, Valid: true}
 }
 
 func strPtr(s string) *string {
@@ -169,14 +168,14 @@ func TestService_RaceLookupErrors(t *testing.T) {
 		{
 			name:           "unknown round",
 			querier:        stubQuerier{raceErr: pgx.ErrNoRows},
-			wantErr:        races.ErrNotFound,
-			wantErrMessage: "race not found",
+			wantErr:        pgx.ErrNoRows,
+			wantErrMessage: "getting race detail: no rows in result set",
 		},
 		{
 			name:           "race not run yet",
 			querier:        stubQuerier{race: notRun},
-			wantErr:        races.ErrNotFound,
-			wantErrMessage: "race not found",
+			wantErr:        pgx.ErrNoRows,
+			wantErrMessage: "race not completed: no rows in result set",
 		},
 		{
 			name:           "race query error",

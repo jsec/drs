@@ -59,15 +59,15 @@ func (s *Service) ListSeasons(ctx context.Context) ([]SeasonResponse, error) {
 	return out, nil
 }
 
-func (s *Service) GetStandings(ctx context.Context, season int32) (StandingsResponse, error) {
+func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverviewResponse, error) {
 	driverRows, err := s.queries.ListSeasonDriverStandings(ctx, season)
 	if err != nil {
-		return StandingsResponse{}, fmt.Errorf("listing season driver standings: %w", err)
+		return SeasonOverviewResponse{}, fmt.Errorf("listing season driver standings: %w", err)
 	}
 
 	constructorRows, err := s.queries.ListSeasonConstructorStandings(ctx, season)
 	if err != nil {
-		return StandingsResponse{}, fmt.Errorf("listing season constructor standings: %w", err)
+		return SeasonOverviewResponse{}, fmt.Errorf("listing season constructor standings: %w", err)
 	}
 
 	drivers := make([]DriverStanding, 0, len(driverRows))
@@ -110,38 +110,25 @@ func (s *Service) GetStandings(ctx context.Context, season int32) (StandingsResp
 		})
 	}
 
-	return StandingsResponse{
+	overview := SeasonOverviewResponse{
 		Drivers:              drivers,
 		Constructors:         constructors,
 		MaxConstructorPoints: maxConstructorPoints(constructors),
-	}, nil
-}
-
-func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverviewResponse, error) {
-	standings, err := s.GetStandings(ctx, season)
-	if err != nil {
-		return SeasonOverviewResponse{}, fmt.Errorf("getting season standings: %w", err)
-	}
-
-	overview := SeasonOverviewResponse{
-		Drivers:              standings.Drivers,
-		Constructors:         standings.Constructors,
-		MaxConstructorPoints: standings.MaxConstructorPoints,
 		Progression: Progression{
 			Data:   []ProgressionDataRow{},
 			Series: []ProgressionSeries{},
 		},
 	}
-	if len(standings.Drivers) == 0 {
+	if len(drivers) == 0 {
 		return overview, nil
 	}
 
-	overview.Leader = &standings.Drivers[0]
-	if len(standings.Drivers) > 1 {
-		overview.RunnerUp = &standings.Drivers[1]
+	overview.Leader = &drivers[0]
+	if len(drivers) > 1 {
+		overview.RunnerUp = &drivers[1]
 	}
 
-	selectedDrivers := standings.Drivers
+	selectedDrivers := drivers
 	if len(selectedDrivers) > 6 {
 		selectedDrivers = selectedDrivers[:6]
 	}

@@ -17,7 +17,6 @@ import (
 
 	"github.com/jsec/drs/internal/circuits"
 	"github.com/jsec/drs/internal/database"
-	"github.com/jsec/drs/internal/dbtypes"
 )
 
 type stubQuerier struct {
@@ -105,9 +104,9 @@ func TestListCircuitsHandler_UsesCamelCaseJSON(t *testing.T) {
 	assert.JSONEq(t, `[{"circuitId":"monza","name":"","country":"","firstRaceYear":1950,"lastRaceYear":2026,"location":"","raceCount":75}]`, rec.Body.String())
 }
 
-func testDate(year int, month time.Month, day int) dbtypes.Date {
-	return dbtypes.Date{Date: pgtype.Date{
+func testDate(year int, month time.Month, day int) pgtype.Date {
+	return pgtype.Date{
 		Time:  time.Date(year, month, day, 0, 0, 0, 0, time.UTC),
 		Valid: true,
-	}}
+	}
 }

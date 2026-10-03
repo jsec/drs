@@ -12,10 +12,11 @@ import (
 
 func serveCommand(logger *slog.Logger, config config) *cli.Command {
 	return &cli.Command{
-		Name:  "serve",
-		Usage: "run the API server",
+		Name:   "serve",
+		Usage:  "run the API server",
+		Before: config.requireDatabaseURL,
 		Action: func(ctx context.Context, _ *cli.Command) error {
-			pool, err := openPool(ctx, config.databaseURL)
+			pool, err := database.NewPool(ctx, config.databaseURL)
 			if err != nil {
 				return err
 			}

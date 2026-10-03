@@ -10,5 +10,5 @@ func (app *application) listConstructorsHandler(w http.ResponseWriter, r *http.R
 		return err
 	}
 
-	return respondJSON(app.logger, w, http.StatusOK, constructors)
+	return respondJSON(app.logger, w, constructors)
 }

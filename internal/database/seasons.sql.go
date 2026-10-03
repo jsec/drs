@@ -9,7 +9,6 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/jsec/drs/internal/dbtypes"
 )
 
 const listSeasonCalendar = `-- name: ListSeasonCalendar :many
@@ -40,7 +39,7 @@ type ListSeasonCalendarRow struct {
 	RaceRound              int32
 	RaceName               string
 	GrandPrixCode          pgtype.Text
-	RaceDate               dbtypes.Date
+	RaceDate               pgtype.Date
 	CircuitID              string
 	CircuitName            string
 	WinnerDriverID         pgtype.Text
@@ -96,7 +95,7 @@ WITH latest_round AS (
 SELECT
     css.position,
     css.position_text AS position_label,
-    css.points::double precision AS points,
+    css.points AS points,
     css.constructor_id,
     css.engine_manufacturer_id AS engine_id,
     CASE
@@ -116,7 +115,7 @@ ORDER BY css.position NULLS LAST, css.constructor_name
 `
 
 type ListSeasonConstructorStandingsRow struct {
-	Position         dbtypes.Int4
+	Position         pgtype.Int4
 	PositionLabel    string
 	Points           float64
 	ConstructorID    string
@@ -160,7 +159,7 @@ SELECT
     dss.race_round,
     dss.driver_id,
     dss.driver_code AS code,
-    dss.points::double precision AS points
+    dss.points AS points
 FROM effone.driver_standings_snapshots AS dss
 WHERE dss.season = $1
     AND dss.driver_id = ANY($2::text[])
@@ -208,7 +207,7 @@ WITH latest_round AS (
 SELECT
     dss.position,
     dss.position_text AS position_label,
-    dss.points::double precision AS points,
+    dss.points AS points,
     dss.driver_id,
     dss.driver_code AS code,
     dss.driver_name AS name,
@@ -233,7 +232,7 @@ ORDER BY dss.position NULLS LAST, dss.driver_name
 `
 
 type ListSeasonDriverStandingsRow struct {
-	Position         dbtypes.Int4
+	Position         pgtype.Int4
 	PositionLabel    string
 	Points           float64
 	DriverID         string
@@ -244,7 +243,7 @@ type ListSeasonDriverStandingsRow struct {
 	ConstructorID    pgtype.Text
 	ConstructorName  pgtype.Text
 	ConstructorColor pgtype.Text
-	CarNumber        dbtypes.Int4
+	CarNumber        pgtype.Int4
 	Wins             int32
 	Podiums          int32
 	Poles            int32

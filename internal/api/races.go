@@ -1,11 +1,8 @@
 package api
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
-
-	"github.com/jsec/drs/internal/races"
 )
 
 func (app *application) getRaceDetailHandler(w http.ResponseWriter, r *http.Request) error {
@@ -16,13 +13,10 @@ func (app *application) getRaceDetailHandler(w http.ResponseWriter, r *http.Requ
 
 	race, err := app.races.GetRaceDetail(r.Context(), year, round)
 	if err != nil {
-		if errors.Is(err, races.ErrNotFound) {
-			return errNotFound
-		}
 		return err
 	}
 
-	return respondJSON(app.logger, w, http.StatusOK, race)
+	return respondJSON(app.logger, w, race)
 }
 
 func (app *application) getRaceLapsHandler(w http.ResponseWriter, r *http.Request) error {
@@ -38,13 +32,10 @@ func (app *application) getRaceLapsHandler(w http.ResponseWriter, r *http.Reques
 
 	laps, err := app.races.GetRaceLaps(r.Context(), year, round, session)
 	if err != nil {
-		if errors.Is(err, races.ErrNotFound) {
-			return errNotFound
-		}
 		return err
 	}
 
-	return respondJSON(app.logger, w, http.StatusOK, laps)
+	return respondJSON(app.logger, w, laps)
 }
 
 func parseYearRound(r *http.Request) (int32, int32, error) {

@@ -95,7 +95,7 @@ SELECT
         ORDER BY rr.race_round DESC
         LIMIT 1
     ) AS car_number,
-    coalesce(dss.final_points, dss.total_points)::double precision AS points,
+    coalesce(dss.final_points, dss.total_points) AS points,
     dss.final_position_text AS position,
     dss.win_count AS wins,
     dss.podium_count AS podiums,
@@ -114,9 +114,9 @@ SELECT DISTINCT ON (rr.race_round)
     rr.position_text AS position_label,
     rr.finish_position AS position,
     rr.status_category,
-    rr.points::double precision AS points,
+    rr.points AS points,
     sr.position_text AS sprint_position_label,
-    coalesce(sr.points, 0)::double precision AS sprint_points
+    coalesce(sr.points, 0) AS sprint_points
 FROM effone.race_results rr
     JOIN effone.races r ON rr.race_id = r.race_id
     LEFT JOIN effone.sprint_results sr
@@ -143,7 +143,7 @@ SELECT
     rr.gap,
     rr.status_category,
     rr.laps_completed,
-    rr.points::double precision AS points,
+    rr.points AS points,
     rr.pit_stop_count,
     rr.time_penalty,
     rr.is_win,
@@ -202,7 +202,7 @@ SELECT
     sr.gap,
     sr.status_category,
     sr.laps_completed,
-    sr.points::double precision AS points,
+    sr.points AS points,
     sr.time_penalty,
     sr.is_win,
     sr.is_grid_p1

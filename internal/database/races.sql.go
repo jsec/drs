@@ -9,7 +9,6 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/jsec/drs/internal/dbtypes"
 )
 
 const getRaceDetail = `-- name: GetRaceDetail :one
@@ -45,7 +44,7 @@ type GetRaceDetailRow struct {
 	Season             int32
 	RaceRound          int32
 	RaceName           string
-	RaceDate           dbtypes.Date
+	RaceDate           pgtype.Date
 	CircuitName        string
 	RaceLaps           int32
 	PoleDriverID       pgtype.Text
@@ -94,7 +93,7 @@ ORDER BY lt.driver_id, lt.lap_number
 type ListRaceLapTimesRow struct {
 	DriverID  string
 	LapNumber int32
-	Position  dbtypes.Int4
+	Position  pgtype.Int4
 	LapTimeMs int32
 }
 
@@ -138,7 +137,7 @@ SELECT
     rr.elapsed_time,
     rr.gap,
     rr.status,
-    rr.points::double precision AS points
+    rr.points AS points
 FROM effone.race_results AS rr
 JOIN effone.drivers AS d
     ON rr.driver_id = d.driver_id
@@ -158,7 +157,7 @@ type ListRaceResultsRow struct {
 	ConstructorID    string
 	ConstructorName  string
 	ConstructorColor pgtype.Text
-	GridPosition     dbtypes.Int4
+	GridPosition     pgtype.Int4
 	ElapsedTime      pgtype.Text
 	Gap              pgtype.Text
 	Status           pgtype.Text

@@ -1,10 +1,12 @@
 package etl
 
 import (
+	"archive/zip"
+	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"log/slog"
 	"net/http"
 	"os"
@@ -31,10 +33,6 @@ const (
 var httpClient = &http.Client{Timeout: 30 * time.Second}
 
 func Load(ctx context.Context, logger *slog.Logger, databaseURL, token string) error {
-	if databaseURL == "" {
-		return errors.New("DATABASE_URL is required")
-	}
-
 	if err := loadF1DB(ctx, logger, databaseURL, token); err != nil {
 		return fmt.Errorf("loading F1DB: %w", err)
 	}
@@ -65,6 +63,20 @@ func download(ctx context.Context, url string, w io.Writer) error {
 
 	_, err = io.Copy(w, resp.Body)
 	return err
+}
+
+func openZipEntry(ctx context.Context, url, name string) (fs.File, error) {
+	var archive bytes.Buffer
+	if err := download(ctx, url, &archive); err != nil {
+		return nil, fmt.Errorf("downloading %s: %w", url, err)
+	}
+
+	reader, err := zip.NewReader(bytes.NewReader(archive.Bytes()), int64(archive.Len()))
+	if err != nil {
+		return nil, fmt.Errorf("opening archive: %w", err)
+	}
+
+	return reader.Open(name)
 }
 
 func execSQL(ctx context.Context, databaseURL string, stdin io.Reader, args ...string) error {

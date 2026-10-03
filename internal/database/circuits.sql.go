@@ -9,7 +9,6 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/jsec/drs/internal/dbtypes"
 )
 
 const getCircuitInfo = `-- name: GetCircuitInfo :one
@@ -41,11 +40,11 @@ type GetCircuitInfoRow struct {
 	Country         string
 	CountryCode     string
 	CountryID       string
-	FirstRaceID     dbtypes.Int4
-	FirstRaceDate   dbtypes.Date
+	FirstRaceID     pgtype.Int4
+	FirstRaceDate   pgtype.Date
 	FirstRaceName   pgtype.Text
-	LastRaceID      dbtypes.Int4
-	LastRaceDate    dbtypes.Date
+	LastRaceID      pgtype.Int4
+	LastRaceDate    pgtype.Date
 	LastRaceName    pgtype.Text
 	CurrentLayoutID pgtype.Text
 	PreviousNames   []string
@@ -92,7 +91,7 @@ ORDER BY race_date DESC
 
 type GetRacesByCircuitIdRow struct {
 	RaceID           int32
-	RaceDate         dbtypes.Date
+	RaceDate         pgtype.Date
 	CircuitLayoutID  string
 	RaceOfficialName string
 	WinnerDriverID   pgtype.Text
@@ -143,8 +142,8 @@ type ListCircuitsRow struct {
 	CircuitID     string
 	Name          string
 	Country       string
-	FirstRaceDate dbtypes.Date
-	LastRaceDate  dbtypes.Date
+	FirstRaceDate pgtype.Date
+	LastRaceDate  pgtype.Date
 	Location      string
 	RaceCount     int32
 }

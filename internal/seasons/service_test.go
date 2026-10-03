@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/jsec/drs/internal/database"
-	"github.com/jsec/drs/internal/dbtypes"
 	"github.com/jsec/drs/internal/seasons"
 )
 
@@ -52,11 +51,11 @@ func text(s string) pgtype.Text {
 	return pgtype.Text{String: s, Valid: true}
 }
 
-func date(year int, month time.Month, day int) dbtypes.Date {
-	return dbtypes.Date{Date: pgtype.Date{
+func date(year int, month time.Month, day int) pgtype.Date {
+	return pgtype.Date{
 		Time:  time.Date(year, month, day, 0, 0, 0, 0, time.UTC),
 		Valid: true,
-	}}
+	}
 }
 
 func TestService_ListSeasons(t *testing.T) {
@@ -164,7 +163,7 @@ func TestService_ListSeasons(t *testing.T) {
 	}
 }
 
-func TestService_GetStandings(t *testing.T) {
+func TestService_GetOverview_Standings(t *testing.T) {
 	t.Parallel()
 
 	svc := seasons.NewService(stubQuerier{
@@ -192,28 +191,26 @@ func TestService_GetStandings(t *testing.T) {
 		}},
 	})
 
-	got, err := svc.GetStandings(context.Background(), 2023)
+	got, err := svc.GetOverview(context.Background(), 2023)
 
 	require.NoError(t, err)
-	assert.Equal(t, seasons.StandingsResponse{
-		Drivers: []seasons.DriverStanding{{
-			PositionLabel: "1",
-			Points:        251.5,
-			ID:            "max-verstappen",
-			Code:          "VER",
-			Name:          "Max Verstappen",
-			Country:       "Netherlands",
-			CountryCode:   "NL",
-			Constructor: &seasons.Constructor{
-				ID: "red-bull", Name: "Red Bull Racing", Color: "#3671C6",
-			},
-			Wins: 8, Podiums: 10, Poles: 6,
-		}},
-		Constructors: []seasons.ConstructorStanding{{
-			PositionLabel: "1", Points: 463.5, ID: "red-bull", Name: "Red Bull Racing", Color: "#3671C6",
-		}},
-		MaxConstructorPoints: 463.5,
-	}, got)
+	assert.Equal(t, []seasons.DriverStanding{{
+		PositionLabel: "1",
+		Points:        251.5,
+		ID:            "max-verstappen",
+		Code:          "VER",
+		Name:          "Max Verstappen",
+		Country:       "Netherlands",
+		CountryCode:   "NL",
+		Constructor: &seasons.Constructor{
+			ID: "red-bull", Name: "Red Bull Racing", Color: "#3671C6",
+		},
+		Wins: 8, Podiums: 10, Poles: 6,
+	}}, got.Drivers)
+	assert.Equal(t, []seasons.ConstructorStanding{{
+		PositionLabel: "1", Points: 463.5, ID: "red-bull", Name: "Red Bull Racing", Color: "#3671C6",
+	}}, got.Constructors)
+	assert.InEpsilon(t, 463.5, got.MaxConstructorPoints, 0.0001)
 }
 
 func TestService_GetOverview(t *testing.T) {

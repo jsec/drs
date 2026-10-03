@@ -16,33 +16,12 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-type dbtVars struct {
-	RefreshID  int64  `json:"refresh_id"`
-	F1dbSchema string `json:"f1db_schema"`
-}
-
-var refreshTables = []string{
-	"seasons",
-	"races",
-	"drivers",
-	"constructors",
-	"circuits",
-	"race_results",
-	"sprint_results",
-	"qualifying_results",
-	"pit_stops",
-	"driver_standings_snapshots",
-	"constructor_standings_snapshots",
-	"driver_season_summaries",
-	"constructor_season_summaries",
-}
-
-func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema, target string) (err error) {
+func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool) (err error) {
 	queries := database.New(pool)
 
 	logger.Info("creating refresh record")
 
-	refreshID, err := queries.CreateRefreshRun(ctx, "running", pgtype.Text{String: "f1db", Valid: true})
+	refreshID, err := queries.CreateRefreshRun(ctx, "running")
 	if err != nil {
 		return err
 	}
@@ -60,7 +39,7 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 	}()
 
 	logger.Info("rebuilding database")
-	if err = runDBT(ctx, refreshID, schema, target, "build"); err != nil {
+	if err = runDBTBuild(ctx); err != nil {
 		return fmt.Errorf("dbt build failed: %w", err)
 	}
 
@@ -80,31 +59,11 @@ func Build(ctx context.Context, logger *slog.Logger, pool *pgxpool.Pool, schema,
 		return err
 	}
 
-	logger.Info("generating docs")
-	if err = runDBT(ctx, refreshID, schema, target, "docs", "generate"); err != nil {
-		logger.Error("dbt docs generate failed",
-			"err", err,
-		)
-	}
-
 	return nil
 }
 
-func runDBT(ctx context.Context, refreshID int64, schema, target string, command ...string) error {
-	vars, err := json.Marshal(dbtVars{RefreshID: refreshID, F1dbSchema: schema})
-	if err != nil {
-		return err
-	}
-
-	args := append([]string{"run", "dbt"}, command...)
-	args = append(args,
-		"--project-dir", "./dbt",
-		"--profiles-dir", "./dbt",
-		"--target", target,
-		"--vars", string(vars),
-	)
-
-	cmd := exec.CommandContext(ctx, "uv", args...)
+func runDBTBuild(ctx context.Context) error {
+	cmd := exec.CommandContext(ctx, "uv", "run", "dbt", "build", "--project-dir", "./dbt", "--profiles-dir", "./dbt")
 	cmd.Dir = "etl"
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -113,9 +72,25 @@ func runDBT(ctx context.Context, refreshID int64, schema, target string, command
 }
 
 func rowCounts(ctx context.Context, pool *pgxpool.Pool) (map[string]int64, error) {
-	counts := make(map[string]int64, len(refreshTables))
+	rows, err := pool.Query(ctx, `
+		select table_name
+		from information_schema.tables
+		where table_schema = 'effone'
+			and table_type = 'BASE TABLE'
+			and table_name <> 'refresh_runs'
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("listing effone tables: %w", err)
+	}
 
-	for _, table := range refreshTables {
+	tables, err := pgx.CollectRows(rows, pgx.RowTo[string])
+	if err != nil {
+		return nil, fmt.Errorf("listing effone tables: %w", err)
+	}
+
+	counts := make(map[string]int64, len(tables))
+
+	for _, table := range tables {
 		query := fmt.Sprintf(
 			"select count(*) as row_count from %s",
 			pgx.Identifier{"effone", table}.Sanitize(),

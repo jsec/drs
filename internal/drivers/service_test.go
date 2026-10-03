@@ -65,7 +65,7 @@ func TestService_GetSeason_NotFound(t *testing.T) {
 
 	_, err := svc.GetSeason(context.Background(), "nobody", 2026)
 
-	require.ErrorIs(t, err, drivers.ErrNotFound)
+	require.ErrorIs(t, err, pgx.ErrNoRows)
 }
 
 func TestService_GetSeason_SprintOnlyWhenPresent(t *testing.T) {
@@ -98,7 +98,7 @@ func TestService_GetRace_NotFound(t *testing.T) {
 
 	_, err := svc.GetRace(context.Background(), "nobody", 2025, 1)
 
-	require.ErrorIs(t, err, drivers.ErrNotFound)
+	require.ErrorIs(t, err, pgx.ErrNoRows)
 }
 
 func TestService_GetRace_NoPitStopsIsEmptyList(t *testing.T) {
@@ -121,5 +121,5 @@ func TestService_GetSprint_NotFound(t *testing.T) {
 
 	_, err := svc.GetSprint(context.Background(), "lando-norris", 2025, 1)
 
-	require.ErrorIs(t, err, drivers.ErrNotFound)
+	require.ErrorIs(t, err, pgx.ErrNoRows)
 }

@@ -23,7 +23,7 @@ WITH latest_round AS (
 SELECT
     dss.position,
     dss.position_text AS position_label,
-    dss.points::double precision AS points,
+    dss.points AS points,
     dss.driver_id,
     dss.driver_code AS code,
     dss.driver_name AS name,
@@ -55,7 +55,7 @@ WITH latest_round AS (
 SELECT
     css.position,
     css.position_text AS position_label,
-    css.points::double precision AS points,
+    css.points AS points,
     css.constructor_id,
     css.engine_manufacturer_id AS engine_id,
     CASE
@@ -78,7 +78,7 @@ SELECT
     dss.race_round,
     dss.driver_id,
     dss.driver_code AS code,
-    dss.points::double precision AS points
+    dss.points AS points
 FROM effone.driver_standings_snapshots AS dss
 WHERE dss.season = sqlc.arg(season)
     AND dss.driver_id = ANY(sqlc.arg(driver_ids)::text[])

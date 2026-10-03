@@ -2,7 +2,6 @@ package races
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/jackc/pgx/v5"
@@ -10,8 +9,6 @@ import (
 
 	"github.com/jsec/drs/internal/database"
 )
-
-var ErrNotFound = errors.New("race not found")
 
 type raceQueries interface {
 	GetRaceDetail(ctx context.Context, season int32, raceRound int32) (database.GetRaceDetailRow, error)
@@ -149,14 +146,11 @@ func (s *Service) GetRaceLaps(ctx context.Context, season, round int32, session 
 
 func (s *Service) getCompletedRace(ctx context.Context, season, round int32) (database.GetRaceDetailRow, error) {
 	race, err := s.queries.GetRaceDetail(ctx, season, round)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return database.GetRaceDetailRow{}, ErrNotFound
-	}
 	if err != nil {
 		return database.GetRaceDetailRow{}, fmt.Errorf("getting race detail: %w", err)
 	}
 	if !race.WinnerDriverID.Valid {
-		return database.GetRaceDetailRow{}, ErrNotFound
+		return database.GetRaceDetailRow{}, fmt.Errorf("race not completed: %w", pgx.ErrNoRows)
 	}
 
 	return race, nil

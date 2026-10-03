@@ -16,11 +16,10 @@ sql:
         omit_unused_structs: true
         query_parameter_limit: 4
         overrides:
-          - db_type: "date"
-            go_type: "github.com/jsec/drs/internal/dbtypes.Date"
-          - db_type: "date"
-            go_type: "github.com/jsec/drs/internal/dbtypes.Date"
+          - db_type: "pg_catalog.numeric"
+            go_type: "float64"
+          - db_type: "pg_catalog.numeric"
             nullable: true
-          - db_type: "pg_catalog.int4"
-            go_type: "github.com/jsec/drs/internal/dbtypes.Int4"
-            nullable: true
+            go_type:
+              import: "github.com/jackc/pgx/v5/pgtype"
+              type: "Float8"

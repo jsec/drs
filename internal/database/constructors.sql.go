@@ -8,7 +8,7 @@ package database
 import (
 	"context"
 
-	"github.com/jsec/drs/internal/dbtypes"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const listConstructors = `-- name: ListConstructors :many
@@ -29,8 +29,8 @@ type ListConstructorsRow struct {
 	ID            string
 	Name          string
 	Color         string
-	FirstRaceDate dbtypes.Date
-	LastRaceDate  dbtypes.Date
+	FirstRaceDate pgtype.Date
+	LastRaceDate  pgtype.Date
 	Championships int32
 	Wins          int32
 	Podiums       int32

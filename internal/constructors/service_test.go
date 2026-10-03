@@ -12,7 +12,6 @@ import (
 
 	"github.com/jsec/drs/internal/constructors"
 	"github.com/jsec/drs/internal/database"
-	"github.com/jsec/drs/internal/dbtypes"
 )
 
 type stubQuerier struct {
@@ -24,13 +23,13 @@ func (s stubQuerier) ListConstructors(context.Context) ([]database.ListConstruct
 	return s.rows, s.err
 }
 
-func date(s string) dbtypes.Date {
+func date(s string) pgtype.Date {
 	tm, err := time.Parse("2006-01-02", s)
 	if err != nil {
 		panic(err)
 	}
 
-	return dbtypes.Date{Date: pgtype.Date{Time: tm, Valid: true}}
+	return pgtype.Date{Time: tm, Valid: true}
 }
 
 func TestService_ListConstructors(t *testing.T) {

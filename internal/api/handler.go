@@ -4,6 +4,8 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+
+	"github.com/jackc/pgx/v5"
 )
 
 var errNotFound = errors.New("not found")
@@ -25,7 +27,7 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if errors.Is(err, errNotFound) {
+	if errors.Is(err, errNotFound) || errors.Is(err, pgx.ErrNoRows) {
 		writeError(w, http.StatusNotFound, "not found")
 		return
 	}
