@@ -2,4 +2,4 @@
 _.file = '.env'
 
 [tools]
-node = "26.8.2"
+node = "26.10.0"
