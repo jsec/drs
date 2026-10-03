@@ -1861,3 +1861,90 @@ models:
         data_type: integer
         constraints:
           - type: not_null
+
+  - name: constructor_engine_seasons
+    description: One row per constructor, season and engine manufacturer, built from race entries so seasons without a constructors' championship are included.
+    config:
+      contract:
+        enforced: true
+    constraints:
+      - type: primary_key
+        columns:
+          - season
+          - constructor_id
+          - engine_manufacturer_id
+    columns:
+      - name: season
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: constructor_id
+        data_type: text
+        constraints:
+          - type: not_null
+      - name: engine_manufacturer_id
+        data_type: text
+        constraints:
+          - type: not_null
+      - name: engine_manufacturer_name
+        data_type: text
+        constraints:
+          - type: not_null
+      - name: start_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: win_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: podium_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: pole_count
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: final_position_text
+        data_type: text
+      - name: final_points
+        data_type: numeric(8, 2)
+      - name: championship_won
+        data_type: boolean
+        constraints:
+          - type: not_null
+
+  - name: constructor_lineage
+    description: One row per entry in a constructor's F1DB chronology, including the constructor itself.
+    config:
+      contract:
+        enforced: true
+    constraints:
+      - type: primary_key
+        columns:
+          - constructor_id
+          - position_display_order
+    columns:
+      - name: constructor_id
+        data_type: text
+        constraints:
+          - type: not_null
+      - name: position_display_order
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: other_constructor_id
+        data_type: text
+        constraints:
+          - type: not_null
+      - name: other_constructor_name
+        data_type: text
+        constraints:
+          - type: not_null
+      - name: year_from
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: year_to
+        data_type: integer
