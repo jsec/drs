@@ -301,7 +301,6 @@ export const Route = createFileRoute('/seasons/$year/races/$round')({
         return {
             crumbs: [
                 { label: params.year, params: { year: params.year }, to: '/seasons/$year' },
-                { label: 'Calendar', params: { year: params.year }, to: '/seasons/$year/calendar' },
                 { label: race.name },
             ],
         };
