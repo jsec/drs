@@ -3,28 +3,10 @@ import { isNumericPosition } from '#/lib/format';
 const FORMER_CHAMPION_COLOR = '#c79100';
 const INACTIVE_DRIVER_COLOR = 'var(--neutral-500)';
 
-type DriverCareerYears = {
-    firstYear: null | number;
-    isActive: boolean;
-    lastYear: null | number;
-};
-
 type DriverHero = {
     championships: number;
     constructorColor: string;
     isActive: boolean;
-};
-
-export const formatDriverYears = ({ firstYear, isActive, lastYear }: DriverCareerYears) => {
-    if (!firstYear) {
-        return '-';
-    }
-
-    if (isActive || !lastYear) {
-        return `${firstYear}–`;
-    }
-
-    return `${firstYear}–${lastYear}`;
 };
 
 export const driverSummaryColor = ({ championships, constructorColor, isActive }: DriverHero) => {

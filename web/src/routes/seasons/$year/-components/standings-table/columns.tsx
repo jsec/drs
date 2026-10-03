@@ -1,3 +1,5 @@
+import { Link } from '@tanstack/react-router';
+
 import type { ConstructorStanding, DriverStanding } from '#/lib/api/seasons';
 
 import { makeColumns } from '#/components/data-table';
@@ -13,6 +15,7 @@ export function makeConstructorColumns(maxConstructor: number) {
         col.competitor('name', {
             header: 'CONSTRUCTOR',
             label: c => c.name,
+            link: c => ({ params: { constructorId: c.id }, to: '/constructors/$constructorId' }),
             visual: c => <TeamSquare color={c.color} size="bar" />,
             width: '240px',
         }),
@@ -49,7 +52,23 @@ export function makeDriverColumns(year: string) {
             visual: d => <TeamBar color={d.constructor?.color ?? 'var(--neutral-500)'} size="md" />,
         }),
         col.custom({
-            cell: info => info.row.original.constructor?.name ?? '—',
+            cell: (info) => {
+                const team = info.row.original.constructor;
+                if (!team) {
+                    return '—';
+                }
+
+                return (
+                    <Link
+                        onClick={event => event.stopPropagation()}
+                        params={{ constructorId: team.id }}
+                        style={{ color: 'inherit', textDecoration: 'none' }}
+                        to="/constructors/$constructorId"
+                    >
+                        {team.name}
+                    </Link>
+                );
+            },
             header: 'TEAM',
             id: 'constructor',
             sortable: false,

@@ -18,6 +18,8 @@ export function makeConstructorColumns(maxWins: number) {
         col.competitor('name', {
             header: 'CONSTRUCTOR',
             label: c => c.name,
+            link: c => ({ params: { constructorId: c.id }, to: '/constructors/$constructorId' }),
+            trailing: 'caret',
             visual: c => (
                 <span style={{ background: c.color, borderRadius: 3, flexShrink: 0, height: 26, width: 6 }} />
             ),

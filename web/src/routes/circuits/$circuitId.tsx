@@ -4,10 +4,10 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import { CountryFlag } from '#/components/country-flag';
 import { GridHeader, MiniStat } from '#/components/f1-ui';
+import '#/components/career-hero.css';
 import { CircuitSummarySchema } from '#/lib/api/circuits';
 import { api } from '#/lib/query/api';
 
-import './circuit-hero.css';
 import { CircuitLayout } from './-components/circuit-layout';
 
 const RACE_COLS = '110px 1fr 200px';
@@ -28,14 +28,14 @@ const CircuitDetail = () => {
 
     return (
         <Stack gap={16}>
-            <div className="circuit-hero">
+            <div className="career-hero" style={{ '--hero-color': 'var(--mantine-primary-color-filled)' }}>
                 <CountryFlag
                     aria-hidden
-                    className="circuit-hero-flag"
+                    className="career-hero-flag"
                     code={data.countryCode}
                 />
-                <div className="circuit-hero-content">
-                    <div className="circuit-hero-mark">
+                <div className="career-hero-content">
+                    <div className="career-hero-mark">
                         <CircuitLayout layoutId={data.layoutId} name={data.name} size={46} />
                     </div>
                     <div>

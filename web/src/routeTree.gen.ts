@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CircuitsIndexRouteImport } from './routes/circuits/index'
 import { Route as CircuitsCircuitIdRouteImport } from './routes/circuits/$circuitId'
 import { Route as ConstructorsIndexRouteImport } from './routes/constructors/index'
+import { Route as ConstructorsConstructorIdRouteImport } from './routes/constructors/$constructorId'
 import { Route as DriversIndexRouteImport } from './routes/drivers/index'
 import { Route as DriversDriverIdRouteImport } from './routes/drivers/$driverId'
 import { Route as SeasonsIndexRouteImport } from './routes/seasons/index'
@@ -42,6 +43,12 @@ const ConstructorsIndexRoute = ConstructorsIndexRouteImport.update({
   path: '/constructors/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConstructorsConstructorIdRoute =
+  ConstructorsConstructorIdRouteImport.update({
+    id: '/constructors/$constructorId',
+    path: '/constructors/$constructorId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DriversIndexRoute = DriversIndexRouteImport.update({
   id: '/drivers/',
   path: '/drivers/',
@@ -88,6 +95,7 @@ const SeasonsYearDriversDriverIdRacesRoundRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/circuits/$circuitId': typeof CircuitsCircuitIdRoute
+  '/constructors/$constructorId': typeof ConstructorsConstructorIdRoute
   '/drivers/$driverId': typeof DriversDriverIdRoute
   '/circuits/': typeof CircuitsIndexRoute
   '/constructors/': typeof ConstructorsIndexRoute
@@ -102,6 +110,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/circuits/$circuitId': typeof CircuitsCircuitIdRoute
+  '/constructors/$constructorId': typeof ConstructorsConstructorIdRoute
   '/drivers/$driverId': typeof DriversDriverIdRoute
   '/circuits': typeof CircuitsIndexRoute
   '/constructors': typeof ConstructorsIndexRoute
@@ -117,6 +126,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/circuits/$circuitId': typeof CircuitsCircuitIdRoute
+  '/constructors/$constructorId': typeof ConstructorsConstructorIdRoute
   '/drivers/$driverId': typeof DriversDriverIdRoute
   '/circuits/': typeof CircuitsIndexRoute
   '/constructors/': typeof ConstructorsIndexRoute
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/circuits/$circuitId'
+    | '/constructors/$constructorId'
     | '/drivers/$driverId'
     | '/circuits/'
     | '/constructors/'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/circuits/$circuitId'
+    | '/constructors/$constructorId'
     | '/drivers/$driverId'
     | '/circuits'
     | '/constructors'
@@ -161,6 +173,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/circuits/$circuitId'
+    | '/constructors/$constructorId'
     | '/drivers/$driverId'
     | '/circuits/'
     | '/constructors/'
@@ -176,6 +189,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CircuitsCircuitIdRoute: typeof CircuitsCircuitIdRoute
+  ConstructorsConstructorIdRoute: typeof ConstructorsConstructorIdRoute
   DriversDriverIdRoute: typeof DriversDriverIdRoute
   CircuitsIndexRoute: typeof CircuitsIndexRoute
   ConstructorsIndexRoute: typeof ConstructorsIndexRoute
@@ -216,6 +230,13 @@ declare module '@tanstack/react-router' {
       path: '/constructors'
       fullPath: '/constructors/'
       preLoaderRoute: typeof ConstructorsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/constructors/$constructorId': {
+      id: '/constructors/$constructorId'
+      path: '/constructors/$constructorId'
+      fullPath: '/constructors/$constructorId'
+      preLoaderRoute: typeof ConstructorsConstructorIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/drivers/': {
@@ -280,6 +301,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CircuitsCircuitIdRoute: CircuitsCircuitIdRoute,
+  ConstructorsConstructorIdRoute: ConstructorsConstructorIdRoute,
   DriversDriverIdRoute: DriversDriverIdRoute,
   CircuitsIndexRoute: CircuitsIndexRoute,
   ConstructorsIndexRoute: ConstructorsIndexRoute,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatLapTime, formatPosition } from './format';
+import { formatCareerYears, formatLapTime, formatPosition } from './format';
 
 describe('formatLapTime', () => {
     it('pads seconds and keeps milliseconds', () => {
@@ -13,5 +13,15 @@ describe('formatPosition', () => {
     it('prefixes numeric positions only', () => {
         expect(formatPosition('3')).toBe('P3');
         expect(formatPosition('DNF')).toBe('DNF');
+    });
+});
+
+describe('formatCareerYears', () => {
+    it('keeps an active career open', () => {
+        expect(formatCareerYears({ firstYear: 2007, isActive: true, lastYear: 2026 })).toBe('2007–');
+    });
+
+    it('shows both years for a finished career', () => {
+        expect(formatCareerYears({ firstYear: 1991, isActive: false, lastYear: 2012 })).toBe('1991–2012');
     });
 });

@@ -5,17 +5,15 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { CountryFlag } from '#/components/country-flag';
 import { GOLD, GridHeader, MiniStat } from '#/components/f1-ui';
-
-import './driver-hero.css';
+import '#/components/career-hero.css';
 import { DriverSummarySchema } from '#/lib/api/drivers';
-import { formatPosition } from '#/lib/format';
+import { formatCareerYears, formatPosition } from '#/lib/format';
 import { api } from '#/lib/query/api';
 import { CURRENT_YEAR } from '#/lib/route-params';
 
 import {
     championshipPositionColor,
     driverSummaryColor,
-    formatDriverYears,
     isChampionshipWinner,
 } from './-components/driver-summary';
 
@@ -35,12 +33,12 @@ const DriverCareer = () => {
     return (
         <Stack gap={16}>
             <div
-                className="driver-hero"
-                style={{ '--driver-color': driverSummaryColor(driver) }}
+                className="career-hero"
+                style={{ '--hero-color': driverSummaryColor(driver) }}
             >
-                <CountryFlag aria-hidden className="driver-hero-flag" code={driver.countryCode} />
-                <div className="driver-hero-content">
-                    <div className="driver-hero-code">
+                <CountryFlag aria-hidden className="career-hero-flag" code={driver.countryCode} />
+                <div className="career-hero-content">
+                    <div className="career-hero-mark">
                         {driver.code}
                     </div>
                     <div>
@@ -50,7 +48,7 @@ const DriverCareer = () => {
                             </Text>
                             {driver.championships > 0
                                 ? (
-                                        <Group className="driver-hero-badge" gap={4} wrap="nowrap">
+                                        <Group className="career-hero-badge" gap={4} wrap="nowrap">
                                             <TrophyIcon size={13} weight="fill" />
                                             World Champion
                                         </Group>
@@ -58,7 +56,7 @@ const DriverCareer = () => {
                                 : null}
                         </Group>
                         <Box fz={13} mt={5} opacity={0.9}>
-                            {`${driver.country} · ${formatDriverYears(driver)} · Career summary`}
+                            {`${driver.country} · ${formatCareerYears(driver)} · Career summary`}
                         </Box>
                     </div>
                 </div>

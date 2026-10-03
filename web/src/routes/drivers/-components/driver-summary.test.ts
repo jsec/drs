@@ -1,16 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { driverSummaryColor, formatDriverYears } from './driver-summary';
-
-describe('formatDriverYears', () => {
-    it('keeps an active driver career open', () => {
-        expect(formatDriverYears({ firstYear: 2007, isActive: true, lastYear: 2026 })).toBe('2007–');
-    });
-
-    it('shows both years for a retired driver', () => {
-        expect(formatDriverYears({ firstYear: 1991, isActive: false, lastYear: 2012 })).toBe('1991–2012');
-    });
-});
+import { driverSummaryColor } from './driver-summary';
 
 describe('driverSummaryColor', () => {
     it('uses the active driver constructor color', () => {

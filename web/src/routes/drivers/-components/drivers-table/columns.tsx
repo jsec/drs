@@ -4,8 +4,9 @@ import type { DriverShortSummary } from '#/lib/api/drivers';
 
 import { makeColumns } from '#/components/data-table';
 import { DriverAvatar } from '#/components/f1-ui';
+import { formatCareerYears } from '#/lib/format';
 
-import { driverSummaryColor, formatDriverYears } from '../driver-summary';
+import { driverSummaryColor } from '../driver-summary';
 
 const col = makeColumns<DriverShortSummary>();
 
@@ -36,7 +37,7 @@ export const columns = [
         accessor: d => d.firstYear,
         cell: info => (
             <span className="table-cell-num table-cell-sm">
-                {formatDriverYears(info.row.original)}
+                {formatCareerYears(info.row.original)}
             </span>
         ),
         header: 'YEARS',

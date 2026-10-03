@@ -6,6 +6,6 @@ declare module 'react' {
         '--circuit-layout-size'?: string;
         '--circuit-layout-src'?: string;
         '--cols'?: string;
-        '--driver-color'?: string;
+        '--hero-color'?: string;
     }
 }
