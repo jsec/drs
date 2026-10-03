@@ -28,80 +28,25 @@ models:
       effone:
         +materialized: table
         +schema: effone
-        circuits:
-          +post-hook:
-            - "{{ create_index('circuits_circuit_id_uidx', ['circuit_id'], unique=true) }}"
-        circuit_layouts:
-          +post-hook:
-            - "{{ create_index('circuit_layouts_circuit_layout_id_uidx', ['circuit_layout_id'], unique=true) }}"
-            - "{{ create_index('circuit_layouts_circuit_id_idx', ['circuit_id']) }}"
-        constructors:
-          +post-hook:
-            - "{{ create_index('constructors_constructor_id_uidx', ['constructor_id'], unique=true) }}"
-        drivers:
-          +post-hook:
-            - "{{ create_index('drivers_driver_id_uidx', ['driver_id'], unique=true) }}"
-            - "{{ create_index('drivers_driver_code_idx', ['driver_code']) }}"
-        seasons:
-          +post-hook:
-            - "{{ create_index('seasons_season_uidx', ['season'], unique=true) }}"
         races:
-          +post-hook:
-            - "{{ create_index('races_race_id_uidx', ['race_id'], unique=true) }}"
-            - "{{ create_index('races_season_round_idx', ['season', 'race_round']) }}"
-            - "{{ create_index('races_circuit_id_idx', ['circuit_id']) }}"
+          +indexes:
+            - columns: [season, race_round]
+            - columns: [circuit_id]
         race_results:
-          +post-hook:
-            - "{{ create_index('race_results_race_finish_order_uidx', ['race_id', 'finish_order'], unique=true) }}"
-            - "{{ create_index('race_results_season_driver_idx', ['season', 'driver_id']) }}"
-            - "{{ create_index('race_results_season_constructor_idx', ['season', 'constructor_id']) }}"
-            - "{{ create_index('race_results_driver_race_idx', ['driver_id', 'race_id']) }}"
-            - "{{ create_index('race_results_constructor_race_idx', ['constructor_id', 'race_id']) }}"
+          +indexes:
+            - columns: [season, driver_id]
         sprint_results:
-          +post-hook:
-            - "{{ create_index('sprint_results_race_driver_uidx', ['race_id', 'driver_id'], unique=true) }}"
-            - "{{ create_index('sprint_results_race_finish_order_idx', ['race_id', 'finish_order']) }}"
-            - "{{ create_index('sprint_results_season_driver_idx', ['season', 'driver_id']) }}"
-            - "{{ create_index('sprint_results_season_constructor_idx', ['season', 'constructor_id']) }}"
-        qualifying_results:
-          +post-hook:
-            - "{{ create_index('qualifying_results_race_order_uidx', ['race_id', 'qualifying_order'], unique=true) }}"
-            - "{{ create_index('qualifying_results_season_driver_idx', ['season', 'driver_id']) }}"
-            - "{{ create_index('qualifying_results_season_constructor_idx', ['season', 'constructor_id']) }}"
-        fastest_laps:
-          +post-hook:
-            - "{{ create_index('fastest_laps_race_driver_uidx', ['race_id', 'driver_id'], unique=true) }}"
-            - "{{ create_index('fastest_laps_season_driver_idx', ['season', 'driver_id']) }}"
-        lap_times:
-          +post-hook:
-            - "{{ create_index('lap_times_race_session_driver_lap_uidx', ['race_id', 'session', 'driver_id', 'lap_number'], unique=true) }}"
-            - "{{ create_index('lap_times_driver_race_idx', ['driver_id', 'race_id']) }}"
+          +indexes:
+            - columns: [season, driver_id]
         pit_stops:
-          +post-hook:
-            - "{{ create_index('pit_stops_race_stop_order_uidx', ['race_id', 'stop_order'], unique=true) }}"
-            - "{{ create_index('pit_stops_race_driver_idx', ['race_id', 'driver_id']) }}"
-            - "{{ create_index('pit_stops_season_driver_idx', ['season', 'driver_id']) }}"
+          +indexes:
+            - columns: [race_id, driver_id]
         driver_standings_snapshots:
-          +post-hook:
-            - "{{ create_index('driver_standings_race_driver_uidx', ['race_id', 'driver_id'], unique=true) }}"
-            - "{{ create_index('driver_standings_race_position_idx', ['race_id', 'position']) }}"
-            - "{{ create_index('driver_standings_season_driver_idx', ['season', 'driver_id']) }}"
+          +indexes:
+            - columns: [season, driver_id]
         constructor_standings_snapshots:
-          +post-hook:
-            - "{{ create_index('constructor_standings_race_constructor_engine_uidx', ['race_id', 'constructor_id', 'engine_manufacturer_id'], unique=true) }}"
-            - "{{ create_index('constructor_standings_race_position_idx', ['race_id', 'position']) }}"
-            - "{{ create_index('constructor_standings_season_constructor_idx', ['season', 'constructor_id']) }}"
-        driver_season_summaries:
-          +post-hook:
-            - "{{ create_index('driver_season_summaries_season_driver_uidx', ['season', 'driver_id'], unique=true) }}"
-            - "{{ create_index('driver_season_summaries_driver_season_idx', ['driver_id', 'season']) }}"
-            - "{{ create_index('driver_season_summaries_season_position_idx', ['season', 'final_position']) }}"
+          +indexes:
+            - columns: [season, constructor_id]
         driver_season_constructor_summaries:
-          +post-hook:
-            - "{{ create_index('driver_season_constructor_summaries_season_driver_ctor_uidx', ['season', 'driver_id', 'constructor_id'], unique=true) }}"
-            - "{{ create_index('driver_season_constructor_summaries_driver_season_idx', ['driver_id', 'season']) }}"
-        constructor_season_summaries:
-          +post-hook:
-            - "{{ create_index('constructor_season_summaries_season_final_order_uidx', ['season', 'final_order'], unique=true) }}"
-            - "{{ create_index('constructor_season_summaries_constructor_season_idx', ['constructor_id', 'season']) }}"
-            - "{{ create_index('constructor_season_summaries_season_position_idx', ['season', 'final_position']) }}"
+          +indexes:
+            - columns: [driver_id, season]

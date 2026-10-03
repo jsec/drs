@@ -1,15 +1,11 @@
 with
     races as (select * from {{ ref("int_f1db__races_with_circuits") }}),
 
-    race_winners as (select * from {{ ref("int_f1db__race_results_with_entities") }} where position_display_order = 1),
+    race_winners as (select * from {{ ref("race_results") }} where finish_order = 1),
 
-    pole_sitters as (
-        select * from {{ ref("int_f1db__qualifying_results_with_entities") }} where position_display_order = 1
-    ),
+    pole_sitters as (select * from {{ ref("qualifying_results") }} where qualifying_order = 1),
 
-    sprint_winners as (
-        select * from {{ ref("int_f1db__sprint_results_with_entities") }} where position_display_order = 1
-    )
+    sprint_winners as (select * from {{ ref("sprint_results") }} where finish_order = 1)
 
 select
     races.race_id,
@@ -56,8 +52,7 @@ select
     sprint_winners.driver_id as sprint_winner_driver_id,
     sprint_winners.driver_name as sprint_winner_driver_name,
     sprint_winners.constructor_id as sprint_winner_constructor_id,
-    sprint_winners.constructor_name as sprint_winner_constructor_name,
-    {{ var("refresh_id") }}::bigint as refresh_id
+    sprint_winners.constructor_name as sprint_winner_constructor_name
 from races
 left join race_winners on races.race_id = race_winners.race_id
 left join pole_sitters on races.race_id = pole_sitters.race_id

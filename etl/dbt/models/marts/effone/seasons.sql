@@ -23,14 +23,12 @@ with
     ),
 
     driver_counts as (
-        select season, count(distinct driver_id)::integer as driver_count
-        from {{ ref("int_f1db__race_results_with_entities") }}
-        group by season
+        select season, count(distinct driver_id)::integer as driver_count from {{ ref("race_results") }} group by season
     ),
 
     constructor_counts as (
         select season, count(distinct constructor_id)::integer as constructor_count
-        from {{ ref("int_f1db__race_results_with_entities") }}
+        from {{ ref("race_results") }}
         group by season
     ),
 
@@ -59,8 +57,7 @@ select
     wdc.driver_id as wdc_driver_id,
     wdc.driver_name as wdc_driver_name,
     wcc.constructor_id as wcc_constructor_id,
-    wcc.constructor_name as wcc_constructor_name,
-    {{ var("refresh_id") }}::bigint as refresh_id
+    wcc.constructor_name as wcc_constructor_name
 from seasons
 left join race_counts on seasons.season = race_counts.season
 left join driver_counts on seasons.season = driver_counts.season

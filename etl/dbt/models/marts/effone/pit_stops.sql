@@ -28,8 +28,7 @@ select
     pit_stops.position_number as stop_position,
     pit_stops.position_text,
     pit_stops.pit_time as duration,
-    pit_stops.pit_time_millis as duration_ms,
-    {{ var("refresh_id") }}::bigint as refresh_id
+    pit_stops.pit_time_millis as duration_ms
 from pit_stops
 join races on pit_stops.race_id = races.race_id
 join drivers on pit_stops.driver_id = drivers.driver_id

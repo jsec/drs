@@ -66,27 +66,14 @@ select
     coalesce(qualifying_aggregates.qualifying_p1_count, 0) as qualifying_p1_count,
     qualifying_aggregates.average_qualifying_position,
     coalesce(race_aggregates.race_points, 0) as race_points,
-    (coalesce(race_aggregates.race_points, 0) * 100)::integer as race_points_x100,
     coalesce(sprint_aggregates.sprint_points, 0) as sprint_points,
-    (coalesce(sprint_aggregates.sprint_points, 0) * 100)::integer as sprint_points_x100,
     coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0) as total_points,
-    ((coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0)) * 100)::integer
-    as total_points_x100,
     season_constructors.position_number as final_position,
     season_constructors.position_text as final_position_text,
     season_constructors.points as final_points,
-    (season_constructors.points * 100)::integer as final_points_x100,
     season_constructors.championship_won,
     (coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0))
-    - season_constructors.points as points_delta,
-    (
-        (
-            (coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0))
-            - season_constructors.points
-        )
-        * 100
-    )::integer as points_delta_x100,
-    {{ var("refresh_id") }}::bigint as refresh_id
+    - season_constructors.points as points_delta
 from season_constructors
 join constructors on season_constructors.constructor_id = constructors.constructor_id
 left join

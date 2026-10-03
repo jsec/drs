@@ -42,15 +42,11 @@ select
     engine_manufacturer_id,
     engine_manufacturer_name,
     points,
-    (points * 100)::integer as points_x100,
     previous_points,
-    (previous_points * 100)::integer as previous_points_x100,
     points - previous_points as points_gained,
-    ((points - previous_points) * 100)::integer as points_gained_x100,
     position,
     position_text,
     previous_position,
     previous_position - position as position_change,
-    championship_won,
-    {{ var("refresh_id") }}::bigint as refresh_id
+    championship_won
 from joined

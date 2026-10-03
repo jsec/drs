@@ -115,12 +115,8 @@ select
     latest_entry.constructor_id,
     latest_entry.car_number,
     standing_qualifying_states.points,
-    (standing_qualifying_states.points * 100)::integer as points_x100,
     standing_qualifying_states.previous_points,
-    (standing_qualifying_states.previous_points * 100)::integer as previous_points_x100,
     standing_qualifying_states.points - standing_qualifying_states.previous_points as points_gained,
-    ((standing_qualifying_states.points - standing_qualifying_states.previous_points) * 100)::integer
-    as points_gained_x100,
     standing_qualifying_states.position,
     standing_qualifying_states.position_text,
     standing_qualifying_states.previous_position,
@@ -128,8 +124,7 @@ select
     coalesce(latest_entry.win_count, 0) as win_count,
     coalesce(latest_entry.podium_count, 0) as podium_count,
     standing_qualifying_states.qualifying_p1_count,
-    standing_qualifying_states.championship_won,
-    {{ var("refresh_id") }}::bigint as refresh_id
+    standing_qualifying_states.championship_won
 from standing_qualifying_states
 left join
     race_cumulative_stats as latest_entry

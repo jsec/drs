@@ -94,27 +94,14 @@ select
     coalesce(qualifying_aggregates.qualifying_p1_count, 0) as qualifying_p1_count,
     qualifying_aggregates.average_qualifying_position,
     coalesce(race_aggregates.race_points, 0) as race_points,
-    (coalesce(race_aggregates.race_points, 0) * 100)::integer as race_points_x100,
     coalesce(sprint_aggregates.sprint_points, 0) as sprint_points,
-    (coalesce(sprint_aggregates.sprint_points, 0) * 100)::integer as sprint_points_x100,
     coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0) as total_points,
-    ((coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0)) * 100)::integer
-    as total_points_x100,
     latest_standings.position as final_position,
     latest_standings.position_text as final_position_text,
     coalesce(latest_standings.points, 0) as final_points,
-    (coalesce(latest_standings.points, 0) * 100)::integer as final_points_x100,
     coalesce(latest_standings.championship_won, false) as championship_won,
     (coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0))
-    - coalesce(latest_standings.points, 0) as points_delta,
-    (
-        (
-            (coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0))
-            - coalesce(latest_standings.points, 0)
-        )
-        * 100
-    )::integer as points_delta_x100,
-    {{ var("refresh_id") }}::bigint as refresh_id
+    - coalesce(latest_standings.points, 0) as points_delta
 from driver_seasons
 join drivers on driver_seasons.driver_id = drivers.driver_id
 left join

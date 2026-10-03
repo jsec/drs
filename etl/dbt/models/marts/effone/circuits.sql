@@ -48,8 +48,7 @@ select
     first_last_races.last_race_date,
     first_last_races.current_layout_id,
     current_layout.length_km as current_layout_length_km,
-    current_layout.turns as current_layout_turns,
-    {{ var("refresh_id") }}::bigint as refresh_id
+    current_layout.turns as current_layout_turns
 from circuits
 left join first_last_races on circuits.circuit_id = first_last_races.circuit_id
 left join layouts as current_layout on first_last_races.current_layout_id = current_layout.circuit_layout_id

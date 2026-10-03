@@ -75,13 +75,8 @@ select
     coalesce(qualifying_aggregates.qualifying_p1_count, 0) as qualifying_p1_count,
     qualifying_aggregates.average_qualifying_position,
     coalesce(race_aggregates.race_points, 0) as race_points,
-    (coalesce(race_aggregates.race_points, 0) * 100)::integer as race_points_x100,
     coalesce(sprint_aggregates.sprint_points, 0) as sprint_points,
-    (coalesce(sprint_aggregates.sprint_points, 0) * 100)::integer as sprint_points_x100,
-    coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0) as total_points,
-    ((coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0)) * 100)::integer
-    as total_points_x100,
-    {{ var("refresh_id") }}::bigint as refresh_id
+    coalesce(race_aggregates.race_points, 0) + coalesce(sprint_aggregates.sprint_points, 0) as total_points
 from race_aggregates
 join drivers on race_aggregates.driver_id = drivers.driver_id
 join constructors on race_aggregates.constructor_id = constructors.constructor_id

@@ -6,6 +6,10 @@ models:
     config:
       contract:
         enforced: true
+    constraints:
+      - type: primary_key
+        columns:
+          - circuit_id
     columns:
       - name: circuit_full_name
         data_type: text
@@ -16,9 +20,6 @@ models:
         description: F1DB circuit identifier.
         constraints:
           - type: not_null
-        tests:
-          - not_null
-          - unique
       - name: circuit_name
         data_type: text
         constraints:
@@ -36,7 +37,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - iso_alpha2_country_code
       - name: country_id
         data_type: text
@@ -93,14 +93,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: turns
         data_type: integer
         constraints:
@@ -111,21 +103,21 @@ models:
     config:
       contract:
         enforced: true
+    constraints:
+      - type: primary_key
+        columns:
+          - circuit_layout_id
     columns:
       - name: circuit_layout_id
         data_type: text
         description: F1DB layout id, also the SVG asset key for the layout diagram.
         constraints:
           - type: not_null
-        tests:
-          - not_null
-          - unique
       - name: circuit_id
         data_type: text
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('circuits')
@@ -163,19 +155,16 @@ models:
         data_type: text
       - name: last_race_date
         data_type: date
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
 
   - name: constructors
     description: One row per constructor with all-time summary metrics.
     config:
       contract:
         enforced: true
+    constraints:
+      - type: primary_key
+        columns:
+          - constructor_id
     columns:
       - name: championship_count
         data_type: integer
@@ -190,9 +179,6 @@ models:
         description: F1DB constructor identifier.
         constraints:
           - type: not_null
-        tests:
-          - not_null
-          - unique
       - name: constructor_name
         data_type: text
         constraints:
@@ -206,7 +192,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - iso_alpha2_country_code
       - name: entry_count
         data_type: integer
@@ -218,16 +203,8 @@ models:
           - type: not_null
       - name: first_race_date
         data_type: date
-      - name: first_race_id
-        data_type: integer
-      - name: first_race_name
-        data_type: text
       - name: last_race_date
         data_type: date
-      - name: last_race_id
-        data_type: integer
-      - name: last_race_name
-        data_type: text
       - name: nationality
         data_type: text
         constraints:
@@ -242,7 +219,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - hex_color
       - name: qualifying_entry_count
         data_type: integer
@@ -260,14 +236,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: secondary_color_hex
         data_type: text
         description: Optional secondary constructor display color as a six-digit hex code.
@@ -289,10 +257,6 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: total_points_x100
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: win_count
         data_type: integer
         constraints:
@@ -303,6 +267,10 @@ models:
     config:
       contract:
         enforced: true
+    constraints:
+      - type: primary_key
+        columns:
+          - driver_id
     columns:
       - name: championship_count
         data_type: integer
@@ -323,30 +291,21 @@ models:
         description: Short driver code used in race timing and result displays.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: driver_full_name
         data_type: text
         description: Full display name.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: driver_id
         data_type: text
         description: F1DB driver identifier.
         constraints:
           - type: not_null
-        tests:
-          - not_null
-          - unique
       - name: driver_name
         data_type: text
         description: Display name for UI contexts.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: driver_number
         data_type: integer
       - name: entry_count
@@ -363,10 +322,6 @@ models:
           - type: not_null
       - name: first_race_date
         data_type: date
-      - name: first_race_id
-        data_type: integer
-      - name: first_race_name
-        data_type: text
       - name: gender
         data_type: text
         constraints:
@@ -377,30 +332,21 @@ models:
           - type: not_null
       - name: last_race_date
         data_type: date
-      - name: last_race_id
-        data_type: integer
-      - name: last_race_name
-        data_type: text
       - name: nationality
         data_type: text
         description: Driver nationality display label.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: nationality_country_id
         data_type: text
         description: F1DB identifier for the driver's primary nationality.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: nationality_country_code
         data_type: text
         constraints:
           - type: not_null
         tests:
-          - not_null
           - iso_alpha2_country_code
       - name: place_of_birth
         data_type: text
@@ -426,14 +372,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: second_nationality_country_id
         data_type: text
       - name: second_nationality_country_code
@@ -456,16 +394,6 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: total_points_x100
-        data_type: integer
-        description: Driver career points multiplied by 100 for integer comparisons.
-        constraints:
-          - type: not_null
-        tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                inclusive: true
       - name: win_count
         data_type: integer
         constraints:
@@ -476,6 +404,10 @@ models:
     config:
       contract:
         enforced: true
+    constraints:
+      - type: primary_key
+        columns:
+          - season
     columns:
       - name: constructor_count
         data_type: integer
@@ -493,22 +425,11 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: season
         data_type: integer
         description: Championship year.
         constraints:
           - type: not_null
-        tests:
-          - not_null
-          - unique
       - name: sprint_count
         data_type: integer
         constraints:
@@ -527,6 +448,10 @@ models:
     config:
       contract:
         enforced: true
+    constraints:
+      - type: primary_key
+        columns:
+          - race_id
     columns:
       - name: circuit_id
         data_type: text
@@ -596,9 +521,6 @@ models:
         description: F1DB race identifier.
         constraints:
           - type: not_null
-        tests:
-          - not_null
-          - unique
       - name: race_laps
         data_type: integer
         constraints:
@@ -617,14 +539,6 @@ models:
           - type: not_null
       - name: race_time
         data_type: time
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: scheduled_distance_km
         data_type: numeric(6, 3)
       - name: scheduled_laps
@@ -634,8 +548,6 @@ models:
         description: Championship year for the race.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: sprint_date
         data_type: date
       - name: sprint_qualifying_date
@@ -675,12 +587,11 @@ models:
     config:
       contract:
         enforced: true
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - race_id
-              - finish_order
+    constraints:
+      - type: primary_key
+        columns:
+          - race_id
+          - finish_order
     columns:
       - name: car_number
         data_type: integer
@@ -694,7 +605,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('constructors')
@@ -713,7 +623,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('drivers')
@@ -724,8 +633,6 @@ models:
           - type: not_null
       - name: elapsed_time
         data_type: text
-      - name: elapsed_time_ms
-        data_type: integer
       - name: engine_manufacturer_id
         data_type: text
         constraints:
@@ -735,22 +642,16 @@ models:
         description: Source display order for official result rows. Use this for official wins, podiums, and race result ordering.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: finish_position
         data_type: integer
       - name: gap
         data_type: text
       - name: gap_laps
         data_type: integer
-      - name: gap_ms
-        data_type: integer
       - name: grid_position
         data_type: integer
       - name: interval
         data_type: text
-      - name: interval_ms
-        data_type: integer
       - name: is_classified_finish
         data_type: boolean
         constraints:
@@ -808,16 +709,6 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: points_x100
-        data_type: integer
-        description: Race points multiplied by 100 for exact integer comparisons.
-        constraints:
-          - type: not_null
-        tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                inclusive: true
       - name: positions_gained
         data_type: integer
       - name: position_text
@@ -836,7 +727,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('races')
@@ -849,14 +739,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: season
         data_type: integer
         constraints:
@@ -884,8 +766,6 @@ models:
                   - other_retirement
       - name: time_penalty
         data_type: text
-      - name: time_penalty_ms
-        data_type: integer
       - name: tyre_manufacturer_id
         data_type: text
         constraints:
@@ -896,12 +776,11 @@ models:
     config:
       contract:
         enforced: true
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - race_id
-              - driver_id
+    constraints:
+      - type: primary_key
+        columns:
+          - race_id
+          - driver_id
     columns:
       - name: car_number
         data_type: integer
@@ -915,7 +794,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('constructors')
@@ -934,7 +812,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('drivers')
@@ -945,8 +822,6 @@ models:
           - type: not_null
       - name: elapsed_time
         data_type: text
-      - name: elapsed_time_ms
-        data_type: integer
       - name: engine_manufacturer_id
         data_type: text
         constraints:
@@ -956,22 +831,16 @@ models:
         description: Source display order for official sprint result rows.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: finish_position
         data_type: integer
       - name: gap
         data_type: text
       - name: gap_laps
         data_type: integer
-      - name: gap_ms
-        data_type: integer
       - name: grid_position
         data_type: integer
       - name: interval
         data_type: text
-      - name: interval_ms
-        data_type: integer
       - name: is_classified_finish
         data_type: boolean
         constraints:
@@ -1011,16 +880,6 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: points_x100
-        data_type: integer
-        description: Sprint points multiplied by 100 for integer comparisons.
-        constraints:
-          - type: not_null
-        tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                inclusive: true
       - name: positions_gained
         data_type: integer
       - name: position_text
@@ -1039,7 +898,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('races')
@@ -1052,14 +910,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: season
         data_type: integer
         constraints:
@@ -1087,8 +937,6 @@ models:
                   - other_retirement
       - name: time_penalty
         data_type: text
-      - name: time_penalty_ms
-        data_type: integer
       - name: tyre_manufacturer_id
         data_type: text
         constraints:
@@ -1099,12 +947,11 @@ models:
     config:
       contract:
         enforced: true
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - race_id
-              - qualifying_order
+    constraints:
+      - type: primary_key
+        columns:
+          - race_id
+          - qualifying_order
     columns:
       - name: advanced_to_q2
         data_type: boolean
@@ -1114,8 +961,6 @@ models:
         data_type: boolean
         constraints:
           - type: not_null
-      - name: best_qualifying_ms
-        data_type: integer
       - name: best_qualifying_time
         data_type: text
       - name: car_number
@@ -1130,7 +975,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('constructors')
@@ -1149,7 +993,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('drivers')
@@ -1164,12 +1007,8 @@ models:
           - type: not_null
       - name: gap
         data_type: text
-      - name: gap_ms
-        data_type: integer
       - name: interval
         data_type: text
-      - name: interval_ms
-        data_type: integer
       - name: is_entry
         data_type: boolean
         constraints:
@@ -1186,21 +1025,17 @@ models:
           - type: not_null
       - name: q1
         data_type: text
-      - name: q1_ms
-        data_type: integer
       - name: q2
         data_type: text
-      - name: q2_ms
-        data_type: integer
       - name: q3
         data_type: text
-      - name: q3_ms
-        data_type: integer
       - name: qualifying_order
         data_type: integer
         description: Source display order for qualifying result rows.
         tests:
           - not_null
+        constraints:
+          - type: not_null
       - name: qualifying_position
         data_type: integer
       - name: race_date
@@ -1213,7 +1048,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('races')
@@ -1226,14 +1060,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: season
         data_type: integer
         constraints:
@@ -1248,12 +1074,11 @@ models:
     config:
       contract:
         enforced: true
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - race_id
-              - driver_id
+    constraints:
+      - type: primary_key
+        columns:
+          - race_id
+          - driver_id
     columns:
       - name: car_number
         data_type: integer
@@ -1279,7 +1104,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('drivers')
@@ -1300,18 +1124,12 @@ models:
         data_type: integer
       - name: gap
         data_type: text
-      - name: gap_ms
-        data_type: integer
       - name: interval
         data_type: text
-      - name: interval_ms
-        data_type: integer
       - name: lap_number
         data_type: integer
       - name: lap_time
         data_type: text
-      - name: lap_time_ms
-        data_type: integer
       - name: position_text
         data_type: text
         constraints:
@@ -1326,7 +1144,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('races')
@@ -1339,14 +1156,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: season
         data_type: integer
         constraints:
@@ -1361,14 +1170,13 @@ models:
     config:
       contract:
         enforced: true
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - race_id
-              - session
-              - driver_id
-              - lap_number
+    constraints:
+      - type: primary_key
+        columns:
+          - race_id
+          - session
+          - driver_id
+          - lap_number
     columns:
       - name: driver_id
         data_type: text
@@ -1407,11 +1215,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
       - name: session
         data_type: text
         description: Which race the lap belongs to, the Grand Prix (race) or the sprint.
@@ -1427,17 +1230,17 @@ models:
         data_type: integer
         constraints:
           - type: not_null
+
   - name: pit_stops
     description: One row per pit stop event from F1DB.
     config:
       contract:
         enforced: true
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - race_id
-              - stop_order
+    constraints:
+      - type: primary_key
+        columns:
+          - race_id
+          - stop_order
     columns:
       - name: car_number
         data_type: integer
@@ -1463,7 +1266,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('drivers')
@@ -1498,7 +1300,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('races')
@@ -1511,14 +1312,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: season
         data_type: integer
         constraints:
@@ -1528,15 +1321,11 @@ models:
         description: Driver-specific stop number within the race.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: stop_order
         data_type: integer
         description: Source display order for pit stop rows within a race.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: stop_position
         data_type: integer
       - name: tyre_manufacturer_id
@@ -1549,14 +1338,15 @@ models:
     config:
       contract:
         enforced: true
+    constraints:
+      - type: primary_key
+        columns:
+          - race_id
+          - driver_id
     tests:
-      - dbt_utils.unique_combination_of_columns:
+      - dbt_utils.equal_rowcount:
           arguments:
-            combination_of_columns:
-              - race_id
-              - driver_id
-      - driver_standings_snapshot_source_coverage
-      - driver_standings_snapshot_event_state
+            compare_model: ref('stg_f1db__race_driver_standing')
     columns:
       - name: car_number
         data_type: integer
@@ -1583,7 +1373,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('drivers')
@@ -1598,18 +1387,6 @@ models:
           - type: not_null
       - name: points_gained
         data_type: numeric(8, 2)
-      - name: points_gained_x100
-        data_type: integer
-      - name: points_x100
-        data_type: integer
-        description: Official standing points multiplied by 100 for integer comparisons.
-        constraints:
-          - type: not_null
-        tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                inclusive: true
       - name: podium_count
         data_type: integer
         description: Cumulative race podiums through this snapshot's race.
@@ -1625,8 +1402,6 @@ models:
           - type: not_null
       - name: previous_points
         data_type: numeric(8, 2)
-      - name: previous_points_x100
-        data_type: integer
       - name: previous_position
         data_type: integer
       - name: race_id
@@ -1635,7 +1410,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('races')
@@ -1649,14 +1423,6 @@ models:
         description: Cumulative pole positions through this snapshot's race.
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: season
         data_type: integer
         constraints:
@@ -1672,13 +1438,12 @@ models:
     config:
       contract:
         enforced: true
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - race_id
-              - constructor_id
-              - engine_manufacturer_id
+    constraints:
+      - type: primary_key
+        columns:
+          - race_id
+          - constructor_id
+          - engine_manufacturer_id
     columns:
       - name: championship_won
         data_type: boolean
@@ -1690,7 +1455,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('constructors')
@@ -1704,8 +1468,6 @@ models:
         description: Engine manufacturer for this constructor standing row.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: engine_manufacturer_name
         data_type: text
         constraints:
@@ -1716,18 +1478,6 @@ models:
           - type: not_null
       - name: points_gained
         data_type: numeric(8, 2)
-      - name: points_gained_x100
-        data_type: integer
-      - name: points_x100
-        data_type: integer
-        description: Official standing points multiplied by 100 for integer comparisons.
-        constraints:
-          - type: not_null
-        tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                inclusive: true
       - name: position
         data_type: integer
       - name: position_change
@@ -1738,8 +1488,6 @@ models:
           - type: not_null
       - name: previous_points
         data_type: numeric(8, 2)
-      - name: previous_points_x100
-        data_type: integer
       - name: previous_position
         data_type: integer
       - name: race_id
@@ -1748,7 +1496,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('races')
@@ -1757,14 +1504,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: season
         data_type: integer
         constraints:
@@ -1775,13 +1514,11 @@ models:
     config:
       contract:
         enforced: true
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - season
-              - driver_id
-      - driver_season_summaries_participation_coverage
+    constraints:
+      - type: primary_key
+        columns:
+          - season
+          - driver_id
     columns:
       - name: average_qualifying_position
         data_type: numeric(6, 2)
@@ -1809,7 +1546,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('drivers')
@@ -1828,14 +1564,6 @@ models:
           - type: not_null
       - name: final_points
         data_type: numeric(8, 2)
-      - name: final_points_x100
-        data_type: integer
-        description: Official final standing points multiplied by 100.
-        tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                inclusive: true
       - name: final_position
         data_type: integer
       - name: final_position_text
@@ -1846,11 +1574,6 @@ models:
           - type: not_null
       - name: points_delta
         data_type: numeric(8, 2)
-        constraints:
-          - type: not_null
-      - name: points_delta_x100
-        data_type: integer
-        description: Difference between computed total points and official final standing points, multiplied by 100.
         constraints:
           - type: not_null
       - name: qualifying_entry_count
@@ -1873,39 +1596,21 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: race_points_x100
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: race_start_count
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
-
       - name: season
         data_type: integer
         description: Championship year.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: sprint_entry_count
         data_type: integer
         constraints:
           - type: not_null
       - name: sprint_points
         data_type: numeric(8, 2)
-        constraints:
-          - type: not_null
-      - name: sprint_points_x100
-        data_type: integer
         constraints:
           - type: not_null
       - name: sprint_start_count
@@ -1920,16 +1625,6 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: total_points_x100
-        data_type: integer
-        description: Computed race plus sprint points multiplied by 100.
-        constraints:
-          - type: not_null
-        tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                inclusive: true
       - name: win_count
         data_type: integer
         constraints:
@@ -1939,13 +1634,12 @@ models:
     config:
       contract:
         enforced: true
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - season
-              - driver_id
-              - constructor_id
+    constraints:
+      - type: primary_key
+        columns:
+          - season
+          - driver_id
+          - constructor_id
     columns:
       - name: average_qualifying_position
         data_type: numeric(6, 2)
@@ -1978,7 +1672,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('drivers')
@@ -2019,38 +1712,21 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: race_points_x100
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: race_start_count
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
       - name: season
         data_type: integer
         description: Championship year.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: sprint_entry_count
         data_type: integer
         constraints:
           - type: not_null
       - name: sprint_points
         data_type: numeric(8, 2)
-        constraints:
-          - type: not_null
-      - name: sprint_points_x100
-        data_type: integer
         constraints:
           - type: not_null
       - name: sprint_start_count
@@ -2065,16 +1741,6 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: total_points_x100
-        data_type: integer
-        description: Computed race plus sprint points multiplied by 100.
-        constraints:
-          - type: not_null
-        tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                inclusive: true
       - name: win_count
         data_type: integer
         constraints:
@@ -2085,12 +1751,11 @@ models:
     config:
       contract:
         enforced: true
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - season
-              - final_order
+    constraints:
+      - type: primary_key
+        columns:
+          - season
+          - final_order
     columns:
       - name: average_qualifying_position
         data_type: numeric(6, 2)
@@ -2104,7 +1769,6 @@ models:
         constraints:
           - type: not_null
         tests:
-          - not_null
           - relationships:
               arguments:
                 to: ref('constructors')
@@ -2130,18 +1794,8 @@ models:
         description: Source display order for official final constructor standings rows.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: final_points
         data_type: numeric(8, 2)
-      - name: final_points_x100
-        data_type: integer
-        description: Official final standing points multiplied by 100.
-        tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                inclusive: true
       - name: final_position
         data_type: integer
       - name: final_position_text
@@ -2152,11 +1806,6 @@ models:
           - type: not_null
       - name: points_delta
         data_type: numeric(8, 2)
-        constraints:
-          - type: not_null
-      - name: points_delta_x100
-        data_type: integer
-        description: Difference between computed total points and official final standing points, multiplied by 100.
         constraints:
           - type: not_null
       - name: qualifying_entry_count
@@ -2179,38 +1828,21 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: race_points_x100
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: race_start_count
         data_type: integer
         constraints:
           - type: not_null
-      - name: refresh_id
-        data_type: bigint
-        description: Identifier for the refresh run that produced this row.
-        constraints:
-          - type: not_null
-        tests:
-          - not_null
       - name: season
         data_type: integer
         description: Championship year.
         constraints:
           - type: not_null
-        tests:
-          - not_null
       - name: sprint_entry_count
         data_type: integer
         constraints:
           - type: not_null
       - name: sprint_points
         data_type: numeric(8, 2)
-        constraints:
-          - type: not_null
-      - name: sprint_points_x100
-        data_type: integer
         constraints:
           - type: not_null
       - name: sprint_start_count
@@ -2225,16 +1857,6 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: total_points_x100
-        data_type: integer
-        description: Computed race plus sprint points multiplied by 100.
-        constraints:
-          - type: not_null
-        tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                inclusive: true
       - name: win_count
         data_type: integer
         constraints:

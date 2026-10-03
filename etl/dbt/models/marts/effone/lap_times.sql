@@ -26,7 +26,6 @@ select
         then to_char(laps.lap_time, 'FMHH24:MI:SS.MS')
         else to_char(laps.lap_time, 'FMMI:SS.MS')
     end as lap_time,
-    laps.lap_time_ms,
-    {{ var("refresh_id") }}::bigint as refresh_id
+    laps.lap_time_ms
 from laps
 join {{ ref("races") }} as races using (race_id)
