@@ -73,7 +73,7 @@ export const DriversTable = ({ drivers }: Props) => {
                 <TextInput
                     leftSection={<MagnifyingGlassIcon size={15} />}
                     onChange={e => setSearch(e.currentTarget.value)}
-                    placeholder="Search name or nationality…"
+                    placeholder="Search name or code…"
                     value={search}
                     w={260}
                 />
