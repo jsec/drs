@@ -2,11 +2,6 @@ version: "2"
 
 linters:
   enable:
-    - errcheck
-    - govet
-    - ineffassign
-    - staticcheck
-    - unused
     - bodyclose
     - misspell
     - testifylint
