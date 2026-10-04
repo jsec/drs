@@ -8,7 +8,7 @@ import type { DriverRef, RaceResult } from '#/lib/api/races';
 
 import { DriverAvatar, GridHeader, SectionCard, TeamBar } from '#/components/f1-ui';
 import { raceDetailQuery, raceLapsQuery } from '#/data/queries';
-import { hasLaps, paceChart, positionChart } from '#/lib/race-charts';
+import { paceChart, positionChart } from '#/lib/race-charts';
 import { parseRound, parseYear } from '#/lib/route-params';
 
 const CHART_DRIVER_COUNT = 5;
@@ -64,20 +64,22 @@ const POSITION_SUBTITLE = `Track position every ${POSITION_LAP_STEP} laps · top
 const PACE_TITLE = 'Race Pace';
 const PACE_SUBTITLE = 'Lap time (s) · lower is faster · pit and safety car laps hidden';
 
+const ChartPlaceholders = ({ text }: { text: string }) => (
+    <>
+        <ChartCard subtitle={POSITION_SUBTITLE} title={POSITION_TITLE}>
+            <ChartPlaceholder text={text} />
+        </ChartCard>
+        <ChartCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
+            <ChartPlaceholder text={text} />
+        </ChartCard>
+    </>
+);
+
 const RaceCharts = ({ round, year }: { round: number; year: number }) => {
     const { data: laps } = useSuspenseQuery(raceLapsQuery(year, round));
 
-    if (!hasLaps(laps)) {
-        return (
-            <>
-                <ChartCard subtitle={POSITION_SUBTITLE} title={POSITION_TITLE}>
-                    <ChartPlaceholder text="No lap data for this race" />
-                </ChartCard>
-                <ChartCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
-                    <ChartPlaceholder text="No lap data for this race" />
-                </ChartCard>
-            </>
-        );
+    if (laps.drivers.every(driver => driver.laps.length === 0)) {
+        return <ChartPlaceholders text="No lap data for this race" />;
     }
 
     const topDrivers = laps.drivers.slice(0, CHART_DRIVER_COUNT);
@@ -110,17 +112,6 @@ const RaceCharts = ({ round, year }: { round: number; year: number }) => {
         </>
     );
 };
-
-const ChartsFallback = () => (
-    <>
-        <ChartCard subtitle={POSITION_SUBTITLE} title={POSITION_TITLE}>
-            <ChartPlaceholder text="Loading laps…" />
-        </ChartCard>
-        <ChartCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
-            <ChartPlaceholder text="Loading laps…" />
-        </ChartCard>
-    </>
-);
 
 const RaceDetail = () => {
     const { round, year } = Route.useParams();
@@ -201,7 +192,7 @@ const RaceDetail = () => {
 
             {/* Charts */}
             <SimpleGrid cols={2} spacing={16}>
-                <Suspense fallback={<ChartsFallback />}>
+                <Suspense fallback={<ChartPlaceholders text="Loading laps…" />}>
                     <RaceCharts round={Number(round)} year={Number(year)} />
                 </Suspense>
             </SimpleGrid>

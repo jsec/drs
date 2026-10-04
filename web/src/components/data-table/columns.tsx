@@ -61,7 +61,7 @@ export function makeColumns<T>() {
         },
     ): ColumnDef<T, unknown> => ({
         accessorFn: opts.accessor,
-        cell: info => opts.cell(info),
+        cell: opts.cell,
         enableSorting: canSort(opts) && opts.accessor != null,
         header: opts.header,
         id: opts.id,
@@ -72,7 +72,7 @@ export function makeColumns<T>() {
 
     const num = <K extends KeysMatching<T, ReactNode>>(
         key: K,
-        opts: Shared<T> & { size?: Size; variant?: 'display' | 'muted' } = {},
+        opts: Shared<T> & { size?: Size; variant?: 'display' } = {},
     ): ColumnDef<T, unknown> => ({
         accessorKey: key,
         cell: (info) => {
@@ -109,7 +109,7 @@ export function makeColumns<T>() {
 
     const text = <K extends KeysMatching<T, ReactNode>>(
         key: K,
-        opts: Shared<T> & { bold?: boolean; fallback?: ReactNode; muted?: boolean; size?: Size } = {},
+        opts: Shared<T> & { bold?: boolean; muted?: boolean } = {},
     ): ColumnDef<T, unknown> => ({
         accessorKey: key,
         cell: (info) => {
@@ -121,10 +121,9 @@ export function makeColumns<T>() {
                         'table-cell-text',
                         opts.bold && 'table-cell-text-bold',
                         opts.muted && 'table-cell-text-muted',
-                        opts.size !== undefined && SIZE_CLASS[opts.size],
                     )}
                 >
-                    {value ?? opts.fallback}
+                    {value}
                 </span>
             );
         },

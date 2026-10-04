@@ -4,12 +4,12 @@ import { ConstructorSchema } from './seasons';
 
 export const SessionSchema = z.enum(['race', 'sprint']);
 
-export const DriverRefSchema = z.object({
+const DriverRefSchema = z.object({
     code: z.string(),
     id: z.string(),
 });
 
-export const RaceResultSchema = z.object({
+const RaceResultSchema = z.object({
     constructor: ConstructorSchema,
     driver: DriverRefSchema.extend({
         name: z.string(),
@@ -41,13 +41,13 @@ export const RaceDetailSchema = z.object({
     winner: DriverRefSchema,
 });
 
-export const RaceLapSchema = z.object({
+const RaceLapSchema = z.object({
     lap: z.number().int(),
     position: z.number().int().nullable(),
     timeMs: z.number().int(),
 });
 
-export const DriverLapsSchema = z.object({
+const DriverLapsSchema = z.object({
     color: z.string(),
     driver: DriverRefSchema,
     laps: z.array(RaceLapSchema),

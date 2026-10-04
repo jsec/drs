@@ -3,7 +3,6 @@ import type { SortingFn } from '@tanstack/react-table';
 import type { ListConstructorsResponse } from '#/lib/api/constructors';
 
 import { makeColumns } from '#/components/data-table';
-import { cn } from '#/lib/utils';
 
 type Constructor = ListConstructorsResponse[number];
 
@@ -37,7 +36,7 @@ export function makeConstructorColumns(maxWins: number) {
                     years = `${firstYear}-${lastYear}`;
                 }
 
-                return <span className={cn('table-cell-num', 'table-cell-sm')}>{years}</span>;
+                return <span className="table-cell-num table-cell-sm">{years}</span>;
             },
             header: 'YEARS',
             id: 'years',
@@ -50,7 +49,7 @@ export function makeConstructorColumns(maxWins: number) {
                 const c = info.row.original;
                 return (
                     <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 10 }}>
-                        <span className={cn('table-cell-num', 'table-cell-num-display')} style={{ width: 34 }}>
+                        <span className="table-cell-num table-cell-num-display" style={{ width: 34 }}>
                             {c.wins}
                         </span>
                         <div style={{ background: 'var(--mantine-color-default-border)', borderRadius: 9999, flex: 1, height: 6, maxWidth: 150, overflow: 'hidden' }}>

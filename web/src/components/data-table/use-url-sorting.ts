@@ -1,5 +1,6 @@
 import type { OnChangeFn, SortingState } from '@tanstack/react-table';
 
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import { z } from 'zod';
 
 export const SortSearchSchema = z.object({
@@ -7,18 +8,9 @@ export const SortSearchSchema = z.object({
     sort: z.string().optional().catch(undefined),
 });
 
-export type SortingRoute = {
-    useNavigate: () => (opts: {
-        search: (prev: Record<string, unknown>) => Record<string, unknown>;
-    }) => unknown;
-    useSearch: () => SortSearch;
-};
-
-export type SortSearch = z.infer<typeof SortSearchSchema>;
-
-export function useUrlSorting(route: SortingRoute) {
-    const { dir, sort } = route.useSearch();
-    const navigate = route.useNavigate();
+export function useUrlSorting() {
+    const { dir, sort } = useSearch({ strict: false });
+    const navigate = useNavigate();
 
     const sorting: SortingState = sort ? [{ desc: dir === 'desc', id: sort }] : [];
 
@@ -32,6 +24,7 @@ export function useUrlSorting(route: SortingRoute) {
                 dir: entry && (entry.desc ? 'desc' : 'asc'),
                 sort: entry?.id,
             }),
+            to: '.',
         });
     };
 

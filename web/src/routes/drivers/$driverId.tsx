@@ -4,7 +4,7 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
 import { CareerHero } from '#/components/career-hero';
-import { GOLD, MiniStat } from '#/components/f1-ui';
+import { MiniStat } from '#/components/f1-ui';
 import { SeasonRow, SeasonsCard } from '#/components/seasons-card';
 import { DriverSummarySchema } from '#/lib/api/drivers';
 import { formatCareerYears, formatPosition } from '#/lib/format';
@@ -79,7 +79,7 @@ const DriverCareer = () => {
                                 <Text c={championshipPositionColor(s.position)} className="f1-num" fw={700} fz={13.5} inherit span>
                                     {formatPosition(s.position)}
                                 </Text>
-                                {isChampion ? <TrophyIcon color={GOLD} size={12} weight="fill" /> : null}
+                                {isChampion ? <TrophyIcon color="var(--gold-500)" size={12} weight="fill" /> : null}
                                 <Text c="dimmed" fw={600} fz={12} inherit span>{s.constructor.name}</Text>
                             </Group>
                             <Text c="dimmed" className="f1-num" inherit span ta="center">{s.starts}</Text>

@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { renderWithRouter, searchOf, testRoute } from '#/test/router';
+import { renderWithRouter, searchOf } from '#/test/router';
 
 import { DataTable, makeColumns, SortSearchSchema, useDataTable, useUrlSorting } from './index';
 
@@ -24,7 +24,7 @@ const columns = [
 ];
 
 const Harness = () => {
-    const { onSortingChange, sorting } = useUrlSorting(testRoute);
+    const { onSortingChange, sorting } = useUrlSorting();
     const { table } = useDataTable({ columns, data: DATA, onSortingChange, sorting });
 
     return <DataTable table={table} />;

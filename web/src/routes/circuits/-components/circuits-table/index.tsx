@@ -1,5 +1,4 @@
 import { Card } from '@mantine/core';
-import { getRouteApi } from '@tanstack/react-router';
 
 import type { ListCircuitsResponse } from '#/lib/api/circuits';
 
@@ -7,14 +6,12 @@ import { DataTable, useDataTable, useUrlSorting } from '#/components/data-table'
 
 import { columns } from './columns';
 
-const route = getRouteApi(('/circuits/'));
-
 type Props = {
     circuits: ListCircuitsResponse[];
 };
 
 export const CircuitsTable = ({ circuits }: Props) => {
-    const { onSortingChange, sorting } = useUrlSorting(route);
+    const { onSortingChange, sorting } = useUrlSorting();
 
     const { table } = useDataTable({ columns, data: circuits, onSortingChange, sorting });
 

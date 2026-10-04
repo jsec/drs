@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const DriverShortSummarySchema = z.object({
+const DriverShortSummarySchema = z.object({
     championships: z.number(),
     code: z.string(),
     constructorColor: z.string(),

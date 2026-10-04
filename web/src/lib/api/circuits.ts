@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CircuitListItemSchema = z.object({
+const CircuitListItemSchema = z.object({
     circuitId: z.string(),
     country: z.string(),
     firstRaceYear: z.number().optional(),

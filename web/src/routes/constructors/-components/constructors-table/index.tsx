@@ -1,13 +1,10 @@
 import { Card } from '@mantine/core';
-import { getRouteApi } from '@tanstack/react-router';
 
 import type { ListConstructorsResponse } from '#/lib/api/constructors';
 
 import { DataTable, useDataTable, useUrlSorting } from '#/components/data-table';
 
 import { makeConstructorColumns } from './columns';
-
-const route = getRouteApi('/constructors/');
 
 type Props = {
     constructors: ListConstructorsResponse;
@@ -17,7 +14,7 @@ export const ConstructorsTable = ({ constructors }: Props) => {
     const maxWins = Math.max(...constructors.map(c => c.wins));
     const columns = makeConstructorColumns(maxWins);
 
-    const { onSortingChange, sorting } = useUrlSorting(route);
+    const { onSortingChange, sorting } = useUrlSorting();
 
     const { table } = useDataTable({ columns, data: constructors, onSortingChange, sorting });
 

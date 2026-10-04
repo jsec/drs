@@ -44,7 +44,7 @@ export const DriversTable = ({ drivers }: Props) => {
 
     const categoryDrivers = filterByCategory(drivers, category);
 
-    const { onSortingChange, sorting } = useUrlSorting(route);
+    const { onSortingChange, sorting } = useUrlSorting();
 
     const { search, setSearch, table } = useDataTable({
         columns,

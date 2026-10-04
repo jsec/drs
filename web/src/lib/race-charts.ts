@@ -1,4 +1,4 @@
-import type { DriverLaps, RaceLaps } from '#/lib/api/races';
+import type { DriverLaps } from '#/lib/api/races';
 
 const PACE_OUTLIER_RATIO = 1.07;
 
@@ -12,9 +12,6 @@ const chartSeries = (drivers: DriverLaps[]) =>
         color,
         name: driver.code,
     }));
-
-export const hasLaps = (raceLaps: RaceLaps) =>
-    raceLaps.drivers.some(driver => driver.laps.length > 0);
 
 export const lapLabel = (lap: number) => `L${lap}`;
 

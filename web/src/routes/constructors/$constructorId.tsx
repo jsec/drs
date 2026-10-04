@@ -4,14 +4,13 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { CareerHero } from '#/components/career-hero';
-import { GOLD, MiniStat } from '#/components/f1-ui';
+import { MiniStat } from '#/components/f1-ui';
 import { SeasonRow, SeasonsCard } from '#/components/seasons-card';
 import { ConstructorSummarySchema } from '#/lib/api/constructors';
 import { formatCareerYears, formatPosition } from '#/lib/format';
 import { api } from '#/lib/query/api';
 import { CURRENT_YEAR } from '#/lib/route-params';
 
-import { countSeasons } from './-components/constructor-summary';
 import { LineageStrip } from './-components/lineage-strip';
 
 const COLS = '84px 64px 110px 1fr 60px 78px 60px 80px 24px';
@@ -41,7 +40,7 @@ const ConstructorCareer = () => {
             <LineageStrip currentId={team.id} lineage={lineage} />
 
             <SimpleGrid cols={6} spacing={8}>
-                <MiniStat label="SEASONS" value={countSeasons(seasons)} />
+                <MiniStat label="SEASONS" value={new Set(seasons.map(s => s.season)).size} />
                 <MiniStat label="STARTS" value={team.starts} />
                 <MiniStat label="WINS" value={team.wins} />
                 <MiniStat label="POLES" value={team.poles} />
@@ -74,10 +73,10 @@ const ConstructorCareer = () => {
                         to="/seasons/$year/constructors/$constructorId"
                     >
                         <Group gap={6} wrap="nowrap">
-                            <Text c={s.isChampion ? GOLD : 'dimmed'} className="f1-num" fw={700} fz={13.5} inherit span>
+                            <Text c={s.isChampion ? 'var(--gold-500)' : 'dimmed'} className="f1-num" fw={700} fz={13.5} inherit span>
                                 {formatPosition(s.position)}
                             </Text>
-                            {s.isChampion ? <TrophyIcon color={GOLD} size={12} weight="fill" /> : null}
+                            {s.isChampion ? <TrophyIcon color="var(--gold-500)" size={12} weight="fill" /> : null}
                         </Group>
                         <Text c="dimmed" fw={600} fz={12} inherit span>{s.engine}</Text>
                         <Text fz={12.5} inherit lineClamp={1} span>

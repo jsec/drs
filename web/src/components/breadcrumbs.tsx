@@ -1,7 +1,7 @@
 import { CaretRightIcon } from '@phosphor-icons/react';
 import { Link, useMatches } from '@tanstack/react-router';
 
-export type Crumb = {
+type Crumb = {
     label: string;
     params?: Record<string, string | undefined>;
     to?: string;
@@ -43,11 +43,7 @@ export const Breadcrumbs = () => {
                                         {c.label}
                                     </span>
                                 )}
-                        {isLast
-                            ? null
-                            : (
-                                    <CaretRightIcon color="var(--neutral-400)" size={11} />
-                                )}
+                        {!isLast && <CaretRightIcon color="var(--neutral-400)" size={11} />}
                     </div>
                 );
             })}

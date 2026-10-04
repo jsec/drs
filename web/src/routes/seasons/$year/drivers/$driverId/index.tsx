@@ -50,7 +50,6 @@ const DriverSeason = () => {
     const { driverId, year } = Route.useParams();
     const { data: driver } = useSuspenseQuery(driverSeasonQuery(Number(year), driverId));
     const color = driver.constructor.color;
-    const pointsMax = Math.max(50, Math.ceil(driver.points / 50) * 50);
     const hasSprints = driver.races.some(r => r.sprint !== null);
     const cols = hasSprints ? SPRINT_COLS : COLS;
     const carNumber = driver.carNumber === null ? '–' : `#${driver.carNumber}`;
@@ -142,7 +141,7 @@ const DriverSeason = () => {
                         h={200}
                         series={[{ color, name: driver.code }]}
                         xAxisProps={{ interval: 1 }}
-                        yAxisProps={{ domain: [0, pointsMax], tickCount: 5 }}
+                        yAxisProps={{ domain: [0, 'auto'], tickCount: 5 }}
                     />
                 </Box>
                 <Box className="f1-card" p={16}>

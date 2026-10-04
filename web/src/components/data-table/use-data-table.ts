@@ -31,7 +31,6 @@ export function useDataTable<T>({
         columns,
         data,
         enableMultiSort: false,
-        enableSortingRemoval: true,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: filter ? getFilteredRowModel() : undefined,
         getSortedRowModel: getSortedRowModel(),

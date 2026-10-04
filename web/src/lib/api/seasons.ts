@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const WDCSchema = z.object({
+const WDCSchema = z.object({
     countryCode: z.string(),
     id: z.string(),
     name: z.string(),
@@ -12,7 +12,7 @@ export const ConstructorSchema = z.object({
     name: z.string(),
 });
 
-export const SeasonSchema = z.object({
+const SeasonSchema = z.object({
     constructorCount: z.number(),
     raceCount: z.number(),
     season: z.number(),
@@ -22,7 +22,7 @@ export const SeasonSchema = z.object({
 
 export const SeasonListSchema = z.array(SeasonSchema);
 
-export const DriverStandingSchema = z.object({
+const DriverStandingSchema = z.object({
     carNumber: z.number().nullable(),
     code: z.string(),
     constructor: ConstructorSchema.nullable(),
@@ -38,7 +38,7 @@ export const DriverStandingSchema = z.object({
     wins: z.number(),
 });
 
-export const ConstructorStandingSchema = ConstructorSchema.extend({
+const ConstructorStandingSchema = ConstructorSchema.extend({
     countryCode: z.string(),
     engineId: z.string(),
     points: z.number(),
@@ -46,16 +46,16 @@ export const ConstructorStandingSchema = ConstructorSchema.extend({
     positionLabel: z.string(),
 });
 
-export const ProgressionSeriesSchema = z.object({
+const ProgressionSeriesSchema = z.object({
     color: z.string().default('var(--neutral-500)'),
     name: z.string(),
 });
 
-export const ProgressionDataRowSchema = z.object({
+const ProgressionDataRowSchema = z.object({
     round: z.number(),
 }).catchall(z.number());
 
-export const ProgressionSchema = z.object({
+const ProgressionSchema = z.object({
     data: z.array(ProgressionDataRowSchema),
     series: z.array(ProgressionSeriesSchema),
 });
@@ -69,7 +69,7 @@ export const SeasonOverviewSchema = z.object({
     runnerUp: DriverStandingSchema.nullable(),
 });
 
-export const SeasonCalendarEntrySchema = z.object({
+const SeasonCalendarEntrySchema = z.object({
     circuit: z.object({
         id: z.string(),
         name: z.string(),
@@ -94,11 +94,7 @@ export const SeasonCalendarSchema = z.object({
     totalRounds: z.number().int(),
 });
 
-export type Constructor = z.infer<typeof ConstructorSchema>;
 export type ConstructorStanding = z.infer<typeof ConstructorStandingSchema>;
 export type DriverStanding = z.infer<typeof DriverStandingSchema>;
 export type ListSeasonsResponse = z.infer<typeof SeasonListSchema>;
-export type Progression = z.infer<typeof ProgressionSchema>;
 export type SeasonCalendarEntry = z.infer<typeof SeasonCalendarEntrySchema>;
-export type SeasonOverview = z.infer<typeof SeasonOverviewSchema>;
-export type WDC = z.infer<typeof WDCSchema>;

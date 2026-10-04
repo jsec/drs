@@ -71,7 +71,6 @@ export function makeDriverColumns(year: string) {
             },
             header: 'TEAM',
             id: 'constructor',
-            sortable: false,
             width: '130px',
         }),
         col.num('wins', { align: 'center', header: 'WINS', width: '70px' }),

@@ -5,8 +5,6 @@ import { TrophyIcon } from '@phosphor-icons/react';
 
 import './f1-ui.css';
 
-export const GOLD = 'var(--gold-500)';
-
 const AVATAR_SIZE = { lg: 44, md: 30 } as const;
 const BAR_HEIGHT = { lg: 26, md: 24, sm: 20 } as const;
 const SQUARE_SIZE = { bar: { height: 30, width: 10 }, dot: { height: 14, width: 14 } } as const;
@@ -86,12 +84,10 @@ export const Pill = ({
     active,
     children,
     onClick,
-    variant = 'solid',
 }: {
     active: boolean;
     children: ReactNode;
     onClick: () => void;
-    variant?: 'solid' | 'subtle';
 }) => {
     return (
         <Button
@@ -99,9 +95,9 @@ export const Pill = ({
             className="f1-pill"
             data-active={active}
             onClick={onClick}
-            size={variant === 'solid' ? 'sm' : 'xs'}
+            size="sm"
             type="button"
-            variant={variant === 'solid' ? 'default' : 'subtle'}
+            variant="default"
         >
             {children}
         </Button>
@@ -112,24 +108,17 @@ export const SectionCard = ({
     action,
     children,
     padded = true,
-    subtitle,
     title,
 }: {
     action?: ReactNode;
     children: ReactNode;
     padded?: boolean;
-    subtitle?: string;
     title: string;
 }) => {
     return (
         <Card>
             <Group align="flex-start" gap="md" justify="space-between" px={18} py={15} wrap="nowrap">
-                <div>
-                    <Text fw={700} fz={15}>{title}</Text>
-                    {subtitle
-                        ? <Text c="dimmed" fz={12} mt={2}>{subtitle}</Text>
-                        : null}
-                </div>
+                <Text fw={700} fz={15}>{title}</Text>
                 {action}
             </Group>
             <div className="f1-section-card-body" data-flush={!padded}>

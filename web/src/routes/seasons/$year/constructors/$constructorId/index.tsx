@@ -47,7 +47,6 @@ const ConstructorSeason = () => {
     const engines = team.entries.length > 1
         ? team.entries.map(e => `${e.engine} ${formatPosition(e.position)}`).join(' · ')
         : team.entries[0]?.engine;
-    const pointsMax = Math.max(50, Math.ceil((team.points ?? 0) / 50) * 50);
     const progression = [
         { [team.name]: 0, x: 'R0' },
         ...team.progression.map(p => ({ [team.name]: p.points, x: `R${p.round}` })),
@@ -118,7 +117,7 @@ const ConstructorSeason = () => {
                                 h={200}
                                 series={[{ color: team.color, name: team.name }]}
                                 xAxisProps={{ interval: 1 }}
-                                yAxisProps={{ domain: [0, pointsMax], tickCount: 5 }}
+                                yAxisProps={{ domain: [0, 'auto'], tickCount: 5 }}
                             />
                         )
                     : <Text c="dimmed" fz={13}>No constructors' championship standings this season.</Text>}

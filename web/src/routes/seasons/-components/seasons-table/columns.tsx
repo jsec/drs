@@ -4,7 +4,7 @@ import { CountryFlag } from '#/components/country-flag';
 import { makeColumns } from '#/components/data-table';
 import { TeamSquare } from '#/components/f1-ui';
 
-export type Season = ListSeasonsResponse[number];
+type Season = ListSeasonsResponse[number];
 
 const col = makeColumns<Season>();
 
