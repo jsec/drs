@@ -53,7 +53,7 @@ type ProgressionDataRow map[string]float64
 
 type ProgressionSeries struct {
 	Name  string `json:"name"`
-	Color string `json:"color"`
+	Color string `json:"color,omitempty"`
 }
 
 type Progression struct {

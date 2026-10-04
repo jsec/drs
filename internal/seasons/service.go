@@ -136,10 +136,11 @@ func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverview
 	driverIDs := make([]string, 0, len(selectedDrivers))
 	for _, driver := range selectedDrivers {
 		driverIDs = append(driverIDs, driver.ID)
-		overview.Progression.Series = append(overview.Progression.Series, ProgressionSeries{
-			Name:  driver.Code,
-			Color: driver.Constructor.Color,
-		})
+		series := ProgressionSeries{Name: driver.Code}
+		if driver.Constructor != nil {
+			series.Color = driver.Constructor.Color
+		}
+		overview.Progression.Series = append(overview.Progression.Series, series)
 	}
 
 	rows, err := s.queries.ListSeasonDriverProgression(ctx, season, driverIDs)

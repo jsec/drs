@@ -267,6 +267,25 @@ func TestService_GetOverview(t *testing.T) {
 	}, got.Progression)
 }
 
+func TestService_GetOverview_DriverWithoutConstructor(t *testing.T) {
+	t.Parallel()
+
+	svc := seasons.NewService(stubQuerier{
+		driverStandingsRows: []database.ListSeasonDriverStandingsRow{{
+			Points:   9,
+			DriverID: "nino-farina",
+			Code:     "FAR",
+			Name:     "Nino Farina",
+		}},
+	})
+
+	got, err := svc.GetOverview(context.Background(), 1950)
+
+	require.NoError(t, err)
+	assert.Nil(t, got.Drivers[0].Constructor)
+	assert.Equal(t, []seasons.ProgressionSeries{{Name: "FAR"}}, got.Progression.Series)
+}
+
 func TestService_GetCalendar(t *testing.T) {
 	t.Parallel()
 

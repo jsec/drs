@@ -47,7 +47,7 @@ export const ConstructorStandingSchema = ConstructorSchema.extend({
 });
 
 export const ProgressionSeriesSchema = z.object({
-    color: z.string(),
+    color: z.string().default('var(--neutral-500)'),
     name: z.string(),
 });
 
