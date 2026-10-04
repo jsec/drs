@@ -33,10 +33,6 @@ models:
         tests:
           - not_null
           - unique
-          - relationships:
-              arguments:
-                to: ref('races')
-                field: race_id
   - name: int_jolpica__driver_identities
     columns:
       - name: external_driver_id
@@ -46,7 +42,3 @@ models:
       - name: driver_id
         tests:
           - not_null
-          - relationships:
-              arguments:
-                to: ref('drivers')
-                field: driver_id

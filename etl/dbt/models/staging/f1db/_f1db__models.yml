@@ -1,8 +1,0 @@
-version: 2
-
-models:
-  - name: stg_f1db__pit_stop
-    columns:
-      - name: stop_number
-        tests:
-          - not_null

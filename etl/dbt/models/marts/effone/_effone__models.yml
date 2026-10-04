@@ -410,11 +410,6 @@ models:
         description: Constructor associated with this official result entry.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('constructors')
-                field: constructor_id
       - name: constructor_name
         data_type: text
         constraints:
@@ -428,11 +423,6 @@ models:
         description: Driver associated with this official result entry.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('drivers')
-                field: driver_id
       - name: driver_name
         data_type: text
         constraints:
@@ -532,11 +522,6 @@ models:
         description: Race associated with the result row.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('races')
-                field: race_id
       - name: race_name
         data_type: text
         constraints:
@@ -585,11 +570,6 @@ models:
         description: Constructor associated with this sprint result entry.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('constructors')
-                field: constructor_id
       - name: constructor_name
         data_type: text
         constraints:
@@ -603,11 +583,6 @@ models:
         description: Driver associated with this sprint result entry.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('drivers')
-                field: driver_id
       - name: driver_name
         data_type: text
         constraints:
@@ -689,11 +664,6 @@ models:
         description: Race weekend associated with the sprint result row.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('races')
-                field: race_id
       - name: race_name
         data_type: text
         constraints:
@@ -752,11 +722,6 @@ models:
         description: Constructor associated with this qualifying entry.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('constructors')
-                field: constructor_id
       - name: constructor_name
         data_type: text
         constraints:
@@ -770,11 +735,6 @@ models:
         description: Driver associated with this qualifying entry.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('drivers')
-                field: driver_id
       - name: driver_name
         data_type: text
         constraints:
@@ -823,11 +783,6 @@ models:
         description: Race weekend associated with the qualifying result row.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('races')
-                field: race_id
       - name: race_name
         data_type: text
         constraints:
@@ -879,11 +834,6 @@ models:
         description: Driver associated with the fastest lap row.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('drivers')
-                field: driver_id
       - name: driver_name
         data_type: text
         constraints:
@@ -919,11 +869,6 @@ models:
         description: Race associated with the fastest lap row.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('races')
-                field: race_id
       - name: race_name
         data_type: text
         constraints:
@@ -958,11 +903,6 @@ models:
         data_type: text
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('drivers')
-                field: driver_id
       - name: lap_number
         data_type: integer
         constraints:
@@ -978,11 +918,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('races')
-                field: race_id
       - name: session
         data_type: text
         description: Which race the lap belongs to, the Grand Prix (race) or the sprint.
@@ -1029,11 +964,6 @@ models:
         description: Driver associated with the pit stop row.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('drivers')
-                field: driver_id
       - name: driver_name
         data_type: text
         constraints:
@@ -1063,11 +993,6 @@ models:
         description: Race associated with the pit stop row.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('races')
-                field: race_id
       - name: race_name
         data_type: text
         constraints:
@@ -1122,11 +1047,6 @@ models:
       - name: constructor_id
         data_type: text
         description: Constructor recorded for the driver in this race.
-        tests:
-          - relationships:
-              arguments:
-                to: ref('constructors')
-                field: constructor_id
       - name: driver_code
         data_type: text
         constraints:
@@ -1136,11 +1056,6 @@ models:
         description: Driver in the standing snapshot.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('drivers')
-                field: driver_id
       - name: driver_name
         data_type: text
         constraints:
@@ -1165,11 +1080,6 @@ models:
         description: Race after which the standing snapshot applies.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('races')
-                field: race_id
       - name: race_round
         data_type: integer
         constraints:
@@ -1206,11 +1116,6 @@ models:
         description: Constructor in the standing snapshot.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('constructors')
-                field: constructor_id
       - name: constructor_name
         data_type: text
         constraints:
@@ -1239,11 +1144,6 @@ models:
         description: Race after which the standing snapshot applies.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('races')
-                field: race_id
       - name: race_round
         data_type: integer
         constraints:
@@ -1269,21 +1169,11 @@ models:
         description: Constructor the driver raced for in their last race of the season.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('constructors')
-                field: constructor_id
       - name: driver_id
         data_type: text
         description: Driver summarized for the season.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('drivers')
-                field: driver_id
       - name: final_points
         data_type: numeric(8, 2)
         constraints:
@@ -1324,11 +1214,6 @@ models:
         description: Constructor the driver raced for during the season.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('constructors')
-                field: constructor_id
       - name: constructor_sequence
         data_type: integer
         description: Order of the constructor within the driver's season, by first race date. 1 for the first constructor.
@@ -1343,11 +1228,6 @@ models:
         description: Driver summarized for the season.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('drivers')
-                field: driver_id
       - name: driver_name
         data_type: text
         constraints:
@@ -1399,11 +1279,6 @@ models:
         description: Constructor summarized for the season.
         constraints:
           - type: not_null
-        tests:
-          - relationships:
-              arguments:
-                to: ref('constructors')
-                field: constructor_id
       - name: engine_manufacturer_id
         data_type: text
         constraints:

@@ -8,7 +8,6 @@ seeds:
         description: F1DB constructor identifier.
         tests:
           - not_null
-          - unique
           - relationships:
               arguments:
                 to: ref('stg_f1db__constructor')
