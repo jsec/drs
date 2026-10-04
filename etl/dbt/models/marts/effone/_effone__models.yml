@@ -1446,7 +1446,7 @@ models:
           - type: not_null
 
   - name: driver_season_summaries
-    description: One row per driver season with computed race/sprint totals and the latest available championship standing fields.
+    description: One row per driver season with race totals and the latest available championship standing fields.
     config:
       contract:
         enforced: true
@@ -1456,12 +1456,6 @@ models:
           - season
           - driver_id
     columns:
-      - name: average_qualifying_position
-        data_type: numeric(6, 2)
-      - name: championship_won
-        data_type: boolean
-        constraints:
-          - type: not_null
       - name: constructor_id
         data_type: text
         description: Constructor the driver raced for in their last race of the season.
@@ -1472,10 +1466,6 @@ models:
               arguments:
                 to: ref('constructors')
                 field: constructor_id
-      - name: driver_code
-        data_type: text
-        constraints:
-          - type: not_null
       - name: driver_id
         data_type: text
         description: Driver summarized for the season.
@@ -1486,33 +1476,13 @@ models:
               arguments:
                 to: ref('drivers')
                 field: driver_id
-      - name: driver_name
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: fastest_lap_count
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: final_points
         data_type: numeric(8, 2)
-      - name: final_position
-        data_type: integer
+        constraints:
+          - type: not_null
       - name: final_position_text
         data_type: text
       - name: podium_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: points_delta
-        data_type: numeric(8, 2)
-        constraints:
-          - type: not_null
-      - name: qualifying_entry_count
         data_type: integer
         constraints:
           - type: not_null
@@ -1520,45 +1490,9 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: qualifying_position_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: race_entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: race_points
-        data_type: numeric(8, 2)
-        constraints:
-          - type: not_null
-      - name: race_start_count
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: season
         data_type: integer
         description: Championship year.
-        constraints:
-          - type: not_null
-      - name: sprint_entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: sprint_points
-        data_type: numeric(8, 2)
-        constraints:
-          - type: not_null
-      - name: sprint_start_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: start_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: total_points
-        data_type: numeric(8, 2)
         constraints:
           - type: not_null
       - name: win_count
@@ -1577,8 +1511,6 @@ models:
           - driver_id
           - constructor_id
     columns:
-      - name: average_qualifying_position
-        data_type: numeric(6, 2)
       - name: constructor_id
         data_type: text
         description: Constructor the driver raced for during the season.
@@ -1589,10 +1521,6 @@ models:
               arguments:
                 to: ref('constructors')
                 field: constructor_id
-      - name: constructor_name
-        data_type: text
-        constraints:
-          - type: not_null
       - name: constructor_sequence
         data_type: integer
         description: Order of the constructor within the driver's season, by first race date. 1 for the first constructor.
@@ -1616,36 +1544,12 @@ models:
         data_type: text
         constraints:
           - type: not_null
-      - name: entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: fastest_lap_count
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: podium_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: qualifying_entry_count
         data_type: integer
         constraints:
           - type: not_null
       - name: qualifying_p1_count
         data_type: integer
-        constraints:
-          - type: not_null
-      - name: qualifying_position_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: race_entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: race_points
-        data_type: numeric(8, 2)
         constraints:
           - type: not_null
       - name: race_start_count
@@ -1655,22 +1559,6 @@ models:
       - name: season
         data_type: integer
         description: Championship year.
-        constraints:
-          - type: not_null
-      - name: sprint_entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: sprint_points
-        data_type: numeric(8, 2)
-        constraints:
-          - type: not_null
-      - name: sprint_start_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: start_count
-        data_type: integer
         constraints:
           - type: not_null
       - name: total_points
@@ -1694,8 +1582,6 @@ models:
           - constructor_id
           - engine_manufacturer_id
     columns:
-      - name: average_qualifying_position
-        data_type: numeric(6, 2)
       - name: championship_won
         data_type: boolean
         constraints:
@@ -1710,10 +1596,6 @@ models:
               arguments:
                 to: ref('constructors')
                 field: constructor_id
-      - name: constructor_name
-        data_type: text
-        constraints:
-          - type: not_null
       - name: engine_manufacturer_id
         data_type: text
         constraints:
@@ -1726,47 +1608,19 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: fastest_lap_count
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: final_order
         data_type: integer
         description: Source display order for official final constructor standings rows.
       - name: final_points
         data_type: numeric(8, 2)
-      - name: final_position
-        data_type: integer
       - name: final_position_text
         data_type: text
       - name: podium_count
         data_type: integer
         constraints:
           - type: not_null
-      - name: points_delta
-        data_type: numeric(8, 2)
-      - name: qualifying_entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: qualifying_p1_count
         data_type: integer
-        constraints:
-          - type: not_null
-      - name: qualifying_position_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: race_entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: race_points
-        data_type: numeric(8, 2)
         constraints:
           - type: not_null
       - name: race_start_count
@@ -1776,26 +1630,6 @@ models:
       - name: season
         data_type: integer
         description: Championship year.
-        constraints:
-          - type: not_null
-      - name: sprint_entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: sprint_points
-        data_type: numeric(8, 2)
-        constraints:
-          - type: not_null
-      - name: sprint_start_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: start_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: total_points
-        data_type: numeric(8, 2)
         constraints:
           - type: not_null
       - name: win_count

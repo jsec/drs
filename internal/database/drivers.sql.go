@@ -142,7 +142,7 @@ SELECT
         ORDER BY rr.race_round DESC
         LIMIT 1
     ) AS car_number,
-    coalesce(dss.final_points, dss.total_points) AS points,
+    dss.final_points AS points,
     dss.final_position_text AS position,
     dss.win_count AS wins,
     dss.podium_count AS podiums,
