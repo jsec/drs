@@ -16,7 +16,6 @@ select
     races.race_date,
     races.race_time,
     races.grand_prix_id,
-    races.grand_prix_name,
     races.grand_prix_code,
     races.circuit_id,
     races.circuit_layout_id,

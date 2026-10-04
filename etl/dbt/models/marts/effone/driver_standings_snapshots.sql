@@ -63,15 +63,12 @@ with
             standings.position_number as position,
             standings.position_text,
             standings.championship_won,
-            race_results.constructor_id,
-            lag(standings.points) over driver_order as previous_points,
-            lag(standings.position_number) over driver_order as previous_position
+            race_results.constructor_id
         from standings
         join races on standings.race_id = races.race_id
         join drivers on standings.driver_id = drivers.driver_id
         left join
             race_results on standings.race_id = race_results.race_id and standings.driver_id = race_results.driver_id
-        window driver_order as (partition by standings.driver_id, races.season order by races.race_round, races.race_id)
     ),
 
     standing_states as (
@@ -115,12 +112,8 @@ select
     latest_entry.constructor_id,
     latest_entry.car_number,
     standing_qualifying_states.points,
-    standing_qualifying_states.previous_points,
-    standing_qualifying_states.points - standing_qualifying_states.previous_points as points_gained,
     standing_qualifying_states.position,
     standing_qualifying_states.position_text,
-    standing_qualifying_states.previous_position,
-    standing_qualifying_states.previous_position - standing_qualifying_states.position as position_change,
     coalesce(latest_entry.win_count, 0) as win_count,
     coalesce(latest_entry.podium_count, 0) as podium_count,
     standing_qualifying_states.qualifying_p1_count,

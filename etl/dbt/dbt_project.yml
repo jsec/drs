@@ -38,9 +38,6 @@ models:
         sprint_results:
           +indexes:
             - columns: [season, driver_id]
-        pit_stops:
-          +indexes:
-            - columns: [race_id, driver_id]
         driver_standings_snapshots:
           +indexes:
             - columns: [season, driver_id]

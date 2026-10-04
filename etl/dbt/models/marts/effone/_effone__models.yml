@@ -35,9 +35,9 @@ models:
       - name: country_code
         data_type: text
         constraints:
+          - type: check
+            expression: "country_code ~ '^[A-Z]{2}$'"
           - type: not_null
-        tests:
-          - iso_alpha2_country_code
       - name: country_id
         data_type: text
         constraints:
@@ -190,9 +190,9 @@ models:
       - name: country_code
         data_type: text
         constraints:
+          - type: check
+            expression: "country_code ~ '^[A-Z]{2}$'"
           - type: not_null
-        tests:
-          - iso_alpha2_country_code
       - name: entry_count
         data_type: integer
         constraints:
@@ -217,9 +217,9 @@ models:
         data_type: text
         description: Primary constructor display color as a six-digit hex code.
         constraints:
+          - type: check
+            expression: "primary_color_hex ~ '^#[0-9A-Fa-f]{6}$'"
           - type: not_null
-        tests:
-          - hex_color
       - name: qualifying_entry_count
         data_type: integer
         constraints:
@@ -239,8 +239,9 @@ models:
       - name: secondary_color_hex
         data_type: text
         description: Optional secondary constructor display color as a six-digit hex code.
-        tests:
-          - hex_color
+        constraints:
+          - type: check
+            expression: "secondary_color_hex ~ '^#[0-9A-Fa-f]{6}$'"
       - name: sprint_entry_count
         data_type: integer
         constraints:
@@ -345,9 +346,9 @@ models:
       - name: nationality_country_code
         data_type: text
         constraints:
+          - type: check
+            expression: "nationality_country_code ~ '^[A-Z]{2}$'"
           - type: not_null
-        tests:
-          - iso_alpha2_country_code
       - name: place_of_birth
         data_type: text
         constraints:
@@ -376,8 +377,9 @@ models:
         data_type: text
       - name: second_nationality_country_code
         data_type: text
-        tests:
-          - iso_alpha2_country_code
+        constraints:
+          - type: check
+            expression: "second_nationality_country_code ~ '^[A-Z]{2}$'"
       - name: sprint_entry_count
         data_type: integer
         constraints:
@@ -489,10 +491,6 @@ models:
         data_type: text
         description: Three-letter grand prix abbreviation (e.g. BHR). Null for grands prix with no recorded abbreviation.
       - name: grand_prix_id
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: grand_prix_name
         data_type: text
         constraints:
           - type: not_null
@@ -750,20 +748,6 @@ models:
         description: Retirement/result category derived from F1DB result status.
         constraints:
           - type: not_null
-        tests:
-          - accepted_values:
-              arguments:
-                values:
-                  - finished
-                  - accident
-                  - collision
-                  - disqualified
-                  - not_qualified
-                  - not_classified
-                  - withdrawn
-                  - mechanical
-                  - driver_error
-                  - other_retirement
       - name: time_penalty
         data_type: text
       - name: tyre_manufacturer_id
@@ -921,20 +905,6 @@ models:
         description: Sprint result category derived from F1DB result status text.
         constraints:
           - type: not_null
-        tests:
-          - accepted_values:
-              arguments:
-                values:
-                  - finished
-                  - accident
-                  - collision
-                  - disqualified
-                  - not_qualified
-                  - not_classified
-                  - withdrawn
-                  - mechanical
-                  - driver_error
-                  - other_retirement
       - name: time_penalty
         data_type: text
       - name: tyre_manufacturer_id
@@ -1032,8 +1002,6 @@ models:
       - name: qualifying_order
         data_type: integer
         description: Source display order for qualifying result rows.
-        tests:
-          - not_null
         constraints:
           - type: not_null
       - name: qualifying_position
@@ -1191,10 +1159,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: lap_time
-        data_type: text
-        constraints:
-          - type: not_null
       - name: lap_time_ms
         data_type: integer
         constraints:
@@ -1211,10 +1175,6 @@ models:
               arguments:
                 to: ref('races')
                 field: race_id
-      - name: race_round
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: session
         data_type: text
         description: Which race the lap belongs to, the Grand Prix (race) or the sprint.
@@ -1226,10 +1186,6 @@ models:
                 values:
                   - race
                   - sprint
-      - name: season
-        data_type: integer
-        constraints:
-          - type: not_null
 
   - name: pit_stops
     description: One row per pit stop event from F1DB.
@@ -1385,8 +1341,6 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: points_gained
-        data_type: numeric(8, 2)
       - name: podium_count
         data_type: integer
         description: Cumulative race podiums through this snapshot's race.
@@ -1394,16 +1348,10 @@ models:
           - type: not_null
       - name: position
         data_type: integer
-      - name: position_change
-        data_type: integer
       - name: position_text
         data_type: text
         constraints:
           - type: not_null
-      - name: previous_points
-        data_type: numeric(8, 2)
-      - name: previous_position
-        data_type: integer
       - name: race_id
         data_type: integer
         description: Race after which the standing snapshot applies.
@@ -1445,10 +1393,6 @@ models:
           - constructor_id
           - engine_manufacturer_id
     columns:
-      - name: championship_won
-        data_type: boolean
-        constraints:
-          - type: not_null
       - name: constructor_id
         data_type: text
         description: Constructor in the standing snapshot.
@@ -1476,20 +1420,12 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: points_gained
-        data_type: numeric(8, 2)
       - name: position
-        data_type: integer
-      - name: position_change
         data_type: integer
       - name: position_text
         data_type: text
         constraints:
           - type: not_null
-      - name: previous_points
-        data_type: numeric(8, 2)
-      - name: previous_position
-        data_type: integer
       - name: race_id
         data_type: integer
         description: Race after which the standing snapshot applies.

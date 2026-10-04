@@ -84,7 +84,8 @@ CREATE TABLE effone.circuits (
     current_layout_turns integer,
     previous_names text[],
     race_count integer NOT NULL,
-    turns integer NOT NULL
+    turns integer NOT NULL,
+    CONSTRAINT circuits__dbt_tmp_country_code_check1 CHECK ((country_code ~ '^[A-Z]{2}$'::text))
 );
 
 
@@ -143,18 +144,13 @@ CREATE TABLE effone.constructor_season_summaries (
 --
 
 CREATE TABLE effone.constructor_standings_snapshots (
-    championship_won boolean NOT NULL,
     constructor_id text NOT NULL,
     constructor_name text NOT NULL,
     engine_manufacturer_id text NOT NULL,
     engine_manufacturer_name text NOT NULL,
     points numeric(8,2) NOT NULL,
-    points_gained numeric(8,2),
     "position" integer,
-    position_change integer,
     position_text text NOT NULL,
-    previous_points numeric(8,2),
-    previous_position integer,
     race_id integer NOT NULL,
     race_round integer NOT NULL,
     season integer NOT NULL
@@ -188,7 +184,10 @@ CREATE TABLE effone.constructors (
     sprint_start_count integer NOT NULL,
     start_count integer NOT NULL,
     total_points numeric(8,2) NOT NULL,
-    win_count integer NOT NULL
+    win_count integer NOT NULL,
+    CONSTRAINT constructors__dbt_tmp_country_code_check CHECK ((country_code ~ '^[A-Z]{2}$'::text)),
+    CONSTRAINT constructors__dbt_tmp_primary_color_hex_check CHECK ((primary_color_hex ~ '^#[0-9A-Fa-f]{6}$'::text)),
+    CONSTRAINT constructors__dbt_tmp_secondary_color_hex_check CHECK ((secondary_color_hex ~ '^#[0-9A-Fa-f]{6}$'::text))
 );
 
 
@@ -269,13 +268,9 @@ CREATE TABLE effone.driver_standings_snapshots (
     driver_id text NOT NULL,
     driver_name text NOT NULL,
     points numeric(8,2) NOT NULL,
-    points_gained numeric(8,2),
     podium_count integer NOT NULL,
     "position" integer,
-    position_change integer,
     position_text text NOT NULL,
-    previous_points numeric(8,2),
-    previous_position integer,
     race_id integer NOT NULL,
     race_round integer NOT NULL,
     qualifying_p1_count integer NOT NULL,
@@ -320,7 +315,9 @@ CREATE TABLE effone.drivers (
     sprint_start_count integer NOT NULL,
     start_count integer NOT NULL,
     total_points numeric(8,2) NOT NULL,
-    win_count integer NOT NULL
+    win_count integer NOT NULL,
+    CONSTRAINT drivers__dbt_tmp_nationality_country_code_check1 CHECK ((nationality_country_code ~ '^[A-Z]{2}$'::text)),
+    CONSTRAINT drivers__dbt_tmp_second_nationality_country_code_check1 CHECK ((second_nationality_country_code ~ '^[A-Z]{2}$'::text))
 );
 
 
@@ -360,13 +357,10 @@ CREATE TABLE effone.fastest_laps (
 CREATE TABLE effone.lap_times (
     driver_id text NOT NULL,
     lap_number integer NOT NULL,
-    lap_time text NOT NULL,
     lap_time_ms integer NOT NULL,
     "position" integer,
     race_id integer NOT NULL,
-    race_round integer NOT NULL,
-    session text NOT NULL,
-    season integer NOT NULL
+    session text NOT NULL
 );
 
 
@@ -503,7 +497,6 @@ CREATE TABLE effone.races (
     fp3_time time without time zone,
     grand_prix_code text,
     grand_prix_id text NOT NULL,
-    grand_prix_name text NOT NULL,
     pole_driver_id text,
     pole_driver_name text,
     qualifying_date date,
@@ -647,43 +640,43 @@ CREATE TABLE effone.sprint_results (
 
 
 --
--- Name: circuit_layouts circuit_layouts__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: circuit_layouts circuit_layouts__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.circuit_layouts
-    ADD CONSTRAINT circuit_layouts__dbt_tmp_pkey PRIMARY KEY (circuit_layout_id);
+    ADD CONSTRAINT circuit_layouts__dbt_tmp_pkey1 PRIMARY KEY (circuit_layout_id);
 
 
 --
--- Name: circuits circuits__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: circuits circuits__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.circuits
-    ADD CONSTRAINT circuits__dbt_tmp_pkey PRIMARY KEY (circuit_id);
+    ADD CONSTRAINT circuits__dbt_tmp_pkey1 PRIMARY KEY (circuit_id);
 
 
 --
--- Name: constructor_lineage constructor_lineage__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: constructor_lineage constructor_lineage__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.constructor_lineage
-    ADD CONSTRAINT constructor_lineage__dbt_tmp_pkey1 PRIMARY KEY (constructor_id, position_display_order);
+    ADD CONSTRAINT constructor_lineage__dbt_tmp_pkey PRIMARY KEY (constructor_id, position_display_order);
 
 
 --
--- Name: constructor_season_summaries constructor_season_summaries__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: constructor_season_summaries constructor_season_summaries__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.constructor_season_summaries
-    ADD CONSTRAINT constructor_season_summaries__dbt_tmp_pkey1 PRIMARY KEY (season, constructor_id, engine_manufacturer_id);
+    ADD CONSTRAINT constructor_season_summaries__dbt_tmp_pkey PRIMARY KEY (season, constructor_id, engine_manufacturer_id);
 
 
 --
--- Name: constructor_standings_snapshots constructor_standings_snapshots__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: constructor_standings_snapshots constructor_standings_snapshots__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.constructor_standings_snapshots
-    ADD CONSTRAINT constructor_standings_snapshots__dbt_tmp_pkey PRIMARY KEY (race_id, constructor_id, engine_manufacturer_id);
+    ADD CONSTRAINT constructor_standings_snapshots__dbt_tmp_pkey1 PRIMARY KEY (race_id, constructor_id, engine_manufacturer_id);
 
 
 --
@@ -703,75 +696,75 @@ ALTER TABLE ONLY effone.driver_season_constructor_summaries
 
 
 --
--- Name: driver_season_summaries driver_season_summaries__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: driver_season_summaries driver_season_summaries__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.driver_season_summaries
-    ADD CONSTRAINT driver_season_summaries__dbt_tmp_pkey PRIMARY KEY (season, driver_id);
+    ADD CONSTRAINT driver_season_summaries__dbt_tmp_pkey1 PRIMARY KEY (season, driver_id);
 
 
 --
--- Name: driver_standings_snapshots driver_standings_snapshots__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: driver_standings_snapshots driver_standings_snapshots__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.driver_standings_snapshots
-    ADD CONSTRAINT driver_standings_snapshots__dbt_tmp_pkey PRIMARY KEY (race_id, driver_id);
+    ADD CONSTRAINT driver_standings_snapshots__dbt_tmp_pkey1 PRIMARY KEY (race_id, driver_id);
 
 
 --
--- Name: drivers drivers__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: drivers drivers__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.drivers
-    ADD CONSTRAINT drivers__dbt_tmp_pkey PRIMARY KEY (driver_id);
+    ADD CONSTRAINT drivers__dbt_tmp_pkey1 PRIMARY KEY (driver_id);
 
 
 --
--- Name: fastest_laps fastest_laps__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: fastest_laps fastest_laps__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.fastest_laps
-    ADD CONSTRAINT fastest_laps__dbt_tmp_pkey PRIMARY KEY (race_id, driver_id);
+    ADD CONSTRAINT fastest_laps__dbt_tmp_pkey1 PRIMARY KEY (race_id, driver_id);
 
 
 --
--- Name: lap_times lap_times__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: lap_times lap_times__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.lap_times
-    ADD CONSTRAINT lap_times__dbt_tmp_pkey PRIMARY KEY (race_id, session, driver_id, lap_number);
+    ADD CONSTRAINT lap_times__dbt_tmp_pkey1 PRIMARY KEY (race_id, session, driver_id, lap_number);
 
 
 --
--- Name: pit_stops pit_stops__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: pit_stops pit_stops__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.pit_stops
-    ADD CONSTRAINT pit_stops__dbt_tmp_pkey PRIMARY KEY (race_id, stop_order);
+    ADD CONSTRAINT pit_stops__dbt_tmp_pkey1 PRIMARY KEY (race_id, stop_order);
 
 
 --
--- Name: qualifying_results qualifying_results__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: qualifying_results qualifying_results__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.qualifying_results
-    ADD CONSTRAINT qualifying_results__dbt_tmp_pkey1 PRIMARY KEY (race_id, qualifying_order);
+    ADD CONSTRAINT qualifying_results__dbt_tmp_pkey PRIMARY KEY (race_id, qualifying_order);
 
 
 --
--- Name: race_results race_results__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: race_results race_results__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.race_results
-    ADD CONSTRAINT race_results__dbt_tmp_pkey1 PRIMARY KEY (race_id, finish_order);
+    ADD CONSTRAINT race_results__dbt_tmp_pkey PRIMARY KEY (race_id, finish_order);
 
 
 --
--- Name: races races__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: races races__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.races
-    ADD CONSTRAINT races__dbt_tmp_pkey PRIMARY KEY (race_id);
+    ADD CONSTRAINT races__dbt_tmp_pkey1 PRIMARY KEY (race_id);
 
 
 --
@@ -783,75 +776,68 @@ ALTER TABLE ONLY effone.refresh_runs
 
 
 --
--- Name: seasons seasons__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: seasons seasons__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.seasons
-    ADD CONSTRAINT seasons__dbt_tmp_pkey PRIMARY KEY (season);
+    ADD CONSTRAINT seasons__dbt_tmp_pkey1 PRIMARY KEY (season);
 
 
 --
--- Name: sprint_results sprint_results__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: sprint_results sprint_results__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.sprint_results
-    ADD CONSTRAINT sprint_results__dbt_tmp_pkey PRIMARY KEY (race_id, driver_id);
+    ADD CONSTRAINT sprint_results__dbt_tmp_pkey1 PRIMARY KEY (race_id, driver_id);
 
 
 --
--- Name: 31cc4ba2a610265f6af569638d4be8ff; Type: INDEX; Schema: effone; Owner: -
+-- Name: 18aa2460b295b4fe94dd9be5767cee2e; Type: INDEX; Schema: effone; Owner: -
 --
 
-CREATE INDEX "31cc4ba2a610265f6af569638d4be8ff" ON effone.races USING btree (season, race_round);
-
-
---
--- Name: 344de05eb8ec58cb4e0de5b43e838312; Type: INDEX; Schema: effone; Owner: -
---
-
-CREATE INDEX "344de05eb8ec58cb4e0de5b43e838312" ON effone.races USING btree (circuit_id);
+CREATE INDEX "18aa2460b295b4fe94dd9be5767cee2e" ON effone.races USING btree (season, race_round);
 
 
 --
--- Name: 5987450a53535a211aa27ca653409219; Type: INDEX; Schema: effone; Owner: -
+-- Name: 743b2a9bc0bc38413b775c5307ee11e8; Type: INDEX; Schema: effone; Owner: -
 --
 
-CREATE INDEX "5987450a53535a211aa27ca653409219" ON effone.race_results USING btree (season, driver_id);
-
-
---
--- Name: 91309e4b44b2f2e94838bfa2d7e16ac6; Type: INDEX; Schema: effone; Owner: -
---
-
-CREATE INDEX "91309e4b44b2f2e94838bfa2d7e16ac6" ON effone.pit_stops USING btree (race_id, driver_id);
+CREATE INDEX "743b2a9bc0bc38413b775c5307ee11e8" ON effone.driver_standings_snapshots USING btree (season, driver_id);
 
 
 --
--- Name: a2562eb61095204262007f262aa2677b; Type: INDEX; Schema: effone; Owner: -
+-- Name: 9a7b0ff20ab67daa9099f27cd6ab4f5c; Type: INDEX; Schema: effone; Owner: -
 --
 
-CREATE INDEX a2562eb61095204262007f262aa2677b ON effone.sprint_results USING btree (season, driver_id);
-
-
---
--- Name: c4256c0667dd35b698c6887ed9437179; Type: INDEX; Schema: effone; Owner: -
---
-
-CREATE INDEX c4256c0667dd35b698c6887ed9437179 ON effone.constructor_standings_snapshots USING btree (season, constructor_id);
+CREATE INDEX "9a7b0ff20ab67daa9099f27cd6ab4f5c" ON effone.race_results USING btree (season, driver_id);
 
 
 --
--- Name: cea8ab0872e9037dd307fdb927f3bef0; Type: INDEX; Schema: effone; Owner: -
+-- Name: c381878dbe4872e3292f7246a1a0d8cc; Type: INDEX; Schema: effone; Owner: -
 --
 
-CREATE INDEX cea8ab0872e9037dd307fdb927f3bef0 ON effone.driver_standings_snapshots USING btree (season, driver_id);
+CREATE INDEX c381878dbe4872e3292f7246a1a0d8cc ON effone.sprint_results USING btree (season, driver_id);
 
 
 --
--- Name: e61ee40f472ce2ef642aae4a6b193439; Type: INDEX; Schema: effone; Owner: -
+-- Name: d64fdcf79b6949f7ad6f8d1cb32979c8; Type: INDEX; Schema: effone; Owner: -
 --
 
-CREATE INDEX e61ee40f472ce2ef642aae4a6b193439 ON effone.driver_season_constructor_summaries USING btree (driver_id, season);
+CREATE INDEX d64fdcf79b6949f7ad6f8d1cb32979c8 ON effone.constructor_standings_snapshots USING btree (season, constructor_id);
+
+
+--
+-- Name: e9335a98fc774098e3f69a62e0277f02; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX e9335a98fc774098e3f69a62e0277f02 ON effone.races USING btree (circuit_id);
+
+
+--
+-- Name: ecce4b74154810d6b68aca55a2a4c8f4; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX ecce4b74154810d6b68aca55a2a4c8f4 ON effone.driver_season_constructor_summaries USING btree (driver_id, season);
 
 
 --

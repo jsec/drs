@@ -9,52 +9,7 @@ with
 
     engine_manufacturers as (select * from {{ ref("stg_f1db__engine_manufacturer") }}),
 
-    race_results as (select * from {{ ref("race_results") }}),
-
-    sprint_results as (select * from {{ ref("sprint_results") }}),
-
-    qualifying_results as (select * from {{ ref("qualifying_results") }}),
-
-    race_aggregates as (
-        select
-            season,
-            constructor_id,
-            engine_manufacturer_id,
-            count(*)::integer as race_entry_count,
-            count(*) filter (where is_start)::integer as race_start_count,
-            count(*) filter (where is_win)::integer as win_count,
-            count(*) filter (where is_podium)::integer as podium_count,
-            count(*) filter (where is_dnf)::integer as dnf_count,
-            count(*) filter (where is_fastest_lap)::integer as fastest_lap_count,
-            sum(points) as race_points
-        from race_results
-        group by season, constructor_id, engine_manufacturer_id
-    ),
-
-    sprint_aggregates as (
-        select
-            season,
-            constructor_id,
-            engine_manufacturer_id,
-            count(*)::integer as sprint_entry_count,
-            count(*) filter (where is_start)::integer as sprint_start_count,
-            sum(points) as sprint_points
-        from sprint_results
-        group by season, constructor_id, engine_manufacturer_id
-    ),
-
-    qualifying_aggregates as (
-        select
-            season,
-            constructor_id,
-            engine_manufacturer_id,
-            count(*)::integer as qualifying_entry_count,
-            count(qualifying_position)::integer as qualifying_position_count,
-            count(*) filter (where is_qualifying_p1)::integer as qualifying_p1_count,
-            avg(qualifying_position)::numeric(6, 2) as average_qualifying_position
-        from qualifying_results
-        group by season, constructor_id, engine_manufacturer_id
-    )
+    {{ season_aggregates(["season", "constructor_id", "engine_manufacturer_id"]) }}
 
 select
     race_aggregates.season,

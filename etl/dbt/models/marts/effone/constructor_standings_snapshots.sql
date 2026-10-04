@@ -5,48 +5,20 @@ with
 
     constructors as (select * from {{ ref("int_f1db__constructors_with_countries") }}),
 
-    engine_manufacturers as (select * from {{ ref("stg_f1db__engine_manufacturer") }}),
-
-    joined as (
-        select
-            races.season,
-            races.race_round,
-            standings.race_id,
-            standings.constructor_id,
-            constructors.constructor_name,
-            standings.engine_manufacturer_id,
-            engine_manufacturers.engine_manufacturer_name,
-            standings.points,
-            standings.position_number as position,
-            standings.position_text,
-            standings.championship_won,
-            lag(standings.points) over constructor_order as previous_points,
-            lag(standings.position_number) over constructor_order as previous_position
-        from standings
-        join races on standings.race_id = races.race_id
-        join constructors on standings.constructor_id = constructors.constructor_id
-        join engine_manufacturers on standings.engine_manufacturer_id = engine_manufacturers.engine_manufacturer_id
-        window
-            constructor_order as (
-                partition by standings.constructor_id, standings.engine_manufacturer_id, races.season
-                order by races.race_round
-            )
-    )
+    engine_manufacturers as (select * from {{ ref("stg_f1db__engine_manufacturer") }})
 
 select
-    season,
-    race_round,
-    race_id,
-    constructor_id,
-    constructor_name,
-    engine_manufacturer_id,
-    engine_manufacturer_name,
-    points,
-    previous_points,
-    points - previous_points as points_gained,
-    position,
-    position_text,
-    previous_position,
-    previous_position - position as position_change,
-    championship_won
-from joined
+    races.season,
+    races.race_round,
+    standings.race_id,
+    standings.constructor_id,
+    constructors.constructor_name,
+    standings.engine_manufacturer_id,
+    engine_manufacturers.engine_manufacturer_name,
+    standings.points,
+    standings.position_number as position,
+    standings.position_text
+from standings
+join races on standings.race_id = races.race_id
+join constructors on standings.constructor_id = constructors.constructor_id
+join engine_manufacturers on standings.engine_manufacturer_id = engine_manufacturers.engine_manufacturer_id

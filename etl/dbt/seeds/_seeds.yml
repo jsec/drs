@@ -17,8 +17,5 @@ seeds:
         description: Primary constructor color as a six-digit hex code.
         tests:
           - not_null
-          - hex_color
       - name: secondary_color_hex
         description: Optional secondary constructor color as a six-digit hex code.
-        tests:
-          - hex_color

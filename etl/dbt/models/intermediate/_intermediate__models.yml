@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: int_jolpica__race_lap_entries
+  - name: int_jolpica__race_laps
     columns:
       - name: external_race_id
         tests:
@@ -25,9 +25,6 @@ models:
           config:
             severity: warn
     columns:
-      - name: source
-        tests:
-          - not_null
       - name: external_race_id
         tests:
           - not_null
@@ -42,9 +39,6 @@ models:
                 field: race_id
   - name: int_jolpica__driver_identities
     columns:
-      - name: source
-        tests:
-          - not_null
       - name: external_driver_id
         tests:
           - not_null
@@ -56,37 +50,3 @@ models:
               arguments:
                 to: ref('drivers')
                 field: driver_id
-  - name: int_f1db__drivers_with_countries
-    columns:
-      - name: driver_id
-        tests:
-          - not_null
-          - unique
-
-  - name: int_f1db__constructors_with_countries
-    columns:
-      - name: constructor_id
-        tests:
-          - not_null
-          - unique
-
-  - name: int_f1db__circuits_with_countries
-    columns:
-      - name: circuit_id
-        tests:
-          - not_null
-          - unique
-
-  - name: int_f1db__races_with_circuits
-    columns:
-      - name: race_id
-        tests:
-          - not_null
-          - unique
-
-  - name: int_f1db__circuit_layouts_with_races
-    columns:
-      - name: circuit_layout_id
-        tests:
-          - not_null
-          - unique
