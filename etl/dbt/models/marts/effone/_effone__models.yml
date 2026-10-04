@@ -277,24 +277,13 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: country_of_birth_id
-        data_type: text
-        constraints:
-          - type: not_null
       - name: date_of_birth
         data_type: date
         constraints:
           - type: not_null
-      - name: date_of_death
-        data_type: date
       - name: driver_code
         data_type: text
         description: Short driver code used in race timing and result displays.
-        constraints:
-          - type: not_null
-      - name: driver_full_name
-        data_type: text
-        description: Full display name.
         constraints:
           - type: not_null
       - name: driver_id
@@ -307,26 +296,8 @@ models:
         description: Display name for UI contexts.
         constraints:
           - type: not_null
-      - name: driver_number
-        data_type: integer
-      - name: entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: fastest_lap_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: first_name
-        data_type: text
-        constraints:
-          - type: not_null
       - name: first_race_date
         data_type: date
-      - name: gender
-        data_type: text
-        constraints:
-          - type: not_null
       - name: last_name
         data_type: text
         constraints:
@@ -338,26 +309,13 @@ models:
         description: Driver nationality display label.
         constraints:
           - type: not_null
-      - name: nationality_country_id
-        data_type: text
-        description: F1DB identifier for the driver's primary nationality.
-        constraints:
-          - type: not_null
       - name: nationality_country_code
         data_type: text
         constraints:
           - type: check
             expression: "nationality_country_code ~ '^[A-Z]{2}$'"
           - type: not_null
-      - name: place_of_birth
-        data_type: text
-        constraints:
-          - type: not_null
       - name: podium_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: qualifying_entry_count
         data_type: integer
         constraints:
           - type: not_null
@@ -365,35 +323,8 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: race_entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: race_start_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: second_nationality_country_id
-        data_type: text
-      - name: second_nationality_country_code
-        data_type: text
-        constraints:
-          - type: check
-            expression: "second_nationality_country_code ~ '^[A-Z]{2}$'"
-      - name: sprint_entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: sprint_start_count
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: start_count
         data_type: integer
-        constraints:
-          - type: not_null
-      - name: total_points
-        data_type: numeric(8, 2)
         constraints:
           - type: not_null
       - name: win_count
