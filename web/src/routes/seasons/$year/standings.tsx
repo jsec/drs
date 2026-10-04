@@ -17,7 +17,7 @@ const Standings = () => {
     const [tab, setTab] = useState<'constructors' | 'drivers'>('drivers');
 
     const driverColumns = makeDriverColumns(year);
-    const constructorColumns = makeConstructorColumns(data.maxConstructorPoints);
+    const constructorColumns = makeConstructorColumns(year, data.maxConstructorPoints);
 
     const driverTable = useDataTable({ columns: driverColumns, data: data.drivers });
     const constructorTable = useDataTable({ columns: constructorColumns, data: data.constructors });

@@ -2,6 +2,7 @@ import { queryOptions } from '@tanstack/react-query';
 
 import type { Session } from '#/lib/api/races';
 
+import { ConstructorSeasonDetailSchema } from '#/lib/api/constructors';
 import { DriverRaceSchema, DriverSeasonSchema } from '#/lib/api/drivers';
 import { RaceDetailSchema, RaceLapsSchema } from '#/lib/api/races';
 import { SeasonCalendarSchema, SeasonOverviewSchema } from '#/lib/api/seasons';
@@ -41,4 +42,10 @@ export const driverRaceQuery = (year: number, round: number, driverId: string, s
     queryOptions({
         queryFn: () => api.get(`seasons/${year}/drivers/${driverId}/races/${round}`, { searchParams: { session } }).json(DriverRaceSchema),
         queryKey: ['driver-race', year, round, driverId, session],
+    });
+
+export const constructorSeasonQuery = (year: number, constructorId: string) =>
+    queryOptions({
+        queryFn: () => api.get(`seasons/${year}/constructors/${constructorId}`).json(ConstructorSeasonDetailSchema),
+        queryKey: ['constructor-season', year, constructorId],
     });

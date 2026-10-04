@@ -7,7 +7,7 @@ import { TeamBar, TeamSquare } from '#/components/f1-ui';
 
 const CODE_STYLE = { color: 'var(--mantine-color-dimmed)', fontSize: 11, fontWeight: 700, marginLeft: 8 } as const;
 
-export function makeConstructorColumns(maxConstructor: number) {
+export function makeConstructorColumns(year: string, maxConstructor: number) {
     const col = makeColumns<ConstructorStanding>();
 
     return [
@@ -15,7 +15,7 @@ export function makeConstructorColumns(maxConstructor: number) {
         col.competitor('name', {
             header: 'CONSTRUCTOR',
             label: c => c.name,
-            link: c => ({ params: { constructorId: c.id }, to: '/constructors/$constructorId' }),
+            link: c => ({ params: { constructorId: c.id, year }, to: '/seasons/$year/constructors/$constructorId' }),
             visual: c => <TeamSquare color={c.color} size="bar" />,
             width: '240px',
         }),

@@ -20,6 +20,7 @@ import { Route as SeasonsIndexRouteImport } from './routes/seasons/index'
 import { Route as SeasonsYearIndexRouteImport } from './routes/seasons/$year/index'
 import { Route as SeasonsYearStandingsRouteImport } from './routes/seasons/$year/standings'
 import { Route as SeasonsYearRacesRoundRouteImport } from './routes/seasons/$year/races/$round'
+import { Route as SeasonsYearConstructorsConstructorIdIndexRouteImport } from './routes/seasons/$year/constructors/$constructorId/index'
 import { Route as SeasonsYearDriversDriverIdIndexRouteImport } from './routes/seasons/$year/drivers/$driverId/index'
 import { Route as SeasonsYearDriversDriverIdRacesRoundRouteImport } from './routes/seasons/$year/drivers/$driverId/races/$round'
 
@@ -79,6 +80,12 @@ const SeasonsYearRacesRoundRoute = SeasonsYearRacesRoundRouteImport.update({
   path: '/seasons/$year/races/$round',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SeasonsYearConstructorsConstructorIdIndexRoute =
+  SeasonsYearConstructorsConstructorIdIndexRouteImport.update({
+    id: '/seasons/$year/constructors/$constructorId/',
+    path: '/seasons/$year/constructors/$constructorId/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SeasonsYearDriversDriverIdIndexRoute =
   SeasonsYearDriversDriverIdIndexRouteImport.update({
     id: '/seasons/$year/drivers/$driverId/',
@@ -104,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/seasons/$year/standings': typeof SeasonsYearStandingsRoute
   '/seasons/$year/': typeof SeasonsYearIndexRoute
   '/seasons/$year/races/$round': typeof SeasonsYearRacesRoundRoute
+  '/seasons/$year/constructors/$constructorId/': typeof SeasonsYearConstructorsConstructorIdIndexRoute
   '/seasons/$year/drivers/$driverId/': typeof SeasonsYearDriversDriverIdIndexRoute
   '/seasons/$year/drivers/$driverId/races/$round': typeof SeasonsYearDriversDriverIdRacesRoundRoute
 }
@@ -119,6 +127,7 @@ export interface FileRoutesByTo {
   '/seasons/$year/standings': typeof SeasonsYearStandingsRoute
   '/seasons/$year': typeof SeasonsYearIndexRoute
   '/seasons/$year/races/$round': typeof SeasonsYearRacesRoundRoute
+  '/seasons/$year/constructors/$constructorId': typeof SeasonsYearConstructorsConstructorIdIndexRoute
   '/seasons/$year/drivers/$driverId': typeof SeasonsYearDriversDriverIdIndexRoute
   '/seasons/$year/drivers/$driverId/races/$round': typeof SeasonsYearDriversDriverIdRacesRoundRoute
 }
@@ -135,6 +144,7 @@ export interface FileRoutesById {
   '/seasons/$year/standings': typeof SeasonsYearStandingsRoute
   '/seasons/$year/': typeof SeasonsYearIndexRoute
   '/seasons/$year/races/$round': typeof SeasonsYearRacesRoundRoute
+  '/seasons/$year/constructors/$constructorId/': typeof SeasonsYearConstructorsConstructorIdIndexRoute
   '/seasons/$year/drivers/$driverId/': typeof SeasonsYearDriversDriverIdIndexRoute
   '/seasons/$year/drivers/$driverId/races/$round': typeof SeasonsYearDriversDriverIdRacesRoundRoute
 }
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/seasons/$year/standings'
     | '/seasons/$year/'
     | '/seasons/$year/races/$round'
+    | '/seasons/$year/constructors/$constructorId/'
     | '/seasons/$year/drivers/$driverId/'
     | '/seasons/$year/drivers/$driverId/races/$round'
   fileRoutesByTo: FileRoutesByTo
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/seasons/$year/standings'
     | '/seasons/$year'
     | '/seasons/$year/races/$round'
+    | '/seasons/$year/constructors/$constructorId'
     | '/seasons/$year/drivers/$driverId'
     | '/seasons/$year/drivers/$driverId/races/$round'
   id:
@@ -182,6 +194,7 @@ export interface FileRouteTypes {
     | '/seasons/$year/standings'
     | '/seasons/$year/'
     | '/seasons/$year/races/$round'
+    | '/seasons/$year/constructors/$constructorId/'
     | '/seasons/$year/drivers/$driverId/'
     | '/seasons/$year/drivers/$driverId/races/$round'
   fileRoutesById: FileRoutesById
@@ -198,6 +211,7 @@ export interface RootRouteChildren {
   SeasonsYearStandingsRoute: typeof SeasonsYearStandingsRoute
   SeasonsYearIndexRoute: typeof SeasonsYearIndexRoute
   SeasonsYearRacesRoundRoute: typeof SeasonsYearRacesRoundRoute
+  SeasonsYearConstructorsConstructorIdIndexRoute: typeof SeasonsYearConstructorsConstructorIdIndexRoute
   SeasonsYearDriversDriverIdIndexRoute: typeof SeasonsYearDriversDriverIdIndexRoute
   SeasonsYearDriversDriverIdRacesRoundRoute: typeof SeasonsYearDriversDriverIdRacesRoundRoute
 }
@@ -281,6 +295,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SeasonsYearRacesRoundRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/seasons/$year/constructors/$constructorId/': {
+      id: '/seasons/$year/constructors/$constructorId/'
+      path: '/seasons/$year/constructors/$constructorId'
+      fullPath: '/seasons/$year/constructors/$constructorId/'
+      preLoaderRoute: typeof SeasonsYearConstructorsConstructorIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/seasons/$year/drivers/$driverId/': {
       id: '/seasons/$year/drivers/$driverId/'
       path: '/seasons/$year/drivers/$driverId'
@@ -310,6 +331,8 @@ const rootRouteChildren: RootRouteChildren = {
   SeasonsYearStandingsRoute: SeasonsYearStandingsRoute,
   SeasonsYearIndexRoute: SeasonsYearIndexRoute,
   SeasonsYearRacesRoundRoute: SeasonsYearRacesRoundRoute,
+  SeasonsYearConstructorsConstructorIdIndexRoute:
+    SeasonsYearConstructorsConstructorIdIndexRoute,
   SeasonsYearDriversDriverIdIndexRoute: SeasonsYearDriversDriverIdIndexRoute,
   SeasonsYearDriversDriverIdRacesRoundRoute:
     SeasonsYearDriversDriverIdRacesRoundRoute,

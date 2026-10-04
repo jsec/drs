@@ -62,3 +62,59 @@ export const ConstructorSummarySchema = z.object({
 });
 
 export type ConstructorSummary = z.infer<typeof ConstructorSummarySchema>;
+
+const SprintResultSchema = z.object({
+    points: z.number(),
+    positionLabel: z.string(),
+});
+
+const SeasonDriverSummarySchema = z.object({
+    code: z.string(),
+    id: z.string(),
+    name: z.string(),
+    podiums: z.number(),
+    points: z.number(),
+    starts: z.number(),
+    wins: z.number(),
+});
+
+const SeasonEntrySchema = z.object({
+    engine: z.string(),
+    position: z.string(),
+});
+
+const ProgressionPointSchema = z.object({
+    points: z.number(),
+    round: z.number(),
+});
+
+const ConstructorSeasonResultSchema = z.object({
+    driverCode: z.string(),
+    driverId: z.string(),
+    points: z.number(),
+    positionLabel: z.string(),
+    raceName: z.string(),
+    round: z.number(),
+    sprint: SprintResultSchema.nullable(),
+    statusCategory: z.string(),
+});
+
+export const ConstructorSeasonDetailSchema = z.object({
+    color: z.string(),
+    countryCode: z.string(),
+    dnfs: z.number(),
+    drivers: z.array(SeasonDriverSummarySchema),
+    entries: z.array(SeasonEntrySchema),
+    id: z.string(),
+    isChampion: z.boolean(),
+    name: z.string(),
+    podiums: z.number(),
+    points: z.number().nullable(),
+    poles: z.number(),
+    position: z.string(),
+    progression: z.array(ProgressionPointSchema),
+    results: z.array(ConstructorSeasonResultSchema),
+    wins: z.number(),
+});
+
+export type ConstructorSeasonResult = z.infer<typeof ConstructorSeasonResultSchema>;

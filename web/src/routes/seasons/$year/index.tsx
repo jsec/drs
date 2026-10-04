@@ -233,7 +233,7 @@ const SeasonOverview = () => {
                             <Group justify="space-between" mb={5} wrap="nowrap">
                                 <Group gap={9} wrap="nowrap">
                                     <Text c="dimmed" className="f1-num" fw={700} fz={11} inherit span ta="center" w={18}>{c.positionLabel}</Text>
-                                    <Link params={{ constructorId: c.id }} style={{ color: 'inherit', textDecoration: 'none' }} to="/constructors/$constructorId">
+                                    <Link params={{ constructorId: c.id, year }} style={{ color: 'inherit', textDecoration: 'none' }} to="/seasons/$year/constructors/$constructorId">
                                         <Text fw={600} fz={13} inherit span>{c.name}</Text>
                                     </Link>
                                 </Group>

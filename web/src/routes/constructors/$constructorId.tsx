@@ -94,7 +94,7 @@ const ConstructorCareer = () => {
                         <div
                             className="f1-row f1-grid-row"
                             key={`${s.season}-${s.engine}`}
-                            onClick={() => void navigate({ params: { year }, to: '/seasons/$year' })}
+                            onClick={() => void navigate({ params: { constructorId: team.id, year }, to: '/seasons/$year/constructors/$constructorId' })}
                             style={{
                                 '--cols': COLS,
                                 'background': s.isChampion ? 'color-mix(in srgb, var(--gold-500) 7%, transparent)' : undefined,
@@ -104,9 +104,9 @@ const ConstructorCareer = () => {
                         >
                             <Link
                                 onClick={event => event.stopPropagation()}
-                                params={{ year }}
+                                params={{ constructorId: team.id, year }}
                                 style={{ color: 'inherit', textDecoration: 'none' }}
-                                to="/seasons/$year"
+                                to="/seasons/$year/constructors/$constructorId"
                             >
                                 <Text className="f1-num f1-display" fw={700} fz={16} inherit lts="-0.4px" span>{s.season}</Text>
                             </Link>
