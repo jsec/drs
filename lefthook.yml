@@ -12,4 +12,4 @@ pre-push:
 
     etl-check:
       glob: "etl/**"
-      run: task etl:check
+      run: task etl:format-check

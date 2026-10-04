@@ -43,10 +43,6 @@ tasks:
     cmds:
       - go run {{.APP_PKG}} etl build
 
-  etl:check:
-    cmds:
-      - task: etl:format-check
-
   etl:dbt-debug:
     dir: etl
     cmds:
