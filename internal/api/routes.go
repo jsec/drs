@@ -15,6 +15,7 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /seasons/{year}/races/{round}/laps", handle(app.logger, app.getRaceLapsHandler))
 	mux.Handle("GET /seasons/{year}/drivers/{driverID}", handle(app.logger, app.getDriverSeasonHandler))
 	mux.Handle("GET /seasons/{year}/drivers/{driverID}/races/{round}", handle(app.logger, app.getDriverRaceHandler))
+	mux.Handle("GET /seasons/{year}/constructors/{constructorID}", handle(app.logger, app.getConstructorSeasonHandler))
 	mux.Handle("GET /constructors", handle(app.logger, app.listConstructorsHandler))
 	mux.Handle("GET /constructors/{constructorID}", handle(app.logger, app.getConstructorSummaryHandler))
 	mux.Handle("GET /circuits", handle(app.logger, app.listCircuitsHandler))

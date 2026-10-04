@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jsec/drs/internal/database"
@@ -15,6 +16,10 @@ type constructorsQueries interface {
 	ListConstructorSeasons(ctx context.Context, constructorID string) ([]database.ListConstructorSeasonsRow, error)
 	ListConstructorSeasonDrivers(ctx context.Context, constructorID string) ([]database.ListConstructorSeasonDriversRow, error)
 	ListConstructorLineage(ctx context.Context, constructorID string) ([]database.ListConstructorLineageRow, error)
+	ListConstructorSeasonEntries(ctx context.Context, season int32, constructorID string) ([]database.ListConstructorSeasonEntriesRow, error)
+	ListConstructorSeasonProgression(ctx context.Context, season int32, constructorID string) ([]database.ListConstructorSeasonProgressionRow, error)
+	ListConstructorSeasonDriverSummaries(ctx context.Context, season int32, constructorID string) ([]database.ListConstructorSeasonDriverSummariesRow, error)
+	ListConstructorSeasonResults(ctx context.Context, season int32, constructorID string) ([]database.ListConstructorSeasonResultsRow, error)
 }
 
 type Service struct {
@@ -138,6 +143,110 @@ func (s *Service) GetSummary(ctx context.Context, constructorID string) (Constru
 		Lineage:       lineage,
 		Seasons:       seasons,
 	}, nil
+}
+
+func (s *Service) GetSeason(ctx context.Context, constructorID string, season int32) (SeasonDetail, error) {
+	entryRows, err := s.queries.ListConstructorSeasonEntries(ctx, season, constructorID)
+	if err != nil {
+		return SeasonDetail{}, fmt.Errorf("listing constructor season entries: %w", err)
+	}
+	if len(entryRows) == 0 {
+		return SeasonDetail{}, fmt.Errorf("listing constructor season entries: %w", pgx.ErrNoRows)
+	}
+
+	summary, err := s.queries.GetConstructorSummary(ctx, constructorID)
+	if err != nil {
+		return SeasonDetail{}, fmt.Errorf("getting constructor summary: %w", err)
+	}
+
+	progressionRows, err := s.queries.ListConstructorSeasonProgression(ctx, season, constructorID)
+	if err != nil {
+		return SeasonDetail{}, fmt.Errorf("listing constructor season progression: %w", err)
+	}
+
+	driverRows, err := s.queries.ListConstructorSeasonDriverSummaries(ctx, season, constructorID)
+	if err != nil {
+		return SeasonDetail{}, fmt.Errorf("listing constructor season drivers: %w", err)
+	}
+
+	resultRows, err := s.queries.ListConstructorSeasonResults(ctx, season, constructorID)
+	if err != nil {
+		return SeasonDetail{}, fmt.Errorf("listing constructor season results: %w", err)
+	}
+
+	best := entryRows[0]
+	detail := SeasonDetail{
+		ID:          summary.ID,
+		Name:        summary.Name,
+		CountryCode: summary.CountryCode,
+		Color:       summary.Color,
+		Position:    best.FinalPositionText.String,
+		Entries:     make([]SeasonEntry, 0, len(entryRows)),
+		Drivers:     make([]SeasonDriverSummary, 0, len(driverRows)),
+		Progression: make([]ProgressionPoint, 0, len(progressionRows)),
+		Results:     make([]SeasonResult, 0, len(resultRows)),
+	}
+
+	for _, row := range entryRows {
+		if row.FinalPoints.Valid {
+			points := row.FinalPoints.Float64
+			if detail.Points != nil {
+				points += *detail.Points
+			}
+			detail.Points = &points
+		}
+		detail.IsChampion = detail.IsChampion || row.ChampionshipWon
+		detail.Wins += row.Wins
+		detail.Podiums += row.Podiums
+		detail.Poles += row.Poles
+		detail.DNFs += row.Dnfs
+		detail.Entries = append(detail.Entries, SeasonEntry{
+			Engine:   row.EngineName,
+			Position: row.FinalPositionText.String,
+		})
+	}
+
+	for _, row := range driverRows {
+		detail.Drivers = append(detail.Drivers, SeasonDriverSummary{
+			ID:      row.DriverID,
+			Code:    row.DriverCode,
+			Name:    row.DriverName,
+			Starts:  row.Starts,
+			Wins:    row.Wins,
+			Podiums: row.Podiums,
+			Points:  row.Points,
+		})
+	}
+
+	for _, row := range progressionRows {
+		detail.Progression = append(detail.Progression, ProgressionPoint{
+			Round:  row.RaceRound,
+			Points: row.Points,
+		})
+	}
+
+	for _, row := range resultRows {
+		result := SeasonResult{
+			Round:          row.RaceRound,
+			RaceName:       row.RaceName,
+			DriverID:       row.DriverID,
+			DriverCode:     row.DriverCode,
+			PositionLabel:  row.PositionLabel,
+			StatusCategory: row.StatusCategory,
+			Points:         row.Points,
+		}
+
+		if row.SprintPositionLabel.Valid {
+			result.Sprint = &SprintResult{
+				PositionLabel: row.SprintPositionLabel.String,
+				Points:        row.SprintPoints,
+			}
+		}
+
+		detail.Results = append(detail.Results, result)
+	}
+
+	return detail, nil
 }
 
 type seasonEngine struct {

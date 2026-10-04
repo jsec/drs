@@ -22,6 +22,8 @@ type stubQuerier struct {
 	seasons    []database.ListConstructorSeasonsRow
 	drivers    []database.ListConstructorSeasonDriversRow
 	lineage    []database.ListConstructorLineageRow
+	entries    []database.ListConstructorSeasonEntriesRow
+	results    []database.ListConstructorSeasonResultsRow
 }
 
 func (s stubQuerier) ListConstructors(context.Context) ([]database.ListConstructorsRow, error) {
@@ -42,6 +44,106 @@ func (s stubQuerier) ListConstructorSeasonDrivers(context.Context, string) ([]da
 
 func (s stubQuerier) ListConstructorLineage(context.Context, string) ([]database.ListConstructorLineageRow, error) {
 	return s.lineage, nil
+}
+
+func (s stubQuerier) ListConstructorSeasonEntries(context.Context, int32, string) ([]database.ListConstructorSeasonEntriesRow, error) {
+	return s.entries, nil
+}
+
+func (s stubQuerier) ListConstructorSeasonProgression(context.Context, int32, string) ([]database.ListConstructorSeasonProgressionRow, error) {
+	return nil, nil
+}
+
+func (s stubQuerier) ListConstructorSeasonDriverSummaries(context.Context, int32, string) ([]database.ListConstructorSeasonDriverSummariesRow, error) {
+	return nil, nil
+}
+
+func (s stubQuerier) ListConstructorSeasonResults(context.Context, int32, string) ([]database.ListConstructorSeasonResultsRow, error) {
+	return s.results, nil
+}
+
+func TestService_GetSeason_NotFound(t *testing.T) {
+	t.Parallel()
+
+	svc := constructors.NewService(stubQuerier{})
+
+	_, err := svc.GetSeason(context.Background(), "lotus", 2030)
+
+	require.ErrorIs(t, err, pgx.ErrNoRows)
+}
+
+func TestService_GetSeason_CombinesEngineEntries(t *testing.T) {
+	t.Parallel()
+
+	svc := constructors.NewService(stubQuerier{
+		entries: []database.ListConstructorSeasonEntriesRow{
+			{
+				EngineName:        "Climax",
+				FinalPositionText: pgtype.Text{String: "3", Valid: true},
+				FinalPoints:       pgtype.Float8{Float64: 24, Valid: true},
+				Wins:              2,
+				Podiums:           5,
+				Poles:             1,
+				Dnfs:              4,
+			},
+			{
+				EngineName:        "Maserati",
+				FinalPositionText: pgtype.Text{String: "9", Valid: true},
+				FinalPoints:       pgtype.Float8{Float64: 3, Valid: true},
+				Podiums:           1,
+				Dnfs:              3,
+			},
+		},
+	})
+
+	got, err := svc.GetSeason(context.Background(), "cooper", 1957)
+
+	require.NoError(t, err)
+	assert.Equal(t, "3", got.Position)
+	require.NotNil(t, got.Points)
+	assert.InDelta(t, 27.0, *got.Points, 0.001)
+	assert.Equal(t, int32(2), got.Wins)
+	assert.Equal(t, int32(6), got.Podiums)
+	assert.Equal(t, int32(7), got.DNFs)
+	assert.Equal(t, []constructors.SeasonEntry{
+		{Engine: "Climax", Position: "3"},
+		{Engine: "Maserati", Position: "9"},
+	}, got.Entries)
+}
+
+func TestService_GetSeason_NoStanding(t *testing.T) {
+	t.Parallel()
+
+	svc := constructors.NewService(stubQuerier{
+		entries: []database.ListConstructorSeasonEntriesRow{{EngineName: "Alta", Wins: 1}},
+	})
+
+	got, err := svc.GetSeason(context.Background(), "connaught", 1955)
+
+	require.NoError(t, err)
+	assert.Empty(t, got.Position)
+	assert.Nil(t, got.Points)
+	assert.Equal(t, int32(1), got.Wins)
+}
+
+func TestService_GetSeason_SprintOnlyWhenPresent(t *testing.T) {
+	t.Parallel()
+
+	svc := constructors.NewService(stubQuerier{
+		entries: []database.ListConstructorSeasonEntriesRow{{EngineName: "Honda RBPT"}},
+		results: []database.ListConstructorSeasonResultsRow{
+			{RaceRound: 1, DriverID: "max-verstappen", Points: 25},
+			{RaceRound: 2, DriverID: "max-verstappen", Points: 25, SprintPositionLabel: pgtype.Text{String: "1", Valid: true}, SprintPoints: 8},
+		},
+	})
+
+	got, err := svc.GetSeason(context.Background(), "red-bull", 2024)
+
+	require.NoError(t, err)
+	assert.Nil(t, got.Results[0].Sprint)
+	assert.Equal(t, &constructors.SprintResult{PositionLabel: "1", Points: 8}, got.Results[1].Sprint)
+	assert.NotNil(t, got.Drivers)
+	assert.NotNil(t, got.Progression)
 }
 
 func TestService_GetSummary_NotFound(t *testing.T) {

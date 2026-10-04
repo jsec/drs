@@ -89,25 +89,6 @@ CREATE TABLE effone.circuits (
 
 
 --
--- Name: constructor_engine_seasons; Type: TABLE; Schema: effone; Owner: -
---
-
-CREATE TABLE effone.constructor_engine_seasons (
-    season integer NOT NULL,
-    constructor_id text NOT NULL,
-    engine_manufacturer_id text NOT NULL,
-    engine_manufacturer_name text NOT NULL,
-    start_count integer NOT NULL,
-    win_count integer NOT NULL,
-    podium_count integer NOT NULL,
-    pole_count integer NOT NULL,
-    final_position_text text,
-    final_points numeric(8,2),
-    championship_won boolean NOT NULL
-);
-
-
---
 -- Name: constructor_lineage; Type: TABLE; Schema: effone; Owner: -
 --
 
@@ -131,14 +112,16 @@ CREATE TABLE effone.constructor_season_summaries (
     constructor_id text NOT NULL,
     constructor_name text NOT NULL,
     engine_manufacturer_id text NOT NULL,
+    engine_manufacturer_name text NOT NULL,
+    dnf_count integer NOT NULL,
     entry_count integer NOT NULL,
     fastest_lap_count integer NOT NULL,
-    final_order integer NOT NULL,
+    final_order integer,
     final_points numeric(8,2),
     final_position integer,
     final_position_text text,
     podium_count integer NOT NULL,
-    points_delta numeric(8,2) NOT NULL,
+    points_delta numeric(8,2),
     qualifying_entry_count integer NOT NULL,
     qualifying_p1_count integer NOT NULL,
     qualifying_position_count integer NOT NULL,
@@ -680,14 +663,6 @@ ALTER TABLE ONLY effone.circuits
 
 
 --
--- Name: constructor_engine_seasons constructor_engine_seasons__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
---
-
-ALTER TABLE ONLY effone.constructor_engine_seasons
-    ADD CONSTRAINT constructor_engine_seasons__dbt_tmp_pkey PRIMARY KEY (season, constructor_id, engine_manufacturer_id);
-
-
---
 -- Name: constructor_lineage constructor_lineage__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
@@ -696,11 +671,11 @@ ALTER TABLE ONLY effone.constructor_lineage
 
 
 --
--- Name: constructor_season_summaries constructor_season_summaries__dbt_tmp_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
+-- Name: constructor_season_summaries constructor_season_summaries__dbt_tmp_pkey1; Type: CONSTRAINT; Schema: effone; Owner: -
 --
 
 ALTER TABLE ONLY effone.constructor_season_summaries
-    ADD CONSTRAINT constructor_season_summaries__dbt_tmp_pkey PRIMARY KEY (season, final_order);
+    ADD CONSTRAINT constructor_season_summaries__dbt_tmp_pkey1 PRIMARY KEY (season, constructor_id, engine_manufacturer_id);
 
 
 --

@@ -21,3 +21,17 @@ func (app *application) getConstructorSummaryHandler(w http.ResponseWriter, r *h
 
 	return respondJSON(app.logger, w, summary)
 }
+
+func (app *application) getConstructorSeasonHandler(w http.ResponseWriter, r *http.Request) error {
+	year, err := parseYear(r)
+	if err != nil {
+		return err
+	}
+
+	season, err := app.constructors.GetSeason(r.Context(), r.PathValue("constructorID"), year)
+	if err != nil {
+		return err
+	}
+
+	return respondJSON(app.logger, w, season)
+}

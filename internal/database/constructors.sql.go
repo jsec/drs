@@ -116,6 +116,59 @@ func (q *Queries) ListConstructorLineage(ctx context.Context, constructorID stri
 	return items, nil
 }
 
+const listConstructorSeasonDriverSummaries = `-- name: ListConstructorSeasonDriverSummaries :many
+SELECT
+    driver_id,
+    driver_code,
+    driver_name,
+    race_start_count AS starts,
+    win_count AS wins,
+    podium_count AS podiums,
+    total_points AS points
+FROM effone.driver_season_constructor_summaries
+WHERE season = $1
+    AND constructor_id = $2
+ORDER BY total_points DESC, race_start_count DESC, driver_name
+`
+
+type ListConstructorSeasonDriverSummariesRow struct {
+	DriverID   string
+	DriverCode string
+	DriverName string
+	Starts     int32
+	Wins       int32
+	Podiums    int32
+	Points     float64
+}
+
+func (q *Queries) ListConstructorSeasonDriverSummaries(ctx context.Context, season int32, constructorID string) ([]ListConstructorSeasonDriverSummariesRow, error) {
+	rows, err := q.db.Query(ctx, listConstructorSeasonDriverSummaries, season, constructorID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListConstructorSeasonDriverSummariesRow
+	for rows.Next() {
+		var i ListConstructorSeasonDriverSummariesRow
+		if err := rows.Scan(
+			&i.DriverID,
+			&i.DriverCode,
+			&i.DriverName,
+			&i.Starts,
+			&i.Wins,
+			&i.Podiums,
+			&i.Points,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listConstructorSeasonDrivers = `-- name: ListConstructorSeasonDrivers :many
 SELECT
     season,
@@ -160,19 +213,174 @@ func (q *Queries) ListConstructorSeasonDrivers(ctx context.Context, constructorI
 	return items, nil
 }
 
+const listConstructorSeasonEntries = `-- name: ListConstructorSeasonEntries :many
+SELECT
+    engine_manufacturer_name AS engine_name,
+    final_position_text,
+    final_points,
+    championship_won,
+    win_count AS wins,
+    podium_count AS podiums,
+    qualifying_p1_count AS poles,
+    dnf_count AS dnfs
+FROM effone.constructor_season_summaries
+WHERE season = $1
+    AND constructor_id = $2
+ORDER BY final_order NULLS LAST, engine_manufacturer_name
+`
+
+type ListConstructorSeasonEntriesRow struct {
+	EngineName        string
+	FinalPositionText pgtype.Text
+	FinalPoints       pgtype.Float8
+	ChampionshipWon   bool
+	Wins              int32
+	Podiums           int32
+	Poles             int32
+	Dnfs              int32
+}
+
+func (q *Queries) ListConstructorSeasonEntries(ctx context.Context, season int32, constructorID string) ([]ListConstructorSeasonEntriesRow, error) {
+	rows, err := q.db.Query(ctx, listConstructorSeasonEntries, season, constructorID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListConstructorSeasonEntriesRow
+	for rows.Next() {
+		var i ListConstructorSeasonEntriesRow
+		if err := rows.Scan(
+			&i.EngineName,
+			&i.FinalPositionText,
+			&i.FinalPoints,
+			&i.ChampionshipWon,
+			&i.Wins,
+			&i.Podiums,
+			&i.Poles,
+			&i.Dnfs,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listConstructorSeasonProgression = `-- name: ListConstructorSeasonProgression :many
+SELECT
+    race_round,
+    sum(points)::NUMERIC AS points
+FROM effone.constructor_standings_snapshots
+WHERE season = $1
+    AND constructor_id = $2
+GROUP BY race_round
+ORDER BY race_round
+`
+
+type ListConstructorSeasonProgressionRow struct {
+	RaceRound int32
+	Points    float64
+}
+
+func (q *Queries) ListConstructorSeasonProgression(ctx context.Context, season int32, constructorID string) ([]ListConstructorSeasonProgressionRow, error) {
+	rows, err := q.db.Query(ctx, listConstructorSeasonProgression, season, constructorID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListConstructorSeasonProgressionRow
+	for rows.Next() {
+		var i ListConstructorSeasonProgressionRow
+		if err := rows.Scan(&i.RaceRound, &i.Points); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listConstructorSeasonResults = `-- name: ListConstructorSeasonResults :many
+SELECT
+    rr.race_round,
+    rr.race_name,
+    rr.driver_id,
+    rr.driver_code,
+    rr.position_text AS position_label,
+    rr.status_category,
+    rr.points,
+    sr.position_text AS sprint_position_label,
+    coalesce(sr.points, 0) AS sprint_points
+FROM effone.race_results rr
+    LEFT JOIN effone.sprint_results sr
+        ON rr.race_id = sr.race_id
+        AND rr.driver_id = sr.driver_id
+        AND rr.constructor_id = sr.constructor_id
+WHERE rr.season = $1
+    AND rr.constructor_id = $2
+ORDER BY rr.race_round, rr.finish_order
+`
+
+type ListConstructorSeasonResultsRow struct {
+	RaceRound           int32
+	RaceName            string
+	DriverID            string
+	DriverCode          string
+	PositionLabel       string
+	StatusCategory      string
+	Points              float64
+	SprintPositionLabel pgtype.Text
+	SprintPoints        float64
+}
+
+func (q *Queries) ListConstructorSeasonResults(ctx context.Context, season int32, constructorID string) ([]ListConstructorSeasonResultsRow, error) {
+	rows, err := q.db.Query(ctx, listConstructorSeasonResults, season, constructorID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListConstructorSeasonResultsRow
+	for rows.Next() {
+		var i ListConstructorSeasonResultsRow
+		if err := rows.Scan(
+			&i.RaceRound,
+			&i.RaceName,
+			&i.DriverID,
+			&i.DriverCode,
+			&i.PositionLabel,
+			&i.StatusCategory,
+			&i.Points,
+			&i.SprintPositionLabel,
+			&i.SprintPoints,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listConstructorSeasons = `-- name: ListConstructorSeasons :many
 SELECT
     season,
     engine_manufacturer_id,
     engine_manufacturer_name,
-    start_count AS starts,
+    race_start_count AS starts,
     win_count AS wins,
     podium_count AS podiums,
-    pole_count AS poles,
+    qualifying_p1_count AS poles,
     final_position_text,
     final_points,
     championship_won
-FROM effone.constructor_engine_seasons
+FROM effone.constructor_season_summaries
 WHERE constructor_id = $1
 ORDER BY season DESC, engine_manufacturer_name
 `

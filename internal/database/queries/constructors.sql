@@ -35,14 +35,14 @@ SELECT
     season,
     engine_manufacturer_id,
     engine_manufacturer_name,
-    start_count AS starts,
+    race_start_count AS starts,
     win_count AS wins,
     podium_count AS podiums,
-    pole_count AS poles,
+    qualifying_p1_count AS poles,
     final_position_text,
     final_points,
     championship_won
-FROM effone.constructor_engine_seasons
+FROM effone.constructor_season_summaries
 WHERE constructor_id = $1
 ORDER BY season DESC, engine_manufacturer_name;
 
@@ -67,3 +67,62 @@ SELECT
 FROM effone.constructor_lineage
 WHERE constructor_id = $1
 ORDER BY position_display_order;
+
+-- name: ListConstructorSeasonEntries :many
+SELECT
+    engine_manufacturer_name AS engine_name,
+    final_position_text,
+    final_points,
+    championship_won,
+    win_count AS wins,
+    podium_count AS podiums,
+    qualifying_p1_count AS poles,
+    dnf_count AS dnfs
+FROM effone.constructor_season_summaries
+WHERE season = sqlc.arg(season)
+    AND constructor_id = sqlc.arg(constructor_id)
+ORDER BY final_order NULLS LAST, engine_manufacturer_name;
+
+-- name: ListConstructorSeasonProgression :many
+SELECT
+    race_round,
+    sum(points)::NUMERIC AS points
+FROM effone.constructor_standings_snapshots
+WHERE season = sqlc.arg(season)
+    AND constructor_id = sqlc.arg(constructor_id)
+GROUP BY race_round
+ORDER BY race_round;
+
+-- name: ListConstructorSeasonDriverSummaries :many
+SELECT
+    driver_id,
+    driver_code,
+    driver_name,
+    race_start_count AS starts,
+    win_count AS wins,
+    podium_count AS podiums,
+    total_points AS points
+FROM effone.driver_season_constructor_summaries
+WHERE season = sqlc.arg(season)
+    AND constructor_id = sqlc.arg(constructor_id)
+ORDER BY total_points DESC, race_start_count DESC, driver_name;
+
+-- name: ListConstructorSeasonResults :many
+SELECT
+    rr.race_round,
+    rr.race_name,
+    rr.driver_id,
+    rr.driver_code,
+    rr.position_text AS position_label,
+    rr.status_category,
+    rr.points,
+    sr.position_text AS sprint_position_label,
+    coalesce(sr.points, 0) AS sprint_points
+FROM effone.race_results rr
+    LEFT JOIN effone.sprint_results sr
+        ON rr.race_id = sr.race_id
+        AND rr.driver_id = sr.driver_id
+        AND rr.constructor_id = sr.constructor_id
+WHERE rr.season = sqlc.arg(season)
+    AND rr.constructor_id = sqlc.arg(constructor_id)
+ORDER BY rr.race_round, rr.finish_order;

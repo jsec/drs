@@ -57,3 +57,57 @@ type ConstructorSummary struct {
 	Lineage       []LineageEntry      `json:"lineage"`
 	Seasons       []ConstructorSeason `json:"seasons"`
 }
+
+type SeasonEntry struct {
+	Engine   string `json:"engine"`
+	Position string `json:"position"`
+}
+
+type SeasonDriverSummary struct {
+	ID      string  `json:"id"`
+	Code    string  `json:"code"`
+	Name    string  `json:"name"`
+	Starts  int32   `json:"starts"`
+	Wins    int32   `json:"wins"`
+	Podiums int32   `json:"podiums"`
+	Points  float64 `json:"points"`
+}
+
+type ProgressionPoint struct {
+	Round  int32   `json:"round"`
+	Points float64 `json:"points"`
+}
+
+type SprintResult struct {
+	PositionLabel string  `json:"positionLabel"`
+	Points        float64 `json:"points"`
+}
+
+type SeasonResult struct {
+	Round          int32         `json:"round"`
+	RaceName       string        `json:"raceName"`
+	DriverID       string        `json:"driverId"`
+	DriverCode     string        `json:"driverCode"`
+	PositionLabel  string        `json:"positionLabel"`
+	StatusCategory string        `json:"statusCategory"`
+	Points         float64       `json:"points"`
+	Sprint         *SprintResult `json:"sprint"`
+}
+
+type SeasonDetail struct {
+	ID          string                `json:"id"`
+	Name        string                `json:"name"`
+	CountryCode string                `json:"countryCode"`
+	Color       string                `json:"color"`
+	Position    string                `json:"position"`
+	IsChampion  bool                  `json:"isChampion"`
+	Points      *float64              `json:"points"`
+	Wins        int32                 `json:"wins"`
+	Podiums     int32                 `json:"podiums"`
+	Poles       int32                 `json:"poles"`
+	DNFs        int32                 `json:"dnfs"`
+	Entries     []SeasonEntry         `json:"entries"`
+	Drivers     []SeasonDriverSummary `json:"drivers"`
+	Progression []ProgressionPoint    `json:"progression"`
+	Results     []SeasonResult        `json:"results"`
+}
