@@ -11,6 +11,7 @@ sql:
         out: "."
         sql_package: "pgx/v5"
         omit_unused_structs: true
+        emit_interface: true
         query_parameter_limit: 4
         overrides:
           - db_type: "pg_catalog.numeric"

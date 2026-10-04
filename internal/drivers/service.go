@@ -9,30 +9,8 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-type driverQueries interface {
-	GetDriverRace(ctx context.Context, season int32, raceRound int32, driverID string) (database.GetDriverRaceRow, error)
-	GetDriverSprint(ctx context.Context, season int32, raceRound int32, driverID string) (database.GetDriverSprintRow, error)
-	GetDriverSeason(ctx context.Context, season int32, driverID string) (database.GetDriverSeasonRow, error)
-	GetDriverSummary(ctx context.Context, driverID string) (database.GetDriverSummaryRow, error)
-	ListDriverRacePitStops(ctx context.Context, raceID int32, driverID string) ([]database.ListDriverRacePitStopsRow, error)
-	ListDriverSeasonRaces(ctx context.Context, season int32, driverID string) ([]database.ListDriverSeasonRacesRow, error)
-	ListDriverSeasons(ctx context.Context, driverID string) ([]database.ListDriverSeasonsRow, error)
-	ListDrivers(ctx context.Context) ([]database.ListDriversRow, error)
-	ListSeasonDriverProgression(ctx context.Context, season int32, driverIds []string) ([]database.ListSeasonDriverProgressionRow, error)
-}
-
-type Service struct {
-	queries driverQueries
-}
-
-func NewService(queries driverQueries) *Service {
-	return &Service{
-		queries: queries,
-	}
-}
-
-func (s *Service) ListDrivers(ctx context.Context) ([]DriverShortSummary, error) {
-	drivers, err := s.queries.ListDrivers(ctx)
+func ListDrivers(ctx context.Context, queries database.Querier) ([]DriverShortSummary, error) {
+	drivers, err := queries.ListDrivers(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("listing drivers: %w", err)
 	}
@@ -59,13 +37,13 @@ func (s *Service) ListDrivers(ctx context.Context) ([]DriverShortSummary, error)
 	return response, nil
 }
 
-func (s *Service) GetSummary(ctx context.Context, driverId string) (DriverSummary, error) {
-	summary, err := s.queries.GetDriverSummary(ctx, driverId)
+func GetSummary(ctx context.Context, queries database.Querier, driverId string) (DriverSummary, error) {
+	summary, err := queries.GetDriverSummary(ctx, driverId)
 	if err != nil {
 		return DriverSummary{}, fmt.Errorf("getting driver summary: %w", err)
 	}
 
-	seasonList, err := s.queries.ListDriverSeasons(ctx, driverId)
+	seasonList, err := queries.ListDriverSeasons(ctx, driverId)
 	if err != nil {
 		return DriverSummary{}, fmt.Errorf("listing driver seasons: %w", err)
 	}
@@ -106,18 +84,18 @@ func (s *Service) GetSummary(ctx context.Context, driverId string) (DriverSummar
 	}, nil
 }
 
-func (s *Service) GetSeason(ctx context.Context, driverID string, season int32) (DriverSeason, error) {
-	summary, err := s.queries.GetDriverSeason(ctx, season, driverID)
+func GetSeason(ctx context.Context, queries database.Querier, driverID string, season int32) (DriverSeason, error) {
+	summary, err := queries.GetDriverSeason(ctx, season, driverID)
 	if err != nil {
 		return DriverSeason{}, fmt.Errorf("getting driver season: %w", err)
 	}
 
-	progressionRows, err := s.queries.ListSeasonDriverProgression(ctx, season, []string{driverID})
+	progressionRows, err := queries.ListSeasonDriverProgression(ctx, season, []string{driverID})
 	if err != nil {
 		return DriverSeason{}, fmt.Errorf("listing driver season progression: %w", err)
 	}
 
-	raceRows, err := s.queries.ListDriverSeasonRaces(ctx, season, driverID)
+	raceRows, err := queries.ListDriverSeasonRaces(ctx, season, driverID)
 	if err != nil {
 		return DriverSeason{}, fmt.Errorf("listing driver season races: %w", err)
 	}
@@ -172,13 +150,13 @@ func (s *Service) GetSeason(ctx context.Context, driverID string, season int32) 
 	}, nil
 }
 
-func (s *Service) GetRace(ctx context.Context, driverID string, season, round int32) (DriverRace, error) {
-	race, err := s.queries.GetDriverRace(ctx, season, round, driverID)
+func GetRace(ctx context.Context, queries database.Querier, driverID string, season, round int32) (DriverRace, error) {
+	race, err := queries.GetDriverRace(ctx, season, round, driverID)
 	if err != nil {
 		return DriverRace{}, fmt.Errorf("getting driver race: %w", err)
 	}
 
-	stopRows, err := s.queries.ListDriverRacePitStops(ctx, race.RaceID, driverID)
+	stopRows, err := queries.ListDriverRacePitStops(ctx, race.RaceID, driverID)
 	if err != nil {
 		return DriverRace{}, fmt.Errorf("listing driver race pit stops: %w", err)
 	}
@@ -226,8 +204,8 @@ func (s *Service) GetRace(ctx context.Context, driverID string, season, round in
 	}, nil
 }
 
-func (s *Service) GetSprint(ctx context.Context, driverID string, season, round int32) (DriverRace, error) {
-	sprint, err := s.queries.GetDriverSprint(ctx, season, round, driverID)
+func GetSprint(ctx context.Context, queries database.Querier, driverID string, season, round int32) (DriverRace, error) {
+	sprint, err := queries.GetDriverSprint(ctx, season, round, driverID)
 	if err != nil {
 		return DriverRace{}, fmt.Errorf("getting driver sprint: %w", err)
 	}

@@ -10,30 +10,8 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-type constructorsQueries interface {
-	ListConstructors(ctx context.Context) ([]database.ListConstructorsRow, error)
-	GetConstructorSummary(ctx context.Context, constructorID string) (database.GetConstructorSummaryRow, error)
-	ListConstructorSeasons(ctx context.Context, constructorID string) ([]database.ListConstructorSeasonsRow, error)
-	ListConstructorSeasonDrivers(ctx context.Context, constructorID string) ([]database.ListConstructorSeasonDriversRow, error)
-	ListConstructorLineage(ctx context.Context, constructorID string) ([]database.ListConstructorLineageRow, error)
-	ListConstructorSeasonEntries(ctx context.Context, season int32, constructorID string) ([]database.ListConstructorSeasonEntriesRow, error)
-	ListConstructorSeasonProgression(ctx context.Context, season int32, constructorID string) ([]database.ListConstructorSeasonProgressionRow, error)
-	ListConstructorSeasonDriverSummaries(ctx context.Context, season int32, constructorID string) ([]database.ListConstructorSeasonDriverSummariesRow, error)
-	ListConstructorSeasonResults(ctx context.Context, season int32, constructorID string) ([]database.ListConstructorSeasonResultsRow, error)
-}
-
-type Service struct {
-	queries constructorsQueries
-}
-
-func NewService(queries constructorsQueries) *Service {
-	return &Service{
-		queries: queries,
-	}
-}
-
-func (s *Service) ListConstructors(ctx context.Context) ([]ConstructorResponse, error) {
-	rows, err := s.queries.ListConstructors(ctx)
+func ListConstructors(ctx context.Context, queries database.Querier) ([]ConstructorResponse, error) {
+	rows, err := queries.ListConstructors(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("listing constructors: %w", err)
 	}
@@ -56,23 +34,23 @@ func (s *Service) ListConstructors(ctx context.Context) ([]ConstructorResponse, 
 	return out, nil
 }
 
-func (s *Service) GetSummary(ctx context.Context, constructorID string) (ConstructorSummary, error) {
-	summary, err := s.queries.GetConstructorSummary(ctx, constructorID)
+func GetSummary(ctx context.Context, queries database.Querier, constructorID string) (ConstructorSummary, error) {
+	summary, err := queries.GetConstructorSummary(ctx, constructorID)
 	if err != nil {
 		return ConstructorSummary{}, fmt.Errorf("getting constructor summary: %w", err)
 	}
 
-	seasonRows, err := s.queries.ListConstructorSeasons(ctx, constructorID)
+	seasonRows, err := queries.ListConstructorSeasons(ctx, constructorID)
 	if err != nil {
 		return ConstructorSummary{}, fmt.Errorf("listing constructor seasons: %w", err)
 	}
 
-	driverRows, err := s.queries.ListConstructorSeasonDrivers(ctx, constructorID)
+	driverRows, err := queries.ListConstructorSeasonDrivers(ctx, constructorID)
 	if err != nil {
 		return ConstructorSummary{}, fmt.Errorf("listing constructor season drivers: %w", err)
 	}
 
-	lineageRows, err := s.queries.ListConstructorLineage(ctx, constructorID)
+	lineageRows, err := queries.ListConstructorLineage(ctx, constructorID)
 	if err != nil {
 		return ConstructorSummary{}, fmt.Errorf("listing constructor lineage: %w", err)
 	}
@@ -145,8 +123,8 @@ func (s *Service) GetSummary(ctx context.Context, constructorID string) (Constru
 	}, nil
 }
 
-func (s *Service) GetSeason(ctx context.Context, constructorID string, season int32) (SeasonDetail, error) {
-	entryRows, err := s.queries.ListConstructorSeasonEntries(ctx, season, constructorID)
+func GetSeason(ctx context.Context, queries database.Querier, constructorID string, season int32) (SeasonDetail, error) {
+	entryRows, err := queries.ListConstructorSeasonEntries(ctx, season, constructorID)
 	if err != nil {
 		return SeasonDetail{}, fmt.Errorf("listing constructor season entries: %w", err)
 	}
@@ -154,22 +132,22 @@ func (s *Service) GetSeason(ctx context.Context, constructorID string, season in
 		return SeasonDetail{}, fmt.Errorf("listing constructor season entries: %w", pgx.ErrNoRows)
 	}
 
-	summary, err := s.queries.GetConstructorSummary(ctx, constructorID)
+	summary, err := queries.GetConstructorSummary(ctx, constructorID)
 	if err != nil {
 		return SeasonDetail{}, fmt.Errorf("getting constructor summary: %w", err)
 	}
 
-	progressionRows, err := s.queries.ListConstructorSeasonProgression(ctx, season, constructorID)
+	progressionRows, err := queries.ListConstructorSeasonProgression(ctx, season, constructorID)
 	if err != nil {
 		return SeasonDetail{}, fmt.Errorf("listing constructor season progression: %w", err)
 	}
 
-	driverRows, err := s.queries.ListConstructorSeasonDriverSummaries(ctx, season, constructorID)
+	driverRows, err := queries.ListConstructorSeasonDriverSummaries(ctx, season, constructorID)
 	if err != nil {
 		return SeasonDetail{}, fmt.Errorf("listing constructor season drivers: %w", err)
 	}
 
-	resultRows, err := s.queries.ListConstructorSeasonResults(ctx, season, constructorID)
+	resultRows, err := queries.ListConstructorSeasonResults(ctx, season, constructorID)
 	if err != nil {
 		return SeasonDetail{}, fmt.Errorf("listing constructor season results: %w", err)
 	}

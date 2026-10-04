@@ -15,6 +15,7 @@ import (
 )
 
 type stubQuerier struct {
+	database.Querier
 	race       database.GetRaceDetailRow
 	raceErr    error
 	results    []database.ListRaceResultsRow
@@ -91,9 +92,9 @@ var raceResults = []database.ListRaceResultsRow{
 func TestService_GetRaceDetail(t *testing.T) {
 	t.Parallel()
 
-	svc := races.NewService(stubQuerier{race: completedRace, results: raceResults})
+	queries := stubQuerier{race: completedRace, results: raceResults}
 
-	got, err := svc.GetRaceDetail(context.Background(), 2026, 14)
+	got, err := races.GetRaceDetail(context.Background(), queries, 2026, 14)
 
 	require.NoError(t, err)
 	assert.Equal(t, races.RaceDetailResponse{
@@ -138,9 +139,9 @@ func TestService_GetRaceDetail_NoPoleOrFastestLap(t *testing.T) {
 	race.PoleCode = pgtype.Text{}
 	race.FastestLapDriverID = pgtype.Text{}
 
-	svc := races.NewService(stubQuerier{race: race})
+	queries := stubQuerier{race: race}
 
-	got, err := svc.GetRaceDetail(context.Background(), 2026, 14)
+	got, err := races.GetRaceDetail(context.Background(), queries, 2026, 14)
 
 	require.NoError(t, err)
 	assert.Nil(t, got.Pole)
@@ -191,13 +192,13 @@ func TestService_RaceLookupErrors(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			svc := races.NewService(tt.querier)
+			queries := tt.querier
 
-			_, err := svc.GetRaceDetail(context.Background(), 2026, 14)
+			_, err := races.GetRaceDetail(context.Background(), queries, 2026, 14)
 			require.ErrorIs(t, err, tt.wantErr)
 			require.EqualError(t, err, tt.wantErrMessage)
 
-			_, err = svc.GetRaceLaps(context.Background(), 2026, 14, "race")
+			_, err = races.GetRaceLaps(context.Background(), queries, 2026, 14, "race")
 			require.ErrorIs(t, err, tt.wantErr)
 			require.EqualError(t, err, tt.wantErrMessage)
 		})
@@ -207,16 +208,16 @@ func TestService_RaceLookupErrors(t *testing.T) {
 func TestService_GetRaceLaps(t *testing.T) {
 	t.Parallel()
 
-	svc := races.NewService(stubQuerier{
+	queries := stubQuerier{
 		race:    completedRace,
 		results: raceResults,
 		laps: []database.ListRaceLapTimesRow{
 			{DriverID: "kimi-antonelli", LapNumber: 1, Position: int4(2), LapTimeMs: 98765},
 			{DriverID: "kimi-antonelli", LapNumber: 2, Position: int4(1), LapTimeMs: 96123},
 		},
-	})
+	}
 
-	got, err := svc.GetRaceLaps(context.Background(), 2026, 14, "race")
+	got, err := races.GetRaceLaps(context.Background(), queries, 2026, 14, "race")
 
 	require.NoError(t, err)
 	assert.Equal(t, races.RaceLapsResponse{
@@ -242,9 +243,9 @@ func TestService_GetRaceLaps_LapQueryError(t *testing.T) {
 	t.Parallel()
 
 	errQuery := errors.New("query failed")
-	svc := races.NewService(stubQuerier{race: completedRace, results: raceResults, lapsErr: errQuery})
+	queries := stubQuerier{race: completedRace, results: raceResults, lapsErr: errQuery}
 
-	_, err := svc.GetRaceLaps(context.Background(), 2026, 14, "race")
+	_, err := races.GetRaceLaps(context.Background(), queries, 2026, 14, "race")
 
 	require.ErrorIs(t, err, errQuery)
 	require.EqualError(t, err, "listing race lap times: query failed")

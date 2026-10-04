@@ -3,6 +3,8 @@ package api
 import (
 	"net/http"
 	"strconv"
+
+	"github.com/jsec/drs/internal/races"
 )
 
 func (app *application) getRaceDetailHandler(w http.ResponseWriter, r *http.Request) error {
@@ -11,7 +13,7 @@ func (app *application) getRaceDetailHandler(w http.ResponseWriter, r *http.Requ
 		return err
 	}
 
-	race, err := app.races.GetRaceDetail(r.Context(), year, round)
+	race, err := races.GetRaceDetail(r.Context(), app.queries, year, round)
 	if err != nil {
 		return err
 	}
@@ -30,7 +32,7 @@ func (app *application) getRaceLapsHandler(w http.ResponseWriter, r *http.Reques
 		return err
 	}
 
-	laps, err := app.races.GetRaceLaps(r.Context(), year, round, session)
+	laps, err := races.GetRaceLaps(r.Context(), app.queries, year, round, session)
 	if err != nil {
 		return err
 	}

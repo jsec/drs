@@ -16,6 +16,7 @@ import (
 )
 
 type stubQuerier struct {
+	database.Querier
 	rows       []database.ListConstructorsRow
 	err        error
 	summaryErr error
@@ -65,9 +66,9 @@ func (s stubQuerier) ListConstructorSeasonResults(context.Context, int32, string
 func TestService_GetSeason_NotFound(t *testing.T) {
 	t.Parallel()
 
-	svc := constructors.NewService(stubQuerier{})
+	queries := stubQuerier{}
 
-	_, err := svc.GetSeason(context.Background(), "lotus", 2030)
+	_, err := constructors.GetSeason(context.Background(), queries, "lotus", 2030)
 
 	require.ErrorIs(t, err, pgx.ErrNoRows)
 }
@@ -75,7 +76,7 @@ func TestService_GetSeason_NotFound(t *testing.T) {
 func TestService_GetSeason_CombinesEngineEntries(t *testing.T) {
 	t.Parallel()
 
-	svc := constructors.NewService(stubQuerier{
+	queries := stubQuerier{
 		entries: []database.ListConstructorSeasonEntriesRow{
 			{
 				EngineName:        "Climax",
@@ -94,9 +95,9 @@ func TestService_GetSeason_CombinesEngineEntries(t *testing.T) {
 				Dnfs:              3,
 			},
 		},
-	})
+	}
 
-	got, err := svc.GetSeason(context.Background(), "cooper", 1957)
+	got, err := constructors.GetSeason(context.Background(), queries, "cooper", 1957)
 
 	require.NoError(t, err)
 	assert.Equal(t, "3", got.Position)
@@ -114,11 +115,11 @@ func TestService_GetSeason_CombinesEngineEntries(t *testing.T) {
 func TestService_GetSeason_NoStanding(t *testing.T) {
 	t.Parallel()
 
-	svc := constructors.NewService(stubQuerier{
+	queries := stubQuerier{
 		entries: []database.ListConstructorSeasonEntriesRow{{EngineName: "Alta", Wins: 1}},
-	})
+	}
 
-	got, err := svc.GetSeason(context.Background(), "connaught", 1955)
+	got, err := constructors.GetSeason(context.Background(), queries, "connaught", 1955)
 
 	require.NoError(t, err)
 	assert.Empty(t, got.Position)
@@ -129,15 +130,15 @@ func TestService_GetSeason_NoStanding(t *testing.T) {
 func TestService_GetSeason_SprintOnlyWhenPresent(t *testing.T) {
 	t.Parallel()
 
-	svc := constructors.NewService(stubQuerier{
+	queries := stubQuerier{
 		entries: []database.ListConstructorSeasonEntriesRow{{EngineName: "Honda RBPT"}},
 		results: []database.ListConstructorSeasonResultsRow{
 			{RaceRound: 1, DriverID: "max-verstappen", Points: 25},
 			{RaceRound: 2, DriverID: "max-verstappen", Points: 25, SprintPositionLabel: pgtype.Text{String: "1", Valid: true}, SprintPoints: 8},
 		},
-	})
+	}
 
-	got, err := svc.GetSeason(context.Background(), "red-bull", 2024)
+	got, err := constructors.GetSeason(context.Background(), queries, "red-bull", 2024)
 
 	require.NoError(t, err)
 	assert.Nil(t, got.Results[0].Sprint)
@@ -149,9 +150,9 @@ func TestService_GetSeason_SprintOnlyWhenPresent(t *testing.T) {
 func TestService_GetSummary_NotFound(t *testing.T) {
 	t.Parallel()
 
-	svc := constructors.NewService(stubQuerier{summaryErr: pgx.ErrNoRows})
+	queries := stubQuerier{summaryErr: pgx.ErrNoRows}
 
-	_, err := svc.GetSummary(context.Background(), "nope")
+	_, err := constructors.GetSummary(context.Background(), queries, "nope")
 
 	require.ErrorIs(t, err, pgx.ErrNoRows)
 }
@@ -159,7 +160,7 @@ func TestService_GetSummary_NotFound(t *testing.T) {
 func TestService_GetSummary_DriversAttachToSeasonAndEngine(t *testing.T) {
 	t.Parallel()
 
-	svc := constructors.NewService(stubQuerier{
+	queries := stubQuerier{
 		seasons: []database.ListConstructorSeasonsRow{
 			{Season: 1967, EngineManufacturerID: "climax", EngineManufacturerName: "Climax"},
 			{Season: 1967, EngineManufacturerID: "ford", EngineManufacturerName: "Ford"},
@@ -168,9 +169,9 @@ func TestService_GetSummary_DriversAttachToSeasonAndEngine(t *testing.T) {
 			{Season: 1967, EngineManufacturerID: "ford", DriverID: "jim-clark", DriverName: "Jim Clark"},
 			{Season: 1967, EngineManufacturerID: "climax", DriverID: "mike-spence", DriverName: "Mike Spence"},
 		},
-	})
+	}
 
-	got, err := svc.GetSummary(context.Background(), "lotus")
+	got, err := constructors.GetSummary(context.Background(), queries, "lotus")
 
 	require.NoError(t, err)
 	require.Len(t, got.Seasons, 2)
@@ -183,11 +184,11 @@ func TestService_GetSummary_DriversAttachToSeasonAndEngine(t *testing.T) {
 func TestService_GetSummary_NoStanding(t *testing.T) {
 	t.Parallel()
 
-	svc := constructors.NewService(stubQuerier{
+	queries := stubQuerier{
 		seasons: []database.ListConstructorSeasonsRow{{Season: 1955, EngineManufacturerID: "alta"}},
-	})
+	}
 
-	got, err := svc.GetSummary(context.Background(), "connaught")
+	got, err := constructors.GetSummary(context.Background(), queries, "connaught")
 
 	require.NoError(t, err)
 	assert.Empty(t, got.Seasons[0].Position)
@@ -198,9 +199,9 @@ func TestService_GetSummary_NoStanding(t *testing.T) {
 func TestService_GetSummary_EmptyLineage(t *testing.T) {
 	t.Parallel()
 
-	svc := constructors.NewService(stubQuerier{})
+	queries := stubQuerier{}
 
-	got, err := svc.GetSummary(context.Background(), "connaught")
+	got, err := constructors.GetSummary(context.Background(), queries, "connaught")
 
 	require.NoError(t, err)
 	assert.NotNil(t, got.Lineage)
@@ -312,9 +313,9 @@ func TestService_ListConstructors(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			svc := constructors.NewService(stubQuerier{rows: tt.rows, err: tt.err})
+			queries := stubQuerier{rows: tt.rows, err: tt.err}
 
-			got, err := svc.ListConstructors(context.Background())
+			got, err := constructors.ListConstructors(context.Background(), queries)
 
 			if tt.wantErr != nil {
 				require.ErrorIs(t, err, tt.wantErr)

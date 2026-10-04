@@ -15,6 +15,7 @@ import (
 )
 
 type stubQuerier struct {
+	database.Querier
 	rows        []database.ListCircuitsRow
 	circuit     database.GetCircuitInfoRow
 	err         error
@@ -127,9 +128,9 @@ func TestService_ListCircuits(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			svc := circuits.NewService(stubQuerier{rows: tt.rows, err: tt.err})
+			queries := stubQuerier{rows: tt.rows, err: tt.err}
 
-			got, err := svc.ListCircuits(context.Background())
+			got, err := circuits.ListCircuits(context.Background(), queries)
 
 			if tt.wantErr != nil {
 				require.ErrorIs(t, err, tt.wantErr)
@@ -170,7 +171,7 @@ func TestService_GetCircuitSummaryWrapsQueryErrors(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			_, err := circuits.NewService(tt.queries).GetCircuitSummary(context.Background(), "monza")
+			_, err := circuits.GetCircuitSummary(context.Background(), tt.queries, "monza")
 
 			require.ErrorIs(t, err, errQuery)
 			assert.EqualError(t, err, tt.wantErr)
@@ -181,13 +182,13 @@ func TestService_GetCircuitSummaryWrapsQueryErrors(t *testing.T) {
 func TestService_GetCircuitSummaryNormalizesNullPreviousNames(t *testing.T) {
 	t.Parallel()
 
-	svc := circuits.NewService(stubQuerier{
+	queries := stubQuerier{
 		circuit: database.GetCircuitInfoRow{
 			CircuitID: "lusail",
 		},
-	})
+	}
 
-	got, err := svc.GetCircuitSummary(context.Background(), "lusail")
+	got, err := circuits.GetCircuitSummary(context.Background(), queries, "lusail")
 
 	require.NoError(t, err)
 	assert.NotNil(t, got.PreviousNames)

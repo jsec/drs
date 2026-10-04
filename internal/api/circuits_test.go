@@ -15,11 +15,11 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/jsec/drs/internal/circuits"
 	"github.com/jsec/drs/internal/database"
 )
 
 type stubQuerier struct {
+	database.Querier
 	circuitErr  error
 	circuitRows []database.ListCircuitsRow
 }
@@ -64,8 +64,8 @@ func TestGetCircuitSummaryHandler(t *testing.T) {
 			t.Parallel()
 
 			app := &application{
-				logger:   slog.New(slog.NewTextHandler(io.Discard, nil)),
-				circuits: circuits.NewService(stubQuerier{circuitErr: tt.circuitErr}),
+				logger:  slog.New(slog.NewTextHandler(io.Discard, nil)),
+				queries: stubQuerier{circuitErr: tt.circuitErr},
 			}
 
 			req := httptest.NewRequest(http.MethodGet, "/circuits/nope", nil)
@@ -85,14 +85,14 @@ func TestListCircuitsHandler_UsesCamelCaseJSON(t *testing.T) {
 
 	app := &application{
 		logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
-		circuits: circuits.NewService(stubQuerier{
+		queries: stubQuerier{
 			circuitRows: []database.ListCircuitsRow{{
 				CircuitID:     "monza",
 				FirstRaceDate: testDate(1950, time.September, 3),
 				LastRaceDate:  testDate(2026, time.September, 6),
 				RaceCount:     75,
 			}},
-		}),
+		},
 	}
 
 	req := httptest.NewRequest(http.MethodGet, "/circuits", nil)

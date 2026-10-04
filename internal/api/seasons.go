@@ -3,15 +3,17 @@ package api
 import (
 	"net/http"
 	"strconv"
+
+	"github.com/jsec/drs/internal/seasons"
 )
 
 func (app *application) listSeasonsHandler(w http.ResponseWriter, r *http.Request) error {
-	seasons, err := app.seasons.ListSeasons(r.Context())
+	list, err := seasons.ListSeasons(r.Context(), app.queries)
 	if err != nil {
 		return err
 	}
 
-	return respondJSON(w, seasons)
+	return respondJSON(w, list)
 }
 
 func (app *application) getSeasonOverviewHandler(w http.ResponseWriter, r *http.Request) error {
@@ -20,7 +22,7 @@ func (app *application) getSeasonOverviewHandler(w http.ResponseWriter, r *http.
 		return err
 	}
 
-	overview, err := app.seasons.GetOverview(r.Context(), year)
+	overview, err := seasons.GetOverview(r.Context(), app.queries, year)
 	if err != nil {
 		return err
 	}
@@ -34,7 +36,7 @@ func (app *application) getSeasonCalendarHandler(w http.ResponseWriter, r *http.
 		return err
 	}
 
-	calendar, err := app.seasons.GetCalendar(r.Context(), year)
+	calendar, err := seasons.GetCalendar(r.Context(), app.queries, year)
 	if err != nil {
 		return err
 	}

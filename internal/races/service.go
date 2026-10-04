@@ -10,29 +10,13 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-type raceQueries interface {
-	GetRaceDetail(ctx context.Context, season int32, raceRound int32) (database.GetRaceDetailRow, error)
-	ListRaceResults(ctx context.Context, raceID int32) ([]database.ListRaceResultsRow, error)
-	ListRaceLapTimes(ctx context.Context, raceID int32, session string) ([]database.ListRaceLapTimesRow, error)
-}
-
-type Service struct {
-	queries raceQueries
-}
-
-func NewService(queries raceQueries) *Service {
-	return &Service{
-		queries: queries,
-	}
-}
-
-func (s *Service) GetRaceDetail(ctx context.Context, season, round int32) (RaceDetailResponse, error) {
-	race, err := s.getCompletedRace(ctx, season, round)
+func GetRaceDetail(ctx context.Context, queries database.Querier, season, round int32) (RaceDetailResponse, error) {
+	race, err := getCompletedRace(ctx, queries, season, round)
 	if err != nil {
 		return RaceDetailResponse{}, err
 	}
 
-	rows, err := s.queries.ListRaceResults(ctx, race.RaceID)
+	rows, err := queries.ListRaceResults(ctx, race.RaceID)
 	if err != nil {
 		return RaceDetailResponse{}, fmt.Errorf("listing race results: %w", err)
 	}
@@ -97,18 +81,18 @@ func (s *Service) GetRaceDetail(ctx context.Context, season, round int32) (RaceD
 	return resp, nil
 }
 
-func (s *Service) GetRaceLaps(ctx context.Context, season, round int32, session string) (RaceLapsResponse, error) {
-	race, err := s.getCompletedRace(ctx, season, round)
+func GetRaceLaps(ctx context.Context, queries database.Querier, season, round int32, session string) (RaceLapsResponse, error) {
+	race, err := getCompletedRace(ctx, queries, season, round)
 	if err != nil {
 		return RaceLapsResponse{}, err
 	}
 
-	results, err := s.queries.ListRaceResults(ctx, race.RaceID)
+	results, err := queries.ListRaceResults(ctx, race.RaceID)
 	if err != nil {
 		return RaceLapsResponse{}, fmt.Errorf("listing race results: %w", err)
 	}
 
-	lapRows, err := s.queries.ListRaceLapTimes(ctx, race.RaceID, session)
+	lapRows, err := queries.ListRaceLapTimes(ctx, race.RaceID, session)
 	if err != nil {
 		return RaceLapsResponse{}, fmt.Errorf("listing race lap times: %w", err)
 	}
@@ -144,8 +128,8 @@ func (s *Service) GetRaceLaps(ctx context.Context, season, round int32, session 
 	return RaceLapsResponse{Drivers: drivers}, nil
 }
 
-func (s *Service) getCompletedRace(ctx context.Context, season, round int32) (database.GetRaceDetailRow, error) {
-	race, err := s.queries.GetRaceDetail(ctx, season, round)
+func getCompletedRace(ctx context.Context, queries database.Querier, season, round int32) (database.GetRaceDetailRow, error) {
+	race, err := queries.GetRaceDetail(ctx, season, round)
 	if err != nil {
 		return database.GetRaceDetailRow{}, fmt.Errorf("getting race detail: %w", err)
 	}

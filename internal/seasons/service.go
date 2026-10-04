@@ -7,26 +7,8 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-type seasonQueries interface {
-	ListSeasons(ctx context.Context) ([]database.ListSeasonsRow, error)
-	ListSeasonCalendar(ctx context.Context, season int32) ([]database.ListSeasonCalendarRow, error)
-	ListSeasonConstructorStandings(ctx context.Context, season int32) ([]database.ListSeasonConstructorStandingsRow, error)
-	ListSeasonDriverProgression(ctx context.Context, season int32, driverIds []string) ([]database.ListSeasonDriverProgressionRow, error)
-	ListSeasonDriverStandings(ctx context.Context, season int32) ([]database.ListSeasonDriverStandingsRow, error)
-}
-
-type Service struct {
-	queries seasonQueries
-}
-
-func NewService(queries seasonQueries) *Service {
-	return &Service{
-		queries: queries,
-	}
-}
-
-func (s *Service) ListSeasons(ctx context.Context) ([]SeasonResponse, error) {
-	rows, err := s.queries.ListSeasons(ctx)
+func ListSeasons(ctx context.Context, queries database.Querier) ([]SeasonResponse, error) {
+	rows, err := queries.ListSeasons(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("listing seasons: %w", err)
 	}
@@ -59,13 +41,13 @@ func (s *Service) ListSeasons(ctx context.Context) ([]SeasonResponse, error) {
 	return out, nil
 }
 
-func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverviewResponse, error) {
-	driverRows, err := s.queries.ListSeasonDriverStandings(ctx, season)
+func GetOverview(ctx context.Context, queries database.Querier, season int32) (SeasonOverviewResponse, error) {
+	driverRows, err := queries.ListSeasonDriverStandings(ctx, season)
 	if err != nil {
 		return SeasonOverviewResponse{}, fmt.Errorf("listing season driver standings: %w", err)
 	}
 
-	constructorRows, err := s.queries.ListSeasonConstructorStandings(ctx, season)
+	constructorRows, err := queries.ListSeasonConstructorStandings(ctx, season)
 	if err != nil {
 		return SeasonOverviewResponse{}, fmt.Errorf("listing season constructor standings: %w", err)
 	}
@@ -145,7 +127,7 @@ func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverview
 		overview.Progression.Series = append(overview.Progression.Series, series)
 	}
 
-	rows, err := s.queries.ListSeasonDriverProgression(ctx, season, driverIDs)
+	rows, err := queries.ListSeasonDriverProgression(ctx, season, driverIDs)
 	if err != nil {
 		return SeasonOverviewResponse{}, fmt.Errorf("listing season driver progression: %w", err)
 	}
@@ -164,8 +146,8 @@ func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverview
 	return overview, nil
 }
 
-func (s *Service) GetCalendar(ctx context.Context, season int32) (CalendarResponse, error) {
-	raceRows, err := s.queries.ListSeasonCalendar(ctx, season)
+func GetCalendar(ctx context.Context, queries database.Querier, season int32) (CalendarResponse, error) {
+	raceRows, err := queries.ListSeasonCalendar(ctx, season)
 	if err != nil {
 		return CalendarResponse{}, err
 	}

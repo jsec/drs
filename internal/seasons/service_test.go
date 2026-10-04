@@ -15,6 +15,7 @@ import (
 )
 
 type stubQuerier struct {
+	database.Querier
 	rows                     []database.ListSeasonsRow
 	err                      error
 	driverStandingsRows      []database.ListSeasonDriverStandingsRow
@@ -146,9 +147,9 @@ func TestService_ListSeasons(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			svc := seasons.NewService(stubQuerier{rows: tt.rows, err: tt.err})
+			queries := stubQuerier{rows: tt.rows, err: tt.err}
 
-			got, err := svc.ListSeasons(context.Background())
+			got, err := seasons.ListSeasons(context.Background(), queries)
 
 			if tt.wantErr != nil {
 				require.ErrorIs(t, err, tt.wantErr)
@@ -166,7 +167,7 @@ func TestService_ListSeasons(t *testing.T) {
 func TestService_GetOverview_Standings(t *testing.T) {
 	t.Parallel()
 
-	svc := seasons.NewService(stubQuerier{
+	queries := stubQuerier{
 		driverStandingsRows: []database.ListSeasonDriverStandingsRow{{
 			PositionLabel:    "1",
 			Points:           251.5,
@@ -189,9 +190,9 @@ func TestService_GetOverview_Standings(t *testing.T) {
 			Name:             "Red Bull Racing",
 			ConstructorColor: "#3671C6",
 		}},
-	})
+	}
 
-	got, err := svc.GetOverview(context.Background(), 2023)
+	got, err := seasons.GetOverview(context.Background(), queries, 2023)
 
 	require.NoError(t, err)
 	assert.Equal(t, []seasons.DriverStanding{{
@@ -216,7 +217,7 @@ func TestService_GetOverview_Standings(t *testing.T) {
 func TestService_GetOverview(t *testing.T) {
 	t.Parallel()
 
-	svc := seasons.NewService(stubQuerier{
+	queries := stubQuerier{
 		driverStandingsRows: []database.ListSeasonDriverStandingsRow{
 			{
 				Points:           43,
@@ -244,9 +245,9 @@ func TestService_GetOverview(t *testing.T) {
 			{RaceRound: 2, DriverID: "sergio-perez", Code: "PER", Points: 33},
 			{RaceRound: 3, DriverID: "max-verstappen", Code: "VER", Points: 43},
 		},
-	})
+	}
 
-	got, err := svc.GetOverview(context.Background(), 2023)
+	got, err := seasons.GetOverview(context.Background(), queries, 2023)
 
 	require.NoError(t, err)
 	require.NotNil(t, got.Leader)
@@ -270,16 +271,16 @@ func TestService_GetOverview(t *testing.T) {
 func TestService_GetOverview_DriverWithoutConstructor(t *testing.T) {
 	t.Parallel()
 
-	svc := seasons.NewService(stubQuerier{
+	queries := stubQuerier{
 		driverStandingsRows: []database.ListSeasonDriverStandingsRow{{
 			Points:   9,
 			DriverID: "nino-farina",
 			Code:     "FAR",
 			Name:     "Nino Farina",
 		}},
-	})
+	}
 
-	got, err := svc.GetOverview(context.Background(), 1950)
+	got, err := seasons.GetOverview(context.Background(), queries, 1950)
 
 	require.NoError(t, err)
 	assert.Nil(t, got.Drivers[0].Constructor)
@@ -289,7 +290,7 @@ func TestService_GetOverview_DriverWithoutConstructor(t *testing.T) {
 func TestService_GetCalendar(t *testing.T) {
 	t.Parallel()
 
-	svc := seasons.NewService(stubQuerier{
+	queries := stubQuerier{
 		calendarRows: []database.ListSeasonCalendarRow{
 			{
 				RaceID:                 1123,
@@ -317,9 +318,9 @@ func TestService_GetCalendar(t *testing.T) {
 				Completed:   pgtype.Bool{Bool: false, Valid: true},
 			},
 		},
-	})
+	}
 
-	got, err := svc.GetCalendar(context.Background(), 2026)
+	got, err := seasons.GetCalendar(context.Background(), queries, 2026)
 
 	require.NoError(t, err)
 	require.Len(t, got.Races, 2)

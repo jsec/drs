@@ -9,24 +9,8 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-type circuitQueries interface {
-	ListCircuits(context.Context) ([]database.ListCircuitsRow, error)
-	GetCircuitInfo(context.Context, string) (database.GetCircuitInfoRow, error)
-	GetRacesByCircuitId(context.Context, string) ([]database.GetRacesByCircuitIdRow, error)
-}
-
-type Service struct {
-	queries circuitQueries
-}
-
-func NewService(queries circuitQueries) *Service {
-	return &Service{
-		queries: queries,
-	}
-}
-
-func (s *Service) ListCircuits(ctx context.Context) ([]ListCircuitsResponse, error) {
-	rows, err := s.queries.ListCircuits(ctx)
+func ListCircuits(ctx context.Context, queries database.Querier) ([]ListCircuitsResponse, error) {
+	rows, err := queries.ListCircuits(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("listing circuits: %w", err)
 	}
@@ -48,13 +32,13 @@ func (s *Service) ListCircuits(ctx context.Context) ([]ListCircuitsResponse, err
 	return out, nil
 }
 
-func (s *Service) GetCircuitSummary(ctx context.Context, circuitID string) (CircuitSummaryResponse, error) {
-	circuit, err := s.queries.GetCircuitInfo(ctx, circuitID)
+func GetCircuitSummary(ctx context.Context, queries database.Querier, circuitID string) (CircuitSummaryResponse, error) {
+	circuit, err := queries.GetCircuitInfo(ctx, circuitID)
 	if err != nil {
 		return CircuitSummaryResponse{}, fmt.Errorf("getting circuit info: %w", err)
 	}
 
-	raceList, err := s.queries.GetRacesByCircuitId(ctx, circuitID)
+	raceList, err := queries.GetRacesByCircuitId(ctx, circuitID)
 	if err != nil {
 		return CircuitSummaryResponse{}, fmt.Errorf("getting circuit races: %w", err)
 	}

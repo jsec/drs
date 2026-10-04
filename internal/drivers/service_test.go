@@ -14,6 +14,7 @@ import (
 )
 
 type stubQuerier struct {
+	database.Querier
 	season    database.GetDriverSeasonRow
 	seasonErr error
 	races     []database.ListDriverSeasonRacesRow
@@ -61,9 +62,9 @@ func (stubQuerier) ListSeasonDriverProgression(context.Context, int32, []string)
 func TestService_GetSeason_NotFound(t *testing.T) {
 	t.Parallel()
 
-	svc := drivers.NewService(stubQuerier{seasonErr: pgx.ErrNoRows})
+	queries := stubQuerier{seasonErr: pgx.ErrNoRows}
 
-	_, err := svc.GetSeason(context.Background(), "nobody", 2026)
+	_, err := drivers.GetSeason(context.Background(), queries, "nobody", 2026)
 
 	require.ErrorIs(t, err, pgx.ErrNoRows)
 }
@@ -71,15 +72,15 @@ func TestService_GetSeason_NotFound(t *testing.T) {
 func TestService_GetSeason_SprintOnlyWhenPresent(t *testing.T) {
 	t.Parallel()
 
-	svc := drivers.NewService(stubQuerier{
+	queries := stubQuerier{
 		season: database.GetDriverSeasonRow{Code: "NOR", Position: pgtype.Text{String: "1", Valid: true}},
 		races: []database.ListDriverSeasonRacesRow{
 			{RaceRound: 1, PositionLabel: "1", Points: 25},
 			{RaceRound: 2, PositionLabel: "2", Points: 18, SprintPositionLabel: pgtype.Text{String: "3", Valid: true}, SprintPoints: 6},
 		},
-	})
+	}
 
-	got, err := svc.GetSeason(context.Background(), "lando-norris", 2026)
+	got, err := drivers.GetSeason(context.Background(), queries, "lando-norris", 2026)
 
 	require.NoError(t, err)
 	assert.Equal(t, "1", got.Position)
@@ -94,9 +95,9 @@ func TestService_GetSeason_SprintOnlyWhenPresent(t *testing.T) {
 func TestService_GetRace_NotFound(t *testing.T) {
 	t.Parallel()
 
-	svc := drivers.NewService(stubQuerier{raceErr: pgx.ErrNoRows})
+	queries := stubQuerier{raceErr: pgx.ErrNoRows}
 
-	_, err := svc.GetRace(context.Background(), "nobody", 2025, 1)
+	_, err := drivers.GetRace(context.Background(), queries, "nobody", 2025, 1)
 
 	require.ErrorIs(t, err, pgx.ErrNoRows)
 }
@@ -104,9 +105,9 @@ func TestService_GetRace_NotFound(t *testing.T) {
 func TestService_GetRace_NoPitStopsIsEmptyList(t *testing.T) {
 	t.Parallel()
 
-	svc := drivers.NewService(stubQuerier{race: database.GetDriverRaceRow{Code: "NOR", PositionLabel: "1"}})
+	queries := stubQuerier{race: database.GetDriverRaceRow{Code: "NOR", PositionLabel: "1"}}
 
-	got, err := svc.GetRace(context.Background(), "lando-norris", 2025, 1)
+	got, err := drivers.GetRace(context.Background(), queries, "lando-norris", 2025, 1)
 
 	require.NoError(t, err)
 	assert.Equal(t, "1", got.PositionLabel)
@@ -117,9 +118,9 @@ func TestService_GetRace_NoPitStopsIsEmptyList(t *testing.T) {
 func TestService_GetSprint_NotFound(t *testing.T) {
 	t.Parallel()
 
-	svc := drivers.NewService(stubQuerier{})
+	queries := stubQuerier{}
 
-	_, err := svc.GetSprint(context.Background(), "lando-norris", 2025, 1)
+	_, err := drivers.GetSprint(context.Background(), queries, "lando-norris", 2025, 1)
 
 	require.ErrorIs(t, err, pgx.ErrNoRows)
 }

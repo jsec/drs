@@ -13,10 +13,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/jsec/drs/internal/database"
-	"github.com/jsec/drs/internal/seasons"
 )
 
 type seasonStubQuerier struct {
+	database.Querier
 	driverRows      []database.ListSeasonDriverStandingsRow
 	constructorRows []database.ListSeasonConstructorStandingsRow
 	progressionRows []database.ListSeasonDriverProgressionRow
@@ -48,7 +48,7 @@ func TestGetSeasonOverviewHandler(t *testing.T) {
 
 	app := &application{
 		logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
-		seasons: seasons.NewService(seasonStubQuerier{
+		queries: seasonStubQuerier{
 			driverRows: []database.ListSeasonDriverStandingsRow{{
 				Points:           44,
 				DriverID:         "max-verstappen",
@@ -64,7 +64,7 @@ func TestGetSeasonOverviewHandler(t *testing.T) {
 				Code:      "VER",
 				Points:    44,
 			}},
-		}),
+		},
 	}
 
 	req := httptest.NewRequest(http.MethodGet, "/seasons/2023", nil)
@@ -98,7 +98,7 @@ func TestGetSeasonCalendarHandler(t *testing.T) {
 
 	app := &application{
 		logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
-		seasons: seasons.NewService(seasonStubQuerier{
+		queries: seasonStubQuerier{
 			calendarRows: []database.ListSeasonCalendarRow{
 				{
 					RaceID:                 1123,
@@ -126,7 +126,7 @@ func TestGetSeasonCalendarHandler(t *testing.T) {
 					Completed:   pgtype.Bool{Bool: false, Valid: true},
 				},
 			},
-		}),
+		},
 	}
 
 	req := httptest.NewRequest(http.MethodGet, "/seasons/2026/calendar", nil)

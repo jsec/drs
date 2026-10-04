@@ -2,19 +2,21 @@ package api
 
 import (
 	"net/http"
+
+	"github.com/jsec/drs/internal/constructors"
 )
 
 func (app *application) listConstructorsHandler(w http.ResponseWriter, r *http.Request) error {
-	constructors, err := app.constructors.ListConstructors(r.Context())
+	list, err := constructors.ListConstructors(r.Context(), app.queries)
 	if err != nil {
 		return err
 	}
 
-	return respondJSON(w, constructors)
+	return respondJSON(w, list)
 }
 
 func (app *application) getConstructorSummaryHandler(w http.ResponseWriter, r *http.Request) error {
-	summary, err := app.constructors.GetSummary(r.Context(), r.PathValue("constructorID"))
+	summary, err := constructors.GetSummary(r.Context(), app.queries, r.PathValue("constructorID"))
 	if err != nil {
 		return err
 	}
@@ -28,7 +30,7 @@ func (app *application) getConstructorSeasonHandler(w http.ResponseWriter, r *ht
 		return err
 	}
 
-	season, err := app.constructors.GetSeason(r.Context(), r.PathValue("constructorID"), year)
+	season, err := constructors.GetSeason(r.Context(), app.queries, r.PathValue("constructorID"), year)
 	if err != nil {
 		return err
 	}

@@ -12,7 +12,7 @@ import (
 func Serve(ctx context.Context, logger *slog.Logger, db *database.Queries, port string) error {
 	srv := &http.Server{
 		Addr:              ":" + port,
-		Handler:           newApplication(logger, db).routes(),
+		Handler:           (&application{logger: logger, queries: db}).routes(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       10 * time.Second,
 		WriteTimeout:      15 * time.Second,

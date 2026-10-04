@@ -10,7 +10,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/jsec/drs/internal/constructors"
 	"github.com/jsec/drs/internal/database"
 )
 
@@ -38,8 +37,8 @@ func TestGetConstructorSeasonHandler_NotFound(t *testing.T) {
 			t.Parallel()
 
 			app := &application{
-				logger:       slog.New(slog.NewTextHandler(io.Discard, nil)),
-				constructors: constructors.NewService(constructorStubQuerier{}),
+				logger:  slog.New(slog.NewTextHandler(io.Discard, nil)),
+				queries: constructorStubQuerier{},
 			}
 
 			req := httptest.NewRequest(http.MethodGet, "/seasons/"+tt.year+"/constructors/lotus", nil)
