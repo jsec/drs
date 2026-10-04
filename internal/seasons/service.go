@@ -73,9 +73,9 @@ func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverview
 	drivers := make([]DriverStanding, 0, len(driverRows))
 	for _, row := range driverRows {
 		var constructor *Constructor
-		if row.ConstructorID.Valid && row.ConstructorName.Valid && row.ConstructorColor.Valid {
+		if row.ConstructorName.Valid && row.ConstructorColor.Valid {
 			constructor = &Constructor{
-				ID: row.ConstructorID.String, Name: row.ConstructorName.String, Color: row.ConstructorColor.String,
+				ID: row.ConstructorID, Name: row.ConstructorName.String, Color: row.ConstructorColor.String,
 			}
 		}
 

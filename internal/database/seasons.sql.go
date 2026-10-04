@@ -213,20 +213,23 @@ SELECT
     dss.driver_name AS name,
     d.nationality AS country,
     d.nationality_country_code AS country_code,
-    dss.constructor_id,
+    summary.constructor_id,
     c.constructor_name,
     c.primary_color_hex AS constructor_color,
-    dss.car_number,
-    dss.win_count AS wins,
-    dss.podium_count AS podiums,
-    dss.qualifying_p1_count AS poles
+    summary.car_number,
+    summary.win_count AS wins,
+    summary.podium_count AS podiums,
+    summary.qualifying_p1_count AS poles
 FROM effone.driver_standings_snapshots AS dss
 JOIN latest_round
     ON dss.race_round = latest_round.race_round
+JOIN effone.driver_season_summaries AS summary
+    ON dss.season = summary.season
+    AND dss.driver_id = summary.driver_id
 JOIN effone.drivers AS d
     ON dss.driver_id = d.driver_id
 LEFT JOIN effone.constructors AS c
-    ON dss.constructor_id = c.constructor_id
+    ON summary.constructor_id = c.constructor_id
 WHERE dss.season = $1
 ORDER BY dss.position NULLS LAST, dss.driver_name
 `
@@ -240,7 +243,7 @@ type ListSeasonDriverStandingsRow struct {
 	Name             string
 	Country          string
 	CountryCode      string
-	ConstructorID    pgtype.Text
+	ConstructorID    string
 	ConstructorName  pgtype.Text
 	ConstructorColor pgtype.Text
 	CarNumber        pgtype.Int4

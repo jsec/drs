@@ -16,17 +16,17 @@ with
     {{ season_aggregates(["season", "driver_id"]) }},
 
     race_events as (
-        select season, driver_id, constructor_id, race_date, race_round, 2 as event_order
+        select season, driver_id, constructor_id, car_number, race_date, race_round, 2 as event_order, finish_order
         from race_results
         union all
-        select season, driver_id, constructor_id, race_date, race_round, 1 as event_order
+        select season, driver_id, constructor_id, car_number, race_date, race_round, 1 as event_order, finish_order
         from sprint_results
     ),
 
-    last_constructor as (
-        select distinct on (season, driver_id) season, driver_id, constructor_id
+    last_entry as (
+        select distinct on (season, driver_id) season, driver_id, constructor_id, car_number
         from race_events
-        order by season, driver_id, race_date desc, race_round desc, event_order desc
+        order by season, driver_id, race_date desc, race_round desc, event_order desc, finish_order
     ),
 
     latest_standings as (
@@ -38,7 +38,8 @@ with
 select
     driver_seasons.season,
     driver_seasons.driver_id,
-    last_constructor.constructor_id,
+    last_entry.constructor_id,
+    last_entry.car_number,
     coalesce(race_aggregates.win_count, 0) as win_count,
     coalesce(race_aggregates.podium_count, 0) as podium_count,
     coalesce(qualifying_aggregates.qualifying_p1_count, 0) as qualifying_p1_count,
@@ -53,10 +54,7 @@ left join
     qualifying_aggregates
     on driver_seasons.season = qualifying_aggregates.season
     and driver_seasons.driver_id = qualifying_aggregates.driver_id
-left join
-    last_constructor
-    on driver_seasons.season = last_constructor.season
-    and driver_seasons.driver_id = last_constructor.driver_id
+left join last_entry on driver_seasons.season = last_entry.season and driver_seasons.driver_id = last_entry.driver_id
 left join
     latest_standings
     on driver_seasons.season = latest_standings.season

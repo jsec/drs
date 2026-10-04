@@ -87,14 +87,7 @@ SELECT
     d.nationality_country_code AS country_code,
     c.constructor_name,
     c.primary_color_hex AS constructor_color,
-    (
-        SELECT rr.car_number
-        FROM effone.race_results rr
-        WHERE rr.season = dss.season
-            AND rr.driver_id = dss.driver_id
-        ORDER BY rr.race_round DESC
-        LIMIT 1
-    ) AS car_number,
+    dss.car_number,
     dss.final_points AS points,
     dss.final_position_text AS position,
     dss.win_count AS wins,

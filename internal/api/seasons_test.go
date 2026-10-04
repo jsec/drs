@@ -61,7 +61,7 @@ func TestGetSeasonOverviewHandler(t *testing.T) {
 				DriverID:         "max-verstappen",
 				Code:             "VER",
 				Name:             "Max Verstappen",
-				ConstructorID:    pgtype.Text{String: "red-bull", Valid: true},
+				ConstructorID:    "red-bull",
 				ConstructorName:  pgtype.Text{String: "Red Bull Racing", Valid: true},
 				ConstructorColor: pgtype.Text{String: "#3671C6", Valid: true},
 			}},

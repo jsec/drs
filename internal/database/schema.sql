@@ -200,6 +200,7 @@ CREATE TABLE effone.driver_season_constructor_summaries (
 --
 
 CREATE TABLE effone.driver_season_summaries (
+    car_number integer,
     constructor_id text NOT NULL,
     driver_id text NOT NULL,
     final_points numeric(8,2) NOT NULL,
@@ -216,21 +217,16 @@ CREATE TABLE effone.driver_season_summaries (
 --
 
 CREATE TABLE effone.driver_standings_snapshots (
-    car_number integer,
     championship_won boolean NOT NULL,
-    constructor_id text,
     driver_code text NOT NULL,
     driver_id text NOT NULL,
     driver_name text NOT NULL,
     points numeric(8,2) NOT NULL,
-    podium_count integer NOT NULL,
     "position" integer,
     position_text text NOT NULL,
     race_id integer NOT NULL,
     race_round integer NOT NULL,
-    qualifying_p1_count integer NOT NULL,
-    season integer NOT NULL,
-    win_count integer NOT NULL
+    season integer NOT NULL
 );
 
 
@@ -681,17 +677,17 @@ CREATE INDEX "7232571207d2422b3a614e915be5cc55" ON effone.sprint_results USING b
 
 
 --
+-- Name: 9f76449728e87dec2a441c8c3191c91a; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX "9f76449728e87dec2a441c8c3191c91a" ON effone.driver_standings_snapshots USING btree (season, driver_id);
+
+
+--
 -- Name: c130ef699c9aa83df305b29ba83a97c5; Type: INDEX; Schema: effone; Owner: -
 --
 
 CREATE INDEX c130ef699c9aa83df305b29ba83a97c5 ON effone.race_results USING btree (season, driver_id);
-
-
---
--- Name: d3cda0d30b86d8a9715ffe328c5111d5; Type: INDEX; Schema: effone; Owner: -
---
-
-CREATE INDEX d3cda0d30b86d8a9715ffe328c5111d5 ON effone.driver_standings_snapshots USING btree (season, driver_id);
 
 
 --

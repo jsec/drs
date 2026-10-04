@@ -1037,16 +1037,10 @@ models:
           arguments:
             compare_model: ref('stg_f1db__race_driver_standing')
     columns:
-      - name: car_number
-        data_type: integer
-        description: Car number recorded for the driver in this race.
       - name: championship_won
         data_type: boolean
         constraints:
           - type: not_null
-      - name: constructor_id
-        data_type: text
-        description: Constructor recorded for the driver in this race.
       - name: driver_code
         data_type: text
         constraints:
@@ -1064,11 +1058,6 @@ models:
         data_type: numeric(8, 2)
         constraints:
           - type: not_null
-      - name: podium_count
-        data_type: integer
-        description: Cumulative race podiums through this snapshot's race.
-        constraints:
-          - type: not_null
       - name: position
         data_type: integer
       - name: position_text
@@ -1084,21 +1073,10 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: qualifying_p1_count
-        data_type: integer
-        description: Cumulative pole positions through this snapshot's race.
-        constraints:
-          - type: not_null
       - name: season
         data_type: integer
         constraints:
           - type: not_null
-      - name: win_count
-        data_type: integer
-        description: Cumulative race wins through this snapshot's race.
-        constraints:
-          - type: not_null
-
   - name: constructor_standings_snapshots
     description: One row per constructor standing snapshot after each race. Engine manufacturer is part of the grain for historical seasons.
     config:
@@ -1164,6 +1142,9 @@ models:
           - season
           - driver_id
     columns:
+      - name: car_number
+        data_type: integer
+        description: Car number from the driver's last race or sprint of the season.
       - name: constructor_id
         data_type: text
         description: Constructor the driver raced for in their last race of the season.
