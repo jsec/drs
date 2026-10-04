@@ -6,7 +6,6 @@ import (
 
 	"github.com/urfave/cli/v3"
 
-	"github.com/jsec/drs/internal/database"
 	"github.com/jsec/drs/internal/etl"
 )
 
@@ -28,13 +27,7 @@ func etlCommand(logger *slog.Logger, config config) *cli.Command {
 				Before: config.requireDatabaseURL,
 				Usage:  "rebuild the effone database",
 				Action: func(ctx context.Context, _ *cli.Command) error {
-					pool, err := database.NewPool(ctx, config.databaseURL)
-					if err != nil {
-						return err
-					}
-					defer pool.Close()
-
-					return etl.Build(ctx, logger, pool)
+					return etl.Build(ctx, logger)
 				},
 			},
 			{
@@ -42,17 +35,11 @@ func etlCommand(logger *slog.Logger, config config) *cli.Command {
 				Before: config.requireDatabaseURL,
 				Usage:  "load the latest source dumps, then rebuild the effone database",
 				Action: func(ctx context.Context, _ *cli.Command) error {
-					pool, err := database.NewPool(ctx, config.databaseURL)
-					if err != nil {
-						return err
-					}
-					defer pool.Close()
-
 					if err := etl.Load(ctx, logger, config.databaseURL, config.githubToken); err != nil {
 						return err
 					}
 
-					return etl.Build(ctx, logger, pool)
+					return etl.Build(ctx, logger)
 				},
 			},
 		},

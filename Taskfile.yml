@@ -81,21 +81,6 @@ tasks:
     cmds:
       - go run {{.APP_PKG}} etl load
 
-  etl:migrate:
-    dir: etl
-    cmds:
-      - goose -table app_goose_db_version -dir ./migrations postgres "$DATABASE_URL" up
-
-  etl:migrate-down:
-    dir: etl
-    cmds:
-      - goose -table app_goose_db_version -dir ./migrations postgres "$DATABASE_URL" down
-
-  etl:migrate-status:
-    dir: etl
-    cmds:
-      - goose -table app_goose_db_version -dir ./migrations postgres "$DATABASE_URL" status
-
   etl:refresh:
     cmds:
       - go run {{.APP_PKG}} etl refresh
