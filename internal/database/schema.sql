@@ -532,50 +532,6 @@ CREATE TABLE effone.races (
 
 
 --
--- Name: refresh_runs; Type: TABLE; Schema: effone; Owner: -
---
-
-CREATE TABLE effone.refresh_runs (
-    refresh_id bigint NOT NULL,
-    started_at timestamp with time zone DEFAULT now() NOT NULL,
-    finished_at timestamp with time zone,
-    status text NOT NULL,
-    row_counts jsonb,
-    error_message text,
-    CONSTRAINT refresh_runs_row_counts_check CHECK (((row_counts IS NULL) OR (jsonb_typeof(row_counts) = 'object'::text))),
-    CONSTRAINT refresh_runs_status_check CHECK ((status = ANY (ARRAY['running'::text, 'succeeded'::text, 'failed'::text])))
-);
-
-
---
--- Name: TABLE refresh_runs; Type: COMMENT; Schema: effone; Owner: -
---
-
-COMMENT ON TABLE effone.refresh_runs IS 'Metadata for source data refreshes.';
-
-
---
--- Name: COLUMN refresh_runs.row_counts; Type: COMMENT; Schema: effone; Owner: -
---
-
-COMMENT ON COLUMN effone.refresh_runs.row_counts IS 'Per-table row counts captured by refreshes.';
-
-
---
--- Name: refresh_runs_refresh_id_seq; Type: SEQUENCE; Schema: effone; Owner: -
---
-
-ALTER TABLE effone.refresh_runs ALTER COLUMN refresh_id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME effone.refresh_runs_refresh_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
-
---
 -- Name: seasons; Type: TABLE; Schema: effone; Owner: -
 --
 
@@ -765,14 +721,6 @@ ALTER TABLE ONLY effone.race_results
 
 ALTER TABLE ONLY effone.races
     ADD CONSTRAINT races__dbt_tmp_pkey1 PRIMARY KEY (race_id);
-
-
---
--- Name: refresh_runs refresh_runs_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
---
-
-ALTER TABLE ONLY effone.refresh_runs
-    ADD CONSTRAINT refresh_runs_pkey PRIMARY KEY (refresh_id);
 
 
 --
