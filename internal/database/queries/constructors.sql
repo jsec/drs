@@ -111,6 +111,7 @@ ORDER BY total_points DESC, race_start_count DESC, driver_name;
 SELECT
     rr.race_round,
     rr.race_name,
+    rr.finish_order,
     rr.driver_id,
     rr.driver_code,
     rr.position_text AS position_label,

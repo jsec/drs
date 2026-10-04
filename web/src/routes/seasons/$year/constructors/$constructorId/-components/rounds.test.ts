@@ -7,6 +7,7 @@ import { groupRounds } from './rounds';
 const result = (overrides: Partial<ConstructorSeasonResult>): ConstructorSeasonResult => ({
     driverCode: 'VER',
     driverId: 'max-verstappen',
+    finishOrder: 1,
     points: 0,
     positionLabel: '1',
     raceName: 'Bahrain Grand Prix',

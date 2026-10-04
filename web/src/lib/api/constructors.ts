@@ -90,6 +90,7 @@ const ProgressionPointSchema = z.object({
 const ConstructorSeasonResultSchema = z.object({
     driverCode: z.string(),
     driverId: z.string(),
+    finishOrder: z.number(),
     points: z.number(),
     positionLabel: z.string(),
     raceName: z.string(),

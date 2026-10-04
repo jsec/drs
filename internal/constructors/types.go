@@ -86,6 +86,7 @@ type SprintResult struct {
 type SeasonResult struct {
 	Round          int32         `json:"round"`
 	RaceName       string        `json:"raceName"`
+	FinishOrder    int32         `json:"finishOrder"`
 	DriverID       string        `json:"driverId"`
 	DriverCode     string        `json:"driverCode"`
 	PositionLabel  string        `json:"positionLabel"`

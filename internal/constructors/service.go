@@ -229,6 +229,7 @@ func (s *Service) GetSeason(ctx context.Context, constructorID string, season in
 		result := SeasonResult{
 			Round:          row.RaceRound,
 			RaceName:       row.RaceName,
+			FinishOrder:    row.FinishOrder,
 			DriverID:       row.DriverID,
 			DriverCode:     row.DriverCode,
 			PositionLabel:  row.PositionLabel,

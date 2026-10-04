@@ -309,6 +309,7 @@ const listConstructorSeasonResults = `-- name: ListConstructorSeasonResults :man
 SELECT
     rr.race_round,
     rr.race_name,
+    rr.finish_order,
     rr.driver_id,
     rr.driver_code,
     rr.position_text AS position_label,
@@ -329,6 +330,7 @@ ORDER BY rr.race_round, rr.finish_order
 type ListConstructorSeasonResultsRow struct {
 	RaceRound           int32
 	RaceName            string
+	FinishOrder         int32
 	DriverID            string
 	DriverCode          string
 	PositionLabel       string
@@ -350,6 +352,7 @@ func (q *Queries) ListConstructorSeasonResults(ctx context.Context, season int32
 		if err := rows.Scan(
 			&i.RaceRound,
 			&i.RaceName,
+			&i.FinishOrder,
 			&i.DriverID,
 			&i.DriverCode,
 			&i.PositionLabel,

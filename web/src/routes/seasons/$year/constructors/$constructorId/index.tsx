@@ -146,7 +146,7 @@ const ConstructorSeason = () => {
 
                                 return (
                                     <Link
-                                        key={`${result.driverId}-${result.positionLabel}`}
+                                        key={result.finishOrder}
                                         params={{ driverId: result.driverId, round: String(r.round), year }}
                                         style={{ color: 'inherit', display: 'grid', gridTemplateColumns: resultCols, textDecoration: 'none' }}
                                         to="/seasons/$year/drivers/$driverId/races/$round"
