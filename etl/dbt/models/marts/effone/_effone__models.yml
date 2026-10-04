@@ -1747,7 +1747,7 @@ models:
           - type: not_null
 
   - name: constructor_season_summaries
-    description: One row per official constructor season standing row with computed race/sprint totals and final standing fields.
+    description: One row per constructor, season and engine manufacturer, built from race entries so seasons without a constructors' championship are included. Final standing fields are null when there was no official standing.
     config:
       contract:
         enforced: true
@@ -1755,7 +1755,8 @@ models:
       - type: primary_key
         columns:
           - season
-          - final_order
+          - constructor_id
+          - engine_manufacturer_id
     columns:
       - name: average_qualifying_position
         data_type: numeric(6, 2)
@@ -1781,6 +1782,14 @@ models:
         data_type: text
         constraints:
           - type: not_null
+      - name: engine_manufacturer_name
+        data_type: text
+        constraints:
+          - type: not_null
+      - name: dnf_count
+        data_type: integer
+        constraints:
+          - type: not_null
       - name: entry_count
         data_type: integer
         constraints:
@@ -1792,8 +1801,6 @@ models:
       - name: final_order
         data_type: integer
         description: Source display order for official final constructor standings rows.
-        constraints:
-          - type: not_null
       - name: final_points
         data_type: numeric(8, 2)
       - name: final_position
@@ -1806,8 +1813,6 @@ models:
           - type: not_null
       - name: points_delta
         data_type: numeric(8, 2)
-        constraints:
-          - type: not_null
       - name: qualifying_entry_count
         data_type: integer
         constraints:
@@ -1859,59 +1864,6 @@ models:
           - type: not_null
       - name: win_count
         data_type: integer
-        constraints:
-          - type: not_null
-
-  - name: constructor_engine_seasons
-    description: One row per constructor, season and engine manufacturer, built from race entries so seasons without a constructors' championship are included.
-    config:
-      contract:
-        enforced: true
-    constraints:
-      - type: primary_key
-        columns:
-          - season
-          - constructor_id
-          - engine_manufacturer_id
-    columns:
-      - name: season
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: constructor_id
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: engine_manufacturer_id
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: engine_manufacturer_name
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: start_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: win_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: podium_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: pole_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: final_position_text
-        data_type: text
-      - name: final_points
-        data_type: numeric(8, 2)
-      - name: championship_won
-        data_type: boolean
         constraints:
           - type: not_null
 
