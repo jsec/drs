@@ -16,20 +16,36 @@ import { parseYear } from '#/lib/route-params';
 import { groupRounds } from './-components/rounds';
 
 const DRIVER_COLS = '56px 1fr 70px 70px 70px 70px';
-const ROUND_COLS = '44px 220px 1fr 60px';
+const RESULT_COLS = '56px 64px';
+const SPRINT_RESULT_COLS = `${RESULT_COLS} 72px`;
 
-function finishLabel(result: ConstructorSeasonResult): string {
+function finish(result: ConstructorSeasonResult): [label: string, color: string] {
     if (result.statusCategory !== 'finished' && isNumericPosition(result.positionLabel)) {
-        return 'DNF';
+        return ['DNF', 'var(--mantine-primary-color-filled)'];
     }
 
-    return formatPosition(result.positionLabel);
+    if (result.positionLabel === '1') {
+        return ['P1', 'var(--gold-500)'];
+    }
+
+    if (result.positionLabel === '2' || result.positionLabel === '3') {
+        return [formatPosition(result.positionLabel), 'var(--silver-500)'];
+    }
+
+    if (result.points > 0) {
+        return [formatPosition(result.positionLabel), 'var(--green-500)'];
+    }
+
+    return [formatPosition(result.positionLabel), 'inherit'];
 }
 
 const ConstructorSeason = () => {
     const { constructorId, year } = Route.useParams();
     const { data: team } = useSuspenseQuery(constructorSeasonQuery(Number(year), constructorId));
     const rounds = groupRounds(team.results);
+    const hasSprints = team.results.some(r => r.sprint !== null);
+    const resultCols = hasSprints ? SPRINT_RESULT_COLS : RESULT_COLS;
+    const roundCols = `44px 1fr ${hasSprints ? 200 : 128}px 60px`;
     const engines = team.entries.length > 1
         ? team.entries.map(e => `${e.engine} ${formatPosition(e.position)}`).join(' · ')
         : team.entries[0]?.engine;
@@ -126,37 +142,42 @@ const ConstructorSeason = () => {
 
             <Box className="f1-card" p={0}>
                 <Box fw={700} fz={15} px={18} py={15}>Race-by-Race Results</Box>
-                <GridHeader columns={ROUND_COLS}>
+                <GridHeader columns={roundCols}>
                     <span>RND</span>
                     <span>GRAND PRIX</span>
-                    <span>DRIVERS</span>
+                    <Box display="grid" style={{ gridTemplateColumns: resultCols }}>
+                        <span>DRIVER</span>
+                        <span>FINISH</span>
+                        {hasSprints && <span>SPRINT</span>}
+                    </Box>
                     <span style={{ textAlign: 'right' }}>PTS</span>
                 </GridHeader>
                 {rounds.map(r => (
-                    <div className="f1-row f1-grid-row" key={r.round} style={{ '--cols': ROUND_COLS }}>
+                    <div className="f1-row f1-grid-row" key={r.round} style={{ '--cols': roundCols }}>
                         <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.round}</Text>
-                        <Text fw={600} fz={13} inherit span>{r.raceName}</Text>
-                        <Group gap={6}>
-                            {r.results.map(result => (
-                                <Link
-                                    key={`${result.driverId}-${result.positionLabel}`}
-                                    params={{ driverId: result.driverId, round: String(r.round), year }}
-                                    style={{
-                                        border: '1px solid var(--mantine-color-default-border)',
-                                        borderRadius: 'var(--radius-sm)',
-                                        color: 'inherit',
-                                        fontSize: 12,
-                                        padding: '2px 8px',
-                                        textDecoration: 'none',
-                                    }}
-                                    to="/seasons/$year/drivers/$driverId/races/$round"
-                                >
-                                    <Text c="dimmed" fw={700} inherit span>{result.driverCode}</Text>
-                                    {` ${finishLabel(result)}`}
-                                    {result.sprint ? <Text c="dimmed" inherit span>{` · S ${formatPosition(result.sprint.positionLabel)}`}</Text> : null}
-                                </Link>
-                            ))}
-                        </Group>
+                        <Text fw={600} fz={14} inherit lineClamp={1} span>{r.raceName}</Text>
+                        <Stack gap={4}>
+                            {r.results.map((result) => {
+                                const [label, color] = finish(result);
+
+                                return (
+                                    <Link
+                                        key={`${result.driverId}-${result.positionLabel}`}
+                                        params={{ driverId: result.driverId, round: String(r.round), year }}
+                                        style={{ color: 'inherit', display: 'grid', gridTemplateColumns: resultCols, textDecoration: 'none' }}
+                                        to="/seasons/$year/drivers/$driverId/races/$round"
+                                    >
+                                        <Text c="dimmed" fw={700} fz={12} inherit span>{result.driverCode}</Text>
+                                        <Text c={color} className="f1-num" fw={700} fz={13} inherit span>{label}</Text>
+                                        {hasSprints && (
+                                            <Text c="dimmed" className="f1-num" fz={13} inherit span>
+                                                {result.sprint ? formatPosition(result.sprint.positionLabel) : '–'}
+                                            </Text>
+                                        )}
+                                    </Link>
+                                );
+                            })}
+                        </Stack>
                         <Text className="f1-num f1-display" fw={700} inherit span ta="right">{r.points > 0 ? r.points : '–'}</Text>
                     </div>
                 ))}
