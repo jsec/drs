@@ -11,29 +11,27 @@ import (
 
 func etlCommand(logger *slog.Logger, config config) *cli.Command {
 	return &cli.Command{
-		Name:  "etl",
-		Usage: "data pipeline commands",
+		Name:   "etl",
+		Usage:  "data pipeline commands",
+		Before: config.requireDatabaseURL,
 		Commands: []*cli.Command{
 			{
-				Name:   "load",
-				Before: config.requireDatabaseURL,
-				Usage:  "load the latest source data dumps",
+				Name:  "load",
+				Usage: "load the latest source data dumps",
 				Action: func(ctx context.Context, _ *cli.Command) error {
 					return etl.Load(ctx, logger, config.databaseURL, config.githubToken)
 				},
 			},
 			{
-				Name:   "build",
-				Before: config.requireDatabaseURL,
-				Usage:  "rebuild the effone database",
+				Name:  "build",
+				Usage: "rebuild the effone database",
 				Action: func(ctx context.Context, _ *cli.Command) error {
 					return etl.Build(ctx, logger)
 				},
 			},
 			{
-				Name:   "refresh",
-				Before: config.requireDatabaseURL,
-				Usage:  "load the latest source dumps, then rebuild the effone database",
+				Name:  "refresh",
+				Usage: "load the latest source dumps, then rebuild the effone database",
 				Action: func(ctx context.Context, _ *cli.Command) error {
 					if err := etl.Load(ctx, logger, config.databaseURL, config.githubToken); err != nil {
 						return err

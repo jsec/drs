@@ -44,34 +44,29 @@ func Load(ctx context.Context, logger *slog.Logger, databaseURL, token string) e
 	return nil
 }
 
-func download(ctx context.Context, url string, w io.Writer) error {
+func openZipEntry(ctx context.Context, url, name string) (fs.File, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	req.Header.Set("User-Agent", "drs-etl")
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("downloading %s: %w", url, err)
 	}
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("downloading %s failed: %s", url, resp.Status)
+		return nil, fmt.Errorf("downloading %s failed: %s", url, resp.Status)
 	}
 
-	_, err = io.Copy(w, resp.Body)
-	return err
-}
-
-func openZipEntry(ctx context.Context, url, name string) (fs.File, error) {
-	var archive bytes.Buffer
-	if err := download(ctx, url, &archive); err != nil {
+	archive, err := io.ReadAll(resp.Body)
+	if err != nil {
 		return nil, fmt.Errorf("downloading %s: %w", url, err)
 	}
 
-	reader, err := zip.NewReader(bytes.NewReader(archive.Bytes()), int64(archive.Len()))
+	reader, err := zip.NewReader(bytes.NewReader(archive), int64(len(archive)))
 	if err != nil {
 		return nil, fmt.Errorf("opening archive: %w", err)
 	}

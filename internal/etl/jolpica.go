@@ -18,16 +18,22 @@ const (
 func loadJolpica(ctx context.Context, logger *slog.Logger, databaseURL string) error {
 	logger.Info("downloading delayed Jolpica SQL dump")
 
-	dump, err := downloadJolpicaDump(ctx)
+	file, err := openZipEntry(ctx, jolpicaDumpURL, jolpicaDumpFileName)
 	if err != nil {
-		return err
+		return fmt.Errorf("opening Jolpica dump: %w", err)
+	}
+	defer func() { _ = file.Close() }()
+
+	var dump bytes.Buffer
+	if err := rewriteJolpicaSchema(&dump, file); err != nil {
+		return fmt.Errorf("rewriting Jolpica dump: %w", err)
 	}
 
 	logger.Info("loading Jolpica dump")
 	err = execSQL(
 		ctx,
 		databaseURL,
-		dump,
+		&dump,
 		"--single-transaction",
 		"-c", "drop schema if exists jolpica cascade",
 		"-c", "create schema jolpica",
@@ -38,22 +44,6 @@ func loadJolpica(ctx context.Context, logger *slog.Logger, databaseURL string) e
 	}
 
 	return nil
-}
-
-func downloadJolpicaDump(ctx context.Context) (io.Reader, error) {
-	file, err := openZipEntry(ctx, jolpicaDumpURL, jolpicaDumpFileName)
-	if err != nil {
-		return nil, fmt.Errorf("opening Jolpica dump: %w", err)
-	}
-	defer func() { _ = file.Close() }()
-
-	var dump bytes.Buffer
-
-	if err := rewriteJolpicaSchema(&dump, file); err != nil {
-		return nil, fmt.Errorf("rewriting Jolpica dump: %w", err)
-	}
-
-	return &dump, nil
 }
 
 func rewriteJolpicaSchema(dst *bytes.Buffer, src io.Reader) error {
