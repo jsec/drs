@@ -301,27 +301,13 @@ CREATE TABLE effone.lap_times (
 --
 
 CREATE TABLE effone.pit_stops (
-    car_number integer,
-    circuit_id text NOT NULL,
-    constructor_id text NOT NULL,
-    constructor_name text NOT NULL,
-    driver_code text NOT NULL,
     driver_id text NOT NULL,
-    driver_name text NOT NULL,
     duration text,
     duration_ms integer,
-    engine_manufacturer_id text NOT NULL,
     lap_number integer NOT NULL,
-    position_text text NOT NULL,
-    race_date date NOT NULL,
     race_id integer NOT NULL,
-    race_name text NOT NULL,
-    race_round integer NOT NULL,
-    season integer NOT NULL,
     stop_number integer NOT NULL,
-    stop_order integer NOT NULL,
-    stop_position integer,
-    tyre_manufacturer_id text NOT NULL
+    stop_order integer NOT NULL
 );
 
 

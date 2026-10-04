@@ -941,68 +941,22 @@ models:
           - race_id
           - stop_order
     columns:
-      - name: car_number
-        data_type: integer
-      - name: circuit_id
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: constructor_id
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: constructor_name
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: driver_code
-        data_type: text
-        constraints:
-          - type: not_null
       - name: driver_id
         data_type: text
         description: Driver associated with the pit stop row.
-        constraints:
-          - type: not_null
-      - name: driver_name
-        data_type: text
         constraints:
           - type: not_null
       - name: duration
         data_type: text
       - name: duration_ms
         data_type: integer
-      - name: engine_manufacturer_id
-        data_type: text
-        constraints:
-          - type: not_null
       - name: lap_number
         data_type: integer
-        constraints:
-          - type: not_null
-      - name: position_text
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: race_date
-        data_type: date
         constraints:
           - type: not_null
       - name: race_id
         data_type: integer
         description: Race associated with the pit stop row.
-        constraints:
-          - type: not_null
-      - name: race_name
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: race_round
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: season
-        data_type: integer
         constraints:
           - type: not_null
       - name: stop_number
@@ -1015,13 +969,6 @@ models:
         description: Source display order for pit stop rows within a race.
         constraints:
           - type: not_null
-      - name: stop_position
-        data_type: integer
-      - name: tyre_manufacturer_id
-        data_type: text
-        constraints:
-          - type: not_null
-
   - name: driver_standings_snapshots
     description: One row per driver standing snapshot after each race.
     config:
