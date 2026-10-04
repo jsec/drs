@@ -258,27 +258,13 @@ CREATE TABLE effone.drivers (
 --
 
 CREATE TABLE effone.fastest_laps (
-    car_number integer,
-    circuit_id text NOT NULL,
-    constructor_id text NOT NULL,
-    constructor_name text NOT NULL,
     driver_code text NOT NULL,
     driver_id text NOT NULL,
-    driver_name text NOT NULL,
-    engine_manufacturer_id text NOT NULL,
     fastest_lap_order integer NOT NULL,
     fastest_lap_position integer,
-    gap text,
-    "interval" text,
     lap_number integer,
     lap_time text,
-    position_text text NOT NULL,
-    race_date date NOT NULL,
-    race_id integer NOT NULL,
-    race_name text NOT NULL,
-    race_round integer NOT NULL,
-    season integer NOT NULL,
-    tyre_manufacturer_id text NOT NULL
+    race_id integer NOT NULL
 );
 
 

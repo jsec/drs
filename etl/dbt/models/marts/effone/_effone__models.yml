@@ -811,20 +811,6 @@ models:
           - race_id
           - driver_id
     columns:
-      - name: car_number
-        data_type: integer
-      - name: circuit_id
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: constructor_id
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: constructor_name
-        data_type: text
-        constraints:
-          - type: not_null
       - name: driver_code
         data_type: text
         constraints:
@@ -834,58 +820,21 @@ models:
         description: Driver associated with the fastest lap row.
         constraints:
           - type: not_null
-      - name: driver_name
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: engine_manufacturer_id
-        data_type: text
-        constraints:
-          - type: not_null
       - name: fastest_lap_order
         data_type: integer
         constraints:
           - type: not_null
       - name: fastest_lap_position
         data_type: integer
-      - name: gap
-        data_type: text
-      - name: interval
-        data_type: text
       - name: lap_number
         data_type: integer
       - name: lap_time
         data_type: text
-      - name: position_text
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: race_date
-        data_type: date
-        constraints:
-          - type: not_null
       - name: race_id
         data_type: integer
         description: Race associated with the fastest lap row.
         constraints:
           - type: not_null
-      - name: race_name
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: race_round
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: season
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: tyre_manufacturer_id
-        data_type: text
-        constraints:
-          - type: not_null
-
   - name: lap_times
     description: One row per driver per lap of the Grand Prix or sprint from Jolpica, mapped to F1DB races and drivers.
     config:
