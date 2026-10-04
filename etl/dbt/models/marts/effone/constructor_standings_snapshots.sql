@@ -1,7 +1,7 @@
 with
     standings as (select * from {{ ref("stg_f1db__race_constructor_standing") }}),
 
-    races as (select * from {{ ref("int_f1db__races_with_circuits") }}),
+    races as (select * from {{ ref("stg_f1db__race") }}),
 
     constructors as (select * from {{ ref("int_f1db__constructors_with_countries") }}),
 

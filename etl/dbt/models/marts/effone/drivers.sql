@@ -5,6 +5,16 @@ with
         select driver_id, min(race_date) as first_race_date, max(race_date) as last_race_date
         from {{ ref("race_results") }}
         group by driver_id
+    ),
+
+    current_season as (select max(season) as season from {{ ref("race_results") }}),
+
+    current_constructors as (
+        select distinct on (driver_id) driver_id, constructor_id
+        from {{ ref("race_results") }}
+        join current_season using (season)
+        group by driver_id, constructor_id
+        order by driver_id, min(race_date) desc, constructor_id desc
     )
 
 select
@@ -21,6 +31,8 @@ select
     drivers.total_pole_positions as qualifying_p1_count,
     drivers.total_championship_wins as championship_count,
     first_last_races.first_race_date,
-    first_last_races.last_race_date
+    first_last_races.last_race_date,
+    current_constructors.constructor_id as current_constructor_id
 from drivers
 left join first_last_races on drivers.driver_id = first_last_races.driver_id
+left join current_constructors on drivers.driver_id = current_constructors.driver_id

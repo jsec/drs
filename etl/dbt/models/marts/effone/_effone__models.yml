@@ -42,10 +42,6 @@ models:
         data_type: text
         constraints:
           - type: not_null
-      - name: direction
-        data_type: text
-        constraints:
-          - type: not_null
       - name: first_race_date
         data_type: date
       - name: first_race_id
@@ -58,29 +54,13 @@ models:
         data_type: integer
       - name: last_race_name
         data_type: text
-      - name: latitude
-        data_type: numeric(10, 6)
-        constraints:
-          - type: not_null
-      - name: length_km
-        data_type: numeric(6, 3)
-        constraints:
-          - type: not_null
       - name: location
         data_type: text
-        constraints:
-          - type: not_null
-      - name: longitude
-        data_type: numeric(10, 6)
         constraints:
           - type: not_null
       - name: current_layout_id
         data_type: text
         description: Layout id (SVG asset key) used in the circuit's most recent race.
-      - name: current_layout_length_km
-        data_type: numeric(6, 3)
-      - name: current_layout_turns
-        data_type: integer
       - name: previous_names
         data_type: text[]
         description: Former circuit names, most recent first. Null when the circuit was never renamed.
@@ -120,23 +100,11 @@ models:
         data_type: text
         constraints:
           - type: not_null
-      - name: country_id
-        data_type: text
-        constraints:
-          - type: not_null
       - name: country_code
         data_type: text
         constraints:
           - type: check
             expression: "country_code ~ '^[A-Z]{2}$'"
-          - type: not_null
-      - name: entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: fastest_lap_count
-        data_type: integer
-        constraints:
           - type: not_null
       - name: first_race_date
         data_type: date
@@ -157,42 +125,12 @@ models:
           - type: check
             expression: "primary_color_hex ~ '^#[0-9A-Fa-f]{6}$'"
           - type: not_null
-      - name: qualifying_entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: qualifying_p1_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: race_entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: race_start_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: secondary_color_hex
-        data_type: text
-        description: Optional secondary constructor display color as a six-digit hex code.
-        constraints:
-          - type: check
-            expression: "secondary_color_hex ~ '^#[0-9A-Fa-f]{6}$'"
-      - name: sprint_entry_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: sprint_start_count
         data_type: integer
         constraints:
           - type: not_null
       - name: start_count
         data_type: integer
-        constraints:
-          - type: not_null
-      - name: total_points
-        data_type: numeric(8, 2)
         constraints:
           - type: not_null
       - name: win_count
@@ -214,6 +152,9 @@ models:
         data_type: integer
         constraints:
           - type: not_null
+      - name: current_constructor_id
+        data_type: text
+        description: Constructor the driver joined most recently in the latest season. Null for drivers who did not race in the latest season.
       - name: date_of_birth
         data_type: date
         constraints:
@@ -283,14 +224,6 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: driver_count
-        data_type: integer
-        constraints:
-          - type: not_null
-      - name: first_race_date
-        data_type: date
-      - name: last_race_date
-        data_type: date
       - name: race_count
         data_type: integer
         constraints:
@@ -298,10 +231,6 @@ models:
       - name: season
         data_type: integer
         description: Championship year.
-        constraints:
-          - type: not_null
-      - name: sprint_count
-        data_type: integer
         constraints:
           - type: not_null
       - name: wcc_constructor_id

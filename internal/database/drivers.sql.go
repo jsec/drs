@@ -258,18 +258,6 @@ func (q *Queries) GetDriverSprint(ctx context.Context, season int32, raceRound i
 }
 
 const getDriverSummary = `-- name: GetDriverSummary :one
-WITH current_season AS (
-    SELECT max(season) AS season
-    FROM effone.driver_season_constructor_summaries
-),
-active_drivers AS (
-    SELECT DISTINCT ON (driver_id)
-        driver_id,
-        constructor_id
-    FROM effone.driver_season_constructor_summaries
-    WHERE season = (SELECT season FROM current_season)
-    ORDER BY driver_id, constructor_sequence DESC
-)
 SELECT
     d.driver_code AS code,
     d.driver_name AS name,
@@ -282,11 +270,10 @@ SELECT
     d.championship_count AS championships,
     d.first_race_date,
     d.last_race_date,
-    a.driver_id IS NOT NULL AS is_active,
+    d.current_constructor_id IS NOT NULL AS is_active,
     c.primary_color_hex AS constructor_color
 FROM effone.drivers d
-LEFT JOIN active_drivers a ON d.driver_id = a.driver_id
-LEFT JOIN effone.constructors c ON a.constructor_id = c.constructor_id
+LEFT JOIN effone.constructors c ON d.current_constructor_id = c.constructor_id
 WHERE d.driver_id = $1
 `
 
@@ -497,18 +484,6 @@ func (q *Queries) ListDriverSeasons(ctx context.Context, driverID string) ([]Lis
 }
 
 const listDrivers = `-- name: ListDrivers :many
-WITH current_season AS (
-    SELECT max(season) AS season
-    FROM effone.driver_season_constructor_summaries
-),
-active_drivers AS (
-    SELECT DISTINCT ON (driver_id)
-        driver_id,
-        constructor_id
-    FROM effone.driver_season_constructor_summaries
-    WHERE season = (SELECT season FROM current_season)
-    ORDER BY driver_id, constructor_sequence DESC
-)
 SELECT
     d.driver_id as id,
     d.driver_code AS code,
@@ -520,11 +495,10 @@ SELECT
     d.championship_count AS championships,
     d.first_race_date,
     d.last_race_date,
-    a.driver_id IS NOT NULL AS is_active,
+    d.current_constructor_id IS NOT NULL AS is_active,
     c.primary_color_hex AS constructor_color
 FROM effone.drivers d
-LEFT JOIN active_drivers a ON d.driver_id = a.driver_id
-LEFT JOIN effone.constructors c ON a.constructor_id = c.constructor_id
+LEFT JOIN effone.constructors c ON d.current_constructor_id = c.constructor_id
 `
 
 type ListDriversRow struct {

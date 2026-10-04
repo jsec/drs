@@ -1,5 +1,7 @@
 with
-    races as (select * from {{ ref("int_f1db__races_with_circuits") }}),
+    races as (select * from {{ ref("stg_f1db__race") }}),
+
+    grands_prix as (select * from {{ ref("stg_f1db__grand_prix") }}),
 
     race_winners as (select * from {{ ref("race_results") }} where finish_order = 1),
 
@@ -11,10 +13,10 @@ select
     races.race_id,
     races.season,
     races.race_round,
-    races.grand_prix_name as race_name,
+    grands_prix.grand_prix_name as race_name,
     races.race_official_name,
     races.race_date,
-    races.grand_prix_code,
+    grands_prix.grand_prix_code,
     races.circuit_id,
     races.circuit_layout_id,
     races.race_laps,
@@ -30,6 +32,7 @@ select
     sprint_winners.constructor_id as sprint_winner_constructor_id,
     sprint_winners.constructor_name as sprint_winner_constructor_name
 from races
+join grands_prix on races.grand_prix_id = grands_prix.grand_prix_id
 left join race_winners on races.race_id = race_winners.race_id
 left join pole_sitters on races.race_id = pole_sitters.race_id
 left join sprint_winners on races.race_id = sprint_winners.race_id

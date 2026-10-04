@@ -37,26 +37,6 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: circuit_layouts; Type: TABLE; Schema: effone; Owner: -
---
-
-CREATE TABLE effone.circuit_layouts (
-    circuit_layout_id text NOT NULL,
-    circuit_id text NOT NULL,
-    is_current_configuration boolean NOT NULL,
-    length_km numeric(6,3) NOT NULL,
-    turns integer NOT NULL,
-    race_count integer NOT NULL,
-    first_race_id integer,
-    first_race_name text,
-    first_race_date date,
-    last_race_id integer,
-    last_race_name text,
-    last_race_date date
-);
-
-
---
 -- Name: circuits; Type: TABLE; Schema: effone; Owner: -
 --
 
@@ -68,20 +48,14 @@ CREATE TABLE effone.circuits (
     country text NOT NULL,
     country_code text NOT NULL,
     country_id text NOT NULL,
-    direction text NOT NULL,
     first_race_date date,
     first_race_id integer,
     first_race_name text,
     last_race_date date,
     last_race_id integer,
     last_race_name text,
-    latitude numeric(10,6) NOT NULL,
-    length_km numeric(6,3) NOT NULL,
     location text NOT NULL,
-    longitude numeric(10,6) NOT NULL,
     current_layout_id text,
-    current_layout_length_km numeric(6,3),
-    current_layout_turns integer,
     previous_names text[],
     race_count integer NOT NULL,
     turns integer NOT NULL,
@@ -151,28 +125,17 @@ CREATE TABLE effone.constructors (
     constructor_full_name text NOT NULL,
     constructor_id text NOT NULL,
     constructor_name text NOT NULL,
-    country_id text NOT NULL,
     country_code text NOT NULL,
-    entry_count integer NOT NULL,
-    fastest_lap_count integer NOT NULL,
     first_race_date date,
     last_race_date date,
     nationality text NOT NULL,
     podium_count integer NOT NULL,
     primary_color_hex text NOT NULL,
-    qualifying_entry_count integer NOT NULL,
     qualifying_p1_count integer NOT NULL,
-    race_entry_count integer NOT NULL,
-    race_start_count integer NOT NULL,
-    secondary_color_hex text,
-    sprint_entry_count integer NOT NULL,
-    sprint_start_count integer NOT NULL,
     start_count integer NOT NULL,
-    total_points numeric(8,2) NOT NULL,
     win_count integer NOT NULL,
     CONSTRAINT constructors_country_code_check CHECK ((country_code ~ '^[A-Z]{2}$'::text)),
-    CONSTRAINT constructors_primary_color_hex_check CHECK ((primary_color_hex ~ '^#[0-9A-Fa-f]{6}$'::text)),
-    CONSTRAINT constructors_secondary_color_hex_check CHECK ((secondary_color_hex ~ '^#[0-9A-Fa-f]{6}$'::text))
+    CONSTRAINT constructors_primary_color_hex_check CHECK ((primary_color_hex ~ '^#[0-9A-Fa-f]{6}$'::text))
 );
 
 
@@ -236,6 +199,7 @@ CREATE TABLE effone.driver_standings_snapshots (
 
 CREATE TABLE effone.drivers (
     championship_count integer NOT NULL,
+    current_constructor_id text,
     date_of_birth date NOT NULL,
     driver_code text NOT NULL,
     driver_id text NOT NULL,
@@ -408,12 +372,8 @@ CREATE TABLE effone.races (
 
 CREATE TABLE effone.seasons (
     constructor_count integer NOT NULL,
-    driver_count integer NOT NULL,
-    first_race_date date,
-    last_race_date date,
     race_count integer NOT NULL,
     season integer NOT NULL,
-    sprint_count integer NOT NULL,
     wcc_constructor_id text,
     wcc_constructor_name text,
     wdc_driver_id text,
@@ -459,14 +419,6 @@ CREATE TABLE effone.sprint_results (
     status_category text NOT NULL,
     time_penalty text
 );
-
-
---
--- Name: circuit_layouts circuit_layouts_pkey; Type: CONSTRAINT; Schema: effone; Owner: -
---
-
-ALTER TABLE ONLY effone.circuit_layouts
-    ADD CONSTRAINT circuit_layouts_pkey PRIMARY KEY (circuit_layout_id);
 
 
 --
@@ -606,52 +558,52 @@ ALTER TABLE ONLY effone.sprint_results
 
 
 --
--- Name: 065184744d0b18d48bdc2b412b805233; Type: INDEX; Schema: effone; Owner: -
+-- Name: 25b1250d00ac0f8e71681569bd30820b; Type: INDEX; Schema: effone; Owner: -
 --
 
-CREATE INDEX "065184744d0b18d48bdc2b412b805233" ON effone.races USING btree (season, race_round);
-
-
---
--- Name: 511ca34a1aeb436bbf8128c4e24b9b06; Type: INDEX; Schema: effone; Owner: -
---
-
-CREATE INDEX "511ca34a1aeb436bbf8128c4e24b9b06" ON effone.races USING btree (circuit_id);
+CREATE INDEX "25b1250d00ac0f8e71681569bd30820b" ON effone.driver_standings_snapshots USING btree (season, driver_id);
 
 
 --
--- Name: 8bb71ee968f7894df799fc9bb9fe37a2; Type: INDEX; Schema: effone; Owner: -
+-- Name: 2d3ab82fb62a8e8c325a358a1d7252ec; Type: INDEX; Schema: effone; Owner: -
 --
 
-CREATE INDEX "8bb71ee968f7894df799fc9bb9fe37a2" ON effone.sprint_results USING btree (season, driver_id);
-
-
---
--- Name: 9f76449728e87dec2a441c8c3191c91a; Type: INDEX; Schema: effone; Owner: -
---
-
-CREATE INDEX "9f76449728e87dec2a441c8c3191c91a" ON effone.driver_standings_snapshots USING btree (season, driver_id);
+CREATE INDEX "2d3ab82fb62a8e8c325a358a1d7252ec" ON effone.race_results USING btree (season, driver_id);
 
 
 --
--- Name: ad4f12d38cbcee51948e0ffc81f82399; Type: INDEX; Schema: effone; Owner: -
+-- Name: 715f2e83f44aa246adca6507320a515f; Type: INDEX; Schema: effone; Owner: -
 --
 
-CREATE INDEX ad4f12d38cbcee51948e0ffc81f82399 ON effone.driver_season_constructor_summaries USING btree (driver_id, season);
-
-
---
--- Name: d1834b10c2405a536d5e76227fefb462; Type: INDEX; Schema: effone; Owner: -
---
-
-CREATE INDEX d1834b10c2405a536d5e76227fefb462 ON effone.race_results USING btree (season, driver_id);
+CREATE INDEX "715f2e83f44aa246adca6507320a515f" ON effone.constructor_standings_snapshots USING btree (season, constructor_id);
 
 
 --
--- Name: d64fdcf79b6949f7ad6f8d1cb32979c8; Type: INDEX; Schema: effone; Owner: -
+-- Name: 8cce82c1e53db5a05d04ab77b65112a4; Type: INDEX; Schema: effone; Owner: -
 --
 
-CREATE INDEX d64fdcf79b6949f7ad6f8d1cb32979c8 ON effone.constructor_standings_snapshots USING btree (season, constructor_id);
+CREATE INDEX "8cce82c1e53db5a05d04ab77b65112a4" ON effone.races USING btree (season, race_round);
+
+
+--
+-- Name: 9868a1d63e7f789e35a91600f755d777; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX "9868a1d63e7f789e35a91600f755d777" ON effone.races USING btree (circuit_id);
+
+
+--
+-- Name: a2ee25231e10b3b2eecaec5d9b7f9fc1; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX a2ee25231e10b3b2eecaec5d9b7f9fc1 ON effone.driver_season_constructor_summaries USING btree (driver_id, season);
+
+
+--
+-- Name: fc0797b7e27b8217044e5c60896d8228; Type: INDEX; Schema: effone; Owner: -
+--
+
+CREATE INDEX fc0797b7e27b8217044e5c60896d8228 ON effone.sprint_results USING btree (season, driver_id);
 
 
 --

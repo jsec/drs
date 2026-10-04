@@ -1,12 +1,11 @@
 with
-    circuits as (select * from {{ ref("int_f1db__circuits_with_countries") }}),
+    circuits as (select * from {{ ref("stg_f1db__circuit") }}),
+
+    countries as (select * from {{ ref("stg_f1db__country") }}),
 
     circuit_races as (
-        select circuit_id, circuit_layout_id, race_id, race_official_name, race_date
-        from {{ ref("int_f1db__races_with_circuits") }}
+        select circuit_id, circuit_layout_id, race_id, race_official_name, race_date from {{ ref("stg_f1db__race") }}
     ),
-
-    layouts as (select * from {{ ref("stg_f1db__circuit_layout") }}),
 
     first_last_races as (
         select distinct
@@ -30,14 +29,10 @@ select
     circuits.circuit_full_name,
     string_to_array(circuits.previous_names, ';') as previous_names,
     circuits.circuit_type,
-    circuits.direction,
     circuits.place_name as location,
     circuits.country_id,
-    circuits.country,
-    circuits.country_code,
-    circuits.latitude,
-    circuits.longitude,
-    circuits.length_km,
+    countries.country_name as country,
+    countries.alpha2_code as country_code,
     circuits.turns,
     circuits.total_races_held as race_count,
     first_last_races.first_race_id,
@@ -46,9 +41,7 @@ select
     first_last_races.last_race_id,
     first_last_races.last_race_name,
     first_last_races.last_race_date,
-    first_last_races.current_layout_id,
-    current_layout.length_km as current_layout_length_km,
-    current_layout.turns as current_layout_turns
+    first_last_races.current_layout_id
 from circuits
+join countries on circuits.country_id = countries.country_id
 left join first_last_races on circuits.circuit_id = first_last_races.circuit_id
-left join layouts as current_layout on first_last_races.current_layout_id = current_layout.circuit_layout_id

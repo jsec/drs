@@ -26,7 +26,7 @@ select
     results."interval",
     {{ result_status_columns() }}
 from {{ ref("stg_f1db__sprint_race_result") }} as results
-join {{ ref("int_f1db__races_with_circuits") }} as races on results.race_id = races.race_id
+join {{ ref("stg_f1db__race") }} as races on results.race_id = races.race_id
 join {{ ref("int_f1db__drivers_with_countries") }} as drivers on results.driver_id = drivers.driver_id
 join
     {{ ref("int_f1db__constructors_with_countries") }} as constructors

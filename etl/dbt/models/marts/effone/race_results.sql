@@ -31,7 +31,7 @@ select
     coalesce(results.driver_of_the_day, false) as is_driver_of_the_day,
     coalesce(results.grand_slam, false) as is_grand_slam
 from {{ ref("stg_f1db__race_result") }} as results
-join {{ ref("int_f1db__races_with_circuits") }} as races on results.race_id = races.race_id
+join {{ ref("stg_f1db__race") }} as races on results.race_id = races.race_id
 join {{ ref("int_f1db__drivers_with_countries") }} as drivers on results.driver_id = drivers.driver_id
 join
     {{ ref("int_f1db__constructors_with_countries") }} as constructors
