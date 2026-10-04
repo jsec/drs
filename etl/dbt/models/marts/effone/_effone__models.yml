@@ -401,10 +401,6 @@ models:
     columns:
       - name: car_number
         data_type: integer
-      - name: circuit_id
-        data_type: text
-        constraints:
-          - type: not_null
       - name: constructor_id
         data_type: text
         description: Constructor associated with this official result entry.
@@ -448,20 +444,12 @@ models:
         data_type: integer
       - name: interval
         data_type: text
-      - name: is_classified_finish
-        data_type: boolean
-        constraints:
-          - type: not_null
       - name: is_dnf
         data_type: boolean
         description: True when the entry started but did not finish, based on F1DB retirement/status text.
         constraints:
           - type: not_null
       - name: is_driver_of_the_day
-        data_type: boolean
-        constraints:
-          - type: not_null
-      - name: is_entry
         data_type: boolean
         constraints:
           - type: not_null
@@ -478,10 +466,6 @@ models:
         constraints:
           - type: not_null
       - name: is_podium
-        data_type: boolean
-        constraints:
-          - type: not_null
-      - name: is_points_finish
         data_type: boolean
         constraints:
           - type: not_null
@@ -543,11 +527,6 @@ models:
           - type: not_null
       - name: time_penalty
         data_type: text
-      - name: tyre_manufacturer_id
-        data_type: text
-        constraints:
-          - type: not_null
-
   - name: sprint_results
     description: One row per official sprint result entry. Race and sprint points remain separate.
     config:
@@ -561,10 +540,6 @@ models:
     columns:
       - name: car_number
         data_type: integer
-      - name: circuit_id
-        data_type: text
-        constraints:
-          - type: not_null
       - name: constructor_id
         data_type: text
         description: Constructor associated with this sprint result entry.
@@ -608,17 +583,9 @@ models:
         data_type: integer
       - name: interval
         data_type: text
-      - name: is_classified_finish
-        data_type: boolean
-        constraints:
-          - type: not_null
       - name: is_dnf
         data_type: boolean
         description: True when the sprint entry started but did not finish, based on F1DB retirement/status text.
-        constraints:
-          - type: not_null
-      - name: is_entry
-        data_type: boolean
         constraints:
           - type: not_null
       - name: is_grid_p1
@@ -626,10 +593,6 @@ models:
         constraints:
           - type: not_null
       - name: is_podium
-        data_type: boolean
-        constraints:
-          - type: not_null
-      - name: is_points_finish
         data_type: boolean
         constraints:
           - type: not_null
@@ -685,11 +648,6 @@ models:
           - type: not_null
       - name: time_penalty
         data_type: text
-      - name: tyre_manufacturer_id
-        data_type: text
-        constraints:
-          - type: not_null
-
   - name: qualifying_results
     description: One row per qualifying result entry. The grain is race plus source qualifying order.
     config:
