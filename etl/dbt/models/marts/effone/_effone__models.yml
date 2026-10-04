@@ -314,7 +314,7 @@ models:
         data_type: text
 
   - name: races
-    description: One row per race with schedule, circuit, format, and winner summary fields.
+    description: One row per race with circuit, pole, winner, and sprint winner fields.
     config:
       contract:
         enforced: true
@@ -331,55 +331,13 @@ models:
         data_type: text
         constraints:
           - type: not_null
-      - name: circuit_type
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: course_length_km
-        data_type: numeric(6, 3)
-        constraints:
-          - type: not_null
-      - name: direction
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: fp1_date
-        data_type: date
-      - name: fp1_time
-        data_type: time
-      - name: fp2_date
-        data_type: date
-      - name: fp2_time
-        data_type: time
-      - name: fp3_date
-        data_type: date
-      - name: fp3_time
-        data_type: time
       - name: grand_prix_code
         data_type: text
         description: Three-letter grand prix abbreviation (e.g. BHR). Null for grands prix with no recorded abbreviation.
-      - name: grand_prix_id
-        data_type: text
-        constraints:
-          - type: not_null
       - name: pole_driver_id
         data_type: text
-      - name: pole_driver_name
-        data_type: text
-      - name: qualifying_date
-        data_type: date
-      - name: qualifying_format
-        data_type: text
-        constraints:
-          - type: not_null
-      - name: qualifying_time
-        data_type: time
       - name: race_date
         data_type: date
-        constraints:
-          - type: not_null
-      - name: race_distance_km
-        data_type: numeric(6, 3)
         constraints:
           - type: not_null
       - name: race_id
@@ -403,39 +361,21 @@ models:
         data_type: integer
         constraints:
           - type: not_null
-      - name: race_time
-        data_type: time
-      - name: scheduled_distance_km
-        data_type: numeric(6, 3)
-      - name: scheduled_laps
-        data_type: integer
       - name: season
         data_type: integer
         description: Championship year for the race.
         constraints:
           - type: not_null
-      - name: sprint_date
-        data_type: date
-      - name: sprint_qualifying_date
-        data_type: date
-      - name: sprint_qualifying_format
-        data_type: text
-      - name: sprint_qualifying_time
-        data_type: time
-      - name: sprint_time
-        data_type: time
       - name: sprint_winner_constructor_id
         data_type: text
       - name: sprint_winner_constructor_name
+        data_type: text
+      - name: sprint_winner_driver_code
         data_type: text
       - name: sprint_winner_driver_id
         data_type: text
       - name: sprint_winner_driver_name
         data_type: text
-      - name: turns
-        data_type: integer
-        constraints:
-          - type: not_null
       - name: winner_constructor_id
         data_type: text
       - name: winner_constructor_name
