@@ -10,9 +10,6 @@ sql:
         package: "database"
         out: "."
         sql_package: "pgx/v5"
-        emit_json_tags: false
-        emit_pointers_for_null_types: false
-        emit_interface: false
         omit_unused_structs: true
         query_parameter_limit: 4
         overrides:

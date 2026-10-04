@@ -10,7 +10,7 @@ func (app *application) listConstructorsHandler(w http.ResponseWriter, r *http.R
 		return err
 	}
 
-	return respondJSON(app.logger, w, constructors)
+	return respondJSON(w, constructors)
 }
 
 func (app *application) getConstructorSummaryHandler(w http.ResponseWriter, r *http.Request) error {
@@ -19,7 +19,7 @@ func (app *application) getConstructorSummaryHandler(w http.ResponseWriter, r *h
 		return err
 	}
 
-	return respondJSON(app.logger, w, summary)
+	return respondJSON(w, summary)
 }
 
 func (app *application) getConstructorSeasonHandler(w http.ResponseWriter, r *http.Request) error {
@@ -33,5 +33,5 @@ func (app *application) getConstructorSeasonHandler(w http.ResponseWriter, r *ht
 		return err
 	}
 
-	return respondJSON(app.logger, w, season)
+	return respondJSON(w, season)
 }

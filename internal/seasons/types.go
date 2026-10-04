@@ -86,7 +86,7 @@ type CalendarEntry struct {
 	RaceID    int32           `json:"raceId"`
 	Round     int32           `json:"round"`
 	Name      string          `json:"name"`
-	Code      *string         `json:"code"`
+	Code      string          `json:"code"`
 	Date      pgtype.Date     `json:"date"`
 	Circuit   calendarCircuit `json:"circuit"`
 	Completed bool            `json:"completed"`

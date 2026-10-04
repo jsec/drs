@@ -77,7 +77,7 @@ func (s *Service) GetCircuitSummary(ctx context.Context, circuitID string) (Circ
 		previousNames = []string{}
 	}
 
-	result := CircuitSummaryResponse{
+	return CircuitSummaryResponse{
 		CircuitID:   circuit.CircuitID,
 		Name:        circuit.Name,
 		CircuitType: circuit.CircuitType,
@@ -99,9 +99,7 @@ func (s *Service) GetCircuitSummary(ctx context.Context, circuitID string) (Circ
 		RaceCount:       int(circuit.RaceCount),
 		Turns:           int(circuit.Turns),
 		Races:           races,
-	}
-
-	return result, nil
+	}, nil
 }
 
 func year(d pgtype.Date) *int32 {

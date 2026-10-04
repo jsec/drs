@@ -43,13 +43,6 @@ func (s seasonStubQuerier) ListSeasonCalendar(context.Context, int32) ([]databas
 	return s.calendarRows, nil
 }
 
-func seasonDate(year int, month time.Month, day int) pgtype.Date {
-	return pgtype.Date{
-		Time:  time.Date(year, month, day, 0, 0, 0, 0, time.UTC),
-		Valid: true,
-	}
-}
-
 func TestGetSeasonOverviewHandler(t *testing.T) {
 	t.Parallel()
 
@@ -112,7 +105,7 @@ func TestGetSeasonCalendarHandler(t *testing.T) {
 					RaceRound:              1,
 					RaceName:               "Australian Grand Prix",
 					GrandPrixCode:          pgtype.Text{String: "AUS", Valid: true},
-					RaceDate:               seasonDate(2026, time.March, 8),
+					RaceDate:               testDate(2026, time.March, 8),
 					CircuitID:              "albert_park",
 					CircuitName:            "Albert Park Grand Prix Circuit",
 					WinnerDriverID:         pgtype.Text{String: "lando-norris", Valid: true},
@@ -127,7 +120,7 @@ func TestGetSeasonCalendarHandler(t *testing.T) {
 					RaceID:      1124,
 					RaceRound:   2,
 					RaceName:    "Chinese Grand Prix",
-					RaceDate:    seasonDate(2026, time.March, 15),
+					RaceDate:    testDate(2026, time.March, 15),
 					CircuitID:   "shanghai",
 					CircuitName: "Shanghai International Circuit",
 					Completed:   pgtype.Bool{Bool: false, Valid: true},

@@ -10,7 +10,7 @@ func (app *application) listCircuitsHandler(w http.ResponseWriter, r *http.Reque
 		return err
 	}
 
-	return respondJSON(app.logger, w, circuits)
+	return respondJSON(w, circuits)
 }
 
 func (app *application) getCircuitSummaryHandler(w http.ResponseWriter, r *http.Request) error {
@@ -19,5 +19,5 @@ func (app *application) getCircuitSummaryHandler(w http.ResponseWriter, r *http.
 		return err
 	}
 
-	return respondJSON(app.logger, w, circuit)
+	return respondJSON(w, circuit)
 }

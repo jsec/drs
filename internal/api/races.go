@@ -16,7 +16,7 @@ func (app *application) getRaceDetailHandler(w http.ResponseWriter, r *http.Requ
 		return err
 	}
 
-	return respondJSON(app.logger, w, race)
+	return respondJSON(w, race)
 }
 
 func (app *application) getRaceLapsHandler(w http.ResponseWriter, r *http.Request) error {
@@ -35,7 +35,7 @@ func (app *application) getRaceLapsHandler(w http.ResponseWriter, r *http.Reques
 		return err
 	}
 
-	return respondJSON(app.logger, w, laps)
+	return respondJSON(w, laps)
 }
 
 func parseYearRound(r *http.Request) (int32, int32, error) {

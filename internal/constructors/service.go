@@ -174,13 +174,12 @@ func (s *Service) GetSeason(ctx context.Context, constructorID string, season in
 		return SeasonDetail{}, fmt.Errorf("listing constructor season results: %w", err)
 	}
 
-	best := entryRows[0]
 	detail := SeasonDetail{
 		ID:          summary.ID,
 		Name:        summary.Name,
 		CountryCode: summary.CountryCode,
 		Color:       summary.Color,
-		Position:    best.FinalPositionText.String,
+		Position:    entryRows[0].FinalPositionText.String,
 		Entries:     make([]SeasonEntry, 0, len(entryRows)),
 		Drivers:     make([]SeasonDriverSummary, 0, len(driverRows)),
 		Progression: make([]ProgressionPoint, 0, len(progressionRows)),

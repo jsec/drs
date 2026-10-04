@@ -12,7 +12,7 @@ func (app *application) getDriverSummaryHandler(w http.ResponseWriter, r *http.R
 		return err
 	}
 
-	return respondJSON(app.logger, w, summary)
+	return respondJSON(w, summary)
 }
 
 func (app *application) listDriversHandler(w http.ResponseWriter, r *http.Request) error {
@@ -21,7 +21,7 @@ func (app *application) listDriversHandler(w http.ResponseWriter, r *http.Reques
 		return err
 	}
 
-	return respondJSON(app.logger, w, drivers)
+	return respondJSON(w, drivers)
 }
 
 func (app *application) getDriverSeasonHandler(w http.ResponseWriter, r *http.Request) error {
@@ -35,7 +35,7 @@ func (app *application) getDriverSeasonHandler(w http.ResponseWriter, r *http.Re
 		return err
 	}
 
-	return respondJSON(app.logger, w, season)
+	return respondJSON(w, season)
 }
 
 func (app *application) getDriverRaceHandler(w http.ResponseWriter, r *http.Request) error {
@@ -59,5 +59,5 @@ func (app *application) getDriverRaceHandler(w http.ResponseWriter, r *http.Requ
 		return err
 	}
 
-	return respondJSON(app.logger, w, race)
+	return respondJSON(w, race)
 }

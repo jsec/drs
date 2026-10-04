@@ -43,10 +43,6 @@ func int4(i int32) pgtype.Int4 {
 	return pgtype.Int4{Int32: i, Valid: true}
 }
 
-func strPtr(s string) *string {
-	return &s
-}
-
 var completedRace = database.GetRaceDetailRow{
 	RaceID:             1163,
 	Season:             2026,
@@ -120,7 +116,7 @@ func TestService_GetRaceDetail(t *testing.T) {
 				Driver:        races.Driver{ID: "kimi-antonelli", Code: "ANT", Name: "Kimi Antonelli", ShortName: "Antonelli"},
 				Constructor:   races.Constructor{ID: "mercedes", Name: "Mercedes", Color: "#00D7B6"},
 				Grid:          int4(2),
-				Time:          strPtr("1:34:23.754"),
+				Time:          new("1:34:23.754"),
 				Points:        25,
 			},
 			{
@@ -128,7 +124,7 @@ func TestService_GetRaceDetail(t *testing.T) {
 				PositionLabel: "DNF",
 				Driver:        races.Driver{ID: "lewis-hamilton", Code: "HAM", Name: "Lewis Hamilton", ShortName: "Hamilton"},
 				Constructor:   races.Constructor{ID: "ferrari", Name: "Ferrari", Color: "#ED1131"},
-				Status:        strPtr("Brakes"),
+				Status:        new("Brakes"),
 			},
 		},
 	}, got)

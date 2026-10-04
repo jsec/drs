@@ -96,8 +96,10 @@ func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverview
 		})
 	}
 
+	var maxConstructorPoints float64
 	constructors := make([]ConstructorStanding, 0, len(constructorRows))
 	for _, row := range constructorRows {
+		maxConstructorPoints = max(maxConstructorPoints, row.Points)
 		constructors = append(constructors, ConstructorStanding{
 			Position:      row.Position,
 			PositionLabel: row.PositionLabel,
@@ -113,7 +115,7 @@ func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverview
 	overview := SeasonOverviewResponse{
 		Drivers:              drivers,
 		Constructors:         constructors,
-		MaxConstructorPoints: maxConstructorPoints(constructors),
+		MaxConstructorPoints: maxConstructorPoints,
 		Progression: Progression{
 			Data:   []ProgressionDataRow{},
 			Series: []ProgressionSeries{},
@@ -164,22 +166,21 @@ func (s *Service) GetOverview(ctx context.Context, season int32) (SeasonOverview
 
 func (s *Service) GetCalendar(ctx context.Context, season int32) (CalendarResponse, error) {
 	raceRows, err := s.queries.ListSeasonCalendar(ctx, season)
-
 	if err != nil {
 		return CalendarResponse{}, err
 	}
 
-	totalRounds := len(raceRows)
-	completedRounds := 0
-
-	races := make([]CalendarEntry, 0, len(raceRows))
+	calendar := CalendarResponse{
+		Races:       make([]CalendarEntry, 0, len(raceRows)),
+		TotalRounds: len(raceRows),
+	}
 
 	for _, race := range raceRows {
 		entry := CalendarEntry{
 			RaceID: race.RaceID,
 			Round:  race.RaceRound,
 			Name:   race.RaceName,
-			Code:   &race.GrandPrixCode.String,
+			Code:   race.GrandPrixCode.String,
 			Date:   race.RaceDate,
 			Circuit: calendarCircuit{
 				ID:   race.CircuitID,
@@ -189,7 +190,7 @@ func (s *Service) GetCalendar(ctx context.Context, season int32) (CalendarRespon
 		}
 
 		if race.WinnerDriverID.Valid {
-			completedRounds += 1
+			calendar.RoundsCompleted++
 
 			entry.Winner = &calendarWinner{
 				ID:   race.WinnerDriverID.String,
@@ -203,25 +204,8 @@ func (s *Service) GetCalendar(ctx context.Context, season int32) (CalendarRespon
 			}
 		}
 
-		races = append(races, entry)
-	}
-
-	calendar := CalendarResponse{
-		Races:           races,
-		RoundsCompleted: completedRounds,
-		TotalRounds:     totalRounds,
+		calendar.Races = append(calendar.Races, entry)
 	}
 
 	return calendar, nil
-}
-
-func maxConstructorPoints(constructors []ConstructorStanding) float64 {
-	var maximum float64
-	for _, constructor := range constructors {
-		if constructor.Points > maximum {
-			maximum = constructor.Points
-		}
-	}
-
-	return maximum
 }

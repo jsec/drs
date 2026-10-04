@@ -12,8 +12,6 @@ func NewPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
 		return nil, err
 	}
 
-	cfg.ConnConfig.RuntimeParams["search_path"] = "effone"
-
 	cfg.MaxConns = 10
 	cfg.MinConns = 2
 

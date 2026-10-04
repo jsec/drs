@@ -11,7 +11,7 @@ func (app *application) listSeasonsHandler(w http.ResponseWriter, r *http.Reques
 		return err
 	}
 
-	return respondJSON(app.logger, w, seasons)
+	return respondJSON(w, seasons)
 }
 
 func (app *application) getSeasonOverviewHandler(w http.ResponseWriter, r *http.Request) error {
@@ -25,7 +25,7 @@ func (app *application) getSeasonOverviewHandler(w http.ResponseWriter, r *http.
 		return err
 	}
 
-	return respondJSON(app.logger, w, overview)
+	return respondJSON(w, overview)
 }
 
 func (app *application) getSeasonCalendarHandler(w http.ResponseWriter, r *http.Request) error {
@@ -39,7 +39,7 @@ func (app *application) getSeasonCalendarHandler(w http.ResponseWriter, r *http.
 		return err
 	}
 
-	return respondJSON(app.logger, w, calendar)
+	return respondJSON(w, calendar)
 }
 
 func parseYear(r *http.Request) (int32, error) {

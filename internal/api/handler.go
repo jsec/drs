@@ -10,33 +10,24 @@ import (
 
 var errNotFound = errors.New("not found")
 
-type handlerFunc func(http.ResponseWriter, *http.Request) error
+func handle(logger *slog.Logger, fn func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := fn(w, r)
+		if err == nil {
+			return
+		}
 
-type handler struct {
-	logger *slog.Logger
-	fn     handlerFunc
-}
+		if errors.Is(err, errNotFound) || errors.Is(err, pgx.ErrNoRows) {
+			writeError(w, http.StatusNotFound, "not found")
+			return
+		}
 
-func handle(logger *slog.Logger, fn handlerFunc) http.Handler {
-	return handler{logger, fn}
-}
+		logger.Error("unhandled handler error",
+			"method", r.Method,
+			"path", r.URL.Path,
+			"err", err,
+		)
 
-func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	err := h.fn(w, r)
-	if err == nil {
-		return
+		writeError(w, http.StatusInternalServerError, "internal server error")
 	}
-
-	if errors.Is(err, errNotFound) || errors.Is(err, pgx.ErrNoRows) {
-		writeError(w, http.StatusNotFound, "not found")
-		return
-	}
-
-	h.logger.Error("unhandled handler error",
-		"method", r.Method,
-		"path", r.URL.Path,
-		"err", err,
-	)
-
-	writeError(w, http.StatusInternalServerError, "internal server error")
 }

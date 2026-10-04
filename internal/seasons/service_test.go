@@ -326,7 +326,7 @@ func TestService_GetCalendar(t *testing.T) {
 	assert.Equal(t, 1, got.RoundsCompleted)
 	assert.Equal(t, 2, got.TotalRounds)
 	assert.Equal(t, int32(1123), got.Races[0].RaceID)
-	assert.Equal(t, "AUS", *got.Races[0].Code)
+	assert.Equal(t, "AUS", got.Races[0].Code)
 	assert.Equal(t, "albert_park", got.Races[0].Circuit.ID)
 	assert.True(t, got.Races[0].Completed)
 	require.NotNil(t, got.Races[0].Winner)

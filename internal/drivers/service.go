@@ -40,7 +40,7 @@ func (s *Service) ListDrivers(ctx context.Context) ([]DriverShortSummary, error)
 	response := make([]DriverShortSummary, 0, len(drivers))
 
 	for _, d := range drivers {
-		driver := DriverShortSummary{
+		response = append(response, DriverShortSummary{
 			ID:               d.ID,
 			Code:             d.Code,
 			Name:             d.Name,
@@ -53,9 +53,7 @@ func (s *Service) ListDrivers(ctx context.Context) ([]DriverShortSummary, error)
 			ConstructorColor: d.ConstructorColor.String,
 			FirstYear:        year(d.FirstRaceDate),
 			LastYear:         year(d.LastRaceDate),
-		}
-
-		response = append(response, driver)
+		})
 	}
 
 	return response, nil
@@ -75,7 +73,7 @@ func (s *Service) GetSummary(ctx context.Context, driverId string) (DriverSummar
 	seasons := make([]driverSeasonSummary, 0, len(seasonList))
 
 	for _, s := range seasonList {
-		season := driverSeasonSummary{
+		seasons = append(seasons, driverSeasonSummary{
 			Season: s.Season,
 			Constructor: constructor{
 				Name:  s.ConstructorName,
@@ -87,12 +85,10 @@ func (s *Service) GetSummary(ctx context.Context, driverId string) (DriverSummar
 			Poles:    s.Poles,
 			Points:   s.Points,
 			Position: s.Position.String,
-		}
-
-		seasons = append(seasons, season)
+		})
 	}
 
-	response := DriverSummary{
+	return DriverSummary{
 		Code:             summary.Code,
 		Name:             summary.Name,
 		Country:          summary.Country,
@@ -107,9 +103,7 @@ func (s *Service) GetSummary(ctx context.Context, driverId string) (DriverSummar
 		FirstYear:        year(summary.FirstRaceDate),
 		LastYear:         year(summary.LastRaceDate),
 		Seasons:          seasons,
-	}
-
-	return response, nil
+	}, nil
 }
 
 func (s *Service) GetSeason(ctx context.Context, driverID string, season int32) (DriverSeason, error) {

@@ -42,10 +42,6 @@ func date(s string) pgtype.Date {
 	return pgtype.Date{Time: tm, Valid: true}
 }
 
-func yearptr(y int32) *int32 {
-	return &y
-}
-
 func TestService_ListCircuits(t *testing.T) {
 	t.Parallel()
 
@@ -74,8 +70,8 @@ func TestService_ListCircuits(t *testing.T) {
 				CircuitID:     "monza",
 				Name:          "Monza",
 				Country:       "Italy",
-				FirstRaceYear: yearptr(1950),
-				LastRaceYear:  yearptr(2026),
+				FirstRaceYear: new(int32(1950)),
+				LastRaceYear:  new(int32(2026)),
 				Location:      "Monza",
 				RaceCount:     75,
 			}},
@@ -109,7 +105,7 @@ func TestService_ListCircuits(t *testing.T) {
 				CircuitID:     "avus",
 				Name:          "AVUS",
 				Country:       "Germany",
-				FirstRaceYear: yearptr(1959),
+				FirstRaceYear: new(int32(1959)),
 				Location:      "Berlin",
 				RaceCount:     1,
 			}},
