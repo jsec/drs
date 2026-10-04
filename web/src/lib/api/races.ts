@@ -60,7 +60,6 @@ export const RaceLapsSchema = z.object({
 export type DriverLaps = z.infer<typeof DriverLapsSchema>;
 export type DriverRef = z.infer<typeof DriverRefSchema>;
 export type RaceDetail = z.infer<typeof RaceDetailSchema>;
-export type RaceLap = z.infer<typeof RaceLapSchema>;
 export type RaceLaps = z.infer<typeof RaceLapsSchema>;
 export type RaceResult = z.infer<typeof RaceResultSchema>;
 export type Session = z.infer<typeof SessionSchema>;

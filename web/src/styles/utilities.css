@@ -17,6 +17,22 @@
 .f1-row:hover {
   background-color: var(--color-accent);
 }
+.f1-stretched-row {
+  position: relative;
+}
+.f1-stretched-link {
+  color: inherit;
+  text-decoration: none;
+}
+.f1-stretched-link::after {
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+.f1-stretched-row a:not(.f1-stretched-link) {
+  position: relative;
+  z-index: 1;
+}
 
 .f1-lift {
   transition:

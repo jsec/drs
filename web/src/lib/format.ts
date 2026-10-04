@@ -23,6 +23,10 @@ export function formatLapTime(ms: number): string {
 }
 
 export function formatPosition(label: string): string {
+    if (label === '') {
+        return '—';
+    }
+
     if (isNumericPosition(label)) {
         return `P${label}`;
     }
@@ -31,5 +35,5 @@ export function formatPosition(label: string): string {
 }
 
 export function isNumericPosition(label: string): boolean {
-    return !Number.isNaN(Number(label));
+    return label !== '' && !Number.isNaN(Number(label));
 }

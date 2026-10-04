@@ -1,3 +1,4 @@
+import { LineChart } from '@mantine/charts';
 import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
@@ -6,7 +7,6 @@ import { Suspense } from 'react';
 import type { DriverRef, RaceResult } from '#/lib/api/races';
 
 import { DriverAvatar, GridHeader, SectionCard, TeamBar } from '#/components/f1-ui';
-import { LineChart } from '#/components/line-chart';
 import { raceDetailQuery, raceLapsQuery } from '#/data/queries';
 import { hasLaps, paceChart, positionChart } from '#/lib/race-charts';
 import { parseRound, parseYear } from '#/lib/route-params';

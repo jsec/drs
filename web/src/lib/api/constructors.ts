@@ -13,7 +13,6 @@ export const ConstructorSchema = z.object({
 
 export const ConstructorListSchema = z.array(ConstructorSchema);
 
-export type ConstructorResponse = z.infer<typeof ConstructorSchema>;
 export type ListConstructorsResponse = z.infer<typeof ConstructorListSchema>;
 
 const LineageEntrySchema = z.object({

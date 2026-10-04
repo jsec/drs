@@ -1,6 +1,6 @@
 import type { ConstructorSeasonResult } from '#/lib/api/constructors';
 
-export type Round = {
+type Round = {
     points: number;
     raceName: string;
     results: ConstructorSeasonResult[];

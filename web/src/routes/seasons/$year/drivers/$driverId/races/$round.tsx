@@ -1,5 +1,6 @@
 import type { ChartReferenceLineProps, LineChartSeries } from '@mantine/charts';
 
+import { LineChart } from '@mantine/charts';
 import { Badge, Box, Group, SegmentedControl, Select, SimpleGrid, Stack, Switch, Text } from '@mantine/core';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
@@ -10,7 +11,6 @@ import type { DriverRace } from '#/lib/api/drivers';
 import type { DriverLaps, Session } from '#/lib/api/races';
 
 import { GridHeader, MiniStat, SectionCard } from '#/components/f1-ui';
-import { LineChart } from '#/components/line-chart';
 import { driverRaceQuery, raceDetailQuery, raceLapsQuery } from '#/data/queries';
 import { SessionSchema } from '#/lib/api/races';
 import { formatLapTime, formatPosition } from '#/lib/format';

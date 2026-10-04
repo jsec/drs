@@ -43,5 +43,4 @@ export const CircuitSummarySchema = z.object({
     turns: z.number(),
 });
 
-export type CircuitSummaryResponse = z.infer<typeof CircuitSummarySchema>;
 export type ListCircuitsResponse = z.infer<typeof CircuitListItemSchema>;

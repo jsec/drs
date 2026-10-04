@@ -1,3 +1,4 @@
+import { LineChart } from '@mantine/charts';
 import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import {
     CalendarDotsIcon,
@@ -11,7 +12,6 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import type { SeasonCalendarEntry } from '#/lib/api/seasons';
 
 import { GridHeader, SectionCard, StatCard, TeamBar } from '#/components/f1-ui';
-import { LineChart } from '#/components/line-chart';
 import { seasonCalendarQuery, seasonOverviewQuery } from '#/data/queries';
 import { parseYear } from '#/lib/route-params';
 

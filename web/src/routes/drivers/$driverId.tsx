@@ -1,11 +1,11 @@
-import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
-import { CaretRightIcon, TrophyIcon } from '@phosphor-icons/react';
+import { Group, SimpleGrid, Stack, Text } from '@mantine/core';
+import { TrophyIcon } from '@phosphor-icons/react';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 
-import { CountryFlag } from '#/components/country-flag';
-import { GOLD, GridHeader, MiniStat } from '#/components/f1-ui';
-import '#/components/career-hero.css';
+import { CareerHero } from '#/components/career-hero';
+import { GOLD, MiniStat } from '#/components/f1-ui';
+import { SeasonRow, SeasonsCard } from '#/components/seasons-card';
 import { DriverSummarySchema } from '#/lib/api/drivers';
 import { formatCareerYears, formatPosition } from '#/lib/format';
 import { api } from '#/lib/query/api';
@@ -32,35 +32,14 @@ const DriverCareer = () => {
 
     return (
         <Stack gap={16}>
-            <div
-                className="career-hero"
-                style={{ '--hero-color': driverSummaryColor(driver) }}
-            >
-                <CountryFlag aria-hidden className="career-hero-flag" code={driver.countryCode} />
-                <div className="career-hero-content">
-                    <div className="career-hero-mark">
-                        {driver.code}
-                    </div>
-                    <div>
-                        <Group gap={10} wrap="nowrap">
-                            <Text className="f1-display" ff="var(--font-display)" fw={700} fz={30} inherit lts="-0.02em" span>
-                                {driver.name}
-                            </Text>
-                            {driver.championships > 0
-                                ? (
-                                        <Group className="career-hero-badge" gap={4} wrap="nowrap">
-                                            <TrophyIcon size={13} weight="fill" />
-                                            World Champion
-                                        </Group>
-                                    )
-                                : null}
-                        </Group>
-                        <Box fz={13} mt={5} opacity={0.9}>
-                            {`${driver.country} · ${formatCareerYears(driver)} · Career summary`}
-                        </Box>
-                    </div>
-                </div>
-            </div>
+            <CareerHero
+                badge={driver.championships > 0 ? 'World Champion' : undefined}
+                color={driverSummaryColor(driver)}
+                countryCode={driver.countryCode}
+                mark={driver.code}
+                subtitle={`${driver.country} · ${formatCareerYears(driver)} · Career summary`}
+                title={driver.name}
+            />
 
             <SimpleGrid cols={6} spacing={8}>
                 <MiniStat label="SEASONS" value={seasons.length} />
@@ -71,38 +50,31 @@ const DriverCareer = () => {
                 <MiniStat label="TITLES" value={driver.championships} />
             </SimpleGrid>
 
-            <Box className="f1-card" p={0}>
-                <Group justify="space-between" px={20} py={15} wrap="nowrap">
-                    <Text fw={700} fz={15} inherit span>Seasons</Text>
-                    <Text c="dimmed" fz={12} inherit span>
-                        Select a season to open its full dashboard
-                    </Text>
-                </Group>
-                <GridHeader columns={COLS} px={20}>
-                    <span>SEASON</span>
-                    <span>CHAMPIONSHIP</span>
-                    <span style={{ textAlign: 'center' }}>STARTS</span>
-                    <span style={{ textAlign: 'center' }}>WINS</span>
-                    <span style={{ textAlign: 'center' }}>PODIUMS</span>
-                    <span style={{ textAlign: 'center' }}>POLES</span>
-                    <span style={{ textAlign: 'right' }}>POINTS</span>
-                    <span />
-                </GridHeader>
+            <SeasonsCard
+                columns={COLS}
+                header={(
+                    <>
+                        <span>SEASON</span>
+                        <span>CHAMPIONSHIP</span>
+                        <span style={{ textAlign: 'center' }}>STARTS</span>
+                        <span style={{ textAlign: 'center' }}>WINS</span>
+                        <span style={{ textAlign: 'center' }}>PODIUMS</span>
+                        <span style={{ textAlign: 'center' }}>POLES</span>
+                        <span style={{ textAlign: 'right' }}>POINTS</span>
+                    </>
+                )}
+            >
                 {seasons.map((s) => {
                     const isChampion = isChampionshipWinner(s.position);
                     return (
-                        <Link
-                            className="f1-row f1-grid-row"
+                        <SeasonRow
+                            columns={COLS}
+                            isChampion={isChampion}
                             key={`${s.season}-${s.constructor.name}`}
                             params={{ year: String(Math.min(s.season, CURRENT_YEAR)) }}
-                            style={{
-                                '--cols': COLS,
-                                'background': isChampion ? 'color-mix(in srgb, var(--gold-500) 7%, transparent)' : undefined,
-                                'padding': '11px 20px',
-                            }}
+                            season={<Text className="f1-num f1-display" fw={700} fz={16} inherit lts="-0.4px" span>{s.season}</Text>}
                             to="/seasons/$year"
                         >
-                            <Text className="f1-num f1-display" fw={700} fz={16} inherit lts="-0.4px" span>{s.season}</Text>
                             <Group gap={9} wrap="nowrap">
                                 <Text c={championshipPositionColor(s.position)} className="f1-num" fw={700} fz={13.5} inherit span>
                                     {formatPosition(s.position)}
@@ -115,11 +87,10 @@ const DriverCareer = () => {
                             <Text c="dimmed" className="f1-num" inherit span ta="center">{s.podiums}</Text>
                             <Text c="dimmed" className="f1-num" inherit span ta="center">{s.poles}</Text>
                             <Text className="f1-num f1-display" fw={700} inherit span ta="right">{s.points}</Text>
-                            <CaretRightIcon color="var(--neutral-400)" size={14} />
-                        </Link>
+                        </SeasonRow>
                     );
                 })}
-            </Box>
+            </SeasonsCard>
         </Stack>
     );
 };

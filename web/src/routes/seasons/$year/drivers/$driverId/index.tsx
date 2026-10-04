@@ -1,3 +1,4 @@
+import { LineChart } from '@mantine/charts';
 import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
@@ -5,7 +6,6 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import type { DriverSeasonRace } from '#/lib/api/drivers';
 
 import { GridHeader, MiniStat } from '#/components/f1-ui';
-import { LineChart } from '#/components/line-chart';
 import { driverSeasonQuery } from '#/data/queries';
 import { formatPosition, isNumericPosition } from '#/lib/format';
 import { parseYear } from '#/lib/route-params';

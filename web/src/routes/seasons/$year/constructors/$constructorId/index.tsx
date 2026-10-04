@@ -1,14 +1,12 @@
-import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
-import { TrophyIcon } from '@phosphor-icons/react';
+import { LineChart } from '@mantine/charts';
+import { Box, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
 import type { ConstructorSeasonResult } from '#/lib/api/constructors';
 
-import { CountryFlag } from '#/components/country-flag';
+import { CareerHero } from '#/components/career-hero';
 import { GridHeader, MiniStat } from '#/components/f1-ui';
-import '#/components/career-hero.css';
-import { LineChart } from '#/components/line-chart';
 import { constructorSeasonQuery } from '#/data/queries';
 import { formatPosition, isNumericPosition } from '#/lib/format';
 import { parseYear } from '#/lib/route-params';
@@ -57,39 +55,25 @@ const ConstructorSeason = () => {
 
     return (
         <Stack gap={16}>
-            <div className="career-hero" style={{ '--hero-color': team.color }}>
-                <CountryFlag aria-hidden className="career-hero-flag" code={team.countryCode} />
-                <div className="career-hero-content">
-                    <div>
-                        <Group gap={10} wrap="nowrap">
-                            <Link
-                                params={{ constructorId }}
-                                style={{ color: 'inherit', textDecoration: 'none' }}
-                                to="/constructors/$constructorId"
-                            >
-                                <Text className="f1-display" ff="var(--font-display)" fw={700} fz={30} inherit lts="-0.02em" span>
-                                    {team.name}
-                                </Text>
-                            </Link>
-                            {team.isChampion
-                                ? (
-                                        <Group className="career-hero-badge" gap={4} wrap="nowrap">
-                                            <TrophyIcon size={13} weight="fill" />
-                                            Constructors' Champion
-                                        </Group>
-                                    )
-                                : null}
-                        </Group>
-                        <Box fz={13} mt={5} opacity={0.9}>
-                            {`${year} · ${engines}`}
-                        </Box>
-                    </div>
-                </div>
-            </div>
+            <CareerHero
+                badge={team.isChampion ? 'Constructors\' Champion' : undefined}
+                color={team.color}
+                countryCode={team.countryCode}
+                subtitle={`${year} · ${engines}`}
+                title={(
+                    <Link
+                        params={{ constructorId }}
+                        style={{ color: 'inherit', textDecoration: 'none' }}
+                        to="/constructors/$constructorId"
+                    >
+                        {team.name}
+                    </Link>
+                )}
+            />
 
             <SimpleGrid cols={6} spacing={8}>
                 <MiniStat label="POINTS" value={team.points ?? '—'} />
-                <MiniStat label="STANDING" value={team.position === '' ? '—' : formatPosition(team.position)} />
+                <MiniStat label="STANDING" value={formatPosition(team.position)} />
                 <MiniStat label="WINS" value={team.wins} />
                 <MiniStat label="PODIUMS" value={team.podiums} />
                 <MiniStat label="POLES" value={team.poles} />

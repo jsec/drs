@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatCareerYears, formatLapTime, formatPosition } from './format';
+import { formatCareerYears, formatLapTime, formatPosition, isNumericPosition } from './format';
 
 describe('formatLapTime', () => {
     it('pads seconds and keeps milliseconds', () => {
@@ -13,6 +13,17 @@ describe('formatPosition', () => {
     it('prefixes numeric positions only', () => {
         expect(formatPosition('3')).toBe('P3');
         expect(formatPosition('DNF')).toBe('DNF');
+    });
+
+    it('shows a dash for a missing position', () => {
+        expect(formatPosition('')).toBe('—');
+    });
+});
+
+describe('isNumericPosition', () => {
+    it('rejects an empty label', () => {
+        expect(isNumericPosition('')).toBe(false);
+        expect(isNumericPosition('12')).toBe(true);
     });
 });
 

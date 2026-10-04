@@ -129,4 +129,3 @@ export type DriverRace = z.infer<typeof DriverRaceSchema>;
 export type DriverSeason = z.infer<typeof DriverSeasonSchema>;
 export type DriverSeasonRace = z.infer<typeof DriverSeasonRaceSchema>;
 export type DriverShortSummary = z.infer<typeof DriverShortSummarySchema>;
-export type DriverSummary = z.infer<typeof DriverSummarySchema>;

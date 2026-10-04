@@ -2,9 +2,8 @@ import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
-import { CountryFlag } from '#/components/country-flag';
+import { CareerHero } from '#/components/career-hero';
 import { GridHeader, MiniStat } from '#/components/f1-ui';
-import '#/components/career-hero.css';
 import { CircuitSummarySchema } from '#/lib/api/circuits';
 import { api } from '#/lib/query/api';
 
@@ -28,26 +27,13 @@ const CircuitDetail = () => {
 
     return (
         <Stack gap={16}>
-            <div className="career-hero" style={{ '--hero-color': 'var(--mantine-primary-color-filled)' }}>
-                <CountryFlag
-                    aria-hidden
-                    className="career-hero-flag"
-                    code={data.countryCode}
-                />
-                <div className="career-hero-content">
-                    <div className="career-hero-mark">
-                        <CircuitLayout layoutId={data.layoutId} name={data.name} size={46} />
-                    </div>
-                    <div>
-                        <Text className="f1-display" ff="var(--font-display)" fw={700} fz={30} inherit lts="-0.02em" span>
-                            {data.name}
-                        </Text>
-                        <Box fz={13} mt={5} opacity={0.9}>
-                            {`${data.country} · ${years} · Circuit summary`}
-                        </Box>
-                    </div>
-                </div>
-            </div>
+            <CareerHero
+                color="var(--mantine-primary-color-filled)"
+                countryCode={data.countryCode}
+                mark={<CircuitLayout layoutId={data.layoutId} name={data.name} size={46} />}
+                subtitle={`${data.country} · ${years} · Circuit summary`}
+                title={data.name}
+            />
 
             <SimpleGrid cols={4} spacing={8}>
                 <MiniStat label="GRANDS PRIX" value={data.raceCount} />
