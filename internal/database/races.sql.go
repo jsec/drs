@@ -78,6 +78,83 @@ func (q *Queries) GetRaceDetail(ctx context.Context, season int32, raceRound int
 	return i, err
 }
 
+const listQualifyingResults = `-- name: ListQualifyingResults :many
+SELECT
+    qr.qualifying_order AS position,
+    qr.position_text AS position_label,
+    qr.driver_id,
+    qr.driver_code AS code,
+    qr.driver_name AS name,
+    d.last_name,
+    qr.constructor_id,
+    qr.constructor_name,
+    c.primary_color_hex AS constructor_color,
+    qr.q1,
+    qr.q2,
+    qr.q3,
+    qr.best_qualifying_time,
+    qr.gap
+FROM effone.qualifying_results AS qr
+JOIN effone.drivers AS d
+    ON qr.driver_id = d.driver_id
+LEFT JOIN effone.constructors AS c
+    ON qr.constructor_id = c.constructor_id
+WHERE qr.race_id = $1
+ORDER BY qr.qualifying_order
+`
+
+type ListQualifyingResultsRow struct {
+	Position           int32
+	PositionLabel      string
+	DriverID           string
+	Code               string
+	Name               string
+	LastName           string
+	ConstructorID      string
+	ConstructorName    string
+	ConstructorColor   pgtype.Text
+	Q1                 pgtype.Text
+	Q2                 pgtype.Text
+	Q3                 pgtype.Text
+	BestQualifyingTime pgtype.Text
+	Gap                pgtype.Text
+}
+
+func (q *Queries) ListQualifyingResults(ctx context.Context, raceID int32) ([]ListQualifyingResultsRow, error) {
+	rows, err := q.db.Query(ctx, listQualifyingResults, raceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListQualifyingResultsRow
+	for rows.Next() {
+		var i ListQualifyingResultsRow
+		if err := rows.Scan(
+			&i.Position,
+			&i.PositionLabel,
+			&i.DriverID,
+			&i.Code,
+			&i.Name,
+			&i.LastName,
+			&i.ConstructorID,
+			&i.ConstructorName,
+			&i.ConstructorColor,
+			&i.Q1,
+			&i.Q2,
+			&i.Q3,
+			&i.BestQualifyingTime,
+			&i.Gap,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listRaceLapTimes = `-- name: ListRaceLapTimes :many
 SELECT
     lt.driver_id,

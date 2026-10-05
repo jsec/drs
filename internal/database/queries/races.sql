@@ -49,6 +49,30 @@ LEFT JOIN effone.constructors AS c
 WHERE rr.race_id = $1
 ORDER BY rr.finish_order;
 
+-- name: ListQualifyingResults :many
+SELECT
+    qr.qualifying_order AS position,
+    qr.position_text AS position_label,
+    qr.driver_id,
+    qr.driver_code AS code,
+    qr.driver_name AS name,
+    d.last_name,
+    qr.constructor_id,
+    qr.constructor_name,
+    c.primary_color_hex AS constructor_color,
+    qr.q1,
+    qr.q2,
+    qr.q3,
+    qr.best_qualifying_time,
+    qr.gap
+FROM effone.qualifying_results AS qr
+JOIN effone.drivers AS d
+    ON qr.driver_id = d.driver_id
+LEFT JOIN effone.constructors AS c
+    ON qr.constructor_id = c.constructor_id
+WHERE qr.race_id = $1
+ORDER BY qr.qualifying_order;
+
 -- name: ListRaceLapTimes :many
 SELECT
     lt.driver_id,

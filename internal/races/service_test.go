@@ -20,6 +20,7 @@ type stubQuerier struct {
 	raceErr    error
 	results    []database.ListRaceResultsRow
 	resultsErr error
+	qualifying []database.ListQualifyingResultsRow
 	laps       []database.ListRaceLapTimesRow
 	lapsErr    error
 }
@@ -30,6 +31,10 @@ func (s stubQuerier) GetRaceDetail(context.Context, int32, int32) (database.GetR
 
 func (s stubQuerier) ListRaceResults(context.Context, int32) ([]database.ListRaceResultsRow, error) {
 	return s.results, s.resultsErr
+}
+
+func (s stubQuerier) ListQualifyingResults(context.Context, int32) ([]database.ListQualifyingResultsRow, error) {
+	return s.qualifying, nil
 }
 
 func (s stubQuerier) ListRaceLapTimes(context.Context, int32, string) ([]database.ListRaceLapTimesRow, error) {
@@ -89,10 +94,42 @@ var raceResults = []database.ListRaceResultsRow{
 	},
 }
 
+var qualifyingResults = []database.ListQualifyingResultsRow{
+	{
+		Position:           1,
+		PositionLabel:      "1",
+		DriverID:           "lando-norris",
+		Code:               "NOR",
+		Name:               "Lando Norris",
+		LastName:           "Norris",
+		ConstructorID:      "mclaren",
+		ConstructorName:    "McLaren",
+		ConstructorColor:   text("#F47600"),
+		Q1:                 text("1:32.101"),
+		Q2:                 text("1:31.877"),
+		Q3:                 text("1:31.402"),
+		BestQualifyingTime: text("1:31.402"),
+	},
+	{
+		Position:           22,
+		PositionLabel:      "DNQ",
+		DriverID:           "lewis-hamilton",
+		Code:               "HAM",
+		Name:               "Lewis Hamilton",
+		LastName:           "Hamilton",
+		ConstructorID:      "ferrari",
+		ConstructorName:    "Ferrari",
+		ConstructorColor:   text("#ED1131"),
+		Q1:                 text("1:33.512"),
+		BestQualifyingTime: text("1:33.512"),
+		Gap:                text("+2.110"),
+	},
+}
+
 func TestService_GetRaceDetail(t *testing.T) {
 	t.Parallel()
 
-	queries := stubQuerier{race: completedRace, results: raceResults}
+	queries := stubQuerier{race: completedRace, results: raceResults, qualifying: qualifyingResults}
 
 	got, err := races.GetRaceDetail(context.Background(), queries, 2026, 14)
 
@@ -117,7 +154,7 @@ func TestService_GetRaceDetail(t *testing.T) {
 				Driver:        races.Driver{ID: "kimi-antonelli", Code: "ANT", Name: "Kimi Antonelli", ShortName: "Antonelli"},
 				Constructor:   races.Constructor{ID: "mercedes", Name: "Mercedes", Color: "#00D7B6"},
 				Grid:          int4(2),
-				Time:          new("1:34:23.754"),
+				Time:          text("1:34:23.754"),
 				Points:        25,
 			},
 			{
@@ -125,7 +162,28 @@ func TestService_GetRaceDetail(t *testing.T) {
 				PositionLabel: "DNF",
 				Driver:        races.Driver{ID: "lewis-hamilton", Code: "HAM", Name: "Lewis Hamilton", ShortName: "Hamilton"},
 				Constructor:   races.Constructor{ID: "ferrari", Name: "Ferrari", Color: "#ED1131"},
-				Status:        new("Brakes"),
+				Status:        text("Brakes"),
+			},
+		},
+		Qualifying: []races.QualifyingResult{
+			{
+				Position:      1,
+				PositionLabel: "1",
+				Driver:        races.Driver{ID: "lando-norris", Code: "NOR", Name: "Lando Norris", ShortName: "Norris"},
+				Constructor:   races.Constructor{ID: "mclaren", Name: "McLaren", Color: "#F47600"},
+				Q1:            text("1:32.101"),
+				Q2:            text("1:31.877"),
+				Q3:            text("1:31.402"),
+				Time:          text("1:31.402"),
+			},
+			{
+				Position:      22,
+				PositionLabel: "DNQ",
+				Driver:        races.Driver{ID: "lewis-hamilton", Code: "HAM", Name: "Lewis Hamilton", ShortName: "Hamilton"},
+				Constructor:   races.Constructor{ID: "ferrari", Name: "Ferrari", Color: "#ED1131"},
+				Q1:            text("1:33.512"),
+				Time:          text("1:33.512"),
+				Gap:           text("+2.110"),
 			},
 		},
 	}, got)
@@ -147,6 +205,7 @@ func TestService_GetRaceDetail_NoPoleOrFastestLap(t *testing.T) {
 	assert.Nil(t, got.Pole)
 	assert.Nil(t, got.FastestLap)
 	assert.Equal(t, []races.Result{}, got.Results)
+	assert.Equal(t, []races.QualifyingResult{}, got.Qualifying)
 }
 
 func TestService_RaceLookupErrors(t *testing.T) {

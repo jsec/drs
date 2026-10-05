@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jsec/drs/internal/database"
 )
@@ -39,10 +38,40 @@ func GetRaceDetail(ctx context.Context, queries database.Querier, season, round 
 				Color: row.ConstructorColor.String,
 			},
 			Grid:   row.GridPosition,
-			Time:   txtPointer(row.ElapsedTime),
-			Gap:    txtPointer(row.Gap),
-			Status: txtPointer(row.Status),
+			Time:   row.ElapsedTime,
+			Gap:    row.Gap,
+			Status: row.Status,
 			Points: row.Points,
+		})
+	}
+
+	qualifyingRows, err := queries.ListQualifyingResults(ctx, race.RaceID)
+	if err != nil {
+		return RaceDetailResponse{}, fmt.Errorf("listing qualifying results: %w", err)
+	}
+
+	qualifying := make([]QualifyingResult, 0, len(qualifyingRows))
+
+	for _, row := range qualifyingRows {
+		qualifying = append(qualifying, QualifyingResult{
+			Position:      row.Position,
+			PositionLabel: row.PositionLabel,
+			Driver: Driver{
+				ID:        row.DriverID,
+				Code:      row.Code,
+				Name:      row.Name,
+				ShortName: row.LastName,
+			},
+			Constructor: Constructor{
+				ID:    row.ConstructorID,
+				Name:  row.ConstructorName,
+				Color: row.ConstructorColor.String,
+			},
+			Q1:   row.Q1,
+			Q2:   row.Q2,
+			Q3:   row.Q3,
+			Time: row.BestQualifyingTime,
+			Gap:  row.Gap,
 		})
 	}
 
@@ -58,7 +87,8 @@ func GetRaceDetail(ctx context.Context, queries database.Querier, season, round 
 			ID:   race.WinnerDriverID.String,
 			Code: race.WinnerDriverCode.String,
 		},
-		Results: results,
+		Results:    results,
+		Qualifying: qualifying,
 	}
 
 	if race.PoleDriverID.Valid {
@@ -138,11 +168,4 @@ func getCompletedRace(ctx context.Context, queries database.Querier, season, rou
 	}
 
 	return race, nil
-}
-
-func txtPointer(t pgtype.Text) *string {
-	if !t.Valid {
-		return nil
-	}
-	return &t.String
 }

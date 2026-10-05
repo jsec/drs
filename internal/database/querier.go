@@ -30,6 +30,7 @@ type Querier interface {
 	ListDriverSeasonRaces(ctx context.Context, season int32, driverID string) ([]ListDriverSeasonRacesRow, error)
 	ListDriverSeasons(ctx context.Context, driverID string) ([]ListDriverSeasonsRow, error)
 	ListDrivers(ctx context.Context) ([]ListDriversRow, error)
+	ListQualifyingResults(ctx context.Context, raceID int32) ([]ListQualifyingResultsRow, error)
 	ListRaceLapTimes(ctx context.Context, raceID int32, session string) ([]ListRaceLapTimesRow, error)
 	ListRaceResults(ctx context.Context, raceID int32) ([]ListRaceResultsRow, error)
 	ListSeasonCalendar(ctx context.Context, season int32) ([]ListSeasonCalendarRow, error)

@@ -31,24 +31,37 @@ type Result struct {
 	Driver        Driver      `json:"driver"`
 	Constructor   Constructor `json:"constructor"`
 	Grid          pgtype.Int4 `json:"grid"`
-	Time          *string     `json:"time"`
-	Gap           *string     `json:"gap"`
-	Status        *string     `json:"status"`
+	Time          pgtype.Text `json:"time"`
+	Gap           pgtype.Text `json:"gap"`
+	Status        pgtype.Text `json:"status"`
 	Points        float64     `json:"points"`
 }
 
+type QualifyingResult struct {
+	Position      int32       `json:"position"`
+	PositionLabel string      `json:"positionLabel"`
+	Driver        Driver      `json:"driver"`
+	Constructor   Constructor `json:"constructor"`
+	Q1            pgtype.Text `json:"q1"`
+	Q2            pgtype.Text `json:"q2"`
+	Q3            pgtype.Text `json:"q3"`
+	Time          pgtype.Text `json:"time"`
+	Gap           pgtype.Text `json:"gap"`
+}
+
 type RaceDetailResponse struct {
-	RaceID     int32       `json:"raceId"`
-	Season     int32       `json:"season"`
-	Round      int32       `json:"round"`
-	Name       string      `json:"name"`
-	Date       pgtype.Date `json:"date"`
-	Circuit    string      `json:"circuit"`
-	Laps       int32       `json:"laps"`
-	Pole       *DriverRef  `json:"pole"`
-	Winner     DriverRef   `json:"winner"`
-	FastestLap *FastestLap `json:"fastestLap"`
-	Results    []Result    `json:"results"`
+	RaceID     int32              `json:"raceId"`
+	Season     int32              `json:"season"`
+	Round      int32              `json:"round"`
+	Name       string             `json:"name"`
+	Date       pgtype.Date        `json:"date"`
+	Circuit    string             `json:"circuit"`
+	Laps       int32              `json:"laps"`
+	Pole       *DriverRef         `json:"pole"`
+	Winner     DriverRef          `json:"winner"`
+	FastestLap *FastestLap        `json:"fastestLap"`
+	Results    []Result           `json:"results"`
+	Qualifying []QualifyingResult `json:"qualifying"`
 }
 
 type Lap struct {
