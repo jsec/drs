@@ -24,6 +24,21 @@ const RaceResultSchema = z.object({
     time: z.string().nullable(),
 });
 
+const QualifyingResultSchema = z.object({
+    constructor: ConstructorSchema,
+    driver: DriverRefSchema.extend({
+        name: z.string(),
+        shortName: z.string(),
+    }),
+    gap: z.string().nullable(),
+    position: z.number().int(),
+    positionLabel: z.string(),
+    q1: z.string().nullable(),
+    q2: z.string().nullable(),
+    q3: z.string().nullable(),
+    time: z.string().nullable(),
+});
+
 export const RaceDetailSchema = z.object({
     circuit: z.string(),
     date: z.string().nullable(),
@@ -34,6 +49,7 @@ export const RaceDetailSchema = z.object({
     laps: z.number().int(),
     name: z.string(),
     pole: DriverRefSchema.nullable(),
+    qualifying: z.array(QualifyingResultSchema),
     raceId: z.number().int(),
     results: z.array(RaceResultSchema),
     round: z.number().int(),

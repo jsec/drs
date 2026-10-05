@@ -15,6 +15,8 @@ const CHART_DRIVER_COUNT = 5;
 const POSITION_LAP_STEP = 5;
 const MEDALS = ['#f59f00', '#adb5bd', '#e8590c'];
 const RESULT_COLS = '36px 1fr 72px 90px 48px';
+const QUALIFYING_SESSION_COLS = '36px 1fr 90px 90px 90px 80px';
+const QUALIFYING_TIME_COLS = '36px 1fr 90px 80px';
 
 const HERO_STYLE: React.CSSProperties = {
     background: 'linear-gradient(110deg, var(--neutral-950), var(--neutral-800))',
@@ -116,6 +118,9 @@ const RaceCharts = ({ round, year }: { round: number; year: number }) => {
 const RaceDetail = () => {
     const { round, year } = Route.useParams();
     const { data } = useSuspenseQuery(raceDetailQuery(Number(year), Number(round)));
+
+    const hasSessions = data.qualifying.some(q => q.q1 !== null);
+    const qualifyingCols = hasSessions ? QUALIFYING_SESSION_COLS : QUALIFYING_TIME_COLS;
 
     const headStats = [
         { driver: data.pole, label: 'POLE' },
@@ -275,6 +280,50 @@ const RaceDetail = () => {
                     })}
                 </Box>
             </div>
+
+            {data.qualifying.length > 0 && (
+                <SectionCard padded={false} title="Qualifying">
+                    <GridHeader columns={qualifyingCols}>
+                        <span>POS</span>
+                        <span>DRIVER</span>
+                        {hasSessions
+                            ? (
+                                    <>
+                                        <span style={{ textAlign: 'right' }}>Q1</span>
+                                        <span style={{ textAlign: 'right' }}>Q2</span>
+                                        <span style={{ textAlign: 'right' }}>Q3</span>
+                                    </>
+                                )
+                            : <span style={{ textAlign: 'right' }}>TIME</span>}
+                        <span style={{ textAlign: 'right' }}>GAP</span>
+                    </GridHeader>
+                    {data.qualifying.map(q => (
+                        <Link
+                            className="f1-row f1-grid-row"
+                            key={q.driver.id}
+                            params={{ driverId: q.driver.id, round, year }}
+                            style={{ '--cols': qualifyingCols, 'padding': '8px 18px' }}
+                            to="/seasons/$year/drivers/$driverId/races/$round"
+                        >
+                            <Text c="dimmed" className="f1-num" fw={700} inherit span>{q.positionLabel}</Text>
+                            <Group gap={9} wrap="nowrap">
+                                <TeamBar color={q.constructor.color} size="sm" />
+                                <Text fw={600} fz={13} inherit span>{q.driver.shortName}</Text>
+                            </Group>
+                            {hasSessions
+                                ? (
+                                        <>
+                                            <Text className="f1-num" fz={12.5} inherit span ta="right">{q.q1}</Text>
+                                            <Text className="f1-num" fz={12.5} inherit span ta="right">{q.q2}</Text>
+                                            <Text className="f1-num" fz={12.5} inherit span ta="right">{q.q3}</Text>
+                                        </>
+                                    )
+                                : <Text className="f1-num" fz={12.5} inherit span ta="right">{q.time}</Text>}
+                            <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="right">{q.gap}</Text>
+                        </Link>
+                    ))}
+                </SectionCard>
+            )}
         </Stack>
     );
 };
