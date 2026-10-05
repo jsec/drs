@@ -45,6 +45,36 @@ func GetRaceDetail(ctx context.Context, queries database.Querier, season, round 
 		})
 	}
 
+	sprintRows, err := queries.ListSprintResults(ctx, race.RaceID)
+	if err != nil {
+		return RaceDetailResponse{}, fmt.Errorf("listing sprint results: %w", err)
+	}
+
+	sprint := make([]Result, 0, len(sprintRows))
+
+	for _, row := range sprintRows {
+		sprint = append(sprint, Result{
+			Position:      row.Position,
+			PositionLabel: row.PositionLabel,
+			Driver: Driver{
+				ID:        row.DriverID,
+				Code:      row.Code,
+				Name:      row.Name,
+				ShortName: row.LastName,
+			},
+			Constructor: Constructor{
+				ID:    row.ConstructorID,
+				Name:  row.ConstructorName,
+				Color: row.ConstructorColor.String,
+			},
+			Grid:   row.GridPosition,
+			Time:   row.ElapsedTime,
+			Gap:    row.Gap,
+			Status: row.Status,
+			Points: row.Points,
+		})
+	}
+
 	qualifyingRows, err := queries.ListQualifyingResults(ctx, race.RaceID)
 	if err != nil {
 		return RaceDetailResponse{}, fmt.Errorf("listing qualifying results: %w", err)
@@ -89,6 +119,7 @@ func GetRaceDetail(ctx context.Context, queries database.Querier, season, round 
 		},
 		Results:    results,
 		Qualifying: qualifying,
+		Sprint:     sprint,
 	}
 
 	if race.PoleDriverID.Valid {

@@ -49,6 +49,30 @@ LEFT JOIN effone.constructors AS c
 WHERE rr.race_id = $1
 ORDER BY rr.finish_order;
 
+-- name: ListSprintResults :many
+SELECT
+    sr.finish_order AS position,
+    sr.position_text AS position_label,
+    sr.driver_id,
+    sr.driver_code AS code,
+    sr.driver_name AS name,
+    d.last_name,
+    sr.constructor_id,
+    sr.constructor_name,
+    c.primary_color_hex AS constructor_color,
+    sr.grid_position,
+    sr.elapsed_time,
+    sr.gap,
+    sr.status,
+    sr.points AS points
+FROM effone.sprint_results AS sr
+JOIN effone.drivers AS d
+    ON sr.driver_id = d.driver_id
+LEFT JOIN effone.constructors AS c
+    ON sr.constructor_id = c.constructor_id
+WHERE sr.race_id = $1
+ORDER BY sr.finish_order;
+
 -- name: ListQualifyingResults :many
 SELECT
     qr.qualifying_order AS position,

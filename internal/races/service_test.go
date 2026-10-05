@@ -21,6 +21,7 @@ type stubQuerier struct {
 	results    []database.ListRaceResultsRow
 	resultsErr error
 	qualifying []database.ListQualifyingResultsRow
+	sprint     []database.ListSprintResultsRow
 	laps       []database.ListRaceLapTimesRow
 	lapsErr    error
 }
@@ -35,6 +36,10 @@ func (s stubQuerier) ListRaceResults(context.Context, int32) ([]database.ListRac
 
 func (s stubQuerier) ListQualifyingResults(context.Context, int32) ([]database.ListQualifyingResultsRow, error) {
 	return s.qualifying, nil
+}
+
+func (s stubQuerier) ListSprintResults(context.Context, int32) ([]database.ListSprintResultsRow, error) {
+	return s.sprint, nil
 }
 
 func (s stubQuerier) ListRaceLapTimes(context.Context, int32, string) ([]database.ListRaceLapTimesRow, error) {
@@ -94,6 +99,23 @@ var raceResults = []database.ListRaceResultsRow{
 	},
 }
 
+var sprintResults = []database.ListSprintResultsRow{
+	{
+		Position:         1,
+		PositionLabel:    "1",
+		DriverID:         "oscar-piastri",
+		Code:             "PIA",
+		Name:             "Oscar Piastri",
+		LastName:         "Piastri",
+		ConstructorID:    "mclaren",
+		ConstructorName:  "McLaren",
+		ConstructorColor: text("#F47600"),
+		GridPosition:     int4(1),
+		ElapsedTime:      text("30:12.405"),
+		Points:           8,
+	},
+}
+
 var qualifyingResults = []database.ListQualifyingResultsRow{
 	{
 		Position:           1,
@@ -129,7 +151,7 @@ var qualifyingResults = []database.ListQualifyingResultsRow{
 func TestService_GetRaceDetail(t *testing.T) {
 	t.Parallel()
 
-	queries := stubQuerier{race: completedRace, results: raceResults, qualifying: qualifyingResults}
+	queries := stubQuerier{race: completedRace, results: raceResults, qualifying: qualifyingResults, sprint: sprintResults}
 
 	got, err := races.GetRaceDetail(context.Background(), queries, 2026, 14)
 
@@ -186,6 +208,17 @@ func TestService_GetRaceDetail(t *testing.T) {
 				Gap:           text("+2.110"),
 			},
 		},
+		Sprint: []races.Result{
+			{
+				Position:      1,
+				PositionLabel: "1",
+				Driver:        races.Driver{ID: "oscar-piastri", Code: "PIA", Name: "Oscar Piastri", ShortName: "Piastri"},
+				Constructor:   races.Constructor{ID: "mclaren", Name: "McLaren", Color: "#F47600"},
+				Grid:          int4(1),
+				Time:          text("30:12.405"),
+				Points:        8,
+			},
+		},
 	}, got)
 }
 
@@ -206,6 +239,7 @@ func TestService_GetRaceDetail_NoPoleOrFastestLap(t *testing.T) {
 	assert.Nil(t, got.FastestLap)
 	assert.Equal(t, []races.Result{}, got.Results)
 	assert.Equal(t, []races.QualifyingResult{}, got.Qualifying)
+	assert.Equal(t, []races.Result{}, got.Sprint)
 }
 
 func TestService_RaceLookupErrors(t *testing.T) {

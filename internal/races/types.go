@@ -62,6 +62,7 @@ type RaceDetailResponse struct {
 	FastestLap *FastestLap        `json:"fastestLap"`
 	Results    []Result           `json:"results"`
 	Qualifying []QualifyingResult `json:"qualifying"`
+	Sprint     []Result           `json:"sprint"`
 }
 
 type Lap struct {

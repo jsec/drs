@@ -275,3 +275,80 @@ func (q *Queries) ListRaceResults(ctx context.Context, raceID int32) ([]ListRace
 	}
 	return items, nil
 }
+
+const listSprintResults = `-- name: ListSprintResults :many
+SELECT
+    sr.finish_order AS position,
+    sr.position_text AS position_label,
+    sr.driver_id,
+    sr.driver_code AS code,
+    sr.driver_name AS name,
+    d.last_name,
+    sr.constructor_id,
+    sr.constructor_name,
+    c.primary_color_hex AS constructor_color,
+    sr.grid_position,
+    sr.elapsed_time,
+    sr.gap,
+    sr.status,
+    sr.points AS points
+FROM effone.sprint_results AS sr
+JOIN effone.drivers AS d
+    ON sr.driver_id = d.driver_id
+LEFT JOIN effone.constructors AS c
+    ON sr.constructor_id = c.constructor_id
+WHERE sr.race_id = $1
+ORDER BY sr.finish_order
+`
+
+type ListSprintResultsRow struct {
+	Position         int32
+	PositionLabel    string
+	DriverID         string
+	Code             string
+	Name             string
+	LastName         string
+	ConstructorID    string
+	ConstructorName  string
+	ConstructorColor pgtype.Text
+	GridPosition     pgtype.Int4
+	ElapsedTime      pgtype.Text
+	Gap              pgtype.Text
+	Status           pgtype.Text
+	Points           float64
+}
+
+func (q *Queries) ListSprintResults(ctx context.Context, raceID int32) ([]ListSprintResultsRow, error) {
+	rows, err := q.db.Query(ctx, listSprintResults, raceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSprintResultsRow
+	for rows.Next() {
+		var i ListSprintResultsRow
+		if err := rows.Scan(
+			&i.Position,
+			&i.PositionLabel,
+			&i.DriverID,
+			&i.Code,
+			&i.Name,
+			&i.LastName,
+			&i.ConstructorID,
+			&i.ConstructorName,
+			&i.ConstructorColor,
+			&i.GridPosition,
+			&i.ElapsedTime,
+			&i.Gap,
+			&i.Status,
+			&i.Points,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

@@ -38,6 +38,7 @@ type Querier interface {
 	ListSeasonDriverProgression(ctx context.Context, season int32, driverIds []string) ([]ListSeasonDriverProgressionRow, error)
 	ListSeasonDriverStandings(ctx context.Context, season int32) ([]ListSeasonDriverStandingsRow, error)
 	ListSeasons(ctx context.Context) ([]ListSeasonsRow, error)
+	ListSprintResults(ctx context.Context, raceID int32) ([]ListSprintResultsRow, error)
 }
 
 var _ Querier = (*Queries)(nil)
