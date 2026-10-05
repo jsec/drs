@@ -54,6 +54,7 @@ export const RaceDetailSchema = z.object({
     results: z.array(RaceResultSchema),
     round: z.number().int(),
     season: z.number().int(),
+    sprint: z.array(RaceResultSchema),
     winner: DriverRefSchema,
 });
 

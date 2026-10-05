@@ -4,7 +4,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Suspense } from 'react';
 
-import type { DriverRef, RaceResult } from '#/lib/api/races';
+import type { DriverRef, RaceResult, Session } from '#/lib/api/races';
 
 import { DriverAvatar, GridHeader, SectionCard, TeamBar } from '#/components/f1-ui';
 import { raceDetailQuery, raceLapsQuery } from '#/data/queries';
@@ -44,6 +44,42 @@ const shortNameFor = (results: RaceResult[], ref: DriverRef | null) => {
     }
     return results.find(result => result.driver.id === ref.id)?.driver.shortName ?? ref.code;
 };
+
+const ResultRows = ({ results, round, session, year }: { results: RaceResult[]; round: string; session?: Session; year: string }) => (
+    <>
+        {results.map(r => (
+            <Link
+                className="f1-row f1-grid-row"
+                key={r.driver.id}
+                params={{ driverId: r.driver.id, round, year }}
+                search={{ session }}
+                style={{ '--cols': RESULT_COLS, 'padding': '8px 18px' }}
+                to="/seasons/$year/drivers/$driverId/races/$round"
+            >
+                <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.positionLabel}</Text>
+                <Group gap={9} wrap="nowrap">
+                    <TeamBar color={r.constructor.color} size="sm" />
+                    <Text fw={600} fz={13} inherit span>{r.driver.shortName}</Text>
+                </Group>
+                <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="center">{r.grid ?? 'PL'}</Text>
+                <Text className="f1-num" fz={12.5} inherit span ta="right">{resultGap(r)}</Text>
+                <Text c={r.points > 0 ? 'inherit' : 'var(--neutral-300)'} className="f1-num" fw={700} inherit span ta="right">
+                    {r.points > 0 ? r.points : '–'}
+                </Text>
+            </Link>
+        ))}
+    </>
+);
+
+const ResultsHeader = () => (
+    <GridHeader columns={RESULT_COLS}>
+        <span>POS</span>
+        <span>DRIVER</span>
+        <span style={{ textAlign: 'center' }}>GRID</span>
+        <span style={{ textAlign: 'right' }}>GAP</span>
+        <span style={{ textAlign: 'right' }}>PTS</span>
+    </GridHeader>
+);
 
 const ChartCard = ({ children, subtitle, title }: { children: React.ReactNode; subtitle: string; title: string }) => (
     <Box className="f1-card" p={16}>
@@ -122,11 +158,15 @@ const RaceDetail = () => {
     const hasSessions = data.qualifying.some(q => q.q1 !== null);
     const qualifyingCols = hasSessions ? QUALIFYING_SESSION_COLS : QUALIFYING_TIME_COLS;
 
-    const headStats = [
+    const headStats: { driver: DriverRef | null; label: string; session?: Session }[] = [
         { driver: data.pole, label: 'POLE' },
         { driver: data.fastestLap?.driver ?? null, label: 'FASTEST LAP' },
-        { driver: data.winner, label: 'WINNER' },
     ];
+    const sprintWinner = data.sprint.at(0);
+    if (sprintWinner) {
+        headStats.push({ driver: sprintWinner.driver, label: 'SPRINT WINNER', session: 'sprint' });
+    }
+    headStats.push({ driver: data.winner, label: 'WINNER' });
 
     return (
         <Stack gap={16}>
@@ -152,6 +192,7 @@ const RaceDetail = () => {
                                     ? (
                                             <Link
                                                 params={{ driverId: s.driver.id, round, year }}
+                                                search={{ session: s.session }}
                                                 style={{ color: 'inherit', textDecoration: 'none' }}
                                                 to="/seasons/$year/drivers/$driverId/races/$round"
                                             >
@@ -205,34 +246,9 @@ const RaceDetail = () => {
             {/* Results + Qual vs Race */}
             <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '7.2fr 4.8fr' }}>
                 <SectionCard padded={false} title="Race Results">
-                    <GridHeader columns={RESULT_COLS}>
-                        <span>POS</span>
-                        <span>DRIVER</span>
-                        <span style={{ textAlign: 'center' }}>GRID</span>
-                        <span style={{ textAlign: 'right' }}>GAP</span>
-                        <span style={{ textAlign: 'right' }}>PTS</span>
-                    </GridHeader>
+                    <ResultsHeader />
                     <Box className="f1-scroll" mah={430} style={{ overflowY: 'auto' }}>
-                        {data.results.map(r => (
-                            <Link
-                                className="f1-row f1-grid-row"
-                                key={r.driver.id}
-                                params={{ driverId: r.driver.id, round, year }}
-                                style={{ '--cols': RESULT_COLS, 'padding': '8px 18px' }}
-                                to="/seasons/$year/drivers/$driverId/races/$round"
-                            >
-                                <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.positionLabel}</Text>
-                                <Group gap={9} wrap="nowrap">
-                                    <TeamBar color={r.constructor.color} size="sm" />
-                                    <Text fw={600} fz={13} inherit span>{r.driver.shortName}</Text>
-                                </Group>
-                                <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="center">{r.grid ?? 'PL'}</Text>
-                                <Text className="f1-num" fz={12.5} inherit span ta="right">{resultGap(r)}</Text>
-                                <Text c={r.points > 0 ? 'inherit' : 'var(--neutral-300)'} className="f1-num" fw={700} inherit span ta="right">
-                                    {r.points > 0 ? r.points : '–'}
-                                </Text>
-                            </Link>
-                        ))}
+                        <ResultRows results={data.results} round={round} year={year} />
                     </Box>
                 </SectionCard>
 
@@ -322,6 +338,13 @@ const RaceDetail = () => {
                             <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="right">{q.gap}</Text>
                         </Link>
                     ))}
+                </SectionCard>
+            )}
+
+            {data.sprint.length > 0 && (
+                <SectionCard padded={false} title="Sprint">
+                    <ResultsHeader />
+                    <ResultRows results={data.sprint} round={round} session="sprint" year={year} />
                 </SectionCard>
             )}
         </Stack>
