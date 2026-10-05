@@ -116,7 +116,7 @@ const DriverSeason = () => {
                         {driver.name}
                     </Box>
                     <Box fz={13} opacity={0.9}>
-                        {`${driver.country} · Championship P${driver.position}`}
+                        {`${driver.country} · Championship ${formatPosition(driver.position)}`}
                     </Box>
                 </Box>
             </Group>
@@ -127,7 +127,7 @@ const DriverSeason = () => {
                 <MiniStat label="WINS" value={driver.wins} />
                 <MiniStat label="PODIUMS" value={driver.podiums} />
                 <MiniStat label="POLES" value={driver.poles} />
-                <MiniStat label="STANDING" value={`P${driver.position}`} />
+                <MiniStat label="STANDING" value={formatPosition(driver.position)} />
                 <MiniStat label="CAR NO." value={carNumber} />
             </SimpleGrid>
 
