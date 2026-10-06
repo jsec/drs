@@ -81,16 +81,6 @@ const ResultsHeader = () => (
     </GridHeader>
 );
 
-const ChartCard = ({ children, subtitle, title }: { children: React.ReactNode; subtitle: string; title: string }) => (
-    <Box className="f1-card" p={16}>
-        <Box fw={700} fz={15}>{title}</Box>
-        <Box c="dimmed" fz={12} mb={8}>
-            {subtitle}
-        </Box>
-        {children}
-    </Box>
-);
-
 const ChartPlaceholder = ({ text }: { text: string }) => (
     <Box c="dimmed" fz={13} h={240} style={{ alignItems: 'center', display: 'flex', justifyContent: 'center' }}>
         {text}
@@ -104,12 +94,12 @@ const PACE_SUBTITLE = 'Lap time (s) · lower is faster · pit and safety car lap
 
 const ChartPlaceholders = ({ text }: { text: string }) => (
     <>
-        <ChartCard subtitle={POSITION_SUBTITLE} title={POSITION_TITLE}>
+        <SectionCard subtitle={POSITION_SUBTITLE} title={POSITION_TITLE}>
             <ChartPlaceholder text={text} />
-        </ChartCard>
-        <ChartCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
+        </SectionCard>
+        <SectionCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
             <ChartPlaceholder text={text} />
-        </ChartCard>
+        </SectionCard>
     </>
 );
 
@@ -126,7 +116,7 @@ const RaceCharts = ({ round, year }: { round: number; year: number }) => {
 
     return (
         <>
-            <ChartCard subtitle={POSITION_SUBTITLE} title={POSITION_TITLE}>
+            <SectionCard subtitle={POSITION_SUBTITLE} title={POSITION_TITLE}>
                 <LineChart
                     data={position.data}
                     dataKey="lap"
@@ -135,8 +125,8 @@ const RaceCharts = ({ round, year }: { round: number; year: number }) => {
                     xAxisProps={{ interval: 'preserveStartEnd' }}
                     yAxisProps={{ allowDecimals: false, domain: [1, 'dataMax'], reversed: true }}
                 />
-            </ChartCard>
-            <ChartCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
+            </SectionCard>
+            <SectionCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
                 <LineChart
                     data={pace.data}
                     dataKey="lap"
@@ -146,7 +136,7 @@ const RaceCharts = ({ round, year }: { round: number; year: number }) => {
                     xAxisProps={{ interval: 'preserveStartEnd' }}
                     yAxisProps={{ domain: ['auto', 'auto'], tickCount: 5 }}
                 />
-            </ChartCard>
+            </SectionCard>
         </>
     );
 };
@@ -191,9 +181,9 @@ const RaceDetail = () => {
                                 {s.driver
                                     ? (
                                             <Link
+                                                className="f1-plain-link"
                                                 params={{ driverId: s.driver.id, round, year }}
                                                 search={{ session: s.session }}
-                                                style={{ color: 'inherit', textDecoration: 'none' }}
                                                 to="/seasons/$year/drivers/$driverId/races/$round"
                                             >
                                                 {shortNameFor(data.results, s.driver)}
@@ -210,9 +200,9 @@ const RaceDetail = () => {
             <SimpleGrid cols={3} spacing={16}>
                 {data.results.slice(0, 3).map((r, i) => (
                     <Link
+                        className="f1-plain-link"
                         key={r.driver.id}
                         params={{ driverId: r.driver.id, round, year }}
-                        style={{ color: 'inherit', textDecoration: 'none' }}
                         to="/seasons/$year/drivers/$driverId/races/$round"
                     >
                         <Box
@@ -252,11 +242,7 @@ const RaceDetail = () => {
                     </Box>
                 </SectionCard>
 
-                <Box className="f1-card" p={16}>
-                    <Box fw={700} fz={15}>Qualifying vs Race</Box>
-                    <Box c="dimmed" fz={12} mb={14}>
-                        Positions gained or lost on Sunday
-                    </Box>
+                <SectionCard subtitle="Positions gained or lost on Sunday" title="Qualifying vs Race">
                     {data.results.slice(0, 10).map((r) => {
                         const delta = (r.grid ?? data.results.length) - r.position;
                         const mag = (Math.min(Math.abs(delta), 8) / 8) * 45;
@@ -294,7 +280,7 @@ const RaceDetail = () => {
                             </Group>
                         );
                     })}
-                </Box>
+                </SectionCard>
             </div>
 
             {data.qualifying.length > 0 && (

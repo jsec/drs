@@ -11,11 +11,7 @@ import { formatCareerYears, formatPosition } from '#/lib/format';
 import { api } from '#/lib/query/api';
 import { CURRENT_YEAR } from '#/lib/route-params';
 
-import {
-    championshipPositionColor,
-    driverSummaryColor,
-    isChampionshipWinner,
-} from './-components/driver-summary';
+import { championshipPositionColor, driverSummaryColor } from './-components/driver-summary';
 
 const COLS = '84px 1fr 64px 60px 78px 60px 80px 24px';
 
@@ -65,14 +61,14 @@ const DriverCareer = () => {
                 )}
             >
                 {seasons.map((s) => {
-                    const isChampion = isChampionshipWinner(s.position);
+                    const isChampion = s.position === '1';
                     return (
                         <SeasonRow
                             columns={COLS}
                             isChampion={isChampion}
                             key={`${s.season}-${s.constructor.name}`}
                             params={{ year: String(Math.min(s.season, CURRENT_YEAR)) }}
-                            season={<Text className="f1-num f1-display" fw={700} fz={16} inherit lts="-0.4px" span>{s.season}</Text>}
+                            season={s.season}
                             to="/seasons/$year"
                         >
                             <Group gap={9} wrap="nowrap">

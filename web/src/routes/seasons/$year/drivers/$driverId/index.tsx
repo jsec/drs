@@ -1,11 +1,10 @@
-import { LineChart } from '@mantine/charts';
 import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
 import type { DriverSeasonRace } from '#/lib/api/drivers';
 
-import { GridHeader, MiniStat } from '#/components/f1-ui';
+import { GridHeader, MiniStat, PointsProgressionCard, SectionCard } from '#/components/f1-ui';
 import { driverSeasonQuery } from '#/data/queries';
 import { formatPosition, isNumericPosition } from '#/lib/format';
 import { parseYear } from '#/lib/route-params';
@@ -53,24 +52,16 @@ const DriverSeason = () => {
     const hasSprints = driver.races.some(r => r.sprint !== null);
     const cols = hasSprints ? SPRINT_COLS : COLS;
     const carNumber = driver.carNumber === null ? '–' : `#${driver.carNumber}`;
-    const progression = [
-        { [driver.code]: 0, x: 'R0' },
-        ...driver.progression.map(p => ({ [driver.code]: p.points, x: `R${p.round}` })),
-    ];
 
     return (
         <Stack gap={16}>
             <Group
+                className="f1-team-hero"
                 gap={24}
                 pos="relative"
                 px={28}
                 py={24}
-                style={{
-                    background: `linear-gradient(110deg, ${color}, color-mix(in srgb, ${color}, black 30%))`,
-                    borderRadius: 'var(--radius-lg)',
-                    color: '#fff',
-                    overflow: 'hidden',
-                }}
+                style={{ '--hero-color': color, 'overflow': 'hidden' }}
                 wrap="nowrap"
             >
                 <Box
@@ -133,25 +124,15 @@ const DriverSeason = () => {
 
             {/* Charts */}
             <SimpleGrid cols={2} spacing={16}>
-                <Box className="f1-card" p={16}>
-                    <Box fw={700} fz={15} mb={8}>Points Progression</Box>
-                    <LineChart
-                        data={progression}
-                        dataKey="x"
-                        h={200}
-                        series={[{ color, name: driver.code }]}
-                        xAxisProps={{ interval: 1 }}
-                        yAxisProps={{ domain: [0, 'auto'], tickCount: 5 }}
-                    />
-                </Box>
-                <Box className="f1-card" p={16}>
-                    <Box fw={700} fz={15} mb={10}>Finishing Positions</Box>
+                <PointsProgressionCard color={color} name={driver.code} progression={driver.progression} />
+                <SectionCard title="Finishing Positions">
                     <Group align="flex-end" gap={6} h={180} wrap="nowrap">
                         {driver.races.map(r => (
                             <Link
+                                className="f1-plain-link"
                                 key={r.round}
                                 params={{ driverId, round: String(r.round), year }}
-                                style={{ color: 'inherit', flex: 1, height: '100%', textDecoration: 'none' }}
+                                style={{ flex: 1, height: '100%' }}
                                 to="/seasons/$year/drivers/$driverId/races/$round"
                             >
                                 <Stack
@@ -175,11 +156,10 @@ const DriverSeason = () => {
                             </Link>
                         ))}
                     </Group>
-                </Box>
+                </SectionCard>
             </SimpleGrid>
 
-            <Box className="f1-card" p={0}>
-                <Box fw={700} fz={15} px={18} py={15}>Race-by-Race Results</Box>
+            <SectionCard padded={false} title="Race-by-Race Results">
                 <GridHeader columns={cols}>
                     <span>RND</span>
                     <span>GRAND PRIX</span>
@@ -214,7 +194,7 @@ const DriverSeason = () => {
                         </Link>
                     );
                 })}
-            </Box>
+            </SectionCard>
         </Stack>
     );
 };

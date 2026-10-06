@@ -1,9 +1,9 @@
-import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Box, SimpleGrid, Stack, Text } from '@mantine/core';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
 import { CareerHero } from '#/components/career-hero';
-import { GridHeader, MiniStat } from '#/components/f1-ui';
+import { GridHeader, MiniStat, SectionCard } from '#/components/f1-ui';
 import { CircuitSummarySchema } from '#/lib/api/circuits';
 import { api } from '#/lib/query/api';
 
@@ -42,13 +42,11 @@ const CircuitDetail = () => {
                 <MiniStat label="LAST RACE" value={year(data.lastRace.date)} />
             </SimpleGrid>
 
-            <Box className="f1-card" p={0}>
-                <Group justify="space-between" px={20} py={15} wrap="nowrap">
-                    <Text fw={700} fz={15} inherit span>Races</Text>
-                    <Text c="dimmed" fz={12} inherit span>
-                        Every Grand Prix held at this circuit
-                    </Text>
-                </Group>
+            <SectionCard
+                action={<Text c="dimmed" fz={12}>Every Grand Prix held at this circuit</Text>}
+                padded={false}
+                title="Races"
+            >
                 <GridHeader columns={RACE_COLS} px={20}>
                     <span>DATE</span>
                     <span>GRAND PRIX</span>
@@ -71,7 +69,7 @@ const CircuitDetail = () => {
                         </Text>
                     </Box>
                 ))}
-            </Box>
+            </SectionCard>
 
             <Box c="dimmed" fz={11.5}>
                 Circuit layouts from

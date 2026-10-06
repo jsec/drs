@@ -1,5 +1,5 @@
 import { LineChart } from '@mantine/charts';
-import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Box, Group, Progress, SimpleGrid, Stack, Text } from '@mantine/core';
 import {
     CalendarDotsIcon,
     CrownIcon,
@@ -233,40 +233,21 @@ const SeasonOverview = () => {
                             <Group justify="space-between" mb={5} wrap="nowrap">
                                 <Group gap={9} wrap="nowrap">
                                     <Text c="dimmed" className="f1-num" fw={700} fz={11} inherit span ta="center" w={18}>{c.positionLabel}</Text>
-                                    <Link params={{ constructorId: c.id, year }} style={{ color: 'inherit', textDecoration: 'none' }} to="/seasons/$year/constructors/$constructorId">
+                                    <Link className="f1-plain-link" params={{ constructorId: c.id, year }} to="/seasons/$year/constructors/$constructorId">
                                         <Text fw={600} fz={13} inherit span>{c.name}</Text>
                                     </Link>
                                 </Group>
                                 <Text className="f1-num f1-display" fw={700} fz={13} inherit span>{c.points}</Text>
                             </Group>
-                            <Box ml={27}>
-                                <Box
-                                    bg="var(--mantine-color-default-border)"
-                                    h={5}
-                                    style={{ borderRadius: 9999, overflow: 'hidden' }}
-                                >
-                                    <Box
-                                        bg={c.color}
-                                        h="100%"
-                                        style={{ borderRadius: 9999 }}
-                                        w={`${(c.points / overview.maxConstructorPoints) * 100}%`}
-                                    />
-                                </Box>
-                            </Box>
+                            <Progress color={c.color} ml={27} size={5} value={(c.points / overview.maxConstructorPoints) * 100} />
                         </Box>
                     ))}
                 </SectionCard>
             </div>
 
             {/* Points progression chart */}
-            <Box className="f1-card" p={16}>
-                <Group align="flex-start" gap={0} justify="space-between" mb={6} wrap="nowrap">
-                    <div>
-                        <Box fw={700} fz={15}>Championship Points Progression</Box>
-                        <Box c="dimmed" fz={12} mt={2}>
-                            Cumulative points after each round · top 6 drivers
-                        </Box>
-                    </div>
+            <SectionCard
+                action={(
                     <Group gap={14} wrap="nowrap">
                         {overview.progression.series.map(s => (
                             <Group fw={600} fz={12} gap={6} key={s.name} wrap="nowrap">
@@ -275,7 +256,10 @@ const SeasonOverview = () => {
                             </Group>
                         ))}
                     </Group>
-                </Group>
+                )}
+                subtitle="Cumulative points after each round · top 6 drivers"
+                title="Championship Points Progression"
+            >
                 <LineChart
                     data={overview.progression.data}
                     dataKey="round"
@@ -284,7 +268,7 @@ const SeasonOverview = () => {
                     xAxisProps={{ interval: 1 }}
                     yAxisProps={{ tickCount: 6 }}
                 />
-            </Box>
+            </SectionCard>
 
             {calendarCard}
         </Stack>

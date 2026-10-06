@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+import { ProgressionPointSchema, SprintResultSchema } from './constructors';
+
+const TeamSchema = z.object({
+    color: z.string(),
+    name: z.string(),
+});
+
 const DriverShortSummarySchema = z.object({
     championships: z.number(),
     code: z.string(),
@@ -16,10 +23,7 @@ const DriverShortSummarySchema = z.object({
 });
 
 const DriverSeasonSummary = z.object({
-    constructor: z.object({
-        color: z.string(),
-        name: z.string(),
-    }),
+    constructor: TeamSchema,
     podiums: z.number(),
     points: z.number(),
     poles: z.number(),
@@ -53,25 +57,14 @@ const DriverSeasonRaceSchema = z.object({
     position: z.number().nullable(),
     positionLabel: z.string(),
     round: z.number(),
-    sprint: z.object({
-        points: z.number(),
-        positionLabel: z.string(),
-    }).nullable(),
+    sprint: SprintResultSchema.nullable(),
     statusCategory: z.string(),
-});
-
-const ProgressionPointSchema = z.object({
-    points: z.number(),
-    round: z.number(),
 });
 
 export const DriverSeasonSchema = z.object({
     carNumber: z.number().nullable(),
     code: z.string(),
-    constructor: z.object({
-        color: z.string(),
-        name: z.string(),
-    }),
+    constructor: TeamSchema,
     country: z.string(),
     countryCode: z.string(),
     name: z.string(),
@@ -95,10 +88,7 @@ export const DriverRaceSchema = z.object({
     bestQualifyingTime: z.string(),
     carNumber: z.number().nullable(),
     code: z.string(),
-    constructor: z.object({
-        color: z.string(),
-        name: z.string(),
-    }),
+    constructor: TeamSchema,
     fastestLapRank: z.number().nullable(),
     gap: z.string(),
     grid: z.number().nullable(),

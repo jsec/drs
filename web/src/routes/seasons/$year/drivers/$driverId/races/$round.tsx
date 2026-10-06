@@ -68,18 +68,6 @@ function formatDelta(ms: number): string {
     return seconds;
 }
 
-function gapText(race: DriverRace): string {
-    if (race.gap) {
-        return race.gap;
-    }
-
-    if (race.time) {
-        return race.time;
-    }
-
-    return '—';
-}
-
 function gridText(grid: null | number): string {
     if (grid === null) {
         return 'PL';
@@ -110,7 +98,6 @@ function pitLines(race: DriverRace, color: string, isDashed: boolean): ChartRefe
 }
 
 const Hero = ({ race, round, year }: { race: DriverRace; round: string; year: string }) => {
-    const color = race.constructor.color;
     const carNumber = race.carNumber === null ? '' : ` · #${race.carNumber}`;
     const details = [race.raceName];
     if (race.qualifyingPositionLabel) {
@@ -142,14 +129,11 @@ const Hero = ({ race, round, year }: { race: DriverRace; round: string; year: st
 
     return (
         <Group
+            className="f1-team-hero"
             justify="space-between"
             px={28}
             py={24}
-            style={{
-                background: `linear-gradient(110deg, ${color}, color-mix(in srgb, ${color}, black 30%))`,
-                borderRadius: 'var(--radius-lg)',
-                color: '#fff',
-            }}
+            style={{ '--hero-color': race.constructor.color }}
             wrap="nowrap"
         >
             <Box>
@@ -188,11 +172,7 @@ const LapTable = ({ driver, raceFastestMs, rival, stopLaps }: {
     stopLaps: Set<number>;
 }) => {
     const personalBestMs = Math.min(...driver.laps.map(l => l.timeMs));
-    const rivalTimes = new Map<number, number>();
-    const rivalLaps = rival?.laps ?? [];
-    for (const lap of rivalLaps) {
-        rivalTimes.set(lap.lap, lap.timeMs);
-    }
+    const rivalTimes = new Map(rival?.laps.map(lap => [lap.lap, lap.timeMs]));
     const cols = rival ? RIVAL_LAP_COLS : LAP_COLS;
 
     return (
@@ -341,7 +321,7 @@ const DriverRacePage = () => {
             <SimpleGrid cols={isSprint ? 4 : 6} spacing={8}>
                 <MiniStat label="RESULT" value={formatPosition(race.positionLabel)} />
                 <MiniStat label="GRID → RESULT" value={<span style={{ whiteSpace: 'nowrap' }}>{`${gridText(race.grid)} → ${formatPosition(race.positionLabel)}`}</span>} />
-                <MiniStat label="GAP" value={gapText(race)} />
+                <MiniStat label="GAP" value={race.gap || race.time || '—'} />
                 <MiniStat label="POINTS" value={race.points} />
                 {!isSprint && <MiniStat label="PIT STOPS" value={race.pitStopCount ?? '–'} />}
                 {!isSprint && <MiniStat label="FASTEST LAP" value={race.fastestLapRank === null ? '–' : `P${race.fastestLapRank}`} />}
@@ -368,8 +348,7 @@ const DriverRacePage = () => {
                             </Group>
 
                             <SimpleGrid cols={2} spacing={16}>
-                                <Box className="f1-card" p={16}>
-                                    <Box fw={700} fz={15} mb={8}>Race Pace</Box>
+                                <SectionCard title="Race Pace">
                                     <LineChart
                                         data={pace.data}
                                         dataKey="lap"
@@ -380,9 +359,8 @@ const DriverRacePage = () => {
                                         xAxisProps={{ interval: 'preserveStartEnd' }}
                                         yAxisProps={{ domain: ['auto', 'auto'], tickCount: 5 }}
                                     />
-                                </Box>
-                                <Box className="f1-card" p={16}>
-                                    <Box fw={700} fz={15} mb={8}>Position</Box>
+                                </SectionCard>
+                                <SectionCard title="Position">
                                     <LineChart
                                         data={position.data}
                                         dataKey="lap"
@@ -392,16 +370,13 @@ const DriverRacePage = () => {
                                         xAxisProps={{ interval: 'preserveStartEnd' }}
                                         yAxisProps={{ allowDecimals: false, domain: [1, 'dataMax'], reversed: true }}
                                     />
-                                </Box>
+                                </SectionCard>
                             </SimpleGrid>
 
-                            {isSprint && <LapTable driver={driverLaps} raceFastestMs={raceFastestMs} rival={rivalLaps} stopLaps={stopLaps} />}
-                            {!isSprint && (
-                                <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '7fr 5fr' }}>
-                                    <LapTable driver={driverLaps} raceFastestMs={raceFastestMs} rival={rivalLaps} stopLaps={stopLaps} />
-                                    <PitStops race={race} />
-                                </div>
-                            )}
+                            <div style={{ display: 'grid', gap: 16, gridTemplateColumns: isSprint ? '1fr' : '7fr 5fr' }}>
+                                <LapTable driver={driverLaps} raceFastestMs={raceFastestMs} rival={rivalLaps} stopLaps={stopLaps} />
+                                {!isSprint && <PitStops race={race} />}
+                            </div>
                         </>
                     )
                 : (

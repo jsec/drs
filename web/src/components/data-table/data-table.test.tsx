@@ -27,7 +27,7 @@ const columns = [
     col.ordinal(),
     col.text('name', { header: 'NAME' }),
     col.num('wins', { header: 'WINS' }),
-    col.text('note', { header: 'NOTE', sortable: false }),
+    col.custom({ cell: info => info.row.original.note, header: 'NOTE', id: 'note' }),
 ];
 
 const customColumns = [

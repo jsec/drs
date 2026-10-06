@@ -33,7 +33,7 @@ export const LineageStrip = ({ currentId, lineage }: LineageStripProps) => {
                         {isCurrent
                             ? label
                             : (
-                                    <Link params={{ constructorId: entry.id }} style={{ color: 'inherit', textDecoration: 'none' }} to="/constructors/$constructorId">
+                                    <Link className="f1-plain-link" params={{ constructorId: entry.id }} to="/constructors/$constructorId">
                                         {label}
                                     </Link>
                                 )}

@@ -1,3 +1,4 @@
+import { Progress } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 
 import type { ConstructorStanding, DriverStanding } from '#/lib/api/seasons';
@@ -20,14 +21,9 @@ export function makeConstructorColumns(year: string, maxConstructor: number) {
             width: '240px',
         }),
         col.custom({
-            cell: (info) => {
-                const c = info.row.original;
-                return (
-                    <div style={{ background: 'var(--mantine-color-default-border)', borderRadius: 9999, height: 9, overflow: 'hidden' }}>
-                        <div style={{ background: c.color, borderRadius: 9999, height: '100%', width: `${(c.points / maxConstructor) * 100}%` }} />
-                    </div>
-                );
-            },
+            cell: info => (
+                <Progress color={info.row.original.color} size={9} value={(info.row.original.points / maxConstructor) * 100} />
+            ),
             header: '',
             id: 'bar',
         }),
@@ -60,9 +56,9 @@ export function makeDriverColumns(year: string) {
 
                 return (
                     <Link
+                        className="f1-plain-link"
                         onClick={event => event.stopPropagation()}
                         params={{ constructorId: team.id }}
-                        style={{ color: 'inherit', textDecoration: 'none' }}
                         to="/constructors/$constructorId"
                     >
                         {team.name}

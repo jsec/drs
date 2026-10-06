@@ -1,10 +1,10 @@
 import type { ComponentPropsWithRef, ReactNode } from 'react';
 
-import { Box, Group, Text } from '@mantine/core';
+import { Text } from '@mantine/core';
 import { CaretRightIcon } from '@phosphor-icons/react';
 import { createLink } from '@tanstack/react-router';
 
-import { GridHeader } from './f1-ui';
+import { GridHeader, SectionCard } from './f1-ui';
 
 export const SeasonsCard = ({
     children,
@@ -16,26 +16,24 @@ export const SeasonsCard = ({
     header: ReactNode;
 }) => {
     return (
-        <Box className="f1-card" p={0}>
-            <Group justify="space-between" px={20} py={15} wrap="nowrap">
-                <Text fw={700} fz={15} inherit span>Seasons</Text>
-                <Text c="dimmed" fz={12} inherit span>
-                    Select a season to open its full dashboard
-                </Text>
-            </Group>
+        <SectionCard
+            action={<Text c="dimmed" fz={12}>Select a season to open its full dashboard</Text>}
+            padded={false}
+            title="Seasons"
+        >
             <GridHeader columns={columns} px={20}>
                 {header}
                 <span />
             </GridHeader>
             {children}
-        </Box>
+        </SectionCard>
     );
 };
 
 type SeasonRowAnchorProps = ComponentPropsWithRef<'a'> & {
     columns: string;
     isChampion: boolean;
-    season: ReactNode;
+    season: number;
 };
 
 const SeasonRowAnchor = ({ children, columns, isChampion, season, ...props }: SeasonRowAnchorProps) => {
@@ -48,7 +46,9 @@ const SeasonRowAnchor = ({ children, columns, isChampion, season, ...props }: Se
                 'padding': '11px 20px',
             }}
         >
-            <a {...props} className="f1-stretched-link">{season}</a>
+            <a {...props} className="f1-stretched-link">
+                <Text className="f1-num f1-display" fw={700} fz={16} inherit lts="-0.4px" span>{season}</Text>
+            </a>
             {children}
             <CaretRightIcon color="var(--neutral-400)" size={14} />
         </div>

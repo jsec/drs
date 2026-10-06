@@ -26,8 +26,6 @@ declare module '@tanstack/react-table' {
     }
 }
 
-const LINK_STYLE = { color: 'inherit', display: 'block', textDecoration: 'none' } as const;
-
 const ARIA_SORT: Record<string, 'ascending' | 'descending' | 'none'> = {
     asc: 'ascending',
     desc: 'descending',
@@ -146,8 +144,9 @@ export function DataTable<T>({ px = 18, table }: DataTableProps<T>) {
                                                         <Link
                                                             {...link}
                                                             aria-label="Open details"
+                                                            className="f1-plain-link"
                                                             onClick={event => event.stopPropagation()}
-                                                            style={LINK_STYLE}
+                                                            style={{ display: 'block' }}
                                                         >
                                                             {content}
                                                         </Link>

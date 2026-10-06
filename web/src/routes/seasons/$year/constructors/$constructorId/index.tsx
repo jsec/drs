@@ -1,4 +1,3 @@
-import { LineChart } from '@mantine/charts';
 import { Box, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
@@ -6,7 +5,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import type { ConstructorSeasonResult } from '#/lib/api/constructors';
 
 import { CareerHero } from '#/components/career-hero';
-import { GridHeader, MiniStat } from '#/components/f1-ui';
+import { GridHeader, MiniStat, PointsProgressionCard, SectionCard } from '#/components/f1-ui';
 import { constructorSeasonQuery } from '#/data/queries';
 import { formatPosition, isNumericPosition } from '#/lib/format';
 import { parseYear } from '#/lib/route-params';
@@ -47,10 +46,6 @@ const ConstructorSeason = () => {
     const engines = team.entries.length > 1
         ? team.entries.map(e => `${e.engine} ${formatPosition(e.position)}`).join(' · ')
         : team.entries[0]?.engine;
-    const progression = [
-        { [team.name]: 0, x: 'R0' },
-        ...team.progression.map(p => ({ [team.name]: p.points, x: `R${p.round}` })),
-    ];
 
     return (
         <Stack gap={16}>
@@ -61,8 +56,8 @@ const ConstructorSeason = () => {
                 subtitle={`${year} · ${engines}`}
                 title={(
                     <Link
+                        className="f1-plain-link"
                         params={{ constructorId }}
-                        style={{ color: 'inherit', textDecoration: 'none' }}
                         to="/constructors/$constructorId"
                     >
                         {team.name}
@@ -79,8 +74,7 @@ const ConstructorSeason = () => {
                 <MiniStat label="DNFS" value={team.dnfs} />
             </SimpleGrid>
 
-            <Box className="f1-card" p={0}>
-                <Box fw={700} fz={15} px={18} py={15}>Drivers</Box>
+            <SectionCard padded={false} title="Drivers">
                 <GridHeader columns={DRIVER_COLS}>
                     <span />
                     <span>DRIVER</span>
@@ -105,26 +99,11 @@ const ConstructorSeason = () => {
                         <Text className="f1-num f1-display" fw={700} inherit span ta="right">{d.points}</Text>
                     </Link>
                 ))}
-            </Box>
+            </SectionCard>
 
-            <Box className="f1-card" p={16}>
-                <Box fw={700} fz={15} mb={8}>Points Progression</Box>
-                {team.progression.length > 0
-                    ? (
-                            <LineChart
-                                data={progression}
-                                dataKey="x"
-                                h={200}
-                                series={[{ color: team.color, name: team.name }]}
-                                xAxisProps={{ interval: 1 }}
-                                yAxisProps={{ domain: [0, 'auto'], tickCount: 5 }}
-                            />
-                        )
-                    : <Text c="dimmed" fz={13}>No constructors' championship standings this season.</Text>}
-            </Box>
+            <PointsProgressionCard color={team.color} name={team.name} progression={team.progression} />
 
-            <Box className="f1-card" p={0}>
-                <Box fw={700} fz={15} px={18} py={15}>Race-by-Race Results</Box>
+            <SectionCard padded={false} title="Race-by-Race Results">
                 <GridHeader columns={roundCols}>
                     <span>RND</span>
                     <span>GRAND PRIX</span>
@@ -145,9 +124,10 @@ const ConstructorSeason = () => {
 
                                 return (
                                     <Link
+                                        className="f1-plain-link"
                                         key={result.finishOrder}
                                         params={{ driverId: result.driverId, round: String(r.round), year }}
-                                        style={{ color: 'inherit', display: 'grid', gridTemplateColumns: resultCols, textDecoration: 'none' }}
+                                        style={{ display: 'grid', gridTemplateColumns: resultCols }}
                                         to="/seasons/$year/drivers/$driverId/races/$round"
                                     >
                                         <Text c="dimmed" fw={700} fz={12} inherit span>{result.driverCode}</Text>
@@ -164,7 +144,7 @@ const ConstructorSeason = () => {
                         <Text className="f1-num f1-display" fw={700} inherit span ta="right">{r.points > 0 ? r.points : '–'}</Text>
                     </div>
                 ))}
-            </Box>
+            </SectionCard>
         </Stack>
     );
 };

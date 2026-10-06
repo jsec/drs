@@ -69,7 +69,7 @@ const ConstructorCareer = () => {
                         isChampion={s.isChampion}
                         key={`${s.season}-${s.engine}`}
                         params={{ constructorId: team.id, year: String(Math.min(s.season, CURRENT_YEAR)) }}
-                        season={<Text className="f1-num f1-display" fw={700} fz={16} inherit lts="-0.4px" span>{s.season}</Text>}
+                        season={s.season}
                         to="/seasons/$year/constructors/$constructorId"
                     >
                         <Group gap={6} wrap="nowrap">

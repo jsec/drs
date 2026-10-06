@@ -1,8 +1,11 @@
 import type { SortingFn } from '@tanstack/react-table';
 
+import { Progress } from '@mantine/core';
+
 import type { ListConstructorsResponse } from '#/lib/api/constructors';
 
 import { makeColumns } from '#/components/data-table';
+import { formatCareerYears } from '#/lib/format';
 
 type Constructor = ListConstructorsResponse[number];
 
@@ -28,13 +31,11 @@ export function makeConstructorColumns(maxWins: number) {
             accessor: c => c.firstRaceDate,
             cell: (info) => {
                 const { firstRaceDate, lastRaceDate } = info.row.original;
-
-                let years = '-';
-                if (firstRaceDate) {
-                    const firstYear = Temporal.PlainDate.from(firstRaceDate).year;
-                    const lastYear = lastRaceDate ? Temporal.PlainDate.from(lastRaceDate).year : '';
-                    years = `${firstYear}-${lastYear}`;
-                }
+                const years = formatCareerYears({
+                    firstYear: firstRaceDate ? Temporal.PlainDate.from(firstRaceDate).year : null,
+                    isActive: false,
+                    lastYear: lastRaceDate ? Temporal.PlainDate.from(lastRaceDate).year : null,
+                });
 
                 return <span className="table-cell-num table-cell-sm">{years}</span>;
             },
@@ -52,9 +53,7 @@ export function makeConstructorColumns(maxWins: number) {
                         <span className="table-cell-num table-cell-num-display" style={{ width: 34 }}>
                             {c.wins}
                         </span>
-                        <div style={{ background: 'var(--mantine-color-default-border)', borderRadius: 9999, flex: 1, height: 6, maxWidth: 150, overflow: 'hidden' }}>
-                            <div style={{ background: c.color, borderRadius: 9999, height: '100%', width: `${(c.wins / maxWins) * 100}%` }} />
-                        </div>
+                        <Progress color={c.color} flex={1} maw={150} size={6} value={(c.wins / maxWins) * 100} />
                     </div>
                 );
             },

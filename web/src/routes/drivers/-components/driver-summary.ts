@@ -21,10 +21,8 @@ export const driverSummaryColor = ({ championships, constructorColor, isActive }
     return INACTIVE_DRIVER_COLOR;
 };
 
-export const isChampionshipWinner = (position: string) => position === '1';
-
 export const championshipPositionColor = (position: string): string => {
-    if (isChampionshipWinner(position)) {
+    if (position === '1') {
         return 'var(--gold-500)';
     }
 

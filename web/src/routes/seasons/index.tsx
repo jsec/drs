@@ -2,11 +2,12 @@ import { Card } from '@mantine/core';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
-import { SortSearchSchema } from '#/components/data-table';
+import { DataTable, SortSearchSchema, useDataTable, useUrlSorting } from '#/components/data-table';
 import { SeasonListSchema } from '#/lib/api/seasons';
 import { api } from '#/lib/query/api';
 
-import { SeasonsTable } from './-components/seasons-table';
+import { columns } from './-components/seasons-table/columns';
+import './-components/seasons-table/seasons-table.css';
 
 const seasonsQuery = queryOptions({
     queryFn: () => api.get('seasons').json(SeasonListSchema),
@@ -15,6 +16,8 @@ const seasonsQuery = queryOptions({
 
 const Seasons = () => {
     const { data: seasons } = useSuspenseQuery(seasonsQuery);
+    const { onSortingChange, sorting } = useUrlSorting();
+    const { table } = useDataTable({ columns, data: seasons, onSortingChange, sorting });
 
     return (
         <div className="f1-page-stack">
@@ -24,7 +27,7 @@ const Seasons = () => {
             </div>
 
             <Card className="f1-table-card">
-                <SeasonsTable seasons={seasons} />
+                <DataTable table={table} />
             </Card>
         </div>
     );

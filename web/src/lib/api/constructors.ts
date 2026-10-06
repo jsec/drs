@@ -62,7 +62,7 @@ export const ConstructorSummarySchema = z.object({
 
 export type ConstructorSummary = z.infer<typeof ConstructorSummarySchema>;
 
-const SprintResultSchema = z.object({
+export const SprintResultSchema = z.object({
     points: z.number(),
     positionLabel: z.string(),
 });
@@ -82,7 +82,7 @@ const SeasonEntrySchema = z.object({
     position: z.string(),
 });
 
-const ProgressionPointSchema = z.object({
+export const ProgressionPointSchema = z.object({
     points: z.number(),
     round: z.number(),
 });

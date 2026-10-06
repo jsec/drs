@@ -188,6 +188,17 @@
   box-shadow: var(--shadow-sm);
 }
 
+.f1-team-hero {
+  background: linear-gradient(110deg, var(--hero-color), color-mix(in srgb, var(--hero-color), black 30%));
+  border-radius: var(--radius-lg);
+  color: #fff;
+}
+
+.f1-plain-link {
+  color: inherit;
+  text-decoration: none;
+}
+
 .f1-table-card {
   overflow: hidden;
 }

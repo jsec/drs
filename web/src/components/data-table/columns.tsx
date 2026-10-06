@@ -17,7 +17,6 @@ type Shared<T> = {
     id?: string;
     link?: (row: T) => LinkProps | undefined;
     sort?: SortingFnOption<T>;
-    sortable?: boolean;
     trailing?: 'caret';
     width?: string;
 };
@@ -44,7 +43,6 @@ export function makeColumns<T>() {
                 <span className="table-cell-entity-label">{opts.label(info.row.original)}</span>
             </span>
         ),
-        enableSorting: canSort(opts),
         header: opts.header,
         id: opts.id ?? key,
         meta: buildMeta(opts),
@@ -62,7 +60,7 @@ export function makeColumns<T>() {
     ): ColumnDef<T, unknown> => ({
         accessorFn: opts.accessor,
         cell: opts.cell,
-        enableSorting: canSort(opts) && opts.accessor != null,
+        enableSorting: opts.accessor != null,
         header: opts.header,
         id: opts.id,
         meta: buildMeta(opts),
@@ -90,7 +88,6 @@ export function makeColumns<T>() {
                 </span>
             );
         },
-        enableSorting: canSort(opts),
         header: opts.header,
         id: opts.id ?? key,
         meta: buildMeta(opts),
@@ -127,7 +124,6 @@ export function makeColumns<T>() {
                 </span>
             );
         },
-        enableSorting: canSort(opts),
         header: opts.header,
         id: opts.id ?? key,
         meta: buildMeta(opts),
@@ -149,7 +145,6 @@ export function makeColumns<T>() {
                 </span>
             );
         },
-        enableSorting: canSort(opts),
         header: opts.header,
         id: opts.id ?? key,
         meta: buildMeta({ align: 'center', ...opts }),
@@ -167,8 +162,4 @@ function buildMeta<T>(opts: Shared<T>): ColumnMeta<T, unknown> {
         trailing: opts.trailing,
         width: opts.width,
     };
-}
-
-function canSort<T>(opts: Shared<T>): boolean {
-    return opts.sortable !== false;
 }

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { LineChart } from '@mantine/charts';
 import { Button, Card, Group, Text } from '@mantine/core';
 import { TrophyIcon } from '@phosphor-icons/react';
 
@@ -108,23 +109,60 @@ export const SectionCard = ({
     action,
     children,
     padded = true,
+    subtitle,
     title,
 }: {
     action?: ReactNode;
     children: ReactNode;
     padded?: boolean;
+    subtitle?: string;
     title: string;
 }) => {
     return (
         <Card>
             <Group align="flex-start" gap="md" justify="space-between" px={18} py={15} wrap="nowrap">
-                <Text fw={700} fz={15}>{title}</Text>
+                <div>
+                    <Text fw={700} fz={15}>{title}</Text>
+                    {subtitle && <Text c="dimmed" fz={12}>{subtitle}</Text>}
+                </div>
                 {action}
             </Group>
             <div className="f1-section-card-body" data-flush={!padded}>
                 {children}
             </div>
         </Card>
+    );
+};
+
+export const PointsProgressionCard = ({
+    color,
+    name,
+    progression,
+}: {
+    color: string;
+    name: string;
+    progression: { points: number; round: number }[];
+}) => {
+    const data = [
+        { [name]: 0, x: 'R0' },
+        ...progression.map(p => ({ [name]: p.points, x: `R${p.round}` })),
+    ];
+
+    return (
+        <SectionCard title="Points Progression">
+            {progression.length > 0
+                ? (
+                        <LineChart
+                            data={data}
+                            dataKey="x"
+                            h={200}
+                            series={[{ color, name }]}
+                            xAxisProps={{ interval: 1 }}
+                            yAxisProps={{ domain: [0, 'auto'], tickCount: 5 }}
+                        />
+                    )
+                : <Text c="dimmed" fz={13}>No championship standings this season.</Text>}
+        </SectionCard>
     );
 };
 

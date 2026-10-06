@@ -10,12 +10,7 @@ type Crumb = {
 export const Breadcrumbs = () => {
     const matches = useMatches();
 
-    let crumbs: Crumb[] = [];
-    for (const m of matches) {
-        if (m.loaderData && 'crumbs' in m.loaderData) {
-            crumbs = m.loaderData.crumbs;
-        }
-    }
+    const crumbs: Crumb[] = matches.findLast(m => m.loaderData && 'crumbs' in m.loaderData)?.loaderData?.crumbs ?? [];
 
     return (
         <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', fontSize: 13.5, gap: 8, minWidth: 0 }}>

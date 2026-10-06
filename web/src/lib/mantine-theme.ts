@@ -1,7 +1,7 @@
 import type { MantineColorsTuple } from '@mantine/core';
 
 import { LineChart } from '@mantine/charts';
-import { Card, createTheme, Table } from '@mantine/core';
+import { Card, createTheme, Progress, Table } from '@mantine/core';
 
 // F1 red
 const f1: MantineColorsTuple = [
@@ -64,6 +64,12 @@ export const theme = createTheme({
                 strokeWidth: 2.4,
                 tickLine: 'none',
                 withDots: false,
+            },
+        }),
+        Progress: Progress.extend({
+            defaultProps: {
+                bg: 'var(--mantine-color-default-border)',
+                radius: 'xl',
             },
         }),
         Table: Table.extend({
