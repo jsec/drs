@@ -5,11 +5,6 @@ linters:
     - bodyclose
     - misspell
     - testifylint
-  exclusions:
-    rules:
-      - path: (\.sql\.go|db\.go|models\.go)$
-        linters:
-          - all
 
 formatters:
   enable:
