@@ -101,7 +101,8 @@ const SeasonOverview = () => {
         </SectionCard>
     );
 
-    if (overview.leader === null || overview.runnerUp === null) {
+    const [leader, runnerUp] = overview.drivers;
+    if (!leader || !runnerUp) {
         return (
             <Stack gap={16}>
                 <SectionCard title="Championship Standings">No championship standings recorded.</SectionCard>
@@ -110,7 +111,6 @@ const SeasonOverview = () => {
         );
     }
 
-    const { leader, runnerUp } = overview;
     const lastCompletedRace = calendar.races.findLast(race => race.completed);
     const topDrivers = overview.drivers.slice(0, 8);
 

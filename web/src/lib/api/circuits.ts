@@ -3,8 +3,8 @@ import { z } from 'zod';
 const CircuitListItemSchema = z.object({
     circuitId: z.string(),
     country: z.string(),
-    firstRaceYear: z.number().optional(),
-    lastRaceYear: z.number().optional(),
+    firstRaceYear: z.number().nullable(),
+    lastRaceYear: z.number().nullable(),
     location: z.string(),
     name: z.string(),
     raceCount: z.number(),

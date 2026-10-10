@@ -63,10 +63,8 @@ const ProgressionSchema = z.object({
 export const SeasonOverviewSchema = z.object({
     constructors: z.array(ConstructorStandingSchema),
     drivers: z.array(DriverStandingSchema),
-    leader: DriverStandingSchema.nullable(),
     maxConstructorPoints: z.number(),
     progression: ProgressionSchema,
-    runnerUp: DriverStandingSchema.nullable(),
 });
 
 const SeasonCalendarEntrySchema = z.object({
