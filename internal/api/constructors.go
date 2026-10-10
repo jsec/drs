@@ -7,7 +7,7 @@ import (
 )
 
 func (app *application) listConstructorsHandler(w http.ResponseWriter, r *http.Request) error {
-	list, err := constructors.ListConstructors(r.Context(), app.queries)
+	list, err := app.queries.ListConstructors(r.Context())
 	if err != nil {
 		return err
 	}

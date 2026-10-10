@@ -35,20 +35,20 @@ ORDER BY r.race_round
 `
 
 type ListSeasonCalendarRow struct {
-	RaceID                 int32
-	RaceRound              int32
-	RaceName               string
-	GrandPrixCode          pgtype.Text
-	RaceDate               pgtype.Date
-	CircuitID              string
-	CircuitName            string
-	WinnerDriverID         pgtype.Text
-	WinnerDriverName       pgtype.Text
-	WinnerDriverCode       pgtype.Text
-	WinnerConstructorID    pgtype.Text
-	WinnerConstructorName  pgtype.Text
-	WinnerConstructorColor pgtype.Text
-	Completed              pgtype.Bool
+	RaceID                 int32       `json:"raceId"`
+	RaceRound              int32       `json:"raceRound"`
+	RaceName               string      `json:"raceName"`
+	GrandPrixCode          pgtype.Text `json:"grandPrixCode"`
+	RaceDate               pgtype.Date `json:"raceDate"`
+	CircuitID              string      `json:"circuitId"`
+	CircuitName            string      `json:"circuitName"`
+	WinnerDriverID         pgtype.Text `json:"winnerDriverId"`
+	WinnerDriverName       pgtype.Text `json:"winnerDriverName"`
+	WinnerDriverCode       pgtype.Text `json:"winnerDriverCode"`
+	WinnerConstructorID    pgtype.Text `json:"winnerConstructorId"`
+	WinnerConstructorName  pgtype.Text `json:"winnerConstructorName"`
+	WinnerConstructorColor pgtype.Text `json:"winnerConstructorColor"`
+	Completed              pgtype.Bool `json:"completed"`
 }
 
 func (q *Queries) ListSeasonCalendar(ctx context.Context, season int32) ([]ListSeasonCalendarRow, error) {
@@ -57,7 +57,7 @@ func (q *Queries) ListSeasonCalendar(ctx context.Context, season int32) ([]ListS
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListSeasonCalendarRow
+	items := []ListSeasonCalendarRow{}
 	for rows.Next() {
 		var i ListSeasonCalendarRow
 		if err := rows.Scan(
@@ -115,14 +115,14 @@ ORDER BY css.position NULLS LAST, css.constructor_name
 `
 
 type ListSeasonConstructorStandingsRow struct {
-	Position         pgtype.Int4
-	PositionLabel    string
-	Points           float64
-	ConstructorID    string
-	EngineID         string
-	Name             string
-	ConstructorColor string
-	CountryCode      string
+	Position         pgtype.Int4 `json:"position"`
+	PositionLabel    string      `json:"positionLabel"`
+	Points           float64     `json:"points"`
+	ConstructorID    string      `json:"constructorId"`
+	EngineID         string      `json:"engineId"`
+	Name             string      `json:"name"`
+	ConstructorColor string      `json:"constructorColor"`
+	CountryCode      string      `json:"countryCode"`
 }
 
 func (q *Queries) ListSeasonConstructorStandings(ctx context.Context, season int32) ([]ListSeasonConstructorStandingsRow, error) {
@@ -131,7 +131,7 @@ func (q *Queries) ListSeasonConstructorStandings(ctx context.Context, season int
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListSeasonConstructorStandingsRow
+	items := []ListSeasonConstructorStandingsRow{}
 	for rows.Next() {
 		var i ListSeasonConstructorStandingsRow
 		if err := rows.Scan(
@@ -167,10 +167,10 @@ ORDER BY dss.race_round, dss.driver_id
 `
 
 type ListSeasonDriverProgressionRow struct {
-	RaceRound int32
-	DriverID  string
-	Code      string
-	Points    float64
+	RaceRound int32   `json:"raceRound"`
+	DriverID  string  `json:"driverId"`
+	Code      string  `json:"code"`
+	Points    float64 `json:"points"`
 }
 
 func (q *Queries) ListSeasonDriverProgression(ctx context.Context, season int32, driverIds []string) ([]ListSeasonDriverProgressionRow, error) {
@@ -179,7 +179,7 @@ func (q *Queries) ListSeasonDriverProgression(ctx context.Context, season int32,
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListSeasonDriverProgressionRow
+	items := []ListSeasonDriverProgressionRow{}
 	for rows.Next() {
 		var i ListSeasonDriverProgressionRow
 		if err := rows.Scan(
@@ -235,21 +235,21 @@ ORDER BY dss.position NULLS LAST, dss.driver_name
 `
 
 type ListSeasonDriverStandingsRow struct {
-	Position         pgtype.Int4
-	PositionLabel    string
-	Points           float64
-	DriverID         string
-	Code             string
-	Name             string
-	Country          string
-	CountryCode      string
-	ConstructorID    string
-	ConstructorName  pgtype.Text
-	ConstructorColor pgtype.Text
-	CarNumber        pgtype.Int4
-	Wins             int32
-	Podiums          int32
-	Poles            int32
+	Position         pgtype.Int4 `json:"position"`
+	PositionLabel    string      `json:"positionLabel"`
+	Points           float64     `json:"points"`
+	DriverID         string      `json:"driverId"`
+	Code             string      `json:"code"`
+	Name             string      `json:"name"`
+	Country          string      `json:"country"`
+	CountryCode      string      `json:"countryCode"`
+	ConstructorID    string      `json:"constructorId"`
+	ConstructorName  pgtype.Text `json:"constructorName"`
+	ConstructorColor pgtype.Text `json:"constructorColor"`
+	CarNumber        pgtype.Int4 `json:"carNumber"`
+	Wins             int32       `json:"wins"`
+	Podiums          int32       `json:"podiums"`
+	Poles            int32       `json:"poles"`
 }
 
 func (q *Queries) ListSeasonDriverStandings(ctx context.Context, season int32) ([]ListSeasonDriverStandingsRow, error) {
@@ -258,7 +258,7 @@ func (q *Queries) ListSeasonDriverStandings(ctx context.Context, season int32) (
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListSeasonDriverStandingsRow
+	items := []ListSeasonDriverStandingsRow{}
 	for rows.Next() {
 		var i ListSeasonDriverStandingsRow
 		if err := rows.Scan(
@@ -306,15 +306,15 @@ ORDER BY s.season DESC
 `
 
 type ListSeasonsRow struct {
-	Season             int32
-	RaceCount          int32
-	ConstructorCount   int32
-	WdcDriverID        pgtype.Text
-	WdcDriverName      pgtype.Text
-	WdcCountryCode     string
-	WccConstructorID   pgtype.Text
-	WccConstructorName pgtype.Text
-	WccColor           pgtype.Text
+	Season             int32       `json:"season"`
+	RaceCount          int32       `json:"raceCount"`
+	ConstructorCount   int32       `json:"constructorCount"`
+	WdcDriverID        pgtype.Text `json:"wdcDriverId"`
+	WdcDriverName      pgtype.Text `json:"wdcDriverName"`
+	WdcCountryCode     string      `json:"wdcCountryCode"`
+	WccConstructorID   pgtype.Text `json:"wccConstructorId"`
+	WccConstructorName pgtype.Text `json:"wccConstructorName"`
+	WccColor           pgtype.Text `json:"wccColor"`
 }
 
 func (q *Queries) ListSeasons(ctx context.Context) ([]ListSeasonsRow, error) {
@@ -323,7 +323,7 @@ func (q *Queries) ListSeasons(ctx context.Context) ([]ListSeasonsRow, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListSeasonsRow
+	items := []ListSeasonsRow{}
 	for rows.Next() {
 		var i ListSeasonsRow
 		if err := rows.Scan(

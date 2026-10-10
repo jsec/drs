@@ -32,20 +32,20 @@ WHERE constructor_id = $1::TEXT
 `
 
 type GetConstructorSummaryRow struct {
-	ID            string
-	Name          string
-	FullName      string
-	Country       string
-	CountryCode   string
-	Color         string
-	Starts        int32
-	Wins          int32
-	Podiums       int32
-	Poles         int32
-	Championships int32
-	FirstYear     pgtype.Int4
-	LastYear      pgtype.Int4
-	IsActive      bool
+	ID            string      `json:"id"`
+	Name          string      `json:"name"`
+	FullName      string      `json:"fullName"`
+	Country       string      `json:"country"`
+	CountryCode   string      `json:"countryCode"`
+	Color         string      `json:"color"`
+	Starts        int32       `json:"starts"`
+	Wins          int32       `json:"wins"`
+	Podiums       int32       `json:"podiums"`
+	Poles         int32       `json:"poles"`
+	Championships int32       `json:"championships"`
+	FirstYear     pgtype.Int4 `json:"firstYear"`
+	LastYear      pgtype.Int4 `json:"lastYear"`
+	IsActive      bool        `json:"isActive"`
 }
 
 func (q *Queries) GetConstructorSummary(ctx context.Context, constructorID string) (GetConstructorSummaryRow, error) {
@@ -83,11 +83,11 @@ ORDER BY position_display_order
 `
 
 type ListConstructorLineageRow struct {
-	PositionDisplayOrder int32
-	OtherConstructorID   string
-	OtherConstructorName string
-	YearFrom             int32
-	YearTo               pgtype.Int4
+	PositionDisplayOrder int32       `json:"positionDisplayOrder"`
+	OtherConstructorID   string      `json:"otherConstructorId"`
+	OtherConstructorName string      `json:"otherConstructorName"`
+	YearFrom             int32       `json:"yearFrom"`
+	YearTo               pgtype.Int4 `json:"yearTo"`
 }
 
 func (q *Queries) ListConstructorLineage(ctx context.Context, constructorID string) ([]ListConstructorLineageRow, error) {
@@ -96,7 +96,7 @@ func (q *Queries) ListConstructorLineage(ctx context.Context, constructorID stri
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListConstructorLineageRow
+	items := []ListConstructorLineageRow{}
 	for rows.Next() {
 		var i ListConstructorLineageRow
 		if err := rows.Scan(
@@ -132,13 +132,13 @@ ORDER BY total_points DESC, race_start_count DESC, driver_name
 `
 
 type ListConstructorSeasonDriverSummariesRow struct {
-	DriverID   string
-	DriverCode string
-	DriverName string
-	Starts     int32
-	Wins       int32
-	Podiums    int32
-	Points     float64
+	DriverID   string  `json:"driverId"`
+	DriverCode string  `json:"driverCode"`
+	DriverName string  `json:"driverName"`
+	Starts     int32   `json:"starts"`
+	Wins       int32   `json:"wins"`
+	Podiums    int32   `json:"podiums"`
+	Points     float64 `json:"points"`
 }
 
 func (q *Queries) ListConstructorSeasonDriverSummaries(ctx context.Context, season int32, constructorID string) ([]ListConstructorSeasonDriverSummariesRow, error) {
@@ -147,7 +147,7 @@ func (q *Queries) ListConstructorSeasonDriverSummaries(ctx context.Context, seas
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListConstructorSeasonDriverSummariesRow
+	items := []ListConstructorSeasonDriverSummariesRow{}
 	for rows.Next() {
 		var i ListConstructorSeasonDriverSummariesRow
 		if err := rows.Scan(
@@ -182,10 +182,10 @@ ORDER BY season DESC, engine_manufacturer_id, count(*) DESC, driver_name
 `
 
 type ListConstructorSeasonDriversRow struct {
-	Season               int32
-	EngineManufacturerID string
-	DriverID             string
-	DriverName           string
+	Season               int32  `json:"season"`
+	EngineManufacturerID string `json:"engineManufacturerId"`
+	DriverID             string `json:"driverId"`
+	DriverName           string `json:"driverName"`
 }
 
 func (q *Queries) ListConstructorSeasonDrivers(ctx context.Context, constructorID string) ([]ListConstructorSeasonDriversRow, error) {
@@ -194,7 +194,7 @@ func (q *Queries) ListConstructorSeasonDrivers(ctx context.Context, constructorI
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListConstructorSeasonDriversRow
+	items := []ListConstructorSeasonDriversRow{}
 	for rows.Next() {
 		var i ListConstructorSeasonDriversRow
 		if err := rows.Scan(
@@ -230,14 +230,14 @@ ORDER BY final_order NULLS LAST, engine_manufacturer_name
 `
 
 type ListConstructorSeasonEntriesRow struct {
-	EngineName        string
-	FinalPositionText pgtype.Text
-	FinalPoints       pgtype.Float8
-	ChampionshipWon   bool
-	Wins              int32
-	Podiums           int32
-	Poles             int32
-	Dnfs              int32
+	EngineName        string        `json:"engineName"`
+	FinalPositionText pgtype.Text   `json:"finalPositionText"`
+	FinalPoints       pgtype.Float8 `json:"finalPoints"`
+	ChampionshipWon   bool          `json:"championshipWon"`
+	Wins              int32         `json:"wins"`
+	Podiums           int32         `json:"podiums"`
+	Poles             int32         `json:"poles"`
+	Dnfs              int32         `json:"dnfs"`
 }
 
 func (q *Queries) ListConstructorSeasonEntries(ctx context.Context, season int32, constructorID string) ([]ListConstructorSeasonEntriesRow, error) {
@@ -246,7 +246,7 @@ func (q *Queries) ListConstructorSeasonEntries(ctx context.Context, season int32
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListConstructorSeasonEntriesRow
+	items := []ListConstructorSeasonEntriesRow{}
 	for rows.Next() {
 		var i ListConstructorSeasonEntriesRow
 		if err := rows.Scan(
@@ -281,8 +281,8 @@ ORDER BY race_round
 `
 
 type ListConstructorSeasonProgressionRow struct {
-	RaceRound int32
-	Points    float64
+	RaceRound int32   `json:"raceRound"`
+	Points    float64 `json:"points"`
 }
 
 func (q *Queries) ListConstructorSeasonProgression(ctx context.Context, season int32, constructorID string) ([]ListConstructorSeasonProgressionRow, error) {
@@ -291,7 +291,7 @@ func (q *Queries) ListConstructorSeasonProgression(ctx context.Context, season i
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListConstructorSeasonProgressionRow
+	items := []ListConstructorSeasonProgressionRow{}
 	for rows.Next() {
 		var i ListConstructorSeasonProgressionRow
 		if err := rows.Scan(&i.RaceRound, &i.Points); err != nil {
@@ -328,16 +328,16 @@ ORDER BY rr.race_round, rr.finish_order
 `
 
 type ListConstructorSeasonResultsRow struct {
-	RaceRound           int32
-	RaceName            string
-	FinishOrder         int32
-	DriverID            string
-	DriverCode          string
-	PositionLabel       string
-	StatusCategory      string
-	Points              float64
-	SprintPositionLabel pgtype.Text
-	SprintPoints        float64
+	RaceRound           int32       `json:"raceRound"`
+	RaceName            string      `json:"raceName"`
+	FinishOrder         int32       `json:"finishOrder"`
+	DriverID            string      `json:"driverId"`
+	DriverCode          string      `json:"driverCode"`
+	PositionLabel       string      `json:"positionLabel"`
+	StatusCategory      string      `json:"statusCategory"`
+	Points              float64     `json:"points"`
+	SprintPositionLabel pgtype.Text `json:"sprintPositionLabel"`
+	SprintPoints        float64     `json:"sprintPoints"`
 }
 
 func (q *Queries) ListConstructorSeasonResults(ctx context.Context, season int32, constructorID string) ([]ListConstructorSeasonResultsRow, error) {
@@ -346,7 +346,7 @@ func (q *Queries) ListConstructorSeasonResults(ctx context.Context, season int32
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListConstructorSeasonResultsRow
+	items := []ListConstructorSeasonResultsRow{}
 	for rows.Next() {
 		var i ListConstructorSeasonResultsRow
 		if err := rows.Scan(
@@ -389,16 +389,16 @@ ORDER BY season DESC, engine_manufacturer_name
 `
 
 type ListConstructorSeasonsRow struct {
-	Season                 int32
-	EngineManufacturerID   string
-	EngineManufacturerName string
-	Starts                 int32
-	Wins                   int32
-	Podiums                int32
-	Poles                  int32
-	FinalPositionText      pgtype.Text
-	FinalPoints            pgtype.Float8
-	ChampionshipWon        bool
+	Season                 int32         `json:"season"`
+	EngineManufacturerID   string        `json:"engineManufacturerId"`
+	EngineManufacturerName string        `json:"engineManufacturerName"`
+	Starts                 int32         `json:"starts"`
+	Wins                   int32         `json:"wins"`
+	Podiums                int32         `json:"podiums"`
+	Poles                  int32         `json:"poles"`
+	FinalPositionText      pgtype.Text   `json:"finalPositionText"`
+	FinalPoints            pgtype.Float8 `json:"finalPoints"`
+	ChampionshipWon        bool          `json:"championshipWon"`
 }
 
 func (q *Queries) ListConstructorSeasons(ctx context.Context, constructorID string) ([]ListConstructorSeasonsRow, error) {
@@ -407,7 +407,7 @@ func (q *Queries) ListConstructorSeasons(ctx context.Context, constructorID stri
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListConstructorSeasonsRow
+	items := []ListConstructorSeasonsRow{}
 	for rows.Next() {
 		var i ListConstructorSeasonsRow
 		if err := rows.Scan(
@@ -447,14 +447,14 @@ ORDER BY championship_count DESC, win_count DESC
 `
 
 type ListConstructorsRow struct {
-	ID            string
-	Name          string
-	Color         string
-	FirstRaceDate pgtype.Date
-	LastRaceDate  pgtype.Date
-	Championships int32
-	Wins          int32
-	Podiums       int32
+	ID            string      `json:"id"`
+	Name          string      `json:"name"`
+	Color         string      `json:"color"`
+	FirstRaceDate pgtype.Date `json:"firstRaceDate"`
+	LastRaceDate  pgtype.Date `json:"lastRaceDate"`
+	Championships int32       `json:"championships"`
+	Wins          int32       `json:"wins"`
+	Podiums       int32       `json:"podiums"`
 }
 
 func (q *Queries) ListConstructors(ctx context.Context) ([]ListConstructorsRow, error) {
@@ -463,7 +463,7 @@ func (q *Queries) ListConstructors(ctx context.Context) ([]ListConstructorsRow, 
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListConstructorsRow
+	items := []ListConstructorsRow{}
 	for rows.Next() {
 		var i ListConstructorsRow
 		if err := rows.Scan(

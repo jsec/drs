@@ -40,20 +40,20 @@ WHERE r.season = $1
 `
 
 type GetRaceDetailRow struct {
-	RaceID             int32
-	Season             int32
-	RaceRound          int32
-	RaceName           string
-	RaceDate           pgtype.Date
-	CircuitName        string
-	RaceLaps           int32
-	PoleDriverID       pgtype.Text
-	PoleCode           pgtype.Text
-	WinnerDriverID     pgtype.Text
-	WinnerDriverCode   pgtype.Text
-	FastestLapDriverID pgtype.Text
-	FastestLapCode     pgtype.Text
-	FastestLapTime     pgtype.Text
+	RaceID             int32       `json:"raceId"`
+	Season             int32       `json:"season"`
+	RaceRound          int32       `json:"raceRound"`
+	RaceName           string      `json:"raceName"`
+	RaceDate           pgtype.Date `json:"raceDate"`
+	CircuitName        string      `json:"circuitName"`
+	RaceLaps           int32       `json:"raceLaps"`
+	PoleDriverID       pgtype.Text `json:"poleDriverId"`
+	PoleCode           pgtype.Text `json:"poleCode"`
+	WinnerDriverID     pgtype.Text `json:"winnerDriverId"`
+	WinnerDriverCode   pgtype.Text `json:"winnerDriverCode"`
+	FastestLapDriverID pgtype.Text `json:"fastestLapDriverId"`
+	FastestLapCode     pgtype.Text `json:"fastestLapCode"`
+	FastestLapTime     pgtype.Text `json:"fastestLapTime"`
 }
 
 func (q *Queries) GetRaceDetail(ctx context.Context, season int32, raceRound int32) (GetRaceDetailRow, error) {
@@ -104,20 +104,20 @@ ORDER BY qr.qualifying_order
 `
 
 type ListQualifyingResultsRow struct {
-	Position           int32
-	PositionLabel      string
-	DriverID           string
-	Code               string
-	Name               string
-	LastName           string
-	ConstructorID      string
-	ConstructorName    string
-	ConstructorColor   pgtype.Text
-	Q1                 pgtype.Text
-	Q2                 pgtype.Text
-	Q3                 pgtype.Text
-	BestQualifyingTime pgtype.Text
-	Gap                pgtype.Text
+	Position           int32       `json:"position"`
+	PositionLabel      string      `json:"positionLabel"`
+	DriverID           string      `json:"driverId"`
+	Code               string      `json:"code"`
+	Name               string      `json:"name"`
+	LastName           string      `json:"lastName"`
+	ConstructorID      string      `json:"constructorId"`
+	ConstructorName    string      `json:"constructorName"`
+	ConstructorColor   pgtype.Text `json:"constructorColor"`
+	Q1                 pgtype.Text `json:"q1"`
+	Q2                 pgtype.Text `json:"q2"`
+	Q3                 pgtype.Text `json:"q3"`
+	BestQualifyingTime pgtype.Text `json:"bestQualifyingTime"`
+	Gap                pgtype.Text `json:"gap"`
 }
 
 func (q *Queries) ListQualifyingResults(ctx context.Context, raceID int32) ([]ListQualifyingResultsRow, error) {
@@ -126,7 +126,7 @@ func (q *Queries) ListQualifyingResults(ctx context.Context, raceID int32) ([]Li
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListQualifyingResultsRow
+	items := []ListQualifyingResultsRow{}
 	for rows.Next() {
 		var i ListQualifyingResultsRow
 		if err := rows.Scan(
@@ -168,10 +168,10 @@ ORDER BY lt.driver_id, lt.lap_number
 `
 
 type ListRaceLapTimesRow struct {
-	DriverID  string
-	LapNumber int32
-	Position  pgtype.Int4
-	LapTimeMs int32
+	DriverID  string      `json:"driverId"`
+	LapNumber int32       `json:"lapNumber"`
+	Position  pgtype.Int4 `json:"position"`
+	LapTimeMs int32       `json:"lapTimeMs"`
 }
 
 func (q *Queries) ListRaceLapTimes(ctx context.Context, raceID int32, session string) ([]ListRaceLapTimesRow, error) {
@@ -180,7 +180,7 @@ func (q *Queries) ListRaceLapTimes(ctx context.Context, raceID int32, session st
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListRaceLapTimesRow
+	items := []ListRaceLapTimesRow{}
 	for rows.Next() {
 		var i ListRaceLapTimesRow
 		if err := rows.Scan(
@@ -225,20 +225,20 @@ ORDER BY rr.finish_order
 `
 
 type ListRaceResultsRow struct {
-	Position         int32
-	PositionLabel    string
-	DriverID         string
-	Code             string
-	Name             string
-	LastName         string
-	ConstructorID    string
-	ConstructorName  string
-	ConstructorColor pgtype.Text
-	GridPosition     pgtype.Int4
-	ElapsedTime      pgtype.Text
-	Gap              pgtype.Text
-	Status           pgtype.Text
-	Points           float64
+	Position         int32       `json:"position"`
+	PositionLabel    string      `json:"positionLabel"`
+	DriverID         string      `json:"driverId"`
+	Code             string      `json:"code"`
+	Name             string      `json:"name"`
+	LastName         string      `json:"lastName"`
+	ConstructorID    string      `json:"constructorId"`
+	ConstructorName  string      `json:"constructorName"`
+	ConstructorColor pgtype.Text `json:"constructorColor"`
+	GridPosition     pgtype.Int4 `json:"gridPosition"`
+	ElapsedTime      pgtype.Text `json:"elapsedTime"`
+	Gap              pgtype.Text `json:"gap"`
+	Status           pgtype.Text `json:"status"`
+	Points           float64     `json:"points"`
 }
 
 func (q *Queries) ListRaceResults(ctx context.Context, raceID int32) ([]ListRaceResultsRow, error) {
@@ -247,7 +247,7 @@ func (q *Queries) ListRaceResults(ctx context.Context, raceID int32) ([]ListRace
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListRaceResultsRow
+	items := []ListRaceResultsRow{}
 	for rows.Next() {
 		var i ListRaceResultsRow
 		if err := rows.Scan(
@@ -302,20 +302,20 @@ ORDER BY sr.finish_order
 `
 
 type ListSprintResultsRow struct {
-	Position         int32
-	PositionLabel    string
-	DriverID         string
-	Code             string
-	Name             string
-	LastName         string
-	ConstructorID    string
-	ConstructorName  string
-	ConstructorColor pgtype.Text
-	GridPosition     pgtype.Int4
-	ElapsedTime      pgtype.Text
-	Gap              pgtype.Text
-	Status           pgtype.Text
-	Points           float64
+	Position         int32       `json:"position"`
+	PositionLabel    string      `json:"positionLabel"`
+	DriverID         string      `json:"driverId"`
+	Code             string      `json:"code"`
+	Name             string      `json:"name"`
+	LastName         string      `json:"lastName"`
+	ConstructorID    string      `json:"constructorId"`
+	ConstructorName  string      `json:"constructorName"`
+	ConstructorColor pgtype.Text `json:"constructorColor"`
+	GridPosition     pgtype.Int4 `json:"gridPosition"`
+	ElapsedTime      pgtype.Text `json:"elapsedTime"`
+	Gap              pgtype.Text `json:"gap"`
+	Status           pgtype.Text `json:"status"`
+	Points           float64     `json:"points"`
 }
 
 func (q *Queries) ListSprintResults(ctx context.Context, raceID int32) ([]ListSprintResultsRow, error) {
@@ -324,7 +324,7 @@ func (q *Queries) ListSprintResults(ctx context.Context, raceID int32) ([]ListSp
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListSprintResultsRow
+	items := []ListSprintResultsRow{}
 	for rows.Next() {
 		var i ListSprintResultsRow
 		if err := rows.Scan(

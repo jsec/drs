@@ -7,29 +7,6 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-func ListCircuits(ctx context.Context, queries database.Querier) ([]ListCircuitsResponse, error) {
-	rows, err := queries.ListCircuits(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("listing circuits: %w", err)
-	}
-
-	out := make([]ListCircuitsResponse, 0, len(rows))
-
-	for _, row := range rows {
-		out = append(out, ListCircuitsResponse{
-			CircuitID:     row.CircuitID,
-			Name:          row.Name,
-			Country:       row.Country,
-			FirstRaceYear: row.FirstRaceYear,
-			LastRaceYear:  row.LastRaceYear,
-			Location:      row.Location,
-			RaceCount:     row.RaceCount,
-		})
-	}
-
-	return out, nil
-}
-
 func GetCircuitSummary(ctx context.Context, queries database.Querier, circuitID string) (CircuitSummaryResponse, error) {
 	circuit, err := queries.GetCircuitInfo(ctx, circuitID)
 	if err != nil {

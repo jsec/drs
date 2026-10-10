@@ -62,33 +62,33 @@ LIMIT 1
 `
 
 type GetDriverRaceRow struct {
-	RaceID                  int32
-	RaceName                string
-	Code                    string
-	Name                    string
-	ConstructorName         string
-	ConstructorColor        pgtype.Text
-	CarNumber               pgtype.Int4
-	PositionLabel           string
-	Position                pgtype.Int4
-	GridPosition            pgtype.Int4
-	PositionsGained         pgtype.Int4
-	ElapsedTime             pgtype.Text
-	Gap                     pgtype.Text
-	StatusCategory          string
-	LapsCompleted           pgtype.Int4
-	Points                  float64
-	PitStopCount            pgtype.Int4
-	TimePenalty             pgtype.Text
-	IsWin                   bool
-	IsPolePosition          bool
-	IsFastestLap            bool
-	IsDriverOfTheDay        bool
-	IsGrandSlam             bool
-	QualifyingPositionLabel pgtype.Text
-	BestQualifyingTime      pgtype.Text
-	FastestLapPosition      pgtype.Int4
-	HasSprint               bool
+	RaceID                  int32       `json:"raceId"`
+	RaceName                string      `json:"raceName"`
+	Code                    string      `json:"code"`
+	Name                    string      `json:"name"`
+	ConstructorName         string      `json:"constructorName"`
+	ConstructorColor        pgtype.Text `json:"constructorColor"`
+	CarNumber               pgtype.Int4 `json:"carNumber"`
+	PositionLabel           string      `json:"positionLabel"`
+	Position                pgtype.Int4 `json:"position"`
+	GridPosition            pgtype.Int4 `json:"gridPosition"`
+	PositionsGained         pgtype.Int4 `json:"positionsGained"`
+	ElapsedTime             pgtype.Text `json:"elapsedTime"`
+	Gap                     pgtype.Text `json:"gap"`
+	StatusCategory          string      `json:"statusCategory"`
+	LapsCompleted           pgtype.Int4 `json:"lapsCompleted"`
+	Points                  float64     `json:"points"`
+	PitStopCount            pgtype.Int4 `json:"pitStopCount"`
+	TimePenalty             pgtype.Text `json:"timePenalty"`
+	IsWin                   bool        `json:"isWin"`
+	IsPolePosition          bool        `json:"isPolePosition"`
+	IsFastestLap            bool        `json:"isFastestLap"`
+	IsDriverOfTheDay        bool        `json:"isDriverOfTheDay"`
+	IsGrandSlam             bool        `json:"isGrandSlam"`
+	QualifyingPositionLabel pgtype.Text `json:"qualifyingPositionLabel"`
+	BestQualifyingTime      pgtype.Text `json:"bestQualifyingTime"`
+	FastestLapPosition      pgtype.Int4 `json:"fastestLapPosition"`
+	HasSprint               bool        `json:"hasSprint"`
 }
 
 func (q *Queries) GetDriverRace(ctx context.Context, season int32, raceRound int32, driverID string) (GetDriverRaceRow, error) {
@@ -148,18 +148,18 @@ WHERE dss.season = $1
 `
 
 type GetDriverSeasonRow struct {
-	Code             string
-	Name             string
-	Country          string
-	CountryCode      string
-	ConstructorName  string
-	ConstructorColor string
-	CarNumber        pgtype.Int4
-	Points           float64
-	Position         pgtype.Text
-	Wins             int32
-	Podiums          int32
-	Poles            int32
+	Code             string      `json:"code"`
+	Name             string      `json:"name"`
+	Country          string      `json:"country"`
+	CountryCode      string      `json:"countryCode"`
+	ConstructorName  string      `json:"constructorName"`
+	ConstructorColor string      `json:"constructorColor"`
+	CarNumber        pgtype.Int4 `json:"carNumber"`
+	Points           float64     `json:"points"`
+	Position         pgtype.Text `json:"position"`
+	Wins             int32       `json:"wins"`
+	Podiums          int32       `json:"podiums"`
+	Poles            int32       `json:"poles"`
 }
 
 func (q *Queries) GetDriverSeason(ctx context.Context, season int32, driverID string) (GetDriverSeasonRow, error) {
@@ -211,24 +211,24 @@ WHERE sr.season = $1
 `
 
 type GetDriverSprintRow struct {
-	RaceName         string
-	Code             string
-	Name             string
-	ConstructorName  string
-	ConstructorColor pgtype.Text
-	CarNumber        pgtype.Int4
-	PositionLabel    string
-	Position         pgtype.Int4
-	GridPosition     pgtype.Int4
-	PositionsGained  pgtype.Int4
-	ElapsedTime      pgtype.Text
-	Gap              pgtype.Text
-	StatusCategory   string
-	LapsCompleted    pgtype.Int4
-	Points           float64
-	TimePenalty      pgtype.Text
-	IsWin            bool
-	IsGridP1         bool
+	RaceName         string      `json:"raceName"`
+	Code             string      `json:"code"`
+	Name             string      `json:"name"`
+	ConstructorName  string      `json:"constructorName"`
+	ConstructorColor pgtype.Text `json:"constructorColor"`
+	CarNumber        pgtype.Int4 `json:"carNumber"`
+	PositionLabel    string      `json:"positionLabel"`
+	Position         pgtype.Int4 `json:"position"`
+	GridPosition     pgtype.Int4 `json:"gridPosition"`
+	PositionsGained  pgtype.Int4 `json:"positionsGained"`
+	ElapsedTime      pgtype.Text `json:"elapsedTime"`
+	Gap              pgtype.Text `json:"gap"`
+	StatusCategory   string      `json:"statusCategory"`
+	LapsCompleted    pgtype.Int4 `json:"lapsCompleted"`
+	Points           float64     `json:"points"`
+	TimePenalty      pgtype.Text `json:"timePenalty"`
+	IsWin            bool        `json:"isWin"`
+	IsGridP1         bool        `json:"isGridP1"`
 }
 
 func (q *Queries) GetDriverSprint(ctx context.Context, season int32, raceRound int32, driverID string) (GetDriverSprintRow, error) {
@@ -278,19 +278,19 @@ WHERE d.driver_id = $1
 `
 
 type GetDriverSummaryRow struct {
-	Code             string
-	Name             string
-	Country          string
-	CountryCode      string
-	Starts           int32
-	Wins             int32
-	Podiums          int32
-	Poles            int32
-	Championships    int32
-	FirstYear        pgtype.Int4
-	LastYear         pgtype.Int4
-	IsActive         pgtype.Bool
-	ConstructorColor pgtype.Text
+	Code             string      `json:"code"`
+	Name             string      `json:"name"`
+	Country          string      `json:"country"`
+	CountryCode      string      `json:"countryCode"`
+	Starts           int32       `json:"starts"`
+	Wins             int32       `json:"wins"`
+	Podiums          int32       `json:"podiums"`
+	Poles            int32       `json:"poles"`
+	Championships    int32       `json:"championships"`
+	FirstYear        pgtype.Int4 `json:"firstYear"`
+	LastYear         pgtype.Int4 `json:"lastYear"`
+	IsActive         pgtype.Bool `json:"isActive"`
+	ConstructorColor pgtype.Text `json:"constructorColor"`
 }
 
 func (q *Queries) GetDriverSummary(ctx context.Context, driverID string) (GetDriverSummaryRow, error) {
@@ -327,10 +327,10 @@ ORDER BY ps.stop_number
 `
 
 type ListDriverRacePitStopsRow struct {
-	StopNumber int32
-	LapNumber  int32
-	Duration   pgtype.Text
-	DurationMs pgtype.Int4
+	StopNumber int32       `json:"stopNumber"`
+	LapNumber  int32       `json:"lapNumber"`
+	Duration   pgtype.Text `json:"duration"`
+	DurationMs pgtype.Int4 `json:"durationMs"`
 }
 
 func (q *Queries) ListDriverRacePitStops(ctx context.Context, raceID int32, driverID string) ([]ListDriverRacePitStopsRow, error) {
@@ -339,7 +339,7 @@ func (q *Queries) ListDriverRacePitStops(ctx context.Context, raceID int32, driv
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListDriverRacePitStopsRow
+	items := []ListDriverRacePitStopsRow{}
 	for rows.Next() {
 		var i ListDriverRacePitStopsRow
 		if err := rows.Scan(
@@ -380,15 +380,15 @@ ORDER BY rr.race_round, rr.finish_order
 `
 
 type ListDriverSeasonRacesRow struct {
-	RaceRound           int32
-	RaceName            string
-	GridPosition        pgtype.Int4
-	PositionLabel       string
-	Position            pgtype.Int4
-	StatusCategory      string
-	Points              float64
-	SprintPositionLabel pgtype.Text
-	SprintPoints        float64
+	RaceRound           int32       `json:"raceRound"`
+	RaceName            string      `json:"raceName"`
+	GridPosition        pgtype.Int4 `json:"gridPosition"`
+	PositionLabel       string      `json:"positionLabel"`
+	Position            pgtype.Int4 `json:"position"`
+	StatusCategory      string      `json:"statusCategory"`
+	Points              float64     `json:"points"`
+	SprintPositionLabel pgtype.Text `json:"sprintPositionLabel"`
+	SprintPoints        float64     `json:"sprintPoints"`
 }
 
 func (q *Queries) ListDriverSeasonRaces(ctx context.Context, season int32, driverID string) ([]ListDriverSeasonRacesRow, error) {
@@ -397,7 +397,7 @@ func (q *Queries) ListDriverSeasonRaces(ctx context.Context, season int32, drive
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListDriverSeasonRacesRow
+	items := []ListDriverSeasonRacesRow{}
 	for rows.Next() {
 		var i ListDriverSeasonRacesRow
 		if err := rows.Scan(
@@ -442,15 +442,15 @@ ORDER BY dscs.season DESC, dscs.constructor_sequence
 `
 
 type ListDriverSeasonsRow struct {
-	Season           int32
-	ConstructorName  string
-	ConstructorColor string
-	Starts           int32
-	Wins             int32
-	Podiums          int32
-	Poles            int32
-	Points           int32
-	Position         pgtype.Text
+	Season           int32       `json:"season"`
+	ConstructorName  string      `json:"constructorName"`
+	ConstructorColor string      `json:"constructorColor"`
+	Starts           int32       `json:"starts"`
+	Wins             int32       `json:"wins"`
+	Podiums          int32       `json:"podiums"`
+	Poles            int32       `json:"poles"`
+	Points           int32       `json:"points"`
+	Position         pgtype.Text `json:"position"`
 }
 
 func (q *Queries) ListDriverSeasons(ctx context.Context, driverID string) ([]ListDriverSeasonsRow, error) {
@@ -459,7 +459,7 @@ func (q *Queries) ListDriverSeasons(ctx context.Context, driverID string) ([]Lis
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListDriverSeasonsRow
+	items := []ListDriverSeasonsRow{}
 	for rows.Next() {
 		var i ListDriverSeasonsRow
 		if err := rows.Scan(
@@ -502,18 +502,18 @@ LEFT JOIN effone.constructors c ON d.current_constructor_id = c.constructor_id
 `
 
 type ListDriversRow struct {
-	ID               string
-	Code             string
-	Name             string
-	Starts           int32
-	Wins             int32
-	Podiums          int32
-	Poles            int32
-	Championships    int32
-	FirstYear        pgtype.Int4
-	LastYear         pgtype.Int4
-	IsActive         pgtype.Bool
-	ConstructorColor pgtype.Text
+	ID               string      `json:"id"`
+	Code             string      `json:"code"`
+	Name             string      `json:"name"`
+	Starts           int32       `json:"starts"`
+	Wins             int32       `json:"wins"`
+	Podiums          int32       `json:"podiums"`
+	Poles            int32       `json:"poles"`
+	Championships    int32       `json:"championships"`
+	FirstYear        pgtype.Int4 `json:"firstYear"`
+	LastYear         pgtype.Int4 `json:"lastYear"`
+	IsActive         pgtype.Bool `json:"isActive"`
+	ConstructorColor pgtype.Text `json:"constructorColor"`
 }
 
 func (q *Queries) ListDrivers(ctx context.Context) ([]ListDriversRow, error) {
@@ -522,7 +522,7 @@ func (q *Queries) ListDrivers(ctx context.Context) ([]ListDriversRow, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListDriversRow
+	items := []ListDriversRow{}
 	for rows.Next() {
 		var i ListDriversRow
 		if err := rows.Scan(

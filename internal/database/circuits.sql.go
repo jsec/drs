@@ -34,22 +34,22 @@ WHERE circuit_id = $1
 `
 
 type GetCircuitInfoRow struct {
-	CircuitID       string
-	Name            string
-	CircuitType     string
-	Country         string
-	CountryCode     string
-	CountryID       string
-	FirstRaceID     pgtype.Int4
-	FirstRaceDate   pgtype.Date
-	FirstRaceName   pgtype.Text
-	LastRaceID      pgtype.Int4
-	LastRaceDate    pgtype.Date
-	LastRaceName    pgtype.Text
-	CurrentLayoutID pgtype.Text
-	PreviousNames   []string
-	RaceCount       int32
-	Turns           int32
+	CircuitID       string      `json:"circuitId"`
+	Name            string      `json:"name"`
+	CircuitType     string      `json:"circuitType"`
+	Country         string      `json:"country"`
+	CountryCode     string      `json:"countryCode"`
+	CountryID       string      `json:"countryId"`
+	FirstRaceID     pgtype.Int4 `json:"firstRaceId"`
+	FirstRaceDate   pgtype.Date `json:"firstRaceDate"`
+	FirstRaceName   pgtype.Text `json:"firstRaceName"`
+	LastRaceID      pgtype.Int4 `json:"lastRaceId"`
+	LastRaceDate    pgtype.Date `json:"lastRaceDate"`
+	LastRaceName    pgtype.Text `json:"lastRaceName"`
+	CurrentLayoutID pgtype.Text `json:"currentLayoutId"`
+	PreviousNames   []string    `json:"previousNames"`
+	RaceCount       int32       `json:"raceCount"`
+	Turns           int32       `json:"turns"`
 }
 
 func (q *Queries) GetCircuitInfo(ctx context.Context, circuitID string) (GetCircuitInfoRow, error) {
@@ -90,12 +90,12 @@ ORDER BY race_date DESC
 `
 
 type GetRacesByCircuitIdRow struct {
-	RaceID           int32
-	RaceDate         pgtype.Date
-	CircuitLayoutID  string
-	RaceOfficialName string
-	WinnerDriverID   pgtype.Text
-	WinnerDriverName pgtype.Text
+	RaceID           int32       `json:"raceId"`
+	RaceDate         pgtype.Date `json:"raceDate"`
+	CircuitLayoutID  string      `json:"circuitLayoutId"`
+	RaceOfficialName string      `json:"raceOfficialName"`
+	WinnerDriverID   pgtype.Text `json:"winnerDriverId"`
+	WinnerDriverName pgtype.Text `json:"winnerDriverName"`
 }
 
 func (q *Queries) GetRacesByCircuitId(ctx context.Context, circuitID string) ([]GetRacesByCircuitIdRow, error) {
@@ -104,7 +104,7 @@ func (q *Queries) GetRacesByCircuitId(ctx context.Context, circuitID string) ([]
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetRacesByCircuitIdRow
+	items := []GetRacesByCircuitIdRow{}
 	for rows.Next() {
 		var i GetRacesByCircuitIdRow
 		if err := rows.Scan(
@@ -139,13 +139,13 @@ ORDER BY last_race_date DESC
 `
 
 type ListCircuitsRow struct {
-	CircuitID     string
-	Name          string
-	Country       string
-	FirstRaceYear pgtype.Int4
-	LastRaceYear  pgtype.Int4
-	Location      string
-	RaceCount     int32
+	CircuitID     string      `json:"circuitId"`
+	Name          string      `json:"name"`
+	Country       string      `json:"country"`
+	FirstRaceYear pgtype.Int4 `json:"firstRaceYear"`
+	LastRaceYear  pgtype.Int4 `json:"lastRaceYear"`
+	Location      string      `json:"location"`
+	RaceCount     int32       `json:"raceCount"`
 }
 
 func (q *Queries) ListCircuits(ctx context.Context) ([]ListCircuitsRow, error) {
@@ -154,7 +154,7 @@ func (q *Queries) ListCircuits(ctx context.Context) ([]ListCircuitsRow, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListCircuitsRow
+	items := []ListCircuitsRow{}
 	for rows.Next() {
 		var i ListCircuitsRow
 		if err := rows.Scan(

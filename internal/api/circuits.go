@@ -7,7 +7,7 @@ import (
 )
 
 func (app *application) listCircuitsHandler(w http.ResponseWriter, r *http.Request) error {
-	list, err := circuits.ListCircuits(r.Context(), app.queries)
+	list, err := app.queries.ListCircuits(r.Context())
 	if err != nil {
 		return err
 	}

@@ -9,30 +9,6 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-func ListConstructors(ctx context.Context, queries database.Querier) ([]ConstructorResponse, error) {
-	rows, err := queries.ListConstructors(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("listing constructors: %w", err)
-	}
-
-	out := make([]ConstructorResponse, 0, len(rows))
-
-	for _, row := range rows {
-		out = append(out, ConstructorResponse{
-			ID:            row.ID,
-			Name:          row.Name,
-			Color:         row.Color,
-			FirstRaceDate: row.FirstRaceDate,
-			LastRaceDate:  row.LastRaceDate,
-			Championships: row.Championships,
-			Wins:          row.Wins,
-			Podiums:       row.Podiums,
-		})
-	}
-
-	return out, nil
-}
-
 func GetSummary(ctx context.Context, queries database.Querier, constructorID string) (ConstructorSummary, error) {
 	summary, err := queries.GetConstructorSummary(ctx, constructorID)
 	if err != nil {
