@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"os"
@@ -16,16 +17,11 @@ type config struct {
 }
 
 func loadConfig() config {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
-	}
-
 	return config{
 		appEnv:      os.Getenv("APP_ENV"),
 		databaseURL: os.Getenv("DATABASE_URL"),
 		githubToken: os.Getenv("GITHUB_TOKEN"),
-		port:        port,
+		port:        cmp.Or(os.Getenv("PORT"), "3000"),
 	}
 }
 

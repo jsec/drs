@@ -29,24 +29,24 @@ type DriverSummary struct {
 	Championships    int32                 `json:"championships"`
 	IsActive         bool                  `json:"isActive"`
 	ConstructorColor string                `json:"constructorColor"`
-	FirstYear        *int32                `json:"firstYear"`
-	LastYear         *int32                `json:"lastYear"`
+	FirstYear        pgtype.Int4           `json:"firstYear"`
+	LastYear         pgtype.Int4           `json:"lastYear"`
 	Seasons          []driverSeasonSummary `json:"seasons"`
 }
 
 type DriverShortSummary struct {
-	ID               string `json:"id"`
-	Code             string `json:"code"`
-	Name             string `json:"name"`
-	Starts           int32  `json:"starts"`
-	Wins             int32  `json:"wins"`
-	Podiums          int32  `json:"podiums"`
-	Poles            int32  `json:"poles"`
-	Championships    int32  `json:"championships"`
-	IsActive         bool   `json:"isActive"`
-	ConstructorColor string `json:"constructorColor"`
-	FirstYear        *int32 `json:"firstYear"`
-	LastYear         *int32 `json:"lastYear"`
+	ID               string      `json:"id"`
+	Code             string      `json:"code"`
+	Name             string      `json:"name"`
+	Starts           int32       `json:"starts"`
+	Wins             int32       `json:"wins"`
+	Podiums          int32       `json:"podiums"`
+	Poles            int32       `json:"poles"`
+	Championships    int32       `json:"championships"`
+	IsActive         bool        `json:"isActive"`
+	ConstructorColor string      `json:"constructorColor"`
+	FirstYear        pgtype.Int4 `json:"firstYear"`
+	LastYear         pgtype.Int4 `json:"lastYear"`
 }
 
 type sprintResult struct {

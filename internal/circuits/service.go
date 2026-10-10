@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jackc/pgx/v5/pgtype"
-
 	"github.com/jsec/drs/internal/database"
 )
 
@@ -22,10 +20,10 @@ func ListCircuits(ctx context.Context, queries database.Querier) ([]ListCircuits
 			CircuitID:     row.CircuitID,
 			Name:          row.Name,
 			Country:       row.Country,
-			FirstRaceYear: year(row.FirstRaceDate),
-			LastRaceYear:  year(row.LastRaceDate),
+			FirstRaceYear: row.FirstRaceYear,
+			LastRaceYear:  row.LastRaceYear,
 			Location:      row.Location,
-			RaceCount:     int(row.RaceCount),
+			RaceCount:     row.RaceCount,
 		})
 	}
 
@@ -47,7 +45,7 @@ func GetCircuitSummary(ctx context.Context, queries database.Querier, circuitID 
 
 	for _, race := range raceList {
 		races = append(races, CircuitRace{
-			RaceID:     int(race.RaceID),
+			RaceID:     race.RaceID,
 			Date:       race.RaceDate,
 			LayoutID:   race.CircuitLayoutID,
 			Name:       race.RaceOfficialName,
@@ -80,16 +78,8 @@ func GetCircuitSummary(ctx context.Context, queries database.Querier, circuitID 
 		},
 		CurrentLayoutId: circuit.CurrentLayoutID.String,
 		PreviousNames:   previousNames,
-		RaceCount:       int(circuit.RaceCount),
-		Turns:           int(circuit.Turns),
+		RaceCount:       circuit.RaceCount,
+		Turns:           circuit.Turns,
 		Races:           races,
 	}, nil
-}
-
-func year(d pgtype.Date) *int32 {
-	if !d.Valid {
-		return nil
-	}
-	y := int32(d.Time.Year())
-	return &y
 }

@@ -24,8 +24,8 @@ SELECT
     podium_count AS podiums,
     qualifying_p1_count AS poles,
     championship_count AS championships,
-    first_race_date,
-    last_race_date,
+    CASE WHEN first_race_date IS NOT NULL THEN date_part('year', first_race_date)::INTEGER END AS first_year,
+    CASE WHEN last_race_date IS NOT NULL THEN date_part('year', last_race_date)::INTEGER END AS last_year,
     coalesce(extract(year FROM last_race_date) = (SELECT max(season) FROM effone.race_results), false)::BOOLEAN AS is_active
 FROM effone.constructors
 WHERE constructor_id = $1::TEXT
@@ -43,8 +43,8 @@ type GetConstructorSummaryRow struct {
 	Podiums       int32
 	Poles         int32
 	Championships int32
-	FirstRaceDate pgtype.Date
-	LastRaceDate  pgtype.Date
+	FirstYear     pgtype.Int4
+	LastYear      pgtype.Int4
 	IsActive      bool
 }
 
@@ -63,8 +63,8 @@ func (q *Queries) GetConstructorSummary(ctx context.Context, constructorID strin
 		&i.Podiums,
 		&i.Poles,
 		&i.Championships,
-		&i.FirstRaceDate,
-		&i.LastRaceDate,
+		&i.FirstYear,
+		&i.LastYear,
 		&i.IsActive,
 	)
 	return i, err

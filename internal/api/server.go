@@ -9,6 +9,11 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
+type application struct {
+	logger  *slog.Logger
+	queries database.Querier
+}
+
 func Serve(ctx context.Context, logger *slog.Logger, db *database.Queries, port string) error {
 	srv := &http.Server{
 		Addr:              ":" + port,

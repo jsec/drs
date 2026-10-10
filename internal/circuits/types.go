@@ -3,13 +3,13 @@ package circuits
 import "github.com/jackc/pgx/v5/pgtype"
 
 type ListCircuitsResponse struct {
-	CircuitID     string `json:"circuitId"`
-	Name          string `json:"name"`
-	Country       string `json:"country"`
-	FirstRaceYear *int32 `json:"firstRaceYear,omitempty"`
-	LastRaceYear  *int32 `json:"lastRaceYear,omitempty"`
-	Location      string `json:"location"`
-	RaceCount     int    `json:"raceCount"`
+	CircuitID     string      `json:"circuitId"`
+	Name          string      `json:"name"`
+	Country       string      `json:"country"`
+	FirstRaceYear pgtype.Int4 `json:"firstRaceYear"`
+	LastRaceYear  pgtype.Int4 `json:"lastRaceYear"`
+	Location      string      `json:"location"`
+	RaceCount     int32       `json:"raceCount"`
 }
 
 type CircuitRaceSummary struct {
@@ -19,7 +19,7 @@ type CircuitRaceSummary struct {
 }
 
 type CircuitRace struct {
-	RaceID     int         `json:"raceId"`
+	RaceID     int32       `json:"raceId"`
 	Date       pgtype.Date `json:"date"`
 	LayoutID   string      `json:"layoutId"`
 	Name       string      `json:"name"`
@@ -38,7 +38,7 @@ type CircuitSummaryResponse struct {
 	LastRace        CircuitRaceSummary `json:"lastRace"`
 	CurrentLayoutId string             `json:"layoutId"`
 	PreviousNames   []string           `json:"previousNames"`
-	RaceCount       int                `json:"raceCount"`
-	Turns           int                `json:"turns"`
+	RaceCount       int32              `json:"raceCount"`
+	Turns           int32              `json:"turns"`
 	Races           []CircuitRace      `json:"races"`
 }

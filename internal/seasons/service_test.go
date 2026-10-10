@@ -250,10 +250,6 @@ func TestService_GetOverview(t *testing.T) {
 	got, err := seasons.GetOverview(context.Background(), queries, 2023)
 
 	require.NoError(t, err)
-	require.NotNil(t, got.Leader)
-	require.NotNil(t, got.RunnerUp)
-	assert.Equal(t, "VER", got.Leader.Code)
-	assert.Equal(t, "PER", got.RunnerUp.Code)
 	assert.InEpsilon(t, 463.5, got.MaxConstructorPoints, 0.0001)
 	assert.Equal(t, seasons.Progression{
 		Data: []seasons.ProgressionDataRow{

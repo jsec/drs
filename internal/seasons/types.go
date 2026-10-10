@@ -64,8 +64,6 @@ type Progression struct {
 type SeasonOverviewResponse struct {
 	Drivers              []DriverStanding      `json:"drivers"`
 	Constructors         []ConstructorStanding `json:"constructors"`
-	Leader               *DriverStanding       `json:"leader"`
-	RunnerUp             *DriverStanding       `json:"runnerUp"`
 	MaxConstructorPoints float64               `json:"maxConstructorPoints"`
 	Progression          Progression           `json:"progression"`
 }

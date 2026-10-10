@@ -24,8 +24,8 @@ SELECT
     podium_count AS podiums,
     qualifying_p1_count AS poles,
     championship_count AS championships,
-    first_race_date,
-    last_race_date,
+    CASE WHEN first_race_date IS NOT NULL THEN date_part('year', first_race_date)::INTEGER END AS first_year,
+    CASE WHEN last_race_date IS NOT NULL THEN date_part('year', last_race_date)::INTEGER END AS last_year,
     coalesce(extract(year FROM last_race_date) = (SELECT max(season) FROM effone.race_results), false)::BOOLEAN AS is_active
 FROM effone.constructors
 WHERE constructor_id = sqlc.arg(constructor_id)::TEXT;

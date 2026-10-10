@@ -88,8 +88,8 @@ func TestListCircuitsHandler_UsesCamelCaseJSON(t *testing.T) {
 		queries: stubQuerier{
 			circuitRows: []database.ListCircuitsRow{{
 				CircuitID:     "monza",
-				FirstRaceDate: testDate(1950, time.September, 3),
-				LastRaceDate:  testDate(2026, time.September, 6),
+				FirstRaceYear: pgtype.Int4{Int32: 1950, Valid: true},
+				LastRaceYear:  pgtype.Int4{Int32: 2026, Valid: true},
 				RaceCount:     75,
 			}},
 		},

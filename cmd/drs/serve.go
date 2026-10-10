@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/urfave/cli/v3"
 
 	"github.com/jsec/drs/internal/api"
@@ -16,7 +17,15 @@ func serveCommand(logger *slog.Logger, config config) *cli.Command {
 		Usage:  "run the API server",
 		Before: config.requireDatabaseURL,
 		Action: func(ctx context.Context, _ *cli.Command) error {
-			pool, err := database.NewPool(ctx, config.databaseURL)
+			cfg, err := pgxpool.ParseConfig(config.databaseURL)
+			if err != nil {
+				return err
+			}
+
+			cfg.MaxConns = 10
+			cfg.MinConns = 2
+
+			pool, err := pgxpool.NewWithConfig(ctx, cfg)
 			if err != nil {
 				return err
 			}

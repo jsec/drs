@@ -14,11 +14,11 @@ type ConstructorResponse struct {
 }
 
 type LineageEntry struct {
-	Order    int32  `json:"order"`
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	YearFrom int32  `json:"yearFrom"`
-	YearTo   *int32 `json:"yearTo"`
+	Order    int32       `json:"order"`
+	ID       string      `json:"id"`
+	Name     string      `json:"name"`
+	YearFrom int32       `json:"yearFrom"`
+	YearTo   pgtype.Int4 `json:"yearTo"`
 }
 
 type SeasonDriver struct {
@@ -30,7 +30,7 @@ type ConstructorSeason struct {
 	Season     int32          `json:"season"`
 	Engine     string         `json:"engine"`
 	Position   string         `json:"position"`
-	Points     *float64       `json:"points"`
+	Points     pgtype.Float8  `json:"points"`
 	IsChampion bool           `json:"isChampion"`
 	Starts     int32          `json:"starts"`
 	Wins       int32          `json:"wins"`
@@ -51,8 +51,8 @@ type ConstructorSummary struct {
 	Podiums       int32               `json:"podiums"`
 	Poles         int32               `json:"poles"`
 	Championships int32               `json:"championships"`
-	FirstYear     *int32              `json:"firstYear"`
-	LastYear      *int32              `json:"lastYear"`
+	FirstYear     pgtype.Int4         `json:"firstYear"`
+	LastYear      pgtype.Int4         `json:"lastYear"`
 	IsActive      bool                `json:"isActive"`
 	Lineage       []LineageEntry      `json:"lineage"`
 	Seasons       []ConstructorSeason `json:"seasons"`
@@ -102,7 +102,7 @@ type SeasonDetail struct {
 	Color       string                `json:"color"`
 	Position    string                `json:"position"`
 	IsChampion  bool                  `json:"isChampion"`
-	Points      *float64              `json:"points"`
+	Points      pgtype.Float8         `json:"points"`
 	Wins        int32                 `json:"wins"`
 	Podiums     int32                 `json:"podiums"`
 	Poles       int32                 `json:"poles"`

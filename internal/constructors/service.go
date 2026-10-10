@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jsec/drs/internal/database"
 )
@@ -68,39 +67,29 @@ func GetSummary(ctx context.Context, queries database.Querier, constructorID str
 			seasonDrivers = []SeasonDriver{}
 		}
 
-		season := ConstructorSeason{
+		seasons = append(seasons, ConstructorSeason{
 			Season:     row.Season,
 			Engine:     row.EngineManufacturerName,
 			Position:   row.FinalPositionText.String,
+			Points:     row.FinalPoints,
 			IsChampion: row.ChampionshipWon,
 			Starts:     row.Starts,
 			Wins:       row.Wins,
 			Podiums:    row.Podiums,
 			Poles:      row.Poles,
 			Drivers:    seasonDrivers,
-		}
-
-		if row.FinalPoints.Valid {
-			season.Points = &row.FinalPoints.Float64
-		}
-
-		seasons = append(seasons, season)
+		})
 	}
 
 	lineage := make([]LineageEntry, 0, len(lineageRows))
 	for _, row := range lineageRows {
-		entry := LineageEntry{
+		lineage = append(lineage, LineageEntry{
 			Order:    row.PositionDisplayOrder,
 			ID:       row.OtherConstructorID,
 			Name:     row.OtherConstructorName,
 			YearFrom: row.YearFrom,
-		}
-
-		if row.YearTo.Valid {
-			entry.YearTo = &row.YearTo.Int32
-		}
-
-		lineage = append(lineage, entry)
+			YearTo:   row.YearTo,
+		})
 	}
 
 	return ConstructorSummary{
@@ -115,8 +104,8 @@ func GetSummary(ctx context.Context, queries database.Querier, constructorID str
 		Podiums:       summary.Podiums,
 		Poles:         summary.Poles,
 		Championships: summary.Championships,
-		FirstYear:     year(summary.FirstRaceDate),
-		LastYear:      year(summary.LastRaceDate),
+		FirstYear:     summary.FirstYear,
+		LastYear:      summary.LastYear,
 		IsActive:      summary.IsActive,
 		Lineage:       lineage,
 		Seasons:       seasons,
@@ -166,11 +155,8 @@ func GetSeason(ctx context.Context, queries database.Querier, constructorID stri
 
 	for _, row := range entryRows {
 		if row.FinalPoints.Valid {
-			points := row.FinalPoints.Float64
-			if detail.Points != nil {
-				points += *detail.Points
-			}
-			detail.Points = &points
+			detail.Points.Float64 += row.FinalPoints.Float64
+			detail.Points.Valid = true
 		}
 		detail.IsChampion = detail.IsChampion || row.ChampionshipWon
 		detail.Wins += row.Wins
@@ -230,12 +216,4 @@ func GetSeason(ctx context.Context, queries database.Querier, constructorID stri
 type seasonEngine struct {
 	season int32
 	engine string
-}
-
-func year(d pgtype.Date) *int32 {
-	if !d.Valid {
-		return nil
-	}
-	y := int32(d.Time.Year())
-	return &y
 }

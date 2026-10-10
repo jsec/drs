@@ -268,8 +268,8 @@ SELECT
     d.podium_count AS podiums,
     d.qualifying_p1_count AS poles,
     d.championship_count AS championships,
-    d.first_race_date,
-    d.last_race_date,
+    CASE WHEN d.first_race_date IS NOT NULL THEN date_part('year', d.first_race_date)::INTEGER END AS first_year,
+    CASE WHEN d.last_race_date IS NOT NULL THEN date_part('year', d.last_race_date)::INTEGER END AS last_year,
     d.current_constructor_id IS NOT NULL AS is_active,
     c.primary_color_hex AS constructor_color
 FROM effone.drivers d
@@ -287,8 +287,8 @@ type GetDriverSummaryRow struct {
 	Podiums          int32
 	Poles            int32
 	Championships    int32
-	FirstRaceDate    pgtype.Date
-	LastRaceDate     pgtype.Date
+	FirstYear        pgtype.Int4
+	LastYear         pgtype.Int4
 	IsActive         pgtype.Bool
 	ConstructorColor pgtype.Text
 }
@@ -306,8 +306,8 @@ func (q *Queries) GetDriverSummary(ctx context.Context, driverID string) (GetDri
 		&i.Podiums,
 		&i.Poles,
 		&i.Championships,
-		&i.FirstRaceDate,
-		&i.LastRaceDate,
+		&i.FirstYear,
+		&i.LastYear,
 		&i.IsActive,
 		&i.ConstructorColor,
 	)
@@ -493,8 +493,8 @@ SELECT
     d.podium_count AS podiums,
     d.qualifying_p1_count AS poles,
     d.championship_count AS championships,
-    d.first_race_date,
-    d.last_race_date,
+    CASE WHEN d.first_race_date IS NOT NULL THEN date_part('year', d.first_race_date)::INTEGER END AS first_year,
+    CASE WHEN d.last_race_date IS NOT NULL THEN date_part('year', d.last_race_date)::INTEGER END AS last_year,
     d.current_constructor_id IS NOT NULL AS is_active,
     c.primary_color_hex AS constructor_color
 FROM effone.drivers d
@@ -510,8 +510,8 @@ type ListDriversRow struct {
 	Podiums          int32
 	Poles            int32
 	Championships    int32
-	FirstRaceDate    pgtype.Date
-	LastRaceDate     pgtype.Date
+	FirstYear        pgtype.Int4
+	LastYear         pgtype.Int4
 	IsActive         pgtype.Bool
 	ConstructorColor pgtype.Text
 }
@@ -534,8 +534,8 @@ func (q *Queries) ListDrivers(ctx context.Context) ([]ListDriversRow, error) {
 			&i.Podiums,
 			&i.Poles,
 			&i.Championships,
-			&i.FirstRaceDate,
-			&i.LastRaceDate,
+			&i.FirstYear,
+			&i.LastYear,
 			&i.IsActive,
 			&i.ConstructorColor,
 		); err != nil {

@@ -107,11 +107,6 @@ func GetOverview(ctx context.Context, queries database.Querier, season int32) (S
 		return overview, nil
 	}
 
-	overview.Leader = &drivers[0]
-	if len(drivers) > 1 {
-		overview.RunnerUp = &drivers[1]
-	}
-
 	selectedDrivers := drivers
 	if len(selectedDrivers) > 6 {
 		selectedDrivers = selectedDrivers[:6]

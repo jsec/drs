@@ -130,8 +130,8 @@ SELECT
     circuit_id,
     circuit_name as name,
     country,
-    first_race_date,
-    last_race_date,
+    CASE WHEN first_race_date IS NOT NULL THEN date_part('year', first_race_date)::INTEGER END AS first_race_year,
+    CASE WHEN last_race_date IS NOT NULL THEN date_part('year', last_race_date)::INTEGER END AS last_race_year,
     location,
     race_count
 FROM effone.circuits
@@ -142,8 +142,8 @@ type ListCircuitsRow struct {
 	CircuitID     string
 	Name          string
 	Country       string
-	FirstRaceDate pgtype.Date
-	LastRaceDate  pgtype.Date
+	FirstRaceYear pgtype.Int4
+	LastRaceYear  pgtype.Int4
 	Location      string
 	RaceCount     int32
 }
@@ -161,8 +161,8 @@ func (q *Queries) ListCircuits(ctx context.Context) ([]ListCircuitsRow, error) {
 			&i.CircuitID,
 			&i.Name,
 			&i.Country,
-			&i.FirstRaceDate,
-			&i.LastRaceDate,
+			&i.FirstRaceYear,
+			&i.LastRaceYear,
 			&i.Location,
 			&i.RaceCount,
 		); err != nil {

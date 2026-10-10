@@ -84,8 +84,6 @@ func TestGetSeasonOverviewHandler(t *testing.T) {
 		}],
 		"constructors":[],
 		"maxConstructorPoints":0,
-		"leader":{"position":null,"positionLabel":"","points":44,"id":"max-verstappen","code":"VER","name":"Max Verstappen","country":"","countryCode":"","constructor":{"id":"red-bull","name":"Red Bull Racing","color":"#3671C6"},"carNumber":null,"wins":0,"podiums":0,"poles":0},
-		"runnerUp":null,
 		"progression":{
 			"data":[{"round":1,"VER":44}],
 			"series":[{"name":"VER","color":"#3671C6"}]

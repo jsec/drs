@@ -101,8 +101,8 @@ func TestService_GetSeason_CombinesEngineEntries(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, "3", got.Position)
-	require.NotNil(t, got.Points)
-	assert.InDelta(t, 27.0, *got.Points, 0.001)
+	assert.True(t, got.Points.Valid)
+	assert.InDelta(t, 27.0, got.Points.Float64, 0.001)
 	assert.Equal(t, int32(2), got.Wins)
 	assert.Equal(t, int32(6), got.Podiums)
 	assert.Equal(t, int32(7), got.DNFs)
@@ -123,7 +123,7 @@ func TestService_GetSeason_NoStanding(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Empty(t, got.Position)
-	assert.Nil(t, got.Points)
+	assert.False(t, got.Points.Valid)
 	assert.Equal(t, int32(1), got.Wins)
 }
 
@@ -192,7 +192,7 @@ func TestService_GetSummary_NoStanding(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Empty(t, got.Seasons[0].Position)
-	assert.Nil(t, got.Seasons[0].Points)
+	assert.False(t, got.Seasons[0].Points.Valid)
 	assert.Equal(t, []constructors.SeasonDriver{}, got.Seasons[0].Drivers)
 }
 

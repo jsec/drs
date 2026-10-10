@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jackc/pgx/v5/pgtype"
-
 	"github.com/jsec/drs/internal/database"
 )
 
@@ -29,8 +27,8 @@ func ListDrivers(ctx context.Context, queries database.Querier) ([]DriverShortSu
 			Championships:    d.Championships,
 			IsActive:         d.IsActive.Bool,
 			ConstructorColor: d.ConstructorColor.String,
-			FirstYear:        year(d.FirstRaceDate),
-			LastYear:         year(d.LastRaceDate),
+			FirstYear:        d.FirstYear,
+			LastYear:         d.LastYear,
 		})
 	}
 
@@ -78,8 +76,8 @@ func GetSummary(ctx context.Context, queries database.Querier, driverId string) 
 		Championships:    summary.Championships,
 		IsActive:         summary.IsActive.Bool,
 		ConstructorColor: summary.ConstructorColor.String,
-		FirstYear:        year(summary.FirstRaceDate),
-		LastYear:         year(summary.LastRaceDate),
+		FirstYear:        summary.FirstYear,
+		LastYear:         summary.LastYear,
 		Seasons:          seasons,
 	}, nil
 }
@@ -234,12 +232,4 @@ func GetSprint(ctx context.Context, queries database.Querier, driverID string, s
 		HasSprint:       true,
 		PitStops:        []pitStop{},
 	}, nil
-}
-
-func year(d pgtype.Date) *int32 {
-	if !d.Valid {
-		return nil
-	}
-	y := int32(d.Time.Year())
-	return &y
 }

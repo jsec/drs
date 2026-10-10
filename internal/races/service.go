@@ -23,26 +23,7 @@ func GetRaceDetail(ctx context.Context, queries database.Querier, season, round 
 	results := make([]Result, 0, len(rows))
 
 	for _, row := range rows {
-		results = append(results, Result{
-			Position:      row.Position,
-			PositionLabel: row.PositionLabel,
-			Driver: Driver{
-				ID:        row.DriverID,
-				Code:      row.Code,
-				Name:      row.Name,
-				ShortName: row.LastName,
-			},
-			Constructor: Constructor{
-				ID:    row.ConstructorID,
-				Name:  row.ConstructorName,
-				Color: row.ConstructorColor.String,
-			},
-			Grid:   row.GridPosition,
-			Time:   row.ElapsedTime,
-			Gap:    row.Gap,
-			Status: row.Status,
-			Points: row.Points,
-		})
+		results = append(results, toResult(row))
 	}
 
 	sprintRows, err := queries.ListSprintResults(ctx, race.RaceID)
@@ -53,26 +34,7 @@ func GetRaceDetail(ctx context.Context, queries database.Querier, season, round 
 	sprint := make([]Result, 0, len(sprintRows))
 
 	for _, row := range sprintRows {
-		sprint = append(sprint, Result{
-			Position:      row.Position,
-			PositionLabel: row.PositionLabel,
-			Driver: Driver{
-				ID:        row.DriverID,
-				Code:      row.Code,
-				Name:      row.Name,
-				ShortName: row.LastName,
-			},
-			Constructor: Constructor{
-				ID:    row.ConstructorID,
-				Name:  row.ConstructorName,
-				Color: row.ConstructorColor.String,
-			},
-			Grid:   row.GridPosition,
-			Time:   row.ElapsedTime,
-			Gap:    row.Gap,
-			Status: row.Status,
-			Points: row.Points,
-		})
+		sprint = append(sprint, toResult(database.ListRaceResultsRow(row)))
 	}
 
 	qualifyingRows, err := queries.ListQualifyingResults(ctx, race.RaceID)
@@ -187,6 +149,29 @@ func GetRaceLaps(ctx context.Context, queries database.Querier, season, round in
 	}
 
 	return RaceLapsResponse{Drivers: drivers}, nil
+}
+
+func toResult(row database.ListRaceResultsRow) Result {
+	return Result{
+		Position:      row.Position,
+		PositionLabel: row.PositionLabel,
+		Driver: Driver{
+			ID:        row.DriverID,
+			Code:      row.Code,
+			Name:      row.Name,
+			ShortName: row.LastName,
+		},
+		Constructor: Constructor{
+			ID:    row.ConstructorID,
+			Name:  row.ConstructorName,
+			Color: row.ConstructorColor.String,
+		},
+		Grid:   row.GridPosition,
+		Time:   row.ElapsedTime,
+		Gap:    row.Gap,
+		Status: row.Status,
+		Points: row.Points,
+	}
 }
 
 func getCompletedRace(ctx context.Context, queries database.Querier, season, round int32) (database.GetRaceDetailRow, error) {

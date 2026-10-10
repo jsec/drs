@@ -3,8 +3,8 @@ SELECT
     circuit_id,
     circuit_name as name,
     country,
-    first_race_date,
-    last_race_date,
+    CASE WHEN first_race_date IS NOT NULL THEN date_part('year', first_race_date)::INTEGER END AS first_race_year,
+    CASE WHEN last_race_date IS NOT NULL THEN date_part('year', last_race_date)::INTEGER END AS last_race_year,
     location,
     race_count
 FROM effone.circuits

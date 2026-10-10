@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"testing"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
@@ -34,13 +33,8 @@ func (s stubQuerier) GetRacesByCircuitId(context.Context, string) ([]database.Ge
 	return nil, s.raceListErr
 }
 
-func date(s string) pgtype.Date {
-	tm, err := time.Parse("2006-01-02", s)
-	if err != nil {
-		panic(err)
-	}
-
-	return pgtype.Date{Time: tm, Valid: true}
+func int4(i int32) pgtype.Int4 {
+	return pgtype.Int4{Int32: i, Valid: true}
 }
 
 func TestService_ListCircuits(t *testing.T) {
@@ -62,8 +56,8 @@ func TestService_ListCircuits(t *testing.T) {
 				CircuitID:     "monza",
 				Name:          "Monza",
 				Country:       "Italy",
-				FirstRaceDate: date("1950-09-03"),
-				LastRaceDate:  date("2026-09-06"),
+				FirstRaceYear: int4(1950),
+				LastRaceYear:  int4(2026),
 				Location:      "Monza",
 				RaceCount:     75,
 			}},
@@ -71,8 +65,8 @@ func TestService_ListCircuits(t *testing.T) {
 				CircuitID:     "monza",
 				Name:          "Monza",
 				Country:       "Italy",
-				FirstRaceYear: new(int32(1950)),
-				LastRaceYear:  new(int32(2026)),
+				FirstRaceYear: int4(1950),
+				LastRaceYear:  int4(2026),
 				Location:      "Monza",
 				RaceCount:     75,
 			}},
@@ -98,7 +92,7 @@ func TestService_ListCircuits(t *testing.T) {
 				CircuitID:     "avus",
 				Name:          "AVUS",
 				Country:       "Germany",
-				FirstRaceDate: date("1959-08-02"),
+				FirstRaceYear: int4(1959),
 				Location:      "Berlin",
 				RaceCount:     1,
 			}},
@@ -106,7 +100,7 @@ func TestService_ListCircuits(t *testing.T) {
 				CircuitID:     "avus",
 				Name:          "AVUS",
 				Country:       "Germany",
-				FirstRaceYear: new(int32(1959)),
+				FirstRaceYear: int4(1959),
 				Location:      "Berlin",
 				RaceCount:     1,
 			}},
