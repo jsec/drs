@@ -8,6 +8,7 @@ import type { DriverRef, RaceResult, Session } from '#/lib/api/races';
 
 import { DriverAvatar, GridHeader, SectionCard, TeamBar } from '#/components/f1-ui';
 import { raceDetailQuery, raceLapsQuery } from '#/data/queries';
+import { formatGrid } from '#/lib/format';
 import { paceChart, positionChart } from '#/lib/race-charts';
 import { parseRound, parseYear } from '#/lib/route-params';
 
@@ -251,7 +252,7 @@ const RaceDetail = () => {
                             <Group gap={10} key={r.driver.id} mb={11} wrap="nowrap">
                                 <Text fw={700} fz={12} inherit span w={40}>{r.driver.code}</Text>
                                 <Text c="dimmed" className="f1-num" fz={11} inherit span w={62}>
-                                    {r.grid === null ? 'PL' : `P${r.grid}`}
+                                    {formatGrid(r.grid)}
                                     →P
                                     {r.position}
                                 </Text>

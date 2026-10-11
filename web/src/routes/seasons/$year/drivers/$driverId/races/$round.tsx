@@ -13,7 +13,7 @@ import type { DriverLaps, Session } from '#/lib/api/races';
 import { GridHeader, MiniStat, SectionCard } from '#/components/f1-ui';
 import { driverRaceQuery, raceDetailQuery, raceLapsQuery } from '#/data/queries';
 import { SessionSchema } from '#/lib/api/races';
-import { formatLapTime, formatPosition } from '#/lib/format';
+import { formatGrid, formatLapTime, formatPosition } from '#/lib/format';
 import { lapLabel, paceChart, positionChart } from '#/lib/race-charts';
 import { parseRound, parseYear } from '#/lib/route-params';
 
@@ -66,14 +66,6 @@ function formatDelta(ms: number): string {
     }
 
     return seconds;
-}
-
-function gridText(grid: null | number): string {
-    if (grid === null) {
-        return 'PL';
-    }
-
-    return `P${grid}`;
 }
 
 function lapTimeColor(timeMs: number, personalBestMs: number, raceFastestMs: number): string | undefined {
@@ -320,7 +312,7 @@ const DriverRacePage = () => {
 
             <SimpleGrid cols={isSprint ? 4 : 6} spacing={8}>
                 <MiniStat label="RESULT" value={formatPosition(race.positionLabel)} />
-                <MiniStat label="GRID → RESULT" value={<span style={{ whiteSpace: 'nowrap' }}>{`${gridText(race.grid)} → ${formatPosition(race.positionLabel)}`}</span>} />
+                <MiniStat label="GRID → RESULT" value={<span style={{ whiteSpace: 'nowrap' }}>{`${formatGrid(race.grid)} → ${formatPosition(race.positionLabel)}`}</span>} />
                 <MiniStat label="GAP" value={race.gap || race.time || '—'} />
                 <MiniStat label="POINTS" value={race.points} />
                 {!isSprint && <MiniStat label="PIT STOPS" value={race.pitStopCount ?? '–'} />}

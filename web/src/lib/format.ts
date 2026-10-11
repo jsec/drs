@@ -16,6 +16,14 @@ export function formatCareerYears({ firstYear, isActive, lastYear }: CareerYears
     return `${firstYear}–${lastYear}`;
 }
 
+export function formatGrid(grid: null | number): string {
+    if (grid === null) {
+        return 'PL';
+    }
+
+    return `P${grid}`;
+}
+
 export function formatLapTime(ms: number): string {
     const minutes = Math.floor(ms / 60_000);
     const seconds = ((ms % 60_000) / 1000).toFixed(3).padStart(6, '0');
