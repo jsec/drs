@@ -2,13 +2,17 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	charmlog "github.com/charmbracelet/log"
-	"github.com/urfave/cli/v3"
+
+	"github.com/jsec/drs/internal/etl"
 )
 
 func main() {
@@ -18,18 +22,32 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	cmd := &cli.Command{
-		Name:  "drs",
-		Usage: "DRS CLI",
-		Commands: []*cli.Command{
-			serveCommand(logger, config),
-			etlCommand(logger, config),
-		},
-	}
-
-	if err := cmd.Run(ctx, os.Args); err != nil {
+	if err := run(ctx, logger, config, strings.Join(os.Args[1:], " ")); err != nil {
 		logger.Error("command failed", "err", err)
 		os.Exit(1)
+	}
+}
+
+func run(ctx context.Context, logger *slog.Logger, config config, command string) error {
+	if config.databaseURL == "" {
+		return errors.New("DATABASE_URL is required")
+	}
+
+	switch command {
+	case "serve":
+		return serve(ctx, logger, config)
+	case "etl load":
+		return etl.Load(ctx, logger, config.databaseURL, config.githubToken)
+	case "etl build":
+		return etl.Build(ctx, logger)
+	case "etl refresh":
+		if err := etl.Load(ctx, logger, config.databaseURL, config.githubToken); err != nil {
+			return err
+		}
+
+		return etl.Build(ctx, logger)
+	default:
+		return fmt.Errorf("unknown command %q, expected one of: serve, etl load, etl build, etl refresh", command)
 	}
 }
 
