@@ -105,11 +105,9 @@ SELECT
     rr.position_text AS position_label,
     rr.finish_position AS position,
     rr.grid_position,
-    rr.positions_gained,
     rr.elapsed_time,
     rr.gap,
     rr.status_category,
-    rr.laps_completed,
     rr.points AS points,
     rr.pit_stop_count,
     rr.time_penalty,
@@ -146,8 +144,7 @@ LIMIT 1;
 SELECT
     ps.stop_number,
     ps.lap_number,
-    ps.duration,
-    ps.duration_ms
+    ps.duration
 FROM effone.pit_stops ps
 WHERE ps.race_id = sqlc.arg(race_id)
     AND ps.driver_id = sqlc.arg(driver_id)
@@ -164,11 +161,9 @@ SELECT
     sr.position_text AS position_label,
     sr.finish_position AS position,
     sr.grid_position,
-    sr.positions_gained,
     sr.elapsed_time,
     sr.gap,
     sr.status_category,
-    sr.laps_completed,
     sr.points AS points,
     sr.time_penalty,
     sr.is_win,

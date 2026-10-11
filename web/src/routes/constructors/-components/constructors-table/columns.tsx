@@ -2,12 +2,10 @@ import type { SortingFn } from '@tanstack/react-table';
 
 import { Progress } from '@mantine/core';
 
-import type { ListConstructorsResponse } from '#/lib/api/constructors';
+import type { Constructor } from '#/lib/api/constructors';
 
 import { makeColumns } from '#/components/data-table';
 import { formatCareerYears } from '#/lib/format';
-
-type Constructor = ListConstructorsResponse[number];
 
 const col = makeColumns<Constructor>();
 

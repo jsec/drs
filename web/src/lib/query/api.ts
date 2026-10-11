@@ -12,8 +12,5 @@ export const api = ky.create({
             },
         ],
     },
-    retry: {
-        limit: 1,
-    },
     timeout: 10_000,
 });

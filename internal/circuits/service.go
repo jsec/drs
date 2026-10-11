@@ -26,35 +26,24 @@ func GetCircuitSummary(ctx context.Context, queries database.Querier, circuitID 
 			Date:       race.RaceDate,
 			LayoutID:   race.CircuitLayoutID,
 			Name:       race.RaceOfficialName,
-			WinnerID:   race.WinnerDriverID.String,
 			WinnerName: race.WinnerDriverName.String,
 		})
-	}
-
-	previousNames := circuit.PreviousNames
-	if previousNames == nil {
-		previousNames = []string{}
 	}
 
 	return CircuitSummaryResponse{
 		CircuitID:   circuit.CircuitID,
 		Name:        circuit.Name,
-		CircuitType: circuit.CircuitType,
 		Country:     circuit.Country,
 		CountryCode: circuit.CountryCode,
-		CountryID:   circuit.CountryID,
 		FirstRace: CircuitRaceSummary{
-			RaceID: circuit.FirstRaceID,
-			Date:   circuit.FirstRaceDate,
-			Name:   circuit.FirstRaceName.String,
+			Date: circuit.FirstRaceDate,
+			Name: circuit.FirstRaceName.String,
 		},
 		LastRace: CircuitRaceSummary{
-			RaceID: circuit.LastRaceID,
-			Date:   circuit.LastRaceDate,
-			Name:   circuit.LastRaceName.String,
+			Date: circuit.LastRaceDate,
+			Name: circuit.LastRaceName.String,
 		},
 		CurrentLayoutId: circuit.CurrentLayoutID.String,
-		PreviousNames:   previousNames,
 		RaceCount:       circuit.RaceCount,
 		Turns:           circuit.Turns,
 		Races:           races,

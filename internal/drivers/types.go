@@ -87,10 +87,9 @@ type DriverSeason struct {
 }
 
 type pitStop struct {
-	Stop       int32       `json:"stop"`
-	Lap        int32       `json:"lap"`
-	Duration   string      `json:"duration"`
-	DurationMs pgtype.Int4 `json:"durationMs"`
+	Stop     int32  `json:"stop"`
+	Lap      int32  `json:"lap"`
+	Duration string `json:"duration"`
 }
 
 type DriverRace struct {
@@ -102,11 +101,9 @@ type DriverRace struct {
 	PositionLabel           string      `json:"positionLabel"`
 	Position                pgtype.Int4 `json:"position"`
 	Grid                    pgtype.Int4 `json:"grid"`
-	PositionsGained         pgtype.Int4 `json:"positionsGained"`
 	Time                    string      `json:"time"`
 	Gap                     string      `json:"gap"`
 	StatusCategory          string      `json:"statusCategory"`
-	LapsCompleted           pgtype.Int4 `json:"lapsCompleted"`
 	Points                  float64     `json:"points"`
 	PitStopCount            pgtype.Int4 `json:"pitStopCount"`
 	TimePenalty             string      `json:"timePenalty"`

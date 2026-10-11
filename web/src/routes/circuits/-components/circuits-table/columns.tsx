@@ -1,10 +1,8 @@
-import type { ListCircuitsResponse } from '#/lib/api/circuits';
+import type { CircuitListItem } from '#/lib/api/circuits';
 
 import { makeColumns } from '#/components/data-table';
 
-type Circuit = ListCircuitsResponse;
-
-const col = makeColumns<Circuit>();
+const col = makeColumns<CircuitListItem>();
 
 export const columns = [
     col.ordinal(),

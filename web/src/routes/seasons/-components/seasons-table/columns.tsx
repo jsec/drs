@@ -1,10 +1,8 @@
-import type { ListSeasonsResponse } from '#/lib/api/seasons';
+import type { Season } from '#/lib/api/seasons';
 
 import { CountryFlag } from '#/components/country-flag';
 import { makeColumns } from '#/components/data-table';
 import { TeamSquare } from '#/components/f1-ui';
-
-type Season = ListSeasonsResponse[number];
 
 const col = makeColumns<Season>();
 

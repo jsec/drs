@@ -292,7 +292,6 @@ const listSeasons = `-- name: ListSeasons :many
 SELECT
     s.season,
     s.race_count,
-    s.constructor_count,
     s.wdc_driver_id,
     s.wdc_driver_name,
     d.nationality_country_code AS wdc_country_code,
@@ -308,7 +307,6 @@ ORDER BY s.season DESC
 type ListSeasonsRow struct {
 	Season             int32       `json:"season"`
 	RaceCount          int32       `json:"raceCount"`
-	ConstructorCount   int32       `json:"constructorCount"`
 	WdcDriverID        pgtype.Text `json:"wdcDriverId"`
 	WdcDriverName      pgtype.Text `json:"wdcDriverName"`
 	WdcCountryCode     string      `json:"wdcCountryCode"`
@@ -329,7 +327,6 @@ func (q *Queries) ListSeasons(ctx context.Context) ([]ListSeasonsRow, error) {
 		if err := rows.Scan(
 			&i.Season,
 			&i.RaceCount,
-			&i.ConstructorCount,
 			&i.WdcDriverID,
 			&i.WdcDriverName,
 			&i.WdcCountryCode,

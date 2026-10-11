@@ -15,7 +15,6 @@ export const CircuitListSchema = z.array(CircuitListItemSchema);
 const CircuitRaceSummarySchema = z.object({
     date: z.string().nullable(),
     name: z.string(),
-    raceId: z.number().nullable(),
 });
 
 const CircuitRaceSchema = z.object({
@@ -23,24 +22,20 @@ const CircuitRaceSchema = z.object({
     layoutId: z.string(),
     name: z.string(),
     raceId: z.number(),
-    winnerId: z.string(),
     winnerName: z.string(),
 });
 
 export const CircuitSummarySchema = z.object({
     circuitId: z.string(),
-    circuitType: z.string(),
     country: z.string(),
     countryCode: z.string(),
-    countryId: z.string(),
     firstRace: CircuitRaceSummarySchema,
     lastRace: CircuitRaceSummarySchema,
     layoutId: z.string(),
     name: z.string(),
-    previousNames: z.array(z.string()),
     raceCount: z.number(),
     races: z.array(CircuitRaceSchema),
     turns: z.number(),
 });
 
-export type ListCircuitsResponse = z.infer<typeof CircuitListItemSchema>;
+export type CircuitListItem = z.infer<typeof CircuitListItemSchema>;

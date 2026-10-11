@@ -3,11 +3,10 @@ package seasons
 import "github.com/jackc/pgx/v5/pgtype"
 
 type SeasonResponse struct {
-	Season           int32        `json:"season"`
-	RaceCount        int32        `json:"raceCount"`
-	ConstructorCount int32        `json:"constructorCount"`
-	Wdc              WDC          `json:"wdc"`
-	Wcc              *Constructor `json:"wcc"`
+	Season    int32        `json:"season"`
+	RaceCount int32        `json:"raceCount"`
+	Wdc       WDC          `json:"wdc"`
+	Wcc       *Constructor `json:"wcc"`
 }
 
 type WDC struct {

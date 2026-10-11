@@ -13,7 +13,6 @@ export const ConstructorSchema = z.object({
 });
 
 const SeasonSchema = z.object({
-    constructorCount: z.number(),
     raceCount: z.number(),
     season: z.number(),
     wcc: ConstructorSchema.nullable(),
@@ -94,5 +93,5 @@ export const SeasonCalendarSchema = z.object({
 
 export type ConstructorStanding = z.infer<typeof ConstructorStandingSchema>;
 export type DriverStanding = z.infer<typeof DriverStandingSchema>;
-export type ListSeasonsResponse = z.infer<typeof SeasonListSchema>;
+export type Season = z.infer<typeof SeasonSchema>;
 export type SeasonCalendarEntry = z.infer<typeof SeasonCalendarEntrySchema>;

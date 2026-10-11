@@ -17,9 +17,8 @@ func ListSeasons(ctx context.Context, queries database.Querier) ([]SeasonRespons
 
 	for _, row := range rows {
 		resp := SeasonResponse{
-			Season:           row.Season,
-			RaceCount:        row.RaceCount,
-			ConstructorCount: row.ConstructorCount,
+			Season:    row.Season,
+			RaceCount: row.RaceCount,
 			Wdc: WDC{
 				ID:          row.WdcDriverID.String,
 				Name:        row.WdcDriverName.String,

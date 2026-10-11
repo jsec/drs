@@ -23,11 +23,9 @@ SELECT
     rr.position_text AS position_label,
     rr.finish_position AS position,
     rr.grid_position,
-    rr.positions_gained,
     rr.elapsed_time,
     rr.gap,
     rr.status_category,
-    rr.laps_completed,
     rr.points AS points,
     rr.pit_stop_count,
     rr.time_penalty,
@@ -72,11 +70,9 @@ type GetDriverRaceRow struct {
 	PositionLabel           string      `json:"positionLabel"`
 	Position                pgtype.Int4 `json:"position"`
 	GridPosition            pgtype.Int4 `json:"gridPosition"`
-	PositionsGained         pgtype.Int4 `json:"positionsGained"`
 	ElapsedTime             pgtype.Text `json:"elapsedTime"`
 	Gap                     pgtype.Text `json:"gap"`
 	StatusCategory          string      `json:"statusCategory"`
-	LapsCompleted           pgtype.Int4 `json:"lapsCompleted"`
 	Points                  float64     `json:"points"`
 	PitStopCount            pgtype.Int4 `json:"pitStopCount"`
 	TimePenalty             pgtype.Text `json:"timePenalty"`
@@ -105,11 +101,9 @@ func (q *Queries) GetDriverRace(ctx context.Context, season int32, raceRound int
 		&i.PositionLabel,
 		&i.Position,
 		&i.GridPosition,
-		&i.PositionsGained,
 		&i.ElapsedTime,
 		&i.Gap,
 		&i.StatusCategory,
-		&i.LapsCompleted,
 		&i.Points,
 		&i.PitStopCount,
 		&i.TimePenalty,
@@ -193,11 +187,9 @@ SELECT
     sr.position_text AS position_label,
     sr.finish_position AS position,
     sr.grid_position,
-    sr.positions_gained,
     sr.elapsed_time,
     sr.gap,
     sr.status_category,
-    sr.laps_completed,
     sr.points AS points,
     sr.time_penalty,
     sr.is_win,
@@ -220,11 +212,9 @@ type GetDriverSprintRow struct {
 	PositionLabel    string      `json:"positionLabel"`
 	Position         pgtype.Int4 `json:"position"`
 	GridPosition     pgtype.Int4 `json:"gridPosition"`
-	PositionsGained  pgtype.Int4 `json:"positionsGained"`
 	ElapsedTime      pgtype.Text `json:"elapsedTime"`
 	Gap              pgtype.Text `json:"gap"`
 	StatusCategory   string      `json:"statusCategory"`
-	LapsCompleted    pgtype.Int4 `json:"lapsCompleted"`
 	Points           float64     `json:"points"`
 	TimePenalty      pgtype.Text `json:"timePenalty"`
 	IsWin            bool        `json:"isWin"`
@@ -244,11 +234,9 @@ func (q *Queries) GetDriverSprint(ctx context.Context, season int32, raceRound i
 		&i.PositionLabel,
 		&i.Position,
 		&i.GridPosition,
-		&i.PositionsGained,
 		&i.ElapsedTime,
 		&i.Gap,
 		&i.StatusCategory,
-		&i.LapsCompleted,
 		&i.Points,
 		&i.TimePenalty,
 		&i.IsWin,
@@ -318,8 +306,7 @@ const listDriverRacePitStops = `-- name: ListDriverRacePitStops :many
 SELECT
     ps.stop_number,
     ps.lap_number,
-    ps.duration,
-    ps.duration_ms
+    ps.duration
 FROM effone.pit_stops ps
 WHERE ps.race_id = $1
     AND ps.driver_id = $2
@@ -330,7 +317,6 @@ type ListDriverRacePitStopsRow struct {
 	StopNumber int32       `json:"stopNumber"`
 	LapNumber  int32       `json:"lapNumber"`
 	Duration   pgtype.Text `json:"duration"`
-	DurationMs pgtype.Int4 `json:"durationMs"`
 }
 
 func (q *Queries) ListDriverRacePitStops(ctx context.Context, raceID int32, driverID string) ([]ListDriverRacePitStopsRow, error) {
@@ -342,12 +328,7 @@ func (q *Queries) ListDriverRacePitStops(ctx context.Context, raceID int32, driv
 	items := []ListDriverRacePitStopsRow{}
 	for rows.Next() {
 		var i ListDriverRacePitStopsRow
-		if err := rows.Scan(
-			&i.StopNumber,
-			&i.LapNumber,
-			&i.Duration,
-			&i.DurationMs,
-		); err != nil {
+		if err := rows.Scan(&i.StopNumber, &i.LapNumber, &i.Duration); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

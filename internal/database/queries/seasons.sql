@@ -2,7 +2,6 @@
 SELECT
     s.season,
     s.race_count,
-    s.constructor_count,
     s.wdc_driver_id,
     s.wdc_driver_name,
     d.nationality_country_code AS wdc_country_code,

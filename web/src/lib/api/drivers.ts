@@ -79,7 +79,6 @@ export const DriverSeasonSchema = z.object({
 
 const PitStopSchema = z.object({
     duration: z.string(),
-    durationMs: z.number().nullable(),
     lap: z.number(),
     stop: z.number(),
 });
@@ -98,14 +97,12 @@ export const DriverRaceSchema = z.object({
     isGrandSlam: z.boolean(),
     isPole: z.boolean(),
     isWin: z.boolean(),
-    lapsCompleted: z.number().nullable(),
     name: z.string(),
     pitStopCount: z.number().nullable(),
     pitStops: z.array(PitStopSchema),
     points: z.number(),
     position: z.number().nullable(),
     positionLabel: z.string(),
-    positionsGained: z.number().nullable(),
     qualifyingPositionLabel: z.string(),
     raceName: z.string(),
     statusCategory: z.string(),

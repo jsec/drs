@@ -15,18 +15,13 @@ const getCircuitInfo = `-- name: GetCircuitInfo :one
 SELECT
     circuit_id,
     circuit_full_name as name,
-    circuit_type,
     country,
     country_code,
-    country_id,
-    first_race_id,
     first_race_date,
     first_race_name,
-    last_race_id,
     last_race_date,
     last_race_name,
     current_layout_id,
-    previous_names,
     race_count,
     turns
 FROM effone.circuits
@@ -36,18 +31,13 @@ WHERE circuit_id = $1
 type GetCircuitInfoRow struct {
 	CircuitID       string      `json:"circuitId"`
 	Name            string      `json:"name"`
-	CircuitType     string      `json:"circuitType"`
 	Country         string      `json:"country"`
 	CountryCode     string      `json:"countryCode"`
-	CountryID       string      `json:"countryId"`
-	FirstRaceID     pgtype.Int4 `json:"firstRaceId"`
 	FirstRaceDate   pgtype.Date `json:"firstRaceDate"`
 	FirstRaceName   pgtype.Text `json:"firstRaceName"`
-	LastRaceID      pgtype.Int4 `json:"lastRaceId"`
 	LastRaceDate    pgtype.Date `json:"lastRaceDate"`
 	LastRaceName    pgtype.Text `json:"lastRaceName"`
 	CurrentLayoutID pgtype.Text `json:"currentLayoutId"`
-	PreviousNames   []string    `json:"previousNames"`
 	RaceCount       int32       `json:"raceCount"`
 	Turns           int32       `json:"turns"`
 }
@@ -58,18 +48,13 @@ func (q *Queries) GetCircuitInfo(ctx context.Context, circuitID string) (GetCirc
 	err := row.Scan(
 		&i.CircuitID,
 		&i.Name,
-		&i.CircuitType,
 		&i.Country,
 		&i.CountryCode,
-		&i.CountryID,
-		&i.FirstRaceID,
 		&i.FirstRaceDate,
 		&i.FirstRaceName,
-		&i.LastRaceID,
 		&i.LastRaceDate,
 		&i.LastRaceName,
 		&i.CurrentLayoutID,
-		&i.PreviousNames,
 		&i.RaceCount,
 		&i.Turns,
 	)
@@ -82,7 +67,6 @@ SELECT
     race_date,
     circuit_layout_id,
     race_official_name,
-    winner_driver_id,
     winner_driver_name
 FROM effone.races
 WHERE circuit_id = $1
@@ -94,7 +78,6 @@ type GetRacesByCircuitIdRow struct {
 	RaceDate         pgtype.Date `json:"raceDate"`
 	CircuitLayoutID  string      `json:"circuitLayoutId"`
 	RaceOfficialName string      `json:"raceOfficialName"`
-	WinnerDriverID   pgtype.Text `json:"winnerDriverId"`
 	WinnerDriverName pgtype.Text `json:"winnerDriverName"`
 }
 
@@ -112,7 +95,6 @@ func (q *Queries) GetRacesByCircuitId(ctx context.Context, circuitID string) ([]
 			&i.RaceDate,
 			&i.CircuitLayoutID,
 			&i.RaceOfficialName,
-			&i.WinnerDriverID,
 			&i.WinnerDriverName,
 		); err != nil {
 			return nil, err
