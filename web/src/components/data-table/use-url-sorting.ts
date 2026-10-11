@@ -1,6 +1,7 @@
 import type { OnChangeFn, SortingState } from '@tanstack/react-table';
 
 import { useNavigate, useSearch } from '@tanstack/react-router';
+import { functionalUpdate } from '@tanstack/react-table';
 import { z } from 'zod';
 
 export const SortSearchSchema = z.object({
@@ -15,8 +16,7 @@ export function useUrlSorting() {
     const sorting: SortingState = sort ? [{ desc: dir === 'desc', id: sort }] : [];
 
     const onSortingChange: OnChangeFn<SortingState> = (updater) => {
-        const next = typeof updater === 'function' ? updater(sorting) : updater;
-        const entry = next[0];
+        const entry = functionalUpdate(updater, sorting)[0];
 
         void navigate({
             search: prev => ({
