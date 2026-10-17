@@ -14,16 +14,6 @@ import (
 	"time"
 )
 
-type asset struct {
-	Name               string `json:"name"`
-	BrowserDownloadURL string `json:"browser_download_url"`
-}
-
-type release struct {
-	TagName string  `json:"tag_name"`
-	Assets  []asset `json:"assets"`
-}
-
 const (
 	assetName = "f1db-sql-postgresql.zip"
 	fileName  = "f1db-sql-postgresql.sql"

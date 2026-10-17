@@ -67,7 +67,13 @@ func getLatestRelease(ctx context.Context, token string) (version, downloadURL s
 		return "", "", fmt.Errorf("fetching latest release failed: %s", resp.Status)
 	}
 
-	var r release
+	var r struct {
+		TagName string `json:"tag_name"`
+		Assets  []struct {
+			Name               string `json:"name"`
+			BrowserDownloadURL string `json:"browser_download_url"`
+		} `json:"assets"`
+	}
 	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
 		return "", "", err
 	}

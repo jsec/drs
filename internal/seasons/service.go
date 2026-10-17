@@ -106,11 +106,7 @@ func GetOverview(ctx context.Context, queries database.Querier, season int32) (S
 		return overview, nil
 	}
 
-	selectedDrivers := drivers
-	if len(selectedDrivers) > 6 {
-		selectedDrivers = selectedDrivers[:6]
-	}
-
+	selectedDrivers := drivers[:min(len(drivers), 6)]
 	driverIDs := make([]string, 0, len(selectedDrivers))
 	for _, driver := range selectedDrivers {
 		driverIDs = append(driverIDs, driver.ID)
