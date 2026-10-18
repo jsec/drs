@@ -1,0 +1,9 @@
+.env
+.env.*
+.git
+.pnpm-store
+bin
+tmp
+etl
+web/node_modules
+web/dist

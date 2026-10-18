@@ -32,7 +32,8 @@ __pycache__
 # Build Outputs
 out/
 build
-dist
+dist/*
+!web/dist/.gitkeep
 
 # Misc
 .DS_Store

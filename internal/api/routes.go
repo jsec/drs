@@ -3,6 +3,8 @@ package api
 import (
 	"net/http"
 	"time"
+
+	"github.com/jsec/drs/web"
 )
 
 func (app *application) routes() http.Handler {
@@ -23,6 +25,9 @@ func (app *application) routes() http.Handler {
 
 	api.Handle("GET /api/drivers", handle(app.logger, app.listDriversHandler))
 	api.Handle("GET /api/drivers/{driverID}", handle(app.logger, app.getDriverSummaryHandler))
+	api.HandleFunc("/api/", func(w http.ResponseWriter, _ *http.Request) {
+		writeError(w, http.StatusNotFound, "not found")
+	})
 
 	mux := http.NewServeMux()
 	if app.appEnv != "dev" {
@@ -30,6 +35,7 @@ func (app *application) routes() http.Handler {
 	} else {
 		mux.Handle("/api/", api)
 	}
+	mux.Handle("/", staticHandler(web.Files()))
 
 	return loggingMiddleware(app.logger,
 		http.TimeoutHandler(mux, 5*time.Second, "request timed out"),
