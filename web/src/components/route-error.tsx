@@ -13,7 +13,7 @@ export const RouteError = ({ error, reset }: ErrorComponentProps) => {
                 This view failed to load. Retrying may help; if it does not, the data for
                 this route is likely unavailable.
             </p>
-            {error.message
+            {error instanceof Error && error.message
                 ? <pre className="route-fallback-detail">{error.message}</pre>
                 : null}
             <div className="route-fallback-actions">
