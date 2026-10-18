@@ -20,7 +20,7 @@ const (
 	f1dbURL   = "https://api.github.com/repos/f1db/f1db/releases/latest"
 )
 
-var httpClient = &http.Client{Timeout: 30 * time.Second}
+var httpClient = &http.Client{Timeout: 5 * time.Minute}
 
 func Load(ctx context.Context, logger *slog.Logger, databaseURL, token string) error {
 	if err := loadF1DB(ctx, logger, databaseURL, token); err != nil {
