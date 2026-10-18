@@ -6,23 +6,30 @@ import (
 )
 
 func (app *application) routes() http.Handler {
+	api := http.NewServeMux()
+
+	api.Handle("GET /api/seasons", handle(app.logger, app.listSeasonsHandler))
+	api.Handle("GET /api/seasons/{year}", handle(app.logger, app.getSeasonOverviewHandler))
+	api.Handle("GET /api/seasons/{year}/calendar", handle(app.logger, app.getSeasonCalendarHandler))
+	api.Handle("GET /api/seasons/{year}/races/{round}", handle(app.logger, app.getRaceDetailHandler))
+	api.Handle("GET /api/seasons/{year}/races/{round}/laps", handle(app.logger, app.getRaceLapsHandler))
+	api.Handle("GET /api/seasons/{year}/drivers/{driverID}", handle(app.logger, app.getDriverSeasonHandler))
+	api.Handle("GET /api/seasons/{year}/drivers/{driverID}/races/{round}", handle(app.logger, app.getDriverRaceHandler))
+	api.Handle("GET /api/seasons/{year}/constructors/{constructorID}", handle(app.logger, app.getConstructorSeasonHandler))
+	api.Handle("GET /api/constructors", handle(app.logger, app.listConstructorsHandler))
+	api.Handle("GET /api/constructors/{constructorID}", handle(app.logger, app.getConstructorSummaryHandler))
+	api.Handle("GET /api/circuits", handle(app.logger, app.listCircuitsHandler))
+	api.Handle("GET /api/circuits/{circuitID}", handle(app.logger, app.getCircuitSummaryHandler))
+
+	api.Handle("GET /api/drivers", handle(app.logger, app.listDriversHandler))
+	api.Handle("GET /api/drivers/{driverID}", handle(app.logger, app.getDriverSummaryHandler))
+
 	mux := http.NewServeMux()
-
-	mux.Handle("GET /seasons", handle(app.logger, app.listSeasonsHandler))
-	mux.Handle("GET /seasons/{year}", handle(app.logger, app.getSeasonOverviewHandler))
-	mux.Handle("GET /seasons/{year}/calendar", handle(app.logger, app.getSeasonCalendarHandler))
-	mux.Handle("GET /seasons/{year}/races/{round}", handle(app.logger, app.getRaceDetailHandler))
-	mux.Handle("GET /seasons/{year}/races/{round}/laps", handle(app.logger, app.getRaceLapsHandler))
-	mux.Handle("GET /seasons/{year}/drivers/{driverID}", handle(app.logger, app.getDriverSeasonHandler))
-	mux.Handle("GET /seasons/{year}/drivers/{driverID}/races/{round}", handle(app.logger, app.getDriverRaceHandler))
-	mux.Handle("GET /seasons/{year}/constructors/{constructorID}", handle(app.logger, app.getConstructorSeasonHandler))
-	mux.Handle("GET /constructors", handle(app.logger, app.listConstructorsHandler))
-	mux.Handle("GET /constructors/{constructorID}", handle(app.logger, app.getConstructorSummaryHandler))
-	mux.Handle("GET /circuits", handle(app.logger, app.listCircuitsHandler))
-	mux.Handle("GET /circuits/{circuitID}", handle(app.logger, app.getCircuitSummaryHandler))
-
-	mux.Handle("GET /drivers", handle(app.logger, app.listDriversHandler))
-	mux.Handle("GET /drivers/{driverID}", handle(app.logger, app.getDriverSummaryHandler))
+	if app.appEnv != "dev" {
+		mux.Handle("/api/", sameOriginMiddleware(api))
+	} else {
+		mux.Handle("/api/", api)
+	}
 
 	return loggingMiddleware(app.logger,
 		http.TimeoutHandler(mux, 5*time.Second, "request timed out"),

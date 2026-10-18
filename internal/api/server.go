@@ -12,12 +12,13 @@ import (
 type application struct {
 	logger  *slog.Logger
 	queries database.Querier
+	appEnv  string
 }
 
-func Serve(ctx context.Context, logger *slog.Logger, db *database.Queries, port string) error {
+func Serve(ctx context.Context, logger *slog.Logger, db *database.Queries, port string, appEnv string) error {
 	srv := &http.Server{
 		Addr:              ":" + port,
-		Handler:           (&application{logger: logger, queries: db}).routes(),
+		Handler:           (&application{logger: logger, queries: db, appEnv: appEnv}).routes(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       10 * time.Second,
 		WriteTimeout:      15 * time.Second,

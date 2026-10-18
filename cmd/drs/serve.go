@@ -25,5 +25,5 @@ func serve(ctx context.Context, logger *slog.Logger, config config) error {
 	}
 	defer pool.Close()
 
-	return api.Serve(ctx, logger, database.New(pool), config.port)
+	return api.Serve(ctx, logger, database.New(pool), config.port, config.appEnv)
 }

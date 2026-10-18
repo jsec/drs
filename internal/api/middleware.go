@@ -16,6 +16,17 @@ func (s *statusRecorder) WriteHeader(code int) {
 	s.ResponseWriter.WriteHeader(code)
 }
 
+func sameOriginMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Sec-Fetch-Site") != "same-origin" {
+			writeError(w, http.StatusForbidden, "forbidden")
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func loggingMiddleware(logger *slog.Logger, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
