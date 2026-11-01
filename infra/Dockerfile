@@ -19,6 +19,7 @@ COPY --from=web /src/web/dist web/dist
 RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /drs ./cmd/drs
 
 FROM gcr.io/distroless/static-debian12:nonroot
+LABEL org.opencontainers.image.source=https://github.com/jsec/drs
 
 COPY --from=api /drs /drs
 EXPOSE 3000
