@@ -158,3 +158,25 @@ jobs:
 
       - name: Parse dbt project
         run: task etl:dbt-parse
+
+  deploy-db:
+    needs: [changes, go, web, etl]
+    if: >-
+      !failure() && !cancelled() &&
+      github.event_name == 'push' && needs.changes.outputs.etl == 'true'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/deploy-db.yml
+    secrets: inherit
+
+  deploy-app:
+    needs: [go, web, etl, deploy-db]
+    if: >-
+      !failure() && !cancelled() &&
+      github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/deploy-app.yml
+    secrets: inherit

@@ -1,0 +1,30 @@
+name: Deploy app
+
+on:
+  workflow_call:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency: deploy-app
+    env:
+      IMAGE: ghcr.io/${{ github.repository_owner }}/drs
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Build image
+        run: docker build -f infra/Dockerfile -t "$IMAGE:latest" .
+
+      - name: Push image
+        run: |
+          echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker tag "$IMAGE:latest" "$IMAGE:$(date -u +%F)"
+          docker push "$IMAGE:latest"
+          docker push "$IMAGE:$(date -u +%F)"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Deploy
+        run: curl -fsS -X POST "$DOKPLOY_APP_WEBHOOK"
+        env:
+          DOKPLOY_APP_WEBHOOK: ${{ secrets.DOKPLOY_APP_WEBHOOK }}

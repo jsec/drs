@@ -1,0 +1,86 @@
+name: Deploy database
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 12 * * 3'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency: deploy-db
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: drs
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      IMAGE: ghcr.io/${{ github.repository_owner }}/drs-db
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/drs
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: drs
+      GITHUB_TOKEN: ${{ github.token }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        with:
+          go-version: '1.27.2'
+          cache: true
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.13'
+
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: etl/uv.lock
+
+      - uses: go-task/setup-task@a00fbb05ce67b35648be3c78cbc9fd85354c757e # v2
+        with:
+          version: 3.x
+
+      - name: Install PostgreSQL 18 client
+        run: |
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y postgresql-client-18
+          echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
+
+      - name: Install ETL dependencies
+        run: |
+          uv --directory etl sync --locked
+          task etl:dbt-deps
+
+      - name: Build image
+        run: task db:image IMAGE="$IMAGE:latest"
+
+      - name: Push image
+        run: |
+          echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker tag "$IMAGE:latest" "$IMAGE:$(date -u +%F)"
+          docker push "$IMAGE:latest"
+          docker push "$IMAGE:$(date -u +%F)"
+
+      - name: Deploy
+        run: curl -fsS -X POST "$DOKPLOY_DB_WEBHOOK"
+        env:
+          DOKPLOY_DB_WEBHOOK: ${{ secrets.DOKPLOY_DB_WEBHOOK }}
