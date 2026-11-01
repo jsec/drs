@@ -15,14 +15,11 @@ tasks:
       - task --list-all
     silent: true
 
-  db:image:
-    vars:
-      IMAGE: '{{.IMAGE | default "drs-db:local"}}'
+  db:dump:
     cmds:
       - task: etl:refresh
       - psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -f infra/db/check.sql
       - pg_dump "$DATABASE_URL" -n effone -Fc -f infra/db/effone.dump
-      - docker build --secret id=db_password,env=DB_PASSWORD -t {{.IMAGE}} infra/db
 
   deps:
     cmds:

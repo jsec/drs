@@ -8,6 +8,5 @@ RUN --mount=type=secret,id=db_password,mode=0444 sh /restore.sh
 
 FROM postgres:18-alpine
 ENV PGDATA=/pgdata
-LABEL org.opencontainers.image.source=https://github.com/jsec/drs
 
 COPY --from=builder --chown=postgres:postgres /pgdata /pgdata
