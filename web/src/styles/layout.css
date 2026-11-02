@@ -16,6 +16,13 @@
   margin: 0 auto;
 }
 
+.f1-footer {
+  margin-top: 40px;
+  color: var(--mantine-color-dimmed);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
 .f1-brand {
   display: flex;
   align-items: center;
