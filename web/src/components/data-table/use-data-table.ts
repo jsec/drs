@@ -28,6 +28,7 @@ export function useDataTable<T>({
     const [localSorting, setLocalSorting] = useState<SortingState>([]);
 
     const table = useReactTable<T>({
+        autoResetPageIndex: false,
         columns,
         data,
         enableMultiSort: false,

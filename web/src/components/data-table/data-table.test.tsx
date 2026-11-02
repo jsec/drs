@@ -113,3 +113,32 @@ describe('DataTable sorting', () => {
         expect(names()).toEqual(['Charlie', 'Bob', 'Alice']);
     });
 });
+
+describe('DataTable re-renders', () => {
+    it('settles when the caller passes a new sorting array on every render', async () => {
+        let renders = 0;
+
+        const ControlledHarness = () => {
+            renders++;
+            const { setSearch, table } = useDataTable({
+                columns,
+                data: DATA,
+                filter: (row, _id, value: string) => row.original.name.includes(value),
+                sorting: [],
+            });
+            return (
+                <>
+                    <input aria-label="search" onChange={e => setSearch(e.currentTarget.value)} />
+                    <DataTable table={table} />
+                </>
+            );
+        };
+
+        await renderWithRouter(<ControlledHarness />);
+        fireEvent.change(screen.getByRole('textbox', { name: 'search' }), { target: { value: 'A' } });
+        renders = 0;
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        expect(renders).toBeLessThan(5);
+    });
+});
