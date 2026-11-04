@@ -342,12 +342,15 @@ const DriverRacePage = () => {
                             <SimpleGrid cols={2} spacing={16}>
                                 <SectionCard title="Race Pace">
                                     <LineChart
+                                        connectNulls={false}
                                         data={pace.data}
                                         dataKey="lap"
+                                        dotProps={{ r: 2 }}
                                         h={240}
                                         referenceLines={referenceLines}
                                         series={dashRival(pace.series, isRivalDashed)}
                                         valueFormatter={v => v.toFixed(3)}
+                                        withDots
                                         xAxisProps={{ interval: 'preserveStartEnd' }}
                                         yAxisProps={{ domain: ['auto', 'auto'], tickCount: 5 }}
                                     />

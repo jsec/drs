@@ -129,11 +129,14 @@ const RaceCharts = ({ round, year }: { round: number; year: number }) => {
             </SectionCard>
             <SectionCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
                 <LineChart
+                    connectNulls={false}
                     data={pace.data}
                     dataKey="lap"
+                    dotProps={{ r: 2 }}
                     h={240}
                     series={pace.series}
                     valueFormatter={v => v.toFixed(1)}
+                    withDots
                     xAxisProps={{ interval: 'preserveStartEnd' }}
                     yAxisProps={{ domain: ['auto', 'auto'], tickCount: 5 }}
                 />

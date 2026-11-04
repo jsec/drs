@@ -1,6 +1,7 @@
 import type { DriverLaps } from '#/lib/api/races';
 
-const PACE_OUTLIER_RATIO = 1.07;
+const PACE_OUTLIER_RATIO = 1.1;
+const PACE_WINDOW = 6;
 
 type LapRow = Record<string, number | string>;
 
@@ -34,13 +35,14 @@ export const positionChart = (drivers: DriverLaps[], lapStep: number) => {
 };
 
 export const paceChart = (drivers: DriverLaps[], shouldHideOutliers: boolean) => {
-    const fastestMs = Math.min(...drivers.flatMap(({ laps }) => laps.map(lap => lap.timeMs)));
     const rows = new Map<number, LapRow>();
 
     for (const { driver, laps } of drivers) {
-        for (const { lap, timeMs } of laps) {
+        for (const [i, { lap, timeMs }] of laps.entries()) {
             const row: LapRow = { ...rows.get(lap), lap: lapLabel(lap) };
-            const isOutlier = lap === 1 || timeMs > fastestMs * PACE_OUTLIER_RATIO;
+            const nearby = laps.slice(Math.max(0, i - PACE_WINDOW), i + PACE_WINDOW + 1);
+            const nearbyFastestMs = Math.min(...nearby.map(l => l.timeMs));
+            const isOutlier = lap === 1 || timeMs > nearbyFastestMs * PACE_OUTLIER_RATIO;
 
             if (!shouldHideOutliers || !isOutlier) {
                 row[driver.code] = timeMs / 1000;
