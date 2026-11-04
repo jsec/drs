@@ -8,7 +8,7 @@ import { formatCareerYears } from '#/lib/format';
 
 import { driverSummaryColor } from '../driver-summary';
 
-const col = makeColumns<DriverShortSummary>();
+const columnBuilder = makeColumns<DriverShortSummary>();
 
 const byTitles: SortingFn<DriverShortSummary> = (a, b) =>
     a.original.championships - b.original.championships || a.original.wins - b.original.wins;
@@ -20,21 +20,21 @@ export const matchesSearch: FilterFn<DriverShortSummary> = (row, _columnId, valu
     `${row.original.name} ${row.original.code}`.toLowerCase().includes(value.toLowerCase());
 
 export const columns = [
-    col.ordinal(),
-    col.competitor('name', {
+    columnBuilder.ordinal(),
+    columnBuilder.competitor('name', {
         header: 'DRIVER',
-        label: d => d.name,
-        link: d => ({
-            params: { driverId: d.id },
+        label: driver => driver.name,
+        link: driver => ({
+            params: { driverId: driver.id },
             to: '/drivers/$driverId',
         }),
         sort: 'text',
         trailing: 'caret',
-        visual: d => <DriverAvatar code={d.code} color={driverSummaryColor(d)} />,
+        visual: driver => <DriverAvatar code={driver.code} color={driverSummaryColor(driver)} />,
         width: '45%',
     }),
-    col.custom({
-        accessor: d => d.firstYear,
+    columnBuilder.custom({
+        accessor: driver => driver.firstYear,
         cell: info => (
             <span className="table-cell-num table-cell-sm">
                 {formatCareerYears(info.row.original)}
@@ -44,9 +44,32 @@ export const columns = [
         id: 'years',
         width: '11%',
     }),
-    col.num('starts', { align: 'center', header: 'STARTS', width: '8%' }),
-    col.num('wins', { align: 'center', header: 'WINS', sort: byWins, variant: 'display', width: '7%' }),
-    col.num('poles', { align: 'center', header: 'POLES', width: '7%' }),
-    col.num('podiums', { align: 'center', header: 'PODIUMS', width: '10%' }),
-    col.trophy('championships', { header: 'TITLES', id: 'titles', sort: byTitles, width: '8%' }),
+    columnBuilder.numeric('starts', {
+        align: 'center',
+        header: 'STARTS',
+        width: '8%',
+    }),
+    columnBuilder.numeric('wins', {
+        align: 'center',
+        header: 'WINS',
+        sort: byWins,
+        variant: 'display',
+        width: '7%',
+    }),
+    columnBuilder.numeric('poles', {
+        align: 'center',
+        header: 'POLES',
+        width: '7%',
+    }),
+    columnBuilder.numeric('podiums', {
+        align: 'center',
+        header: 'PODIUMS',
+        width: '10%',
+    }),
+    columnBuilder.trophy('championships', {
+        header: 'TITLES',
+        id: 'titles',
+        sort: byTitles,
+        width: '8%',
+    }),
 ];

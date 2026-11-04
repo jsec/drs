@@ -16,7 +16,12 @@ const listCircuitsQuery = queryOptions({
 const Circuits = () => {
     const { data: circuits } = useSuspenseQuery(listCircuitsQuery);
     const { onSortingChange, sorting } = useUrlSorting();
-    const { table } = useDataTable({ columns, data: circuits, onSortingChange, sorting });
+    const { table } = useDataTable({
+        columns,
+        data: circuits,
+        onSortingChange,
+        sorting,
+    });
 
     return (
         <div className="f1-page-stack">
@@ -40,6 +45,7 @@ export const Route = createFileRoute('/circuits/')({
     // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData(listCircuitsQuery);
+
         return { crumbs: [{ label: 'Circuits' }] };
     },
 });

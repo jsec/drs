@@ -17,7 +17,12 @@ const seasonsQuery = queryOptions({
 const Seasons = () => {
     const { data: seasons } = useSuspenseQuery(seasonsQuery);
     const { onSortingChange, sorting } = useUrlSorting();
-    const { table } = useDataTable({ columns, data: seasons, onSortingChange, sorting });
+    const { table } = useDataTable({
+        columns,
+        data: seasons,
+        onSortingChange,
+        sorting,
+    });
 
     return (
         <div className="f1-page-stack">
@@ -39,6 +44,7 @@ export const Route = createFileRoute('/seasons/')({
     // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData(seasonsQuery);
+
         return { crumbs: [{ label: 'Seasons' }] };
     },
 });

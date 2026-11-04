@@ -6,9 +6,11 @@ const FIRST_SEASON = 1950;
 
 export function parseRound(raw: string): number {
     const round = Number(raw);
+
     if (!Number.isSafeInteger(round) || round < 1) {
         throw notFound();
     }
+
     return round;
 }
 
@@ -19,8 +21,11 @@ export function parseRound(raw: string): number {
  */
 export function parseYear(raw: string): number {
     const year = Number(raw);
-    if (!Number.isSafeInteger(year) || year < FIRST_SEASON || year > CURRENT_YEAR) {
+    const isKnownSeason = Number.isSafeInteger(year) && year >= FIRST_SEASON && year <= CURRENT_YEAR;
+
+    if (!isKnownSeason) {
         throw notFound();
     }
+
     return year;
 }

@@ -12,15 +12,15 @@ import { makeConstructorColumns, makeDriverColumns } from './-components/standin
 
 const Standings = () => {
     const { year } = Route.useParams();
-    const { data } = useSuspenseQuery(seasonOverviewQuery(Number(year)));
+    const { data: overview } = useSuspenseQuery(seasonOverviewQuery(Number(year)));
     const { data: calendar } = useSuspenseQuery(seasonCalendarQuery(Number(year)));
     const [tab, setTab] = useState<'constructors' | 'drivers'>('drivers');
 
     const driverColumns = makeDriverColumns(year);
-    const constructorColumns = makeConstructorColumns(year, data.maxConstructorPoints);
+    const constructorColumns = makeConstructorColumns(year, overview.maxConstructorPoints);
 
-    const driverTable = useDataTable({ columns: driverColumns, data: data.drivers });
-    const constructorTable = useDataTable({ columns: constructorColumns, data: data.constructors });
+    const driverTable = useDataTable({ columns: driverColumns, data: overview.drivers });
+    const constructorTable = useDataTable({ columns: constructorColumns, data: overview.constructors });
 
     return (
         <Stack gap={16}>
@@ -32,8 +32,8 @@ const Standings = () => {
             </div>
 
             <Group gap={8} wrap="nowrap">
-                <Pill active={tab === 'drivers'} onClick={() => setTab('drivers')}>Drivers</Pill>
-                <Pill active={tab === 'constructors'} onClick={() => setTab('constructors')}>Constructors</Pill>
+                <Pill isActive={tab === 'drivers'} onClick={() => setTab('drivers')}>Drivers</Pill>
+                <Pill isActive={tab === 'constructors'} onClick={() => setTab('constructors')}>Constructors</Pill>
             </Group>
 
             <Card className="f1-table-card">
@@ -53,6 +53,7 @@ export const Route = createFileRoute('/seasons/$year/standings')({
             context.queryClient.ensureQueryData(seasonOverviewQuery(year)),
             context.queryClient.ensureQueryData(seasonCalendarQuery(year)),
         ]);
+
         return {
             crumbs: [
                 { label: params.year, params: { year: params.year }, to: '/seasons/$year' },

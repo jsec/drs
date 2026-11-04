@@ -7,7 +7,12 @@ import { TrophyIcon } from '@phosphor-icons/react';
 import './f1-ui.css';
 
 const AVATAR_SIZE = { lg: 44, md: 30 } as const;
-const BAR_HEIGHT = { lg: 26, md: 24, sm: 20 } as const;
+const AVATAR_FONT_RATIO = 0.36;
+const BAR_HEIGHT = {
+    lg: 26,
+    md: 24,
+    sm: 20,
+} as const;
 const SQUARE_SIZE = { bar: { height: 30, width: 10 }, dot: { height: 14, width: 14 } } as const;
 
 export const DriverAvatar = ({
@@ -19,7 +24,8 @@ export const DriverAvatar = ({
     color: string;
     size?: keyof typeof AVATAR_SIZE;
 }) => {
-    const px = AVATAR_SIZE[size];
+    const diameter = AVATAR_SIZE[size];
+
     return (
         <div
             style={{
@@ -29,11 +35,11 @@ export const DriverAvatar = ({
                 color: '#fff',
                 display: 'flex',
                 flexShrink: 0,
-                fontSize: px * 0.36,
+                fontSize: diameter * AVATAR_FONT_RATIO,
                 fontWeight: 700,
-                height: px,
+                height: diameter,
                 justifyContent: 'center',
-                width: px,
+                width: diameter,
             }}
         >
             {code}
@@ -82,19 +88,19 @@ export const MiniStat = ({ label, value }: { label: string; value: ReactNode }) 
 };
 
 export const Pill = ({
-    active,
     children,
+    isActive,
     onClick,
 }: {
-    active: boolean;
     children: ReactNode;
+    isActive: boolean;
     onClick: () => void;
 }) => {
     return (
         <Button
-            aria-pressed={active}
+            aria-pressed={isActive}
             className="f1-pill"
-            data-active={active}
+            data-active={isActive}
             onClick={onClick}
             size="sm"
             type="button"
@@ -108,13 +114,13 @@ export const Pill = ({
 export const SectionCard = ({
     action,
     children,
-    padded = true,
+    isPadded = true,
     subtitle,
     title,
 }: {
     action?: ReactNode;
     children: ReactNode;
-    padded?: boolean;
+    isPadded?: boolean;
     subtitle?: string;
     title: string;
 }) => {
@@ -127,7 +133,7 @@ export const SectionCard = ({
                 </div>
                 {action}
             </Group>
-            <div className="f1-section-card-body" data-flush={!padded}>
+            <div className="f1-section-card-body" data-flush={!isPadded}>
                 {children}
             </div>
         </Card>
@@ -143,9 +149,9 @@ export const PointsProgressionCard = ({
     name: string;
     progression: { points: number; round: number }[];
 }) => {
-    const data = [
+    const chartRows = [
         { [name]: 0, x: 'R0' },
-        ...progression.map(p => ({ [name]: p.points, x: `R${p.round}` })),
+        ...progression.map(point => ({ [name]: point.points, x: `R${point.round}` })),
     ];
 
     return (
@@ -153,7 +159,7 @@ export const PointsProgressionCard = ({
             {progression.length > 0
                 ? (
                         <LineChart
-                            data={data}
+                            data={chartRows}
                             dataKey="x"
                             h={200}
                             series={[{ color, name }]}

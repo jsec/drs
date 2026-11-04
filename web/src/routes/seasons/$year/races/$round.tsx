@@ -15,9 +15,12 @@ import { parseRound, parseYear } from '#/lib/route-params';
 const CHART_DRIVER_COUNT = 5;
 const POSITION_LAP_STEP = 5;
 const MEDALS = ['#f59f00', '#adb5bd', '#e8590c'];
-const RESULT_COLS = '36px 1fr 72px 90px 48px';
-const QUALIFYING_SESSION_COLS = '36px 1fr 90px 90px 90px 80px';
-const QUALIFYING_TIME_COLS = '36px 1fr 90px 80px';
+const DELTA_DRIVER_COUNT = 10;
+const MAX_CHARTED_DELTA = 8;
+const MAX_DELTA_BAR_WIDTH = 45;
+const RESULT_COLUMNS = '36px 1fr 72px 90px 48px';
+const QUALIFYING_SESSION_COLUMNS = '36px 1fr 90px 90px 90px 80px';
+const QUALIFYING_TIME_COLUMNS = '36px 1fr 90px 80px';
 
 const HERO_STYLE: React.CSSProperties = {
     background: 'linear-gradient(110deg, var(--neutral-950), var(--neutral-800))',
@@ -39,33 +42,30 @@ const getDeltaColor = (delta: number): string => {
 
 const resultGap = (result: RaceResult) => result.gap ?? result.time ?? result.positionLabel;
 
-const shortNameFor = (results: RaceResult[], ref: DriverRef | null) => {
-    if (!ref) {
-        return '—';
-    }
-    return results.find(result => result.driver.id === ref.id)?.driver.shortName ?? ref.code;
-};
-
 const ResultRows = ({ results, round, session, year }: { results: RaceResult[]; round: string; session?: Session; year: string }) => (
     <>
-        {results.map(r => (
+        {results.map(result => (
             <Link
                 className="f1-row f1-grid-row"
-                key={r.driver.id}
-                params={{ driverId: r.driver.id, round, year }}
+                key={result.driver.id}
+                params={{
+                    driverId: result.driver.id,
+                    round,
+                    year,
+                }}
                 search={{ session }}
-                style={{ '--cols': RESULT_COLS, 'padding': '8px 18px' }}
+                style={{ '--cols': RESULT_COLUMNS, 'padding': '8px 18px' }}
                 to="/seasons/$year/drivers/$driverId/races/$round"
             >
-                <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.positionLabel}</Text>
+                <Text c="dimmed" className="f1-num" fw={700} inherit span>{result.positionLabel}</Text>
                 <Group gap={9} wrap="nowrap">
-                    <TeamBar color={r.constructor.color} size="sm" />
-                    <Text fw={600} fz={13} inherit span>{r.driver.shortName}</Text>
+                    <TeamBar color={result.constructor.color} size="sm" />
+                    <Text fw={600} fz={13} inherit span>{result.driver.shortName}</Text>
                 </Group>
-                <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="center">{r.grid ?? 'PL'}</Text>
-                <Text className="f1-num" fz={12.5} inherit span ta="right">{resultGap(r)}</Text>
-                <Text c={r.points > 0 ? 'inherit' : 'var(--neutral-300)'} className="f1-num" fw={700} inherit span ta="right">
-                    {r.points > 0 ? r.points : '–'}
+                <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="center">{result.grid ?? 'PL'}</Text>
+                <Text className="f1-num" fz={12.5} inherit span ta="right">{resultGap(result)}</Text>
+                <Text c={result.points > 0 ? 'inherit' : 'var(--neutral-300)'} className="f1-num" fw={700} inherit span ta="right">
+                    {result.points > 0 ? result.points : '–'}
                 </Text>
             </Link>
         ))}
@@ -73,7 +73,7 @@ const ResultRows = ({ results, round, session, year }: { results: RaceResult[]; 
 );
 
 const ResultsHeader = () => (
-    <GridHeader columns={RESULT_COLS}>
+    <GridHeader columns={RESULT_COLUMNS}>
         <span>POS</span>
         <span>DRIVER</span>
         <span style={{ textAlign: 'center' }}>GRID</span>
@@ -83,7 +83,16 @@ const ResultsHeader = () => (
 );
 
 const ChartPlaceholder = ({ text }: { text: string }) => (
-    <Box c="dimmed" fz={13} h={240} style={{ alignItems: 'center', display: 'flex', justifyContent: 'center' }}>
+    <Box
+        c="dimmed"
+        fz={13}
+        h={240}
+        style={{
+            alignItems: 'center',
+            display: 'flex',
+            justifyContent: 'center',
+        }}
+    >
         {text}
     </Box>
 );
@@ -125,7 +134,11 @@ const RaceCharts = ({ round, year }: { round: number; year: number }) => {
                     h={240}
                     series={position.series}
                     xAxisProps={{ interval: 'preserveStartEnd' }}
-                    yAxisProps={{ allowDecimals: false, domain: [1, 'dataMax'], reversed: true }}
+                    yAxisProps={{
+                        allowDecimals: false,
+                        domain: [1, 'dataMax'],
+                        reversed: true,
+                    }}
                 />
             </SectionCard>
             <SectionCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
@@ -134,7 +147,7 @@ const RaceCharts = ({ round, year }: { round: number; year: number }) => {
                     dataKey="lap"
                     h={240}
                     series={pace.series}
-                    valueFormatter={v => v.toFixed(1)}
+                    valueFormatter={value => value.toFixed(1)}
                     xAxisProps={{ interval: 'preserveStartEnd' }}
                     yAxisProps={{
                         allowDataOverflow: true,
@@ -149,50 +162,58 @@ const RaceCharts = ({ round, year }: { round: number; year: number }) => {
 
 const RaceDetail = () => {
     const { round, year } = Route.useParams();
-    const { data } = useSuspenseQuery(raceDetailQuery(Number(year), Number(round)));
+    const { data: race } = useSuspenseQuery(raceDetailQuery(Number(year), Number(round)));
 
-    const hasSessions = data.qualifying.some(q => q.q1 !== null);
-    const qualifyingCols = hasSessions ? QUALIFYING_SESSION_COLS : QUALIFYING_TIME_COLS;
+    const hasSessions = race.qualifying.some(entry => entry.q1 !== null);
+    const qualifyingColumns = hasSessions ? QUALIFYING_SESSION_COLUMNS : QUALIFYING_TIME_COLUMNS;
 
-    const headStats: { driver: DriverRef | null; label: string; session?: Session }[] = [
-        { driver: data.pole, label: 'POLE' },
-        { driver: data.fastestLap?.driver ?? null, label: 'FASTEST LAP' },
+    const headStats: { driver: DriverRef | null | undefined; label: string; session?: Session }[] = [
+        { driver: race.pole, label: 'POLE' },
+        { driver: race.fastestLap?.driver, label: 'FASTEST LAP' },
     ];
-    const sprintWinner = data.sprint.at(0);
+    const sprintWinner = race.sprint.at(0);
     if (sprintWinner) {
-        headStats.push({ driver: sprintWinner.driver, label: 'SPRINT WINNER', session: 'sprint' });
+        headStats.push({
+            driver: sprintWinner.driver,
+            label: 'SPRINT WINNER',
+            session: 'sprint',
+        });
     }
-    headStats.push({ driver: data.winner, label: 'WINNER' });
+
+    headStats.push({ driver: race.winner, label: 'WINNER' });
 
     return (
         <Stack gap={16}>
-            {/* Hero */}
             <Group gap={0} justify="space-between" px={26} py={22} style={HERO_STYLE} wrap="nowrap">
                 <div>
                     <Box c="var(--color-sidebar-muted)" fw={700} fz={12} lts="1px">
-                        {`ROUND ${data.round} · ${data.season}`}
+                        {`ROUND ${race.round} · ${race.season}`}
                     </Box>
                     <Box className="f1-display" ff="var(--font-display)" fw={700} fz={28} lts="-0.02em" my={6}>
-                        {data.name}
+                        {race.name}
                     </Box>
                     <Box c="var(--neutral-300)" fz={13}>
-                        {`${data.circuit} · ${data.date ?? 'Date TBD'} · ${data.laps} laps`}
+                        {`${race.circuit} · ${race.date ?? 'Date TBD'} · ${race.laps} laps`}
                     </Box>
                 </div>
                 <Group gap={26} wrap="nowrap">
-                    {headStats.map(s => (
-                        <Box key={s.label} ta="center">
-                            <Box c="var(--color-sidebar-muted)" fw={600} fz={11}>{s.label}</Box>
+                    {headStats.map(stat => (
+                        <Box key={stat.label} ta="center">
+                            <Box c="var(--color-sidebar-muted)" fw={600} fz={11}>{stat.label}</Box>
                             <Box className="f1-display" ff="var(--font-display)" fw={700} fz={16} mt={3}>
-                                {s.driver
+                                {stat.driver
                                     ? (
                                             <Link
                                                 className="f1-plain-link"
-                                                params={{ driverId: s.driver.id, round, year }}
-                                                search={{ session: s.session }}
+                                                params={{
+                                                    driverId: stat.driver.id,
+                                                    round,
+                                                    year,
+                                                }}
+                                                search={{ session: stat.session }}
                                                 to="/seasons/$year/drivers/$driverId/races/$round"
                                             >
-                                                {shortNameFor(data.results, s.driver)}
+                                                {race.results.find(result => result.driver.id === stat.driver?.id)?.driver.shortName ?? stat.driver.code}
                                             </Link>
                                         )
                                     : '—'}
@@ -202,28 +223,31 @@ const RaceDetail = () => {
                 </Group>
             </Group>
 
-            {/* Podium cards */}
             <SimpleGrid cols={3} spacing={16}>
-                {data.results.slice(0, 3).map((r, i) => (
+                {race.results.slice(0, MEDALS.length).map((result, index) => (
                     <Link
                         className="f1-plain-link"
-                        key={r.driver.id}
-                        params={{ driverId: r.driver.id, round, year }}
+                        key={result.driver.id}
+                        params={{
+                            driverId: result.driver.id,
+                            round,
+                            year,
+                        }}
                         to="/seasons/$year/drivers/$driverId/races/$round"
                     >
                         <Box
                             className="f1-card f1-lift"
                             p={16}
-                            style={{ borderTop: `4px solid ${r.constructor.color}`, cursor: 'pointer' }}
+                            style={{ borderTop: `4px solid ${result.constructor.color}`, cursor: 'pointer' }}
                         >
                             <Group gap={14} wrap="nowrap">
-                                <Text c={MEDALS[i]} className="f1-display" ff="var(--font-display)" fw={700} fz={30} inherit span>{i + 1}</Text>
-                                <DriverAvatar code={r.driver.code} color={r.constructor.color} size="lg" />
+                                <Text c={MEDALS[index]} className="f1-display" ff="var(--font-display)" fw={700} fz={30} inherit span>{index + 1}</Text>
+                                <DriverAvatar code={result.driver.code} color={result.constructor.color} size="lg" />
                                 <div>
-                                    <Box fw={700} fz={15}>{r.driver.name}</Box>
-                                    <Box c="dimmed" fz={12}>{r.constructor.name}</Box>
+                                    <Box fw={700} fz={15}>{result.driver.name}</Box>
+                                    <Box c="dimmed" fz={12}>{result.constructor.name}</Box>
                                     <Box className="f1-num" fw={600} fz={12} mt={2}>
-                                        {resultGap(r)}
+                                        {resultGap(result)}
                                     </Box>
                                 </div>
                             </Group>
@@ -232,34 +256,38 @@ const RaceDetail = () => {
                 ))}
             </SimpleGrid>
 
-            {/* Charts */}
             <SimpleGrid cols={2} spacing={16}>
                 <Suspense fallback={<ChartPlaceholders text="Loading laps…" />}>
                     <RaceCharts round={Number(round)} year={Number(year)} />
                 </Suspense>
             </SimpleGrid>
 
-            {/* Results + Qual vs Race */}
-            <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '7.2fr 4.8fr' }}>
-                <SectionCard padded={false} title="Race Results">
+            <div style={{
+                display: 'grid',
+                gap: 16,
+                gridTemplateColumns: '7.2fr 4.8fr',
+            }}
+            >
+                <SectionCard isPadded={false} title="Race Results">
                     <ResultsHeader />
                     <Box className="f1-scroll" mah={430} style={{ overflowY: 'auto' }}>
-                        <ResultRows results={data.results} round={round} year={year} />
+                        <ResultRows results={race.results} round={round} year={year} />
                     </Box>
                 </SectionCard>
 
                 <SectionCard subtitle="Positions gained or lost on Sunday" title="Qualifying vs Race">
-                    {data.results.slice(0, 10).map((r) => {
-                        const delta = (r.grid ?? data.results.length) - r.position;
-                        const mag = (Math.min(Math.abs(delta), 8) / 8) * 45;
+                    {race.results.slice(0, DELTA_DRIVER_COUNT).map((result) => {
+                        const delta = (result.grid ?? race.results.length) - result.position;
+                        const magnitude = (Math.min(Math.abs(delta), MAX_CHARTED_DELTA) / MAX_CHARTED_DELTA) * MAX_DELTA_BAR_WIDTH;
                         const color = getDeltaColor(delta);
+
                         return (
-                            <Group gap={10} key={r.driver.id} mb={11} wrap="nowrap">
-                                <Text fw={700} fz={12} inherit span w={40}>{r.driver.code}</Text>
+                            <Group gap={10} key={result.driver.id} mb={11} wrap="nowrap">
+                                <Text fw={700} fz={12} inherit span w={40}>{result.driver.code}</Text>
                                 <Text c="dimmed" className="f1-num" fz={11} inherit span w={62}>
-                                    {formatGrid(r.grid)}
+                                    {formatGrid(result.grid)}
                                     →P
-                                    {r.position}
+                                    {result.position}
                                 </Text>
                                 <Box flex={1} h={14} pos="relative">
                                     <Box
@@ -273,11 +301,11 @@ const RaceDetail = () => {
                                     <Box
                                         bg={color}
                                         h={8}
-                                        left={delta >= 0 ? '50%' : `${50 - mag}%`}
+                                        left={delta >= 0 ? '50%' : `${50 - magnitude}%`}
                                         pos="absolute"
                                         style={{ borderRadius: 3 }}
                                         top={3}
-                                        w={`${Math.max(mag, 1)}%`}
+                                        w={`${Math.max(magnitude, 1)}%`}
                                     />
                                 </Box>
                                 <Text c={color} className="f1-num" fw={700} fz={12} inherit span ta="right" w={34}>
@@ -289,9 +317,9 @@ const RaceDetail = () => {
                 </SectionCard>
             </div>
 
-            {data.qualifying.length > 0 && (
-                <SectionCard padded={false} title="Qualifying">
-                    <GridHeader columns={qualifyingCols}>
+            {race.qualifying.length > 0 && (
+                <SectionCard isPadded={false} title="Qualifying">
+                    <GridHeader columns={qualifyingColumns}>
                         <span>POS</span>
                         <span>DRIVER</span>
                         {hasSessions
@@ -305,38 +333,42 @@ const RaceDetail = () => {
                             : <span style={{ textAlign: 'right' }}>TIME</span>}
                         <span style={{ textAlign: 'right' }}>GAP</span>
                     </GridHeader>
-                    {data.qualifying.map(q => (
+                    {race.qualifying.map(entry => (
                         <Link
                             className="f1-row f1-grid-row"
-                            key={q.driver.id}
-                            params={{ driverId: q.driver.id, round, year }}
-                            style={{ '--cols': qualifyingCols, 'padding': '8px 18px' }}
+                            key={entry.driver.id}
+                            params={{
+                                driverId: entry.driver.id,
+                                round,
+                                year,
+                            }}
+                            style={{ '--cols': qualifyingColumns, 'padding': '8px 18px' }}
                             to="/seasons/$year/drivers/$driverId/races/$round"
                         >
-                            <Text c="dimmed" className="f1-num" fw={700} inherit span>{q.positionLabel}</Text>
+                            <Text c="dimmed" className="f1-num" fw={700} inherit span>{entry.positionLabel}</Text>
                             <Group gap={9} wrap="nowrap">
-                                <TeamBar color={q.constructor.color} size="sm" />
-                                <Text fw={600} fz={13} inherit span>{q.driver.shortName}</Text>
+                                <TeamBar color={entry.constructor.color} size="sm" />
+                                <Text fw={600} fz={13} inherit span>{entry.driver.shortName}</Text>
                             </Group>
                             {hasSessions
                                 ? (
                                         <>
-                                            <Text className="f1-num" fz={12.5} inherit span ta="right">{q.q1}</Text>
-                                            <Text className="f1-num" fz={12.5} inherit span ta="right">{q.q2}</Text>
-                                            <Text className="f1-num" fz={12.5} inherit span ta="right">{q.q3}</Text>
+                                            <Text className="f1-num" fz={12.5} inherit span ta="right">{entry.q1}</Text>
+                                            <Text className="f1-num" fz={12.5} inherit span ta="right">{entry.q2}</Text>
+                                            <Text className="f1-num" fz={12.5} inherit span ta="right">{entry.q3}</Text>
                                         </>
                                     )
-                                : <Text className="f1-num" fz={12.5} inherit span ta="right">{q.time}</Text>}
-                            <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="right">{q.gap}</Text>
+                                : <Text className="f1-num" fz={12.5} inherit span ta="right">{entry.time}</Text>}
+                            <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="right">{entry.gap}</Text>
                         </Link>
                     ))}
                 </SectionCard>
             )}
 
-            {data.sprint.length > 0 && (
-                <SectionCard padded={false} title="Sprint">
+            {race.sprint.length > 0 && (
+                <SectionCard isPadded={false} title="Sprint">
                     <ResultsHeader />
-                    <ResultRows results={data.sprint} round={round} session="sprint" year={year} />
+                    <ResultRows results={race.sprint} round={round} session="sprint" year={year} />
                 </SectionCard>
             )}
         </Stack>

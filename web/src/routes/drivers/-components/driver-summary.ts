@@ -2,6 +2,7 @@ import { isNumericPosition } from '#/lib/format';
 
 const FORMER_CHAMPION_COLOR = '#c79100';
 const INACTIVE_DRIVER_COLOR = 'var(--neutral-500)';
+const PODIUM_SIZE = 3;
 
 type DriverHero = {
     championships: number;
@@ -9,12 +10,12 @@ type DriverHero = {
     isActive: boolean;
 };
 
-export const driverSummaryColor = ({ championships, constructorColor, isActive }: DriverHero) => {
-    if (isActive) {
-        return constructorColor;
+export const driverSummaryColor = (driver: DriverHero) => {
+    if (driver.isActive) {
+        return driver.constructorColor;
     }
 
-    if (championships > 0) {
+    if (driver.championships > 0) {
         return FORMER_CHAMPION_COLOR;
     }
 
@@ -26,7 +27,7 @@ export const championshipPositionColor = (position: string): string => {
         return 'var(--gold-500)';
     }
 
-    if (isNumericPosition(position) && Number(position) <= 3) {
+    if (isNumericPosition(position) && Number(position) <= PODIUM_SIZE) {
         return 'var(--mantine-color-text)';
     }
 

@@ -38,10 +38,17 @@ export const driverSeasonQuery = (year: number, driverId: string) =>
         queryKey: ['driver-season', year, driverId],
     });
 
-export const driverRaceQuery = (year: number, round: number, driverId: string, session: Session) =>
+type DriverRaceQueryOptions = {
+    driverId: string;
+    round: number;
+    session: Session;
+    year: number;
+};
+
+export const driverRaceQuery = (options: DriverRaceQueryOptions) =>
     queryOptions({
-        queryFn: () => api.get(`seasons/${year}/drivers/${driverId}/races/${round}`, { searchParams: { session } }).json(DriverRaceSchema),
-        queryKey: ['driver-race', year, round, driverId, session],
+        queryFn: () => api.get(`seasons/${options.year}/drivers/${options.driverId}/races/${options.round}`, { searchParams: { session: options.session } }).json(DriverRaceSchema),
+        queryKey: ['driver-race', options.year, options.round, options.driverId, options.session],
     });
 
 export const constructorSeasonQuery = (year: number, constructorId: string) =>

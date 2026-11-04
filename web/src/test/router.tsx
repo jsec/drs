@@ -12,6 +12,8 @@ import { render } from '@testing-library/react';
 
 import { theme } from '#/lib/mantine-theme';
 
+const LEADING_QUESTION_MARK = /^\?/;
+
 export async function renderWithRouter(ui: ReactNode, initialUrl = '/') {
     const rootRoute = createRootRoute();
 
@@ -39,5 +41,5 @@ export async function renderWithRouter(ui: ReactNode, initialUrl = '/') {
 }
 
 export function searchOf(router: { state: { location: { searchStr: string } } }) {
-    return router.state.location.searchStr.replace(/^\?/, '');
+    return router.state.location.searchStr.replace(LEADING_QUESTION_MARK, '');
 }

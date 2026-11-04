@@ -9,8 +9,11 @@ import { driverSeasonQuery } from '#/data/queries';
 import { formatPosition, isNumericPosition } from '#/lib/format';
 import { parseYear } from '#/lib/route-params';
 
-const COLS = '44px 1fr 70px 70px 70px 60px';
-const SPRINT_COLS = `${COLS} 80px`;
+const COLUMNS = '44px 1fr 70px 70px 70px 60px';
+const SPRINT_COLUMNS = `${COLUMNS} 80px`;
+const LOWEST_CHARTED_POSITION = 20;
+const MIN_BAR_HEIGHT = 4;
+const MAX_BAR_HEIGHT = 90;
 
 function finishColor(position: number, teamColor: string): string {
     if (position <= 3) {
@@ -27,6 +30,7 @@ function finishColor(position: number, teamColor: string): string {
 function raceStatus(race: DriverSeasonRace): [label: string, color: string] {
     if (race.statusCategory !== 'finished' || race.position === null) {
         const label = isNumericPosition(race.positionLabel) ? 'DNF' : race.positionLabel;
+
         return [label, 'var(--mantine-primary-color-filled)'];
     }
 
@@ -49,8 +53,8 @@ const DriverSeason = () => {
     const { driverId, year } = Route.useParams();
     const { data: driver } = useSuspenseQuery(driverSeasonQuery(Number(year), driverId));
     const color = driver.constructor.color;
-    const hasSprints = driver.races.some(r => r.sprint !== null);
-    const cols = hasSprints ? SPRINT_COLS : COLS;
+    const hasSprints = driver.races.some(race => race.sprint !== null);
+    const columns = hasSprints ? SPRINT_COLUMNS : COLUMNS;
     const carNumber = driver.carNumber === null ? '–' : `#${driver.carNumber}`;
 
     return (
@@ -112,7 +116,6 @@ const DriverSeason = () => {
                 </Box>
             </Group>
 
-            {/* Stat tiles */}
             <SimpleGrid cols={6} spacing={8}>
                 <MiniStat label="POINTS" value={driver.points} />
                 <MiniStat label="WINS" value={driver.wins} />
@@ -122,16 +125,19 @@ const DriverSeason = () => {
                 <MiniStat label="CAR NO." value={carNumber} />
             </SimpleGrid>
 
-            {/* Charts */}
             <SimpleGrid cols={2} spacing={16}>
                 <PointsProgressionCard color={color} name={driver.code} progression={driver.progression} />
                 <SectionCard title="Finishing Positions">
                     <Group align="flex-end" gap={6} h={180} wrap="nowrap">
-                        {driver.races.map(r => (
+                        {driver.races.map(race => (
                             <Link
                                 className="f1-plain-link"
-                                key={r.round}
-                                params={{ driverId, round: String(r.round), year }}
+                                key={race.round}
+                                params={{
+                                    driverId,
+                                    round: String(race.round),
+                                    year,
+                                }}
                                 style={{ flex: 1, height: '100%' }}
                                 to="/seasons/$year/drivers/$driverId/races/$round"
                             >
@@ -141,17 +147,17 @@ const DriverSeason = () => {
                                     h="100%"
                                     justify="flex-end"
                                 >
-                                    <Text c="var(--neutral-700)" className="f1-num" fw={700} fz={10} inherit mb={3} span>{r.positionLabel}</Text>
-                                    {r.position !== null && (
+                                    <Text c="var(--neutral-700)" className="f1-num" fw={700} fz={10} inherit mb={3} span>{race.positionLabel}</Text>
+                                    {race.position !== null && (
                                         <Box
-                                            bg={finishColor(r.position, color)}
-                                            h={`${Math.max(4, (100 - ((r.position - 1) / 19) * 100) * 0.9)}%`}
+                                            bg={finishColor(race.position, color)}
+                                            h={`${Math.max(MIN_BAR_HEIGHT, (1 - (race.position - 1) / (LOWEST_CHARTED_POSITION - 1)) * MAX_BAR_HEIGHT)}%`}
                                             maw={26}
                                             style={{ borderRadius: '4px 4px 0 0' }}
                                             w="100%"
                                         />
                                     )}
-                                    <Text c="dimmed" fz={9.5} inherit mt={4} span>{`R${r.round}`}</Text>
+                                    <Text c="dimmed" fz={9.5} inherit mt={4} span>{`R${race.round}`}</Text>
                                 </Stack>
                             </Link>
                         ))}
@@ -159,8 +165,8 @@ const DriverSeason = () => {
                 </SectionCard>
             </SimpleGrid>
 
-            <SectionCard padded={false} title="Race-by-Race Results">
-                <GridHeader columns={cols}>
+            <SectionCard isPadded={false} title="Race-by-Race Results">
+                <GridHeader columns={columns}>
                     <span>RND</span>
                     <span>GRAND PRIX</span>
                     <span style={{ textAlign: 'center' }}>GRID</span>
@@ -169,26 +175,30 @@ const DriverSeason = () => {
                     <span style={{ textAlign: 'right' }}>PTS</span>
                     {hasSprints && <span style={{ textAlign: 'right' }}>SPR</span>}
                 </GridHeader>
-                {driver.races.map((r) => {
-                    const [status, statusColor] = raceStatus(r);
+                {driver.races.map((race) => {
+                    const [status, statusColor] = raceStatus(race);
 
                     return (
                         <Link
                             className="f1-row f1-grid-row"
-                            key={r.round}
-                            params={{ driverId, round: String(r.round), year }}
-                            style={{ '--cols': cols }}
+                            key={race.round}
+                            params={{
+                                driverId,
+                                round: String(race.round),
+                                year,
+                            }}
+                            style={{ '--cols': columns }}
                             to="/seasons/$year/drivers/$driverId/races/$round"
                         >
-                            <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.round}</Text>
-                            <Text fw={600} fz={13} inherit span>{r.name}</Text>
-                            <Text c="dimmed" className="f1-num" inherit span ta="center">{r.grid ?? '–'}</Text>
-                            <Text className="f1-num f1-display" fw={700} inherit span ta="center">{r.positionLabel}</Text>
+                            <Text c="dimmed" className="f1-num" fw={700} inherit span>{race.round}</Text>
+                            <Text fw={600} fz={13} inherit span>{race.name}</Text>
+                            <Text c="dimmed" className="f1-num" inherit span ta="center">{race.grid ?? '–'}</Text>
+                            <Text className="f1-num f1-display" fw={700} inherit span ta="center">{race.positionLabel}</Text>
                             <Text c={statusColor} fw={700} fz={11} inherit span ta="center">{status}</Text>
-                            <Text className="f1-num" fw={700} inherit span ta="right">{r.points > 0 ? r.points : '–'}</Text>
+                            <Text className="f1-num" fw={700} inherit span ta="right">{race.points > 0 ? race.points : '–'}</Text>
                             {hasSprints && (
                                 <Text c="dimmed" className="f1-num" inherit span ta="right">
-                                    {r.sprint ? `${formatPosition(r.sprint.positionLabel)} · ${r.sprint.points}` : '–'}
+                                    {race.sprint ? `${formatPosition(race.sprint.positionLabel)} · ${race.sprint.points}` : '–'}
                                 </Text>
                             )}
                         </Link>

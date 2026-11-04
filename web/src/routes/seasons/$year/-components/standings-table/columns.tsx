@@ -6,48 +6,58 @@ import type { ConstructorStanding, DriverStanding } from '#/lib/api/seasons';
 import { makeColumns } from '#/components/data-table';
 import { TeamBar, TeamSquare } from '#/components/f1-ui';
 
-const CODE_STYLE = { color: 'var(--mantine-color-dimmed)', fontSize: 11, fontWeight: 700, marginLeft: 8 } as const;
+const CODE_STYLE = {
+    color: 'var(--mantine-color-dimmed)',
+    fontSize: 11,
+    fontWeight: 700,
+    marginLeft: 8,
+} as const;
 
-export function makeConstructorColumns(year: string, maxConstructor: number) {
-    const col = makeColumns<ConstructorStanding>();
+export function makeConstructorColumns(year: string, maxConstructorPoints: number) {
+    const columnBuilder = makeColumns<ConstructorStanding>();
 
     return [
-        col.ordinal({ header: 'POS', width: '46px' }),
-        col.competitor('name', {
+        columnBuilder.ordinal({ header: 'POS', width: '46px' }),
+        columnBuilder.competitor('name', {
             header: 'CONSTRUCTOR',
-            label: c => c.name,
-            link: c => ({ params: { constructorId: c.id, year }, to: '/seasons/$year/constructors/$constructorId' }),
-            visual: c => <TeamSquare color={c.color} size="bar" />,
+            label: standing => standing.name,
+            link: standing => ({ params: { constructorId: standing.id, year }, to: '/seasons/$year/constructors/$constructorId' }),
+            visual: standing => <TeamSquare color={standing.color} size="bar" />,
             width: '240px',
         }),
-        col.custom({
+        columnBuilder.custom({
             cell: info => (
-                <Progress color={info.row.original.color} size={9} value={(info.row.original.points / maxConstructor) * 100} />
+                <Progress color={info.row.original.color} size={9} value={(info.row.original.points / maxConstructorPoints) * 100} />
             ),
             header: '',
             id: 'bar',
         }),
-        col.num('points', { align: 'right', header: 'PTS', variant: 'display', width: '90px' }),
+        columnBuilder.numeric('points', {
+            align: 'right',
+            header: 'PTS',
+            variant: 'display',
+            width: '90px',
+        }),
     ];
 }
 
 export function makeDriverColumns(year: string) {
-    const col = makeColumns<DriverStanding>();
+    const columnBuilder = makeColumns<DriverStanding>();
 
     return [
-        col.ordinal({ header: 'POS', width: '46px' }),
-        col.competitor('name', {
+        columnBuilder.ordinal({ header: 'POS', width: '46px' }),
+        columnBuilder.competitor('name', {
             header: 'DRIVER',
-            label: d => (
+            label: driver => (
                 <>
-                    {d.name}
-                    <span style={CODE_STYLE}>{d.code}</span>
+                    {driver.name}
+                    <span style={CODE_STYLE}>{driver.code}</span>
                 </>
             ),
-            link: d => ({ params: { driverId: d.id, year }, to: '/seasons/$year/drivers/$driverId' }),
-            visual: d => <TeamBar color={d.constructor?.color ?? 'var(--neutral-500)'} size="md" />,
+            link: driver => ({ params: { driverId: driver.id, year }, to: '/seasons/$year/drivers/$driverId' }),
+            visual: driver => <TeamBar color={driver.constructor?.color ?? 'var(--neutral-500)'} size="md" />,
         }),
-        col.custom({
+        columnBuilder.custom({
             cell: (info) => {
                 const team = info.row.original.constructor;
                 if (!team) {
@@ -69,9 +79,26 @@ export function makeDriverColumns(year: string) {
             id: 'constructor',
             width: '130px',
         }),
-        col.num('wins', { align: 'center', header: 'WINS', width: '70px' }),
-        col.num('podiums', { align: 'center', header: 'PODIUMS', width: '80px' }),
-        col.num('poles', { align: 'center', header: 'POLES', width: '80px' }),
-        col.num('points', { align: 'right', header: 'PTS', variant: 'display', width: '80px' }),
+        columnBuilder.numeric('wins', {
+            align: 'center',
+            header: 'WINS',
+            width: '70px',
+        }),
+        columnBuilder.numeric('podiums', {
+            align: 'center',
+            header: 'PODIUMS',
+            width: '80px',
+        }),
+        columnBuilder.numeric('poles', {
+            align: 'center',
+            header: 'POLES',
+            width: '80px',
+        }),
+        columnBuilder.numeric('points', {
+            align: 'right',
+            header: 'PTS',
+            variant: 'display',
+            width: '80px',
+        }),
     ];
 }

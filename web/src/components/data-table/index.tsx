@@ -1,6 +1,5 @@
 import type { LinkProps } from '@tanstack/react-router';
 import type { Cell, RowData, Table } from '@tanstack/react-table';
-import type { ReactNode } from 'react';
 
 import { Table as TablePrimitive } from '@mantine/core';
 import { CaretDownIcon, CaretRightIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react';
@@ -19,8 +18,8 @@ declare module '@tanstack/react-table' {
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-unused-vars
     interface ColumnMeta<TData extends RowData, TValue> {
         align?: 'center' | 'right';
+        isOrdinal?: boolean;
         link?: (row: TData) => LinkProps | undefined;
-        ordinal?: boolean;
         trailing?: 'caret';
         width?: string;
     }
@@ -74,28 +73,28 @@ export function DataTable<T>({ px = 18, table }: DataTableProps<T>) {
                 </colgroup>
                 <TablePrimitive.Thead>
                     <TablePrimitive.Tr>
-                        {headers.map((h) => {
-                            const label = h.isPlaceholder
+                        {headers.map((header) => {
+                            const label = header.isPlaceholder
                                 ? null
-                                : flexRender(h.column.columnDef.header, h.getContext());
-                            const sorted = h.column.getIsSorted();
+                                : flexRender(header.column.columnDef.header, header.getContext());
+                            const sorted = header.column.getIsSorted();
 
                             return (
                                 <TablePrimitive.Th
-                                    aria-sort={h.column.getCanSort() ? ARIA_SORT[String(sorted)] : undefined}
-                                    key={h.id}
+                                    aria-sort={header.column.getCanSort() ? ARIA_SORT[String(sorted)] : undefined}
+                                    key={header.id}
                                     scope="col"
                                     style={{
                                         paddingBlock: 14,
                                         paddingInline: px,
-                                        textAlign: h.column.columnDef.meta?.align ?? 'left',
+                                        textAlign: header.column.columnDef.meta?.align ?? 'left',
                                     }}
                                 >
-                                    {h.column.getCanSort()
+                                    {header.column.getCanSort()
                                         ? (
                                                 <button
                                                     className="table-head-sort"
-                                                    onClick={h.column.getToggleSortingHandler()}
+                                                    onClick={header.column.getToggleSortingHandler()}
                                                     type="button"
                                                 >
                                                     {label}
@@ -109,7 +108,7 @@ export function DataTable<T>({ px = 18, table }: DataTableProps<T>) {
                     </TablePrimitive.Tr>
                 </TablePrimitive.Thead>
                 <TablePrimitive.Tbody>
-                    {rows.map((row, i) => {
+                    {rows.map((row, rowIndex) => {
                         const link = linkColumn?.columnDef.meta?.link?.(row.original);
 
                         return (
@@ -123,21 +122,24 @@ export function DataTable<T>({ px = 18, table }: DataTableProps<T>) {
                                     const align = meta?.align ?? 'left';
                                     const isLinkCell = link != null && cell.column.id === linkColumn?.id;
 
-                                    let content: ReactNode = <CellBody align={align} cell={cell} rank={i + 1} />;
-
-                                    if (isLinkCell && hasCaret) {
-                                        content = (
-                                            <span className="table-cell-linkrow">
-                                                {content}
-                                                <CaretRightIcon className="table-cell-caret" size={13} />
-                                            </span>
-                                        );
-                                    }
+                                    const body = <CellBody align={align} cell={cell} rank={rowIndex + 1} />;
+                                    const content = isLinkCell && hasCaret
+                                        ? (
+                                                <span className="table-cell-linkrow">
+                                                    {body}
+                                                    <CaretRightIcon className="table-cell-caret" size={13} />
+                                                </span>
+                                            )
+                                        : body;
 
                                     return (
                                         <TablePrimitive.Td
                                             key={cell.id}
-                                            style={{ paddingBlock: 14, paddingInline: px, textAlign: align }}
+                                            style={{
+                                                paddingBlock: 14,
+                                                paddingInline: px,
+                                                textAlign: align,
+                                            }}
                                         >
                                             {isLinkCell
                                                 ? (
@@ -165,7 +167,7 @@ export function DataTable<T>({ px = 18, table }: DataTableProps<T>) {
 }
 
 function CellBody<T>({ align, cell, rank }: CellBodyProps<T>) {
-    if (cell.column.columnDef.meta?.ordinal) {
+    if (cell.column.columnDef.meta?.isOrdinal) {
         return (
             <span className="table-cell-rank" style={{ display: 'block', textAlign: align }}>
                 {rank}

@@ -10,7 +10,7 @@ import { CURRENT_YEAR } from '#/lib/route-params';
 
 import './overview.css';
 
-type RecordStat = { icon: ReactNode; label: string; sub: string; value: number };
+type RecordStat = { icon: ReactNode; label: string; subtitle: string; value: number };
 type StandingsRow = {
     code?: string;
     color: string;
@@ -22,26 +22,70 @@ type StandingsRow = {
 };
 type Total = { label: string; meta: string; value: number };
 
+const STANDINGS_LIMIT = 10;
+
 const TOTALS: Total[] = [
-    { label: 'Seasons', meta: `1950 → ${CURRENT_YEAR}`, value: 77 },
-    { label: 'Drivers', meta: '34 champions', value: 774 },
-    { label: 'Constructors', meta: '10 on the grid', value: 171 },
-    { label: 'Circuits', meta: '34 countries', value: 77 },
+    {
+        label: 'Seasons',
+        meta: `1950 → ${CURRENT_YEAR}`,
+        value: 77,
+    },
+    {
+        label: 'Drivers',
+        meta: '34 champions',
+        value: 774,
+    },
+    {
+        label: 'Constructors',
+        meta: '10 on the grid',
+        value: 171,
+    },
+    {
+        label: 'Circuits',
+        meta: '34 countries',
+        value: 77,
+    },
 ];
 
 const RECORDS: RecordStat[] = [
-    { icon: <CrownIcon color="var(--gold-500)" size={15} weight="fill" />, label: 'WDC', sub: '🇬🇧 Hamilton · 🇩🇪 Schumacher', value: 7 },
-    { icon: <WrenchIcon color="#DC0000" size={15} weight="fill" />, label: 'WCC', sub: '🇮🇹 Scuderia Ferrari', value: 16 },
-    { icon: <TrophyIcon color="var(--mantine-primary-color-filled)" size={15} weight="fill" />, label: 'Most wins', sub: '🇬🇧 Lewis Hamilton', value: 105 },
-    { icon: <TimerIcon color="var(--teal-500)" size={15} weight="fill" />, label: 'Most poles', sub: '🇬🇧 Lewis Hamilton', value: 104 },
-    { icon: <FlagCheckeredIcon color="var(--blue-500)" size={15} weight="fill" />, label: 'Most starts', sub: '🇪🇸 Fernando Alonso', value: 416 },
+    {
+        icon: <CrownIcon color="var(--gold-500)" size={15} weight="fill" />,
+        label: 'WDC',
+        subtitle: '🇬🇧 Hamilton · 🇩🇪 Schumacher',
+        value: 7,
+    },
+    {
+        icon: <WrenchIcon color="#DC0000" size={15} weight="fill" />,
+        label: 'WCC',
+        subtitle: '🇮🇹 Scuderia Ferrari',
+        value: 16,
+    },
+    {
+        icon: <TrophyIcon color="var(--mantine-primary-color-filled)" size={15} weight="fill" />,
+        label: 'Most wins',
+        subtitle: '🇬🇧 Lewis Hamilton',
+        value: 105,
+    },
+    {
+        icon: <TimerIcon color="var(--teal-500)" size={15} weight="fill" />,
+        label: 'Most poles',
+        subtitle: '🇬🇧 Lewis Hamilton',
+        value: 104,
+    },
+    {
+        icon: <FlagCheckeredIcon color="var(--blue-500)" size={15} weight="fill" />,
+        label: 'Most starts',
+        subtitle: '🇪🇸 Fernando Alonso',
+        value: 416,
+    },
 ];
 
 export const Overview = () => {
-    const { data } = useSuspenseQuery(seasonOverviewQuery(CURRENT_YEAR));
+    const { data: overview } = useSuspenseQuery(seasonOverviewQuery(CURRENT_YEAR));
     const { data: calendar } = useSuspenseQuery(seasonCalendarQuery(CURRENT_YEAR));
-    const drivers = data.drivers.slice(0, 10);
-    const constructors = data.constructors.slice(0, 10);
+
+    const drivers = overview.drivers.slice(0, STANDINGS_LIMIT);
+    const constructors = overview.constructors.slice(0, STANDINGS_LIMIT);
     const leaderPoints = drivers[0]?.points ?? 0;
     const subtitle = `${CURRENT_YEAR} · after ${calendar.roundsCompleted} of ${calendar.totalRounds} rounds`;
 
@@ -70,24 +114,24 @@ export const Overview = () => {
                     <div className="overview-card-sub">{`The series at a glance · 1950 → ${CURRENT_YEAR}`}</div>
                 </div>
                 <div className="overview-totals">
-                    {TOTALS.map(t => (
-                        <div className="overview-total" key={t.label}>
-                            <div className="overview-total-value">{t.value}</div>
-                            <div className="overview-total-label">{t.label}</div>
-                            <div className="overview-total-meta">{t.meta}</div>
+                    {TOTALS.map(total => (
+                        <div className="overview-total" key={total.label}>
+                            <div className="overview-total-value">{total.value}</div>
+                            <div className="overview-total-label">{total.label}</div>
+                            <div className="overview-total-meta">{total.meta}</div>
                         </div>
                     ))}
                 </div>
                 <div className="overview-records-head">All-time records</div>
                 <div className="overview-records">
-                    {RECORDS.map(r => (
-                        <div className="overview-record" key={r.label}>
+                    {RECORDS.map(record => (
+                        <div className="overview-record" key={record.label}>
                             <div className="overview-record-label">
-                                {r.icon}
-                                {r.label}
+                                {record.icon}
+                                {record.label}
                             </div>
-                            <div className="overview-record-value">{r.value}</div>
-                            <div className="overview-record-sub">{r.sub}</div>
+                            <div className="overview-record-value">{record.value}</div>
+                            <div className="overview-record-sub">{record.subtitle}</div>
                         </div>
                     ))}
                 </div>
@@ -96,27 +140,27 @@ export const Overview = () => {
             <div className="overview-standings">
                 <StandingsCard
                     maxPoints={leaderPoints}
-                    rows={drivers.map(d => ({
-                        code: d.code,
-                        color: d.constructor?.color ?? 'var(--neutral-400)',
-                        countryCode: d.countryCode,
-                        key: d.id,
-                        name: d.name,
-                        points: d.points,
-                        positionLabel: d.positionLabel,
+                    rows={drivers.map(driver => ({
+                        code: driver.code,
+                        color: driver.constructor?.color ?? 'var(--neutral-400)',
+                        countryCode: driver.countryCode,
+                        key: driver.id,
+                        name: driver.name,
+                        points: driver.points,
+                        positionLabel: driver.positionLabel,
                     }))}
                     subtitle={subtitle}
                     title="Drivers' championship"
                 />
                 <StandingsCard
-                    maxPoints={data.maxConstructorPoints}
-                    rows={constructors.map(c => ({
-                        color: c.color,
-                        countryCode: c.countryCode,
-                        key: `${c.id}-${c.engineId}`,
-                        name: c.name,
-                        points: c.points,
-                        positionLabel: c.positionLabel,
+                    maxPoints={overview.maxConstructorPoints}
+                    rows={constructors.map(team => ({
+                        color: team.color,
+                        countryCode: team.countryCode,
+                        key: `${team.id}-${team.engineId}`,
+                        name: team.name,
+                        points: team.points,
+                        positionLabel: team.positionLabel,
                     }))}
                     subtitle={subtitle}
                     title="Constructors' championship"
@@ -142,21 +186,21 @@ const StandingsCard = ({ maxPoints, rows, subtitle, title }: StandingsCardProps)
             </div>
             <span className="overview-pts-label">PTS</span>
         </div>
-        {rows.map((r, i) => (
-            <div className="overview-row" key={r.key}>
-                <span className="overview-row-pos" style={{ color: i === 0 ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-dimmed)' }}>{r.positionLabel}</span>
-                <span className="overview-row-team" style={{ background: r.color }} />
+        {rows.map((row, index) => (
+            <div className="overview-row" key={row.key}>
+                <span className="overview-row-pos" style={{ color: index === 0 ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-dimmed)' }}>{row.positionLabel}</span>
+                <span className="overview-row-team" style={{ background: row.color }} />
                 <span className="overview-row-flag">
-                    <CountryFlag aria-hidden code={r.countryCode} />
+                    <CountryFlag aria-hidden code={row.countryCode} />
                 </span>
                 <div className="overview-row-name">
-                    <span className="overview-row-driver">{r.name}</span>
-                    {r.code && <span className="overview-row-code">{r.code}</span>}
+                    <span className="overview-row-driver">{row.name}</span>
+                    {row.code && <span className="overview-row-code">{row.code}</span>}
                 </div>
                 <div className="overview-bar">
-                    <div style={{ background: r.color, width: `${(r.points / maxPoints) * 100}%` }} />
+                    <div style={{ background: row.color, width: `${(row.points / maxPoints) * 100}%` }} />
                 </div>
-                <span className="overview-row-pts">{r.points}</span>
+                <span className="overview-row-pts">{row.points}</span>
             </div>
         ))}
     </Card>

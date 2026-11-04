@@ -67,7 +67,14 @@ const navItems: NavItem[] = [
     },
 ];
 
-const NAV_CLASS_NAMES = { body: 'f1-nav-body', label: 'f1-nav-label', root: 'f1-nav-item' };
+const NAV_CLASS_NAMES = {
+    body: 'f1-nav-body',
+    label: 'f1-nav-label',
+    root: 'f1-nav-item',
+};
+
+const NAVBAR_WIDTH = 232;
+const NAVBAR_WIDTH_COLLAPSED = 60;
 
 const RootLayout = () => {
     const [isMobileOpen, { toggle: toggleMobile }] = useDisclosure(false);
@@ -83,7 +90,7 @@ const RootLayout = () => {
             navbar={{
                 breakpoint: 'sm',
                 collapsed: { mobile: !isMobileOpen },
-                width: isCollapsed ? 60 : 232,
+                width: isCollapsed ? NAVBAR_WIDTH_COLLAPSED : NAVBAR_WIDTH,
             }}
             padding={28}
             transitionDuration={280}
@@ -110,6 +117,7 @@ const RootLayout = () => {
                             fuzzy: item.to !== '/',
                             to: item.to,
                         });
+
                         return (
                             <NavLink
                                 active={isActive}

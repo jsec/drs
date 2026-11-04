@@ -4,7 +4,7 @@ import { LineChart } from '@mantine/charts';
 import { Badge, Box, Group, SegmentedControl, Select, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { keyBy, minBy } from 'es-toolkit';
+import { compact, keyBy, minBy } from 'es-toolkit';
 import { z } from 'zod';
 
 import type { DriverRace } from '#/lib/api/drivers';
@@ -13,13 +13,14 @@ import type { DriverLaps, Session } from '#/lib/api/races';
 import { GridHeader, MiniStat, SectionCard } from '#/components/f1-ui';
 import { driverRaceQuery, raceDetailQuery, raceLapsQuery } from '#/data/queries';
 import { SessionSchema } from '#/lib/api/races';
-import { formatGrid, formatLapTime, formatPosition } from '#/lib/format';
+import { formatGrid, formatLapTime, formatPosition, MS_PER_SECOND } from '#/lib/format';
 import { lapLabel, paceChart, positionChart } from '#/lib/race-charts';
 import { parseRound, parseYear } from '#/lib/route-params';
 
-const LAP_COLS = '70px 1fr 60px';
-const RIVAL_LAP_COLS = `${LAP_COLS} 90px`;
-const PIT_COLS = '60px 60px 1fr';
+const LAP_COLUMNS = '70px 1fr 60px';
+const RIVAL_LAP_COLUMNS = `${LAP_COLUMNS} 90px`;
+const PIT_COLUMNS = '60px 60px 1fr';
+const POSITION_LAP_STEP = 1;
 const RIVAL_DASH = '6 4';
 const SESSION_OPTIONS = [
     { label: 'Grand Prix', value: 'race' },
@@ -30,14 +31,6 @@ const SearchSchema = z.object({
     session: SessionSchema.optional().catch(undefined),
     vs: z.string().optional().catch(undefined),
 });
-
-function crumbLabel(race: DriverRace, session: Session): string {
-    if (session === 'sprint') {
-        return `${race.raceName} Sprint`;
-    }
-
-    return race.raceName;
-}
 
 function dashRival(series: LineChartSeries[], isDashed: boolean): LineChartSeries[] {
     if (!isDashed || series.length < 2) {
@@ -60,7 +53,8 @@ function deltaColor(ms: number): string {
 }
 
 function formatDelta(ms: number): string {
-    const seconds = (ms / 1000).toFixed(3);
+    const seconds = (ms / MS_PER_SECOND).toFixed(3);
+
     if (ms > 0) {
         return `+${seconds}`;
     }
@@ -148,7 +142,11 @@ const Hero = ({ race, round, year }: { race: DriverRace; round: string; year: st
             </Box>
             <Link
                 params={{ round, year }}
-                style={{ color: '#fff', fontWeight: 700, whiteSpace: 'nowrap' }}
+                style={{
+                    color: '#fff',
+                    fontWeight: 700,
+                    whiteSpace: 'nowrap',
+                }}
                 to="/seasons/$year/races/$round"
             >
                 Full race →
@@ -165,11 +163,11 @@ const LapTable = ({ driver, raceFastestMs, rival, stopLaps }: {
 }) => {
     const personalBestMs = minBy(driver.laps, lap => lap.timeMs)?.timeMs;
     const rivalLapsByNumber = keyBy(rival?.laps ?? [], lap => lap.lap);
-    const cols = rival ? RIVAL_LAP_COLS : LAP_COLS;
+    const columns = rival ? RIVAL_LAP_COLUMNS : LAP_COLUMNS;
 
     return (
-        <SectionCard padded={false} title="Lap Times">
-            <GridHeader columns={cols}>
+        <SectionCard isPadded={false} title="Lap Times">
+            <GridHeader columns={columns}>
                 <span>LAP</span>
                 <span>TIME</span>
                 <span style={{ textAlign: 'center' }}>POS</span>
@@ -184,7 +182,7 @@ const LapTable = ({ driver, raceFastestMs, rival, stopLaps }: {
                             className="f1-grid-row"
                             key={lap.lap}
                             py={7}
-                            style={{ '--cols': cols }}
+                            style={{ '--cols': columns }}
                         >
                             <Group gap={6} wrap="nowrap">
                                 <Text c="dimmed" className="f1-num" fw={700} inherit span>{lap.lap}</Text>
@@ -225,8 +223,8 @@ const PitStops = ({ race }: { race: DriverRace }) => {
     }
 
     return (
-        <SectionCard padded={false} title="Pit Stops">
-            <GridHeader columns={PIT_COLS}>
+        <SectionCard isPadded={false} title="Pit Stops">
+            <GridHeader columns={PIT_COLUMNS}>
                 <span>STOP</span>
                 <span>LAP</span>
                 <span style={{ textAlign: 'right' }}>DURATION</span>
@@ -236,7 +234,7 @@ const PitStops = ({ race }: { race: DriverRace }) => {
                     className="f1-grid-row"
                     key={stop.stop}
                     py={8}
-                    style={{ '--cols': PIT_COLS }}
+                    style={{ '--cols': PIT_COLUMNS }}
                 >
                     <Text className="f1-num" fw={700} inherit span>{stop.stop}</Text>
                     <Text className="f1-num" inherit span>{stop.lap}</Text>
@@ -253,20 +251,31 @@ const DriverRacePage = () => {
     const isSprint = session === 'sprint';
     const navigate = Route.useNavigate();
 
-    const { data: race } = useSuspenseQuery(driverRaceQuery(Number(year), Number(round), driverId, session));
+    const { data: race } = useSuspenseQuery(driverRaceQuery({
+        driverId,
+        round: Number(round),
+        session,
+        year: Number(year),
+    }));
     const { data: raceDetail } = useSuspenseQuery(raceDetailQuery(Number(year), Number(round)));
     const { data: raceLaps } = useSuspenseQuery(raceLapsQuery(Number(year), Number(round), session));
     const { data: rivalRace } = useQuery({
-        ...driverRaceQuery(Number(year), Number(round), vs ?? '', session),
+        ...driverRaceQuery({
+            driverId: vs ?? '',
+            round: Number(round),
+            session,
+            year: Number(year),
+        }),
         enabled: vs !== undefined,
     });
 
-    const ownResult = raceDetail.results.find(r => r.driver.id === driverId);
+    const ownResult = raceDetail.results.find(result => result.driver.id === driverId);
     const rivalOptions = [];
     for (const result of raceDetail.results) {
         if (result.driver.id === driverId) {
             continue;
         }
+
         const isTeammate = result.constructor.id === ownResult?.constructor.id;
         rivalOptions.push({
             label: isTeammate ? `${result.driver.name} (teammate)` : result.driver.name,
@@ -274,15 +283,9 @@ const DriverRacePage = () => {
         });
     }
 
-    const driverLaps = raceLaps.drivers.find(d => d.driver.id === driverId);
-    const rivalLaps = raceLaps.drivers.find(d => d.driver.id === vs);
-    const chartDrivers: DriverLaps[] = [];
-    if (driverLaps) {
-        chartDrivers.push(driverLaps);
-    }
-    if (rivalLaps) {
-        chartDrivers.push(rivalLaps);
-    }
+    const driverLaps = raceLaps.drivers.find(laps => laps.driver.id === driverId);
+    const rivalLaps = raceLaps.drivers.find(laps => laps.driver.id === vs);
+    const chartDrivers = compact([driverLaps, rivalLaps]);
     const hasLapData = driverLaps !== undefined && driverLaps.laps.length > 0;
     const isRivalDashed = rivalLaps !== undefined && rivalLaps.color === driverLaps?.color;
 
@@ -291,10 +294,10 @@ const DriverRacePage = () => {
         referenceLines.push(...pitLines(rivalRace, rivalLaps.color, true));
     }
 
-    const position = positionChart(chartDrivers, 1);
+    const position = positionChart(chartDrivers, POSITION_LAP_STEP);
     const pace = paceChart(chartDrivers);
     const raceFastestMs = minBy(raceLaps.drivers.flatMap(driver => driver.laps), lap => lap.timeMs)?.timeMs;
-    const stopLaps = new Set(race.pitStops.map(s => s.lap));
+    const stopLaps = new Set(race.pitStops.map(stop => stop.lap));
 
     return (
         <Stack gap={16}>
@@ -303,7 +306,7 @@ const DriverRacePage = () => {
             {race.hasSprint && (
                 <SegmentedControl
                     data={SESSION_OPTIONS}
-                    onChange={value => void navigate({ search: prev => ({ ...prev, session: value === 'sprint' ? 'sprint' : undefined }) })}
+                    onChange={value => void navigate({ search: previous => ({ ...previous, session: value === 'sprint' ? 'sprint' : undefined }) })}
                     style={{ alignSelf: 'flex-start' }}
                     value={session}
                 />
@@ -324,7 +327,7 @@ const DriverRacePage = () => {
                             <Select
                                 clearable
                                 data={rivalOptions}
-                                onChange={value => void navigate({ search: prev => ({ ...prev, vs: value ?? undefined }) })}
+                                onChange={value => void navigate({ search: previous => ({ ...previous, vs: value ?? undefined }) })}
                                 placeholder="Compare with…"
                                 searchable
                                 value={vs ?? null}
@@ -339,7 +342,7 @@ const DriverRacePage = () => {
                                         h={240}
                                         referenceLines={referenceLines}
                                         series={dashRival(pace.series, isRivalDashed)}
-                                        valueFormatter={v => v.toFixed(3)}
+                                        valueFormatter={value => value.toFixed(3)}
                                         xAxisProps={{ interval: 'preserveStartEnd' }}
                                         yAxisProps={{
                                             allowDataOverflow: true,
@@ -356,12 +359,21 @@ const DriverRacePage = () => {
                                         referenceLines={referenceLines}
                                         series={dashRival(position.series, isRivalDashed)}
                                         xAxisProps={{ interval: 'preserveStartEnd' }}
-                                        yAxisProps={{ allowDecimals: false, domain: [1, 'dataMax'], reversed: true }}
+                                        yAxisProps={{
+                                            allowDecimals: false,
+                                            domain: [1, 'dataMax'],
+                                            reversed: true,
+                                        }}
                                     />
                                 </SectionCard>
                             </SimpleGrid>
 
-                            <div style={{ display: 'grid', gap: 16, gridTemplateColumns: isSprint ? '1fr' : '7fr 5fr' }}>
+                            <div style={{
+                                display: 'grid',
+                                gap: 16,
+                                gridTemplateColumns: isSprint ? '1fr' : '7fr 5fr',
+                            }}
+                            >
                                 <LapTable driver={driverLaps} raceFastestMs={raceFastestMs} rival={rivalLaps} stopLaps={stopLaps} />
                                 {!isSprint && <PitStops race={race} />}
                             </div>
@@ -392,13 +404,19 @@ export const Route = createFileRoute('/seasons/$year/drivers/$driverId/races/$ro
         void context.queryClient.prefetchQuery(raceLapsQuery(year, round, deps.session));
         void context.queryClient.prefetchQuery(raceDetailQuery(year, round));
 
-        const race = await context.queryClient.ensureQueryData(driverRaceQuery(year, round, params.driverId, deps.session));
+        const race = await context.queryClient.ensureQueryData(driverRaceQuery({
+            driverId: params.driverId,
+            round,
+            session: deps.session,
+            year,
+        }));
+        const sessionLabel = deps.session === 'sprint' ? `${race.raceName} Sprint` : race.raceName;
 
         return {
             crumbs: [
                 { label: params.year, params: { year: params.year }, to: '/seasons/$year' },
                 { label: race.name, params: { driverId: params.driverId, year: params.year }, to: '/seasons/$year/drivers/$driverId' },
-                { label: crumbLabel(race, deps.session) },
+                { label: sessionLabel },
             ],
         };
     },

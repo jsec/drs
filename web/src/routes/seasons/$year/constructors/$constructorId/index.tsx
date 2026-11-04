@@ -12,9 +12,11 @@ import { parseYear } from '#/lib/route-params';
 
 import { groupRounds } from './-components/rounds';
 
-const DRIVER_COLS = '56px 1fr 70px 70px 70px 70px';
-const RESULT_COLS = '56px 64px';
-const SPRINT_RESULT_COLS = `${RESULT_COLS} 72px`;
+const DRIVER_COLUMNS = '56px 1fr 70px 70px 70px 70px';
+const RESULT_COLUMNS = '56px 64px';
+const SPRINT_RESULT_COLUMNS = `${RESULT_COLUMNS} 72px`;
+const ROUND_COLUMNS = '44px 1fr 128px 60px';
+const SPRINT_ROUND_COLUMNS = '44px 1fr 200px 60px';
 
 function finish(result: ConstructorSeasonResult): [label: string, color: string] {
     if (result.statusCategory !== 'finished' && isNumericPosition(result.positionLabel)) {
@@ -40,11 +42,11 @@ const ConstructorSeason = () => {
     const { constructorId, year } = Route.useParams();
     const { data: team } = useSuspenseQuery(constructorSeasonQuery(Number(year), constructorId));
     const rounds = groupRounds(team.results);
-    const hasSprints = team.results.some(r => r.sprint !== null);
-    const resultCols = hasSprints ? SPRINT_RESULT_COLS : RESULT_COLS;
-    const roundCols = `44px 1fr ${hasSprints ? 200 : 128}px 60px`;
+    const hasSprints = team.results.some(result => result.sprint !== null);
+    const resultColumns = hasSprints ? SPRINT_RESULT_COLUMNS : RESULT_COLUMNS;
+    const roundColumns = hasSprints ? SPRINT_ROUND_COLUMNS : ROUND_COLUMNS;
     const engines = team.entries.length > 1
-        ? team.entries.map(e => `${e.engine} ${formatPosition(e.position)}`).join(' · ')
+        ? team.entries.map(entry => `${entry.engine} ${formatPosition(entry.position)}`).join(' · ')
         : team.entries[0]?.engine;
 
     return (
@@ -74,8 +76,8 @@ const ConstructorSeason = () => {
                 <MiniStat label="DNFS" value={team.dnfs} />
             </SimpleGrid>
 
-            <SectionCard padded={false} title="Drivers">
-                <GridHeader columns={DRIVER_COLS}>
+            <SectionCard isPadded={false} title="Drivers">
+                <GridHeader columns={DRIVER_COLUMNS}>
                     <span />
                     <span>DRIVER</span>
                     <span style={{ textAlign: 'center' }}>STARTS</span>
@@ -83,51 +85,55 @@ const ConstructorSeason = () => {
                     <span style={{ textAlign: 'center' }}>PODIUMS</span>
                     <span style={{ textAlign: 'right' }}>PTS</span>
                 </GridHeader>
-                {team.drivers.map(d => (
+                {team.drivers.map(driver => (
                     <Link
                         className="f1-row f1-grid-row"
-                        key={d.id}
-                        params={{ driverId: d.id, year }}
-                        style={{ '--cols': DRIVER_COLS }}
+                        key={driver.id}
+                        params={{ driverId: driver.id, year }}
+                        style={{ '--cols': DRIVER_COLUMNS }}
                         to="/seasons/$year/drivers/$driverId"
                     >
-                        <Text c="dimmed" fw={700} fz={12} inherit span>{d.code}</Text>
-                        <Text fw={600} fz={13} inherit span>{d.name}</Text>
-                        <Text c="dimmed" className="f1-num" inherit span ta="center">{d.starts}</Text>
-                        <Text className="f1-num f1-display" fw={700} inherit span ta="center">{d.wins}</Text>
-                        <Text c="dimmed" className="f1-num" inherit span ta="center">{d.podiums}</Text>
-                        <Text className="f1-num f1-display" fw={700} inherit span ta="right">{d.points}</Text>
+                        <Text c="dimmed" fw={700} fz={12} inherit span>{driver.code}</Text>
+                        <Text fw={600} fz={13} inherit span>{driver.name}</Text>
+                        <Text c="dimmed" className="f1-num" inherit span ta="center">{driver.starts}</Text>
+                        <Text className="f1-num f1-display" fw={700} inherit span ta="center">{driver.wins}</Text>
+                        <Text c="dimmed" className="f1-num" inherit span ta="center">{driver.podiums}</Text>
+                        <Text className="f1-num f1-display" fw={700} inherit span ta="right">{driver.points}</Text>
                     </Link>
                 ))}
             </SectionCard>
 
             <PointsProgressionCard color={team.color} name={team.name} progression={team.progression} />
 
-            <SectionCard padded={false} title="Race-by-Race Results">
-                <GridHeader columns={roundCols}>
+            <SectionCard isPadded={false} title="Race-by-Race Results">
+                <GridHeader columns={roundColumns}>
                     <span>RND</span>
                     <span>GRAND PRIX</span>
-                    <Box display="grid" style={{ gridTemplateColumns: resultCols }}>
+                    <Box display="grid" style={{ gridTemplateColumns: resultColumns }}>
                         <span>DRIVER</span>
                         <span>FINISH</span>
                         {hasSprints && <span>SPRINT</span>}
                     </Box>
                     <span style={{ textAlign: 'right' }}>PTS</span>
                 </GridHeader>
-                {rounds.map(r => (
-                    <div className="f1-row f1-grid-row" key={r.round} style={{ '--cols': roundCols }}>
-                        <Text c="dimmed" className="f1-num" fw={700} inherit span>{r.round}</Text>
-                        <Text fw={600} fz={14} inherit lineClamp={1} span>{r.raceName}</Text>
+                {rounds.map(round => (
+                    <div className="f1-row f1-grid-row" key={round.round} style={{ '--cols': roundColumns }}>
+                        <Text c="dimmed" className="f1-num" fw={700} inherit span>{round.round}</Text>
+                        <Text fw={600} fz={14} inherit lineClamp={1} span>{round.raceName}</Text>
                         <Stack gap={4}>
-                            {r.results.map((result) => {
+                            {round.results.map((result) => {
                                 const [label, color] = finish(result);
 
                                 return (
                                     <Link
                                         className="f1-plain-link"
                                         key={result.finishOrder}
-                                        params={{ driverId: result.driverId, round: String(r.round), year }}
-                                        style={{ display: 'grid', gridTemplateColumns: resultCols }}
+                                        params={{
+                                            driverId: result.driverId,
+                                            round: String(round.round),
+                                            year,
+                                        }}
+                                        style={{ display: 'grid', gridTemplateColumns: resultColumns }}
                                         to="/seasons/$year/drivers/$driverId/races/$round"
                                     >
                                         <Text c="dimmed" fw={700} fz={12} inherit span>{result.driverCode}</Text>
@@ -141,7 +147,7 @@ const ConstructorSeason = () => {
                                 );
                             })}
                         </Stack>
-                        <Text className="f1-num f1-display" fw={700} inherit span ta="right">{r.points > 0 ? r.points : '–'}</Text>
+                        <Text className="f1-num f1-display" fw={700} inherit span ta="right">{round.points > 0 ? round.points : '–'}</Text>
                     </div>
                 ))}
             </SectionCard>

@@ -12,6 +12,7 @@ export const Route = createFileRoute('/')({
             context.queryClient.ensureQueryData(seasonOverviewQuery(CURRENT_YEAR)),
             context.queryClient.ensureQueryData(seasonCalendarQuery(CURRENT_YEAR)),
         ]);
+
         return { crumbs: [{ label: 'Overview' }] };
     },
 });

@@ -43,5 +43,9 @@ export function useDataTable<T>({
         },
     });
 
-    return { search, setSearch, table };
+    return {
+        search,
+        setSearch,
+        table,
+    };
 }

@@ -16,10 +16,16 @@ const constructorsQuery = queryOptions({
 
 const Constructors = () => {
     const { data: constructors } = useSuspenseQuery(constructorsQuery);
-    const mostWins = maxBy(constructors, constructor => constructor.wins)?.wins ?? 0;
-    const columns = makeConstructorColumns(mostWins);
     const { onSortingChange, sorting } = useUrlSorting();
-    const { table } = useDataTable({ columns, data: constructors, onSortingChange, sorting });
+
+    const mostWins = maxBy(constructors, team => team.wins)?.wins ?? 0;
+    const columns = makeConstructorColumns(mostWins);
+    const { table } = useDataTable({
+        columns,
+        data: constructors,
+        onSortingChange,
+        sorting,
+    });
 
     return (
         <div className="f1-page-stack">
@@ -45,6 +51,7 @@ export const Route = createFileRoute('/constructors/')({
     // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData(constructorsQuery);
+
         return { crumbs: [{ label: 'Constructors' }] };
     },
 });

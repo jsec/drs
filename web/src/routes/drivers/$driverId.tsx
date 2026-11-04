@@ -13,7 +13,7 @@ import { CURRENT_YEAR } from '#/lib/route-params';
 
 import { championshipPositionColor, driverSummaryColor } from './-components/driver-summary';
 
-const COLS = '84px 1fr 64px 60px 78px 60px 80px 24px';
+const SEASON_COLUMNS = '84px 1fr 64px 60px 78px 60px 80px 24px';
 
 const driverCareerQuery = (driverId: string) =>
     queryOptions({
@@ -23,8 +23,7 @@ const driverCareerQuery = (driverId: string) =>
 
 const DriverCareer = () => {
     const { driverId } = Route.useParams();
-    const { data } = useSuspenseQuery(driverCareerQuery(driverId));
-    const { seasons, ...driver } = data;
+    const { data: driver } = useSuspenseQuery(driverCareerQuery(driverId));
 
     return (
         <Stack gap={16}>
@@ -38,7 +37,7 @@ const DriverCareer = () => {
             />
 
             <SimpleGrid cols={6} spacing={8}>
-                <MiniStat label="SEASONS" value={seasons.length} />
+                <MiniStat label="SEASONS" value={driver.seasons.length} />
                 <MiniStat label="STARTS" value={driver.starts} />
                 <MiniStat label="WINS" value={driver.wins} />
                 <MiniStat label="POLES" value={driver.poles} />
@@ -47,7 +46,7 @@ const DriverCareer = () => {
             </SimpleGrid>
 
             <SeasonsCard
-                columns={COLS}
+                columns={SEASON_COLUMNS}
                 header={(
                     <>
                         <span>SEASON</span>
@@ -60,29 +59,30 @@ const DriverCareer = () => {
                     </>
                 )}
             >
-                {seasons.map((s) => {
-                    const isChampion = s.position === '1';
+                {driver.seasons.map((season) => {
+                    const isChampion = season.position === '1';
+
                     return (
                         <SeasonRow
-                            columns={COLS}
+                            columns={SEASON_COLUMNS}
                             isChampion={isChampion}
-                            key={`${s.season}-${s.constructor.name}`}
-                            params={{ year: String(Math.min(s.season, CURRENT_YEAR)) }}
-                            season={s.season}
+                            key={`${season.season}-${season.constructor.name}`}
+                            params={{ year: String(Math.min(season.season, CURRENT_YEAR)) }}
+                            season={season.season}
                             to="/seasons/$year"
                         >
                             <Group gap={9} wrap="nowrap">
-                                <Text c={championshipPositionColor(s.position)} className="f1-num" fw={700} fz={13.5} inherit span>
-                                    {formatPosition(s.position)}
+                                <Text c={championshipPositionColor(season.position)} className="f1-num" fw={700} fz={13.5} inherit span>
+                                    {formatPosition(season.position)}
                                 </Text>
                                 {isChampion ? <TrophyIcon color="var(--gold-500)" size={12} weight="fill" /> : null}
-                                <Text c="dimmed" fw={600} fz={12} inherit span>{s.constructor.name}</Text>
+                                <Text c="dimmed" fw={600} fz={12} inherit span>{season.constructor.name}</Text>
                             </Group>
-                            <Text c="dimmed" className="f1-num" inherit span ta="center">{s.starts}</Text>
-                            <Text className="f1-num f1-display" fw={700} inherit span ta="center">{s.wins}</Text>
-                            <Text c="dimmed" className="f1-num" inherit span ta="center">{s.podiums}</Text>
-                            <Text c="dimmed" className="f1-num" inherit span ta="center">{s.poles}</Text>
-                            <Text className="f1-num f1-display" fw={700} inherit span ta="right">{s.points}</Text>
+                            <Text c="dimmed" className="f1-num" inherit span ta="center">{season.starts}</Text>
+                            <Text className="f1-num f1-display" fw={700} inherit span ta="center">{season.wins}</Text>
+                            <Text c="dimmed" className="f1-num" inherit span ta="center">{season.podiums}</Text>
+                            <Text c="dimmed" className="f1-num" inherit span ta="center">{season.poles}</Text>
+                            <Text className="f1-num f1-display" fw={700} inherit span ta="right">{season.points}</Text>
                         </SeasonRow>
                     );
                 })}
@@ -94,10 +94,10 @@ const DriverCareer = () => {
 export const Route = createFileRoute('/drivers/$driverId')({
     component: DriverCareer,
     loader: async ({ context, params }) => {
-        const { name } = await context.queryClient.ensureQueryData(driverCareerQuery(params.driverId));
+        const summary = await context.queryClient.ensureQueryData(driverCareerQuery(params.driverId));
 
         return {
-            crumbs: [{ label: 'Drivers', to: '/drivers' }, { label: name }],
+            crumbs: [{ label: 'Drivers', to: '/drivers' }, { label: summary.name }],
         };
     },
 });

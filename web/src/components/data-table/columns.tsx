@@ -30,136 +30,146 @@ const SIZE_CLASS = { lg: 'table-cell-lg', sm: 'table-cell-sm' } as const;
 export function makeColumns<T>() {
     const competitor = (
         key: keyof T & string,
-        opts: Shared<T> & {
+        options: Shared<T> & {
             accessor?: (row: T) => SortValue;
             label: (row: T) => ReactNode;
             visual: (row: T) => ReactNode;
         },
     ): ColumnDef<T, unknown> => ({
-        accessorFn: opts.accessor ?? (row => row[key]),
+        accessorFn: options.accessor ?? (row => row[key]),
         cell: info => (
             <span className="table-cell-entity">
-                {opts.visual(info.row.original)}
-                <span className="table-cell-entity-label">{opts.label(info.row.original)}</span>
+                {options.visual(info.row.original)}
+                <span className="table-cell-entity-label">{options.label(info.row.original)}</span>
             </span>
         ),
-        header: opts.header,
-        id: opts.id ?? key,
-        meta: buildMeta(opts),
+        header: options.header,
+        id: options.id ?? key,
+        meta: buildMeta(options),
         sortDescFirst: false,
-        sortingFn: opts.sort ?? 'auto',
+        sortingFn: options.sort ?? 'auto',
     });
 
     const custom = (
-        opts: Shared<T> & {
+        options: Shared<T> & {
             accessor?: (row: T) => SortValue;
             cell: (info: CellContext<T, unknown>) => ReactNode;
-            descFirst?: boolean;
             id: string;
+            isDescFirst?: boolean;
         },
     ): ColumnDef<T, unknown> => ({
-        accessorFn: opts.accessor,
-        cell: opts.cell,
-        enableSorting: opts.accessor != null,
-        header: opts.header,
-        id: opts.id,
-        meta: buildMeta(opts),
-        sortDescFirst: opts.descFirst ?? false,
-        sortingFn: opts.sort ?? 'auto',
+        accessorFn: options.accessor,
+        cell: options.cell,
+        enableSorting: options.accessor != null,
+        header: options.header,
+        id: options.id,
+        meta: buildMeta(options),
+        sortDescFirst: options.isDescFirst ?? false,
+        sortingFn: options.sort ?? 'auto',
     });
 
-    const num = <K extends KeysMatching<T, ReactNode>>(
+    const numeric = <K extends KeysMatching<T, ReactNode>>(
         key: K,
-        opts: Shared<T> & { size?: Size; variant?: 'display' } = {},
+        options: Shared<T> & { size?: Size; variant?: 'display' } = {},
     ): ColumnDef<T, unknown> => ({
         accessorKey: key,
         cell: (info) => {
             // SAFETY: K extends KeysMatching<T, ReactNode>, so T[K] is ReactNode; TS can't resolve that for a generic T.
             const value = info.row.original[key] as ReactNode;
+
             return (
                 <span
                     className={cn(
                         'table-cell-num',
-                        opts.variant === 'display' && 'table-cell-num-display',
-                        opts.size !== undefined && SIZE_CLASS[opts.size],
+                        options.variant === 'display' && 'table-cell-num-display',
+                        options.size !== undefined && SIZE_CLASS[options.size],
                     )}
                 >
                     {value}
                 </span>
             );
         },
-        header: opts.header,
-        id: opts.id ?? key,
-        meta: buildMeta(opts),
+        header: options.header,
+        id: options.id ?? key,
+        meta: buildMeta(options),
         sortDescFirst: true,
-        sortingFn: opts.sort ?? 'auto',
+        sortingFn: options.sort ?? 'auto',
     });
 
     const ordinal = (
-        opts: { header?: string; id?: string; width?: string } = {},
+        options: { header?: string; id?: string; width?: string } = {},
     ): ColumnDef<T, unknown> => ({
         enableSorting: false,
-        header: opts.header ?? '#',
-        id: opts.id ?? 'rank',
-        meta: { ordinal: true, width: opts.width ?? '4%' },
+        header: options.header ?? '#',
+        id: options.id ?? 'rank',
+        meta: { isOrdinal: true, width: options.width ?? '4%' },
     });
 
     const text = <K extends KeysMatching<T, ReactNode>>(
         key: K,
-        opts: Shared<T> & { bold?: boolean; muted?: boolean } = {},
+        options: Shared<T> & { isBold?: boolean; isMuted?: boolean } = {},
     ): ColumnDef<T, unknown> => ({
         accessorKey: key,
         cell: (info) => {
             // SAFETY: K extends KeysMatching<T, ReactNode>, so T[K] is ReactNode; TS can't resolve that for a generic T.
             const value = info.row.original[key] as ReactNode;
+
             return (
                 <span
                     className={cn(
                         'table-cell-text',
-                        opts.bold && 'table-cell-text-bold',
-                        opts.muted && 'table-cell-text-muted',
+                        options.isBold && 'table-cell-text-bold',
+                        options.isMuted && 'table-cell-text-muted',
                     )}
                 >
                     {value}
                 </span>
             );
         },
-        header: opts.header,
-        id: opts.id ?? key,
-        meta: buildMeta(opts),
+        header: options.header,
+        id: options.id ?? key,
+        meta: buildMeta(options),
         sortDescFirst: false,
-        sortingFn: opts.sort ?? 'auto',
+        sortingFn: options.sort ?? 'auto',
     });
 
     const trophy = <K extends KeysMatching<T, number>>(
         key: K,
-        opts: Shared<T> = {},
+        options: Shared<T> = {},
     ): ColumnDef<T, unknown> => ({
         accessorKey: key,
         cell: (info) => {
             // SAFETY: K extends KeysMatching<T, number>, so T[K] is number; TS can't resolve that for a generic T.
             const count = info.row.original[key] as number;
+
             return (
                 <span className="table-cell-trophy">
                     <TrophyCount count={count} />
                 </span>
             );
         },
-        header: opts.header,
-        id: opts.id ?? key,
-        meta: buildMeta({ align: 'center', ...opts }),
+        header: options.header,
+        id: options.id ?? key,
+        meta: buildMeta({ align: 'center', ...options }),
         sortDescFirst: true,
-        sortingFn: opts.sort ?? 'auto',
+        sortingFn: options.sort ?? 'auto',
     });
 
-    return { competitor, custom, num, ordinal, text, trophy };
+    return {
+        competitor,
+        custom,
+        numeric,
+        ordinal,
+        text,
+        trophy,
+    };
 }
 
-function buildMeta<T>(opts: Shared<T>): ColumnMeta<T, unknown> {
+function buildMeta<T>(options: Shared<T>): ColumnMeta<T, unknown> {
     return {
-        align: opts.align,
-        link: opts.link,
-        trailing: opts.trailing,
-        width: opts.width,
+        align: options.align,
+        link: options.link,
+        trailing: options.trailing,
+        width: options.width,
     };
 }

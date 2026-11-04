@@ -9,7 +9,7 @@ import { api } from '#/lib/query/api';
 
 import { CircuitLayout } from './-components/circuit-layout';
 
-const RACE_COLS = '110px 1fr 200px';
+const RACE_COLUMNS = '110px 1fr 200px';
 
 const circuitSummaryQuery = (circuitId: string) =>
     queryOptions({
@@ -21,44 +21,44 @@ const year = (date: null | string) => date?.slice(0, 4) ?? '—';
 
 const CircuitDetail = () => {
     const { circuitId } = Route.useParams();
-    const { data } = useSuspenseQuery(circuitSummaryQuery(circuitId));
+    const { data: circuit } = useSuspenseQuery(circuitSummaryQuery(circuitId));
 
-    const years = `${year(data.firstRace.date)}-${year(data.lastRace.date)}`;
+    const years = `${year(circuit.firstRace.date)}-${year(circuit.lastRace.date)}`;
 
     return (
         <Stack gap={16}>
             <CareerHero
                 color="var(--mantine-primary-color-filled)"
-                countryCode={data.countryCode}
-                mark={<CircuitLayout layoutId={data.layoutId} name={data.name} size={46} />}
-                subtitle={`${data.country} · ${years} · Circuit summary`}
-                title={data.name}
+                countryCode={circuit.countryCode}
+                mark={<CircuitLayout layoutId={circuit.layoutId} name={circuit.name} size={46} />}
+                subtitle={`${circuit.country} · ${years} · Circuit summary`}
+                title={circuit.name}
             />
 
             <SimpleGrid cols={4} spacing={8}>
-                <MiniStat label="GRANDS PRIX" value={data.raceCount} />
-                <MiniStat label="TURNS" value={data.turns} />
-                <MiniStat label="FIRST RACE" value={year(data.firstRace.date)} />
-                <MiniStat label="LAST RACE" value={year(data.lastRace.date)} />
+                <MiniStat label="GRANDS PRIX" value={circuit.raceCount} />
+                <MiniStat label="TURNS" value={circuit.turns} />
+                <MiniStat label="FIRST RACE" value={year(circuit.firstRace.date)} />
+                <MiniStat label="LAST RACE" value={year(circuit.lastRace.date)} />
             </SimpleGrid>
 
             <SectionCard
                 action={<Text c="dimmed" fz={12}>Every Grand Prix held at this circuit</Text>}
-                padded={false}
+                isPadded={false}
                 title="Races"
             >
-                <GridHeader columns={RACE_COLS} px={20}>
+                <GridHeader columns={RACE_COLUMNS} px={20}>
                     <span>DATE</span>
                     <span>GRAND PRIX</span>
                     <span>WINNER</span>
                 </GridHeader>
-                {data.races.map(race => (
+                {circuit.races.map(race => (
                     <Box
                         className="f1-grid-row"
                         key={race.raceId}
                         px={20}
                         py={11}
-                        style={{ '--cols': RACE_COLS }}
+                        style={{ '--cols': RACE_COLUMNS }}
                     >
                         <Text c="dimmed" className="f1-num" fz={12.5} inherit span>
                             {race.date ?? '—'}
@@ -94,6 +94,7 @@ export const Route = createFileRoute('/circuits/$circuitId')({
         const summary = await context.queryClient.ensureQueryData(
             circuitSummaryQuery(params.circuitId),
         );
+
         return {
             crumbs: [{ label: 'Circuits', to: '/circuits' }, { label: summary.name }],
         };

@@ -1,3 +1,5 @@
+import { groupBy, sumBy } from 'es-toolkit';
+
 import type { ConstructorSeasonResult } from '#/lib/api/constructors';
 
 type Round = {
@@ -8,18 +10,12 @@ type Round = {
 };
 
 export function groupRounds(results: ConstructorSeasonResult[]): Round[] {
-    const rounds: Round[] = [];
+    const resultsByRound = groupBy(results, result => result.round);
 
-    for (const result of results) {
-        let current = rounds.at(-1);
-        if (current?.round !== result.round) {
-            current = { points: 0, raceName: result.raceName, results: [], round: result.round };
-            rounds.push(current);
-        }
-
-        current.points += result.points + (result.sprint?.points ?? 0);
-        current.results.push(result);
-    }
-
-    return rounds;
+    return Object.values(resultsByRound).map(roundResults => ({
+        points: sumBy(roundResults, result => result.points + (result.sprint?.points ?? 0)),
+        raceName: roundResults[0].raceName,
+        results: roundResults,
+        round: roundResults[0].round,
+    }));
 }

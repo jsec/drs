@@ -7,32 +7,39 @@ import type { Constructor } from '#/lib/api/constructors';
 import { makeColumns } from '#/components/data-table';
 import { formatCareerYears } from '#/lib/format';
 
-const col = makeColumns<Constructor>();
+const columnBuilder = makeColumns<Constructor>();
 
 const byTitles: SortingFn<Constructor> = (a, b) =>
     a.original.championships - b.original.championships || a.original.wins - b.original.wins;
 
 export function makeConstructorColumns(maxWins: number) {
     return [
-        col.ordinal(),
-        col.competitor('name', {
+        columnBuilder.ordinal(),
+        columnBuilder.competitor('name', {
             header: 'CONSTRUCTOR',
-            label: c => c.name,
-            link: c => ({ params: { constructorId: c.id }, to: '/constructors/$constructorId' }),
+            label: team => team.name,
+            link: team => ({ params: { constructorId: team.id }, to: '/constructors/$constructorId' }),
             trailing: 'caret',
-            visual: c => (
-                <span style={{ background: c.color, borderRadius: 3, flexShrink: 0, height: 26, width: 6 }} />
+            visual: team => (
+                <span style={{
+                    background: team.color,
+                    borderRadius: 3,
+                    flexShrink: 0,
+                    height: 26,
+                    width: 6,
+                }}
+                />
             ),
             width: '38%',
         }),
-        col.custom({
-            accessor: c => c.firstRaceDate,
+        columnBuilder.custom({
+            accessor: team => team.firstRaceDate,
             cell: (info) => {
-                const { firstRaceDate, lastRaceDate } = info.row.original;
+                const team = info.row.original;
                 const years = formatCareerYears({
-                    firstYear: firstRaceDate ? Temporal.PlainDate.from(firstRaceDate).year : null,
+                    firstYear: team.firstRaceDate ? Temporal.PlainDate.from(team.firstRaceDate).year : null,
                     isActive: false,
-                    lastYear: lastRaceDate ? Temporal.PlainDate.from(lastRaceDate).year : null,
+                    lastYear: team.lastRaceDate ? Temporal.PlainDate.from(team.lastRaceDate).year : null,
                 });
 
                 return <span className="table-cell-num table-cell-sm">{years}</span>;
@@ -41,25 +48,41 @@ export function makeConstructorColumns(maxWins: number) {
             id: 'years',
             width: '10%',
         }),
-        col.trophy('championships', { header: 'TITLES', id: 'titles', sort: byTitles, width: '9%' }),
-        col.custom({
-            accessor: c => c.wins,
+        columnBuilder.trophy('championships', {
+            header: 'TITLES',
+            id: 'titles',
+            sort: byTitles,
+            width: '9%',
+        }),
+        columnBuilder.custom({
+            accessor: team => team.wins,
             cell: (info) => {
-                const c = info.row.original;
+                const team = info.row.original;
+
                 return (
-                    <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'nowrap', gap: 10 }}>
+                    <div style={{
+                        alignItems: 'center',
+                        display: 'flex',
+                        flexWrap: 'nowrap',
+                        gap: 10,
+                    }}
+                    >
                         <span className="table-cell-num table-cell-num-display" style={{ width: 34 }}>
-                            {c.wins}
+                            {team.wins}
                         </span>
-                        <Progress color={c.color} flex={1} maw={150} size={6} value={(c.wins / maxWins) * 100} />
+                        <Progress color={team.color} flex={1} maw={150} size={6} value={(team.wins / maxWins) * 100} />
                     </div>
                 );
             },
-            descFirst: true,
             header: 'WINS',
             id: 'wins',
+            isDescFirst: true,
             width: '23%',
         }),
-        col.num('podiums', { align: 'center', header: 'PODIUMS', width: '8%' }),
+        columnBuilder.numeric('podiums', {
+            align: 'center',
+            header: 'PODIUMS',
+            width: '8%',
+        }),
     ];
 }

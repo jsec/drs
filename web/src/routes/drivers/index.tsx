@@ -26,17 +26,11 @@ const listDriversQuery = queryOptions({
     queryKey: ['drivers'],
 });
 
-const filterByCategory = (drivers: DriverShortSummary[], category: Category) => {
-    if (category === 'active') {
-        return drivers.filter(d => d.isActive);
-    }
-
-    if (category === 'champions') {
-        return drivers.filter(d => d.championships > 0);
-    }
-
-    return drivers;
-};
+const CATEGORY_FILTERS = {
+    active: (driver: DriverShortSummary) => driver.isActive,
+    all: () => true,
+    champions: (driver: DriverShortSummary) => driver.championships > 0,
+} satisfies Record<Category, (driver: DriverShortSummary) => boolean>;
 
 const DriversIndex = () => {
     const { data: drivers } = useSuspenseQuery(listDriversQuery);
@@ -46,7 +40,7 @@ const DriversIndex = () => {
 
     const { search, setSearch, table } = useDataTable({
         columns,
-        data: filterByCategory(drivers, category),
+        data: drivers.filter(driver => CATEGORY_FILTERS[category](driver)),
         filter: matchesSearch,
         onSortingChange,
         sorting,
@@ -66,20 +60,20 @@ const DriversIndex = () => {
             <div className="f1-toolbar">
                 <TextInput
                     leftSection={<MagnifyingGlassIcon size={15} />}
-                    onChange={e => setSearch(e.currentTarget.value)}
+                    onChange={event => setSearch(event.currentTarget.value)}
                     placeholder="Search name or code…"
                     value={search}
                     w={260}
                 />
 
                 <div className="f1-control-group">
-                    {CATEGORIES.map(c => (
+                    {CATEGORIES.map(option => (
                         <Pill
-                            active={category === c.key}
-                            key={c.key}
-                            onClick={() => void navigate({ search: prev => ({ ...prev, category: c.key }) })}
+                            isActive={category === option.key}
+                            key={option.key}
+                            onClick={() => void navigate({ search: previous => ({ ...previous, category: option.key }) })}
                         >
-                            {c.label}
+                            {option.label}
                         </Pill>
                     ))}
                 </div>
@@ -100,6 +94,7 @@ export const Route = createFileRoute('/drivers/')({
     // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData(listDriversQuery);
+
         return { crumbs: [{ label: 'Drivers' }] };
     },
 });

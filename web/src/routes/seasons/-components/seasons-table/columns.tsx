@@ -4,35 +4,40 @@ import { CountryFlag } from '#/components/country-flag';
 import { makeColumns } from '#/components/data-table';
 import { TeamSquare } from '#/components/f1-ui';
 
-const col = makeColumns<Season>();
+const columnBuilder = makeColumns<Season>();
 
 export const columns = [
-    col.num('season', {
+    columnBuilder.numeric('season', {
         header: 'SEASON',
-        link: s => ({ params: { year: String(s.season) }, to: '/seasons/$year' }),
+        link: season => ({ params: { year: String(season.season) }, to: '/seasons/$year' }),
         size: 'lg',
         variant: 'display',
         width: '12%',
     }),
-    col.num('raceCount', { align: 'center', header: 'RACES', width: '10%' }),
-    col.competitor('wdc', {
-        accessor: s => s.wdc.name,
+    columnBuilder.numeric('raceCount', {
+        align: 'center',
+        header: 'RACES',
+        width: '10%',
+    }),
+    columnBuilder.competitor('wdc', {
+        accessor: season => season.wdc.name,
         header: 'WORLD CHAMPION',
-        label: s => s.wdc.name,
-        visual: s => <CountryFlag aria-hidden className="season-champion-flag" code={s.wdc.countryCode} />,
+        label: season => season.wdc.name,
+        visual: season => <CountryFlag aria-hidden className="season-champion-flag" code={season.wdc.countryCode} />,
         width: '39%',
     }),
-    col.custom({
-        accessor: s => s.wcc?.name ?? '',
+    columnBuilder.custom({
+        accessor: season => season.wcc?.name ?? '',
         cell: (info) => {
-            const { wcc } = info.row.original;
-            if (!wcc) {
+            const season = info.row.original;
+            if (!season.wcc) {
                 return <span className="table-cell-text table-cell-text-muted">—</span>;
             }
+
             return (
                 <span className="table-cell-entity">
-                    <TeamSquare color={wcc.color} />
-                    <span className="table-cell-entity-label">{wcc.name}</span>
+                    <TeamSquare color={season.wcc.color} />
+                    <span className="table-cell-entity-label">{season.wcc.name}</span>
                 </span>
             );
         },

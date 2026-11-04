@@ -18,21 +18,37 @@ const result = (overrides: Partial<ConstructorSeasonResult>): ConstructorSeasonR
 });
 
 describe('groupRounds', () => {
-    it('groups each round with race and sprint points summed', () => {
+    it('should group each round with race and sprint points summed', () => {
         const rounds = groupRounds([
             result({ points: 25 }),
-            result({ driverCode: 'PER', driverId: 'sergio-perez', points: 0, positionLabel: 'DNF' }),
-            result({ points: 18, raceName: 'Chinese Grand Prix', round: 2, sprint: { points: 8, positionLabel: '1' } }),
-            result({ driverCode: 'PER', driverId: 'sergio-perez', points: 4, round: 2, sprint: { points: 3, positionLabel: '6' } }),
+            result({
+                driverCode: 'PER',
+                driverId: 'sergio-perez',
+                points: 0,
+                positionLabel: 'DNF',
+            }),
+            result({
+                points: 18,
+                raceName: 'Chinese Grand Prix',
+                round: 2,
+                sprint: { points: 8, positionLabel: '1' },
+            }),
+            result({
+                driverCode: 'PER',
+                driverId: 'sergio-perez',
+                points: 4,
+                round: 2,
+                sprint: { points: 3, positionLabel: '6' },
+            }),
         ]);
 
-        expect(rounds.map(r => [r.round, r.raceName, r.points, r.results.length])).toEqual([
+        expect(rounds.map(round => [round.round, round.raceName, round.points, round.results.length])).toEqual([
             [1, 'Bahrain Grand Prix', 25, 2],
             [2, 'Chinese Grand Prix', 33, 2],
         ]);
     });
 
-    it('returns no rounds for no results', () => {
+    it('should return no rounds for no results', () => {
         expect(groupRounds([])).toEqual([]);
     });
 });

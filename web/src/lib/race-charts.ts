@@ -2,6 +2,8 @@ import { median, sortBy } from 'es-toolkit';
 
 import type { DriverLaps } from '#/lib/api/races';
 
+import { MS_PER_SECOND } from '#/lib/format';
+
 const PACE_CEILING_RATIO = 1.5;
 
 type LapRow = Record<string, number | string>;
@@ -22,7 +24,9 @@ export const positionChart = (drivers: DriverLaps[], lapStep: number) => {
 
     for (const { driver, laps } of drivers) {
         for (const { lap, position } of laps) {
-            if (position !== null && (lap - 1) % lapStep === 0) {
+            const isSampledLap = (lap - 1) % lapStep === 0;
+
+            if (position !== null && isSampledLap) {
                 rows.set(lap, {
                     ...rows.get(lap),
                     [driver.code]: position,
@@ -42,13 +46,13 @@ export const paceChart = (drivers: DriverLaps[]) => {
         for (const { lap, timeMs } of laps) {
             rows.set(lap, {
                 ...rows.get(lap),
-                [driver.code]: timeMs / 1000,
+                [driver.code]: timeMs / MS_PER_SECOND,
                 lap: lapLabel(lap),
             });
         }
     }
 
-    const lapSeconds = drivers.flatMap(driver => driver.laps.map(lap => lap.timeMs / 1000));
+    const lapSeconds = drivers.flatMap(driver => driver.laps.map(lap => lap.timeMs / MS_PER_SECOND));
     const medianLapSeconds = median(lapSeconds);
 
     return {

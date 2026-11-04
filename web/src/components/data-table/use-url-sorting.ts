@@ -18,11 +18,26 @@ export function useUrlSorting() {
     const onSortingChange: OnChangeFn<SortingState> = (updater) => {
         const entry = functionalUpdate(updater, sorting)[0];
 
+        if (!entry) {
+            void navigate({
+                search: previousSearch => ({
+                    ...previousSearch,
+                    dir: undefined,
+                    sort: undefined,
+                }),
+                to: '.',
+            });
+
+            return;
+        }
+
+        const dir = entry.desc ? 'desc' : 'asc';
+
         void navigate({
-            search: prev => ({
-                ...prev,
-                dir: entry && (entry.desc ? 'desc' : 'asc'),
-                sort: entry?.id,
+            search: previousSearch => ({
+                ...previousSearch,
+                dir,
+                sort: entry.id,
             }),
             to: '.',
         });

@@ -15,7 +15,23 @@ import { GridHeader, SectionCard, StatCard, TeamBar } from '#/components/f1-ui';
 import { seasonCalendarQuery, seasonOverviewQuery } from '#/data/queries';
 import { parseYear } from '#/lib/route-params';
 
-const DRIVER_COLS = '34px 1fr 64px 56px 70px';
+const DRIVER_COLUMNS = '34px 1fr 64px 56px 70px';
+const TOP_DRIVER_COUNT = 8;
+
+const RACE_CELL_STYLES = {
+    done: {
+        background: 'var(--mantine-color-default)',
+        border: '1px solid var(--mantine-color-default-border)',
+    },
+    next: {
+        background: 'color-mix(in srgb, var(--mantine-primary-color-filled) 6%, var(--mantine-color-body))',
+        border: '1px solid color-mix(in srgb, var(--mantine-primary-color-filled) 40%, var(--mantine-color-default-border))',
+    },
+    upcoming: {
+        background: 'var(--color-accent)',
+        border: '1px solid var(--mantine-color-default-border)',
+    },
+};
 
 type MiniRaceCellProps = {
     isNext: boolean;
@@ -23,28 +39,33 @@ type MiniRaceCellProps = {
     year: string;
 };
 
+function raceCellStatus(isDone: boolean, isNext: boolean): keyof typeof RACE_CELL_STYLES {
+    if (isDone) {
+        return 'done';
+    }
+
+    if (isNext) {
+        return 'next';
+    }
+
+    return 'upcoming';
+}
+
 const MiniRaceCell = ({ isNext, race, year }: MiniRaceCellProps) => {
     const isDone = race.completed;
 
-    let background: string;
-    let border: string;
-    if (isDone) {
-        background = 'var(--mantine-color-default)';
-        border = '1px solid var(--mantine-color-default-border)';
-    } else if (isNext) {
-        background = 'color-mix(in srgb, var(--mantine-primary-color-filled) 6%, var(--mantine-color-body))';
-        border = '1px solid color-mix(in srgb, var(--mantine-primary-color-filled) 40%, var(--mantine-color-default-border))';
-    } else {
-        background = 'var(--color-accent)';
-        border = '1px solid var(--mantine-color-default-border)';
-    }
+    const status = raceCellStatus(isDone, isNext);
 
     const cell = (
         <Box
             className={isDone ? 'f1-lift' : undefined}
             px={10}
             py={9}
-            style={{ background, border, borderRadius: 7, cursor: isDone ? 'pointer' : 'default' }}
+            style={{
+                ...RACE_CELL_STYLES[status],
+                borderRadius: 7,
+                cursor: isDone ? 'pointer' : 'default',
+            }}
         >
             <Box c="dimmed" className="f1-num" fw={700} fz={10}>
                 R
@@ -112,7 +133,7 @@ const SeasonOverview = () => {
     }
 
     const lastCompletedRace = calendar.races.findLast(race => race.completed);
-    const topDrivers = overview.drivers.slice(0, 8);
+    const topDrivers = overview.drivers.slice(0, TOP_DRIVER_COUNT);
 
     return (
         <Stack gap={16}>
@@ -140,7 +161,6 @@ const SeasonOverview = () => {
                 </Box>
             </Group>
 
-            {/* KPI cards */}
             <SimpleGrid cols={2} spacing={16}>
                 <StatCard
                     accent="var(--mantine-primary-color-filled)"
@@ -172,43 +192,48 @@ const SeasonOverview = () => {
                 />
             </SimpleGrid>
 
-            <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '7.2fr 4.8fr' }}>
+            <div style={{
+                display: 'grid',
+                gap: 16,
+                gridTemplateColumns: '7.2fr 4.8fr',
+            }}
+            >
                 <SectionCard
                     action={(
                         <Link params={{ year }} style={ACTION_LINK} to="/seasons/$year/standings">
                             View full table →
                         </Link>
                     )}
-                    padded={false}
+                    isPadded={false}
                     title="Drivers' Championship"
                 >
-                    <GridHeader columns={DRIVER_COLS}>
+                    <GridHeader columns={DRIVER_COLUMNS}>
                         <span>POS</span>
                         <span>DRIVER</span>
                         <span style={{ textAlign: 'right' }}>PTS</span>
                         <span style={{ textAlign: 'center' }}>WINS</span>
                         <span style={{ textAlign: 'right' }}>GAP</span>
                     </GridHeader>
-                    {topDrivers.map((d, i) => (
+                    {topDrivers.map((driver, index) => (
                         <Link
                             className="f1-row f1-grid-row"
-                            key={d.code}
-                            params={{ driverId: d.id, year }}
-                            style={{ '--cols': DRIVER_COLS }}
+                            key={driver.code}
+                            params={{ driverId: driver.id, year }}
+                            style={{ '--cols': DRIVER_COLUMNS }}
                             to="/seasons/$year/drivers/$driverId"
                         >
-                            <Text c="dimmed" className="f1-num" fw={700} inherit span>{i + 1}</Text>
+                            <Text c="dimmed" className="f1-num" fw={700} inherit span>{index + 1}</Text>
                             <Group gap={11} wrap="nowrap">
-                                <TeamBar color={d.constructor?.color ?? 'var(--neutral-500)'} />
+                                <TeamBar color={driver.constructor?.color ?? 'var(--neutral-500)'} />
                                 <Box miw={0}>
-                                    <Box fw={600} fz={13.5} style={{ whiteSpace: 'nowrap' }}>{d.name}</Box>
-                                    <Box c="dimmed" fz={11}>{d.constructor?.name ?? 'No constructor recorded'}</Box>
+                                    <Box fw={600} fz={13.5} style={{ whiteSpace: 'nowrap' }}>{driver.name}</Box>
+                                    <Box c="dimmed" fz={11}>{driver.constructor?.name ?? 'No constructor recorded'}</Box>
                                 </Box>
                             </Group>
-                            <Text className="f1-num f1-display" fw={700} inherit span ta="right">{d.points}</Text>
-                            <Text c="dimmed" className="f1-num" inherit span ta="center">{d.wins}</Text>
+                            <Text className="f1-num f1-display" fw={700} inherit span ta="right">{driver.points}</Text>
+                            <Text c="dimmed" className="f1-num" inherit span ta="center">{driver.wins}</Text>
                             <Text c="dimmed" className="f1-num" fz={12.5} inherit span ta="right">
-                                {i === 0 ? '—' : `-${leader.points - d.points}`}
+                                {index === 0 ? '—' : `-${leader.points - driver.points}`}
                             </Text>
                         </Link>
                     ))}
@@ -220,39 +245,38 @@ const SeasonOverview = () => {
                             Compare →
                         </Link>
                     )}
-                    padded={false}
+                    isPadded={false}
                     title="Constructors"
                 >
-                    {overview.constructors.map(c => (
+                    {overview.constructors.map(standing => (
                         <Box
-                            key={`${c.id}-${c.engineId}`}
+                            key={`${standing.id}-${standing.engineId}`}
                             px={18}
                             py={8}
                             style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}
                         >
                             <Group justify="space-between" mb={5} wrap="nowrap">
                                 <Group gap={9} wrap="nowrap">
-                                    <Text c="dimmed" className="f1-num" fw={700} fz={11} inherit span ta="center" w={18}>{c.positionLabel}</Text>
-                                    <Link className="f1-plain-link" params={{ constructorId: c.id, year }} to="/seasons/$year/constructors/$constructorId">
-                                        <Text fw={600} fz={13} inherit span>{c.name}</Text>
+                                    <Text c="dimmed" className="f1-num" fw={700} fz={11} inherit span ta="center" w={18}>{standing.positionLabel}</Text>
+                                    <Link className="f1-plain-link" params={{ constructorId: standing.id, year }} to="/seasons/$year/constructors/$constructorId">
+                                        <Text fw={600} fz={13} inherit span>{standing.name}</Text>
                                     </Link>
                                 </Group>
-                                <Text className="f1-num f1-display" fw={700} fz={13} inherit span>{c.points}</Text>
+                                <Text className="f1-num f1-display" fw={700} fz={13} inherit span>{standing.points}</Text>
                             </Group>
-                            <Progress color={c.color} ml={27} size={5} value={(c.points / overview.maxConstructorPoints) * 100} />
+                            <Progress color={standing.color} ml={27} size={5} value={(standing.points / overview.maxConstructorPoints) * 100} />
                         </Box>
                     ))}
                 </SectionCard>
             </div>
 
-            {/* Points progression chart */}
             <SectionCard
                 action={(
                     <Group gap={14} wrap="nowrap">
-                        {overview.progression.series.map(s => (
-                            <Group fw={600} fz={12} gap={6} key={s.name} wrap="nowrap">
-                                <Box bg={s.color} h={3} style={{ borderRadius: 2 }} w={11} />
-                                {s.name}
+                        {overview.progression.series.map(series => (
+                            <Group fw={600} fz={12} gap={6} key={series.name} wrap="nowrap">
+                                <Box bg={series.color} h={3} style={{ borderRadius: 2 }} w={11} />
+                                {series.name}
                             </Group>
                         ))}
                     </Group>
@@ -283,6 +307,7 @@ export const Route = createFileRoute('/seasons/$year/')({
             context.queryClient.ensureQueryData(seasonOverviewQuery(year)),
             context.queryClient.ensureQueryData(seasonCalendarQuery(year)),
         ]);
+
         return { crumbs: [{ label: 'Season Overview' }] };
     },
 });

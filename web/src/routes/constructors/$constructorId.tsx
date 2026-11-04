@@ -14,7 +14,8 @@ import { CURRENT_YEAR } from '#/lib/route-params';
 
 import { LineageStrip } from './-components/lineage-strip';
 
-const COLS = '84px 64px 110px 1fr 60px 78px 60px 80px 24px';
+const SEASON_COLUMNS = '84px 64px 110px 1fr 60px 78px 60px 80px 24px';
+const MAX_LISTED_DRIVERS = 3;
 
 const constructorCareerQuery = (constructorId: string) =>
     queryOptions({
@@ -24,8 +25,7 @@ const constructorCareerQuery = (constructorId: string) =>
 
 const ConstructorCareer = () => {
     const { constructorId } = Route.useParams();
-    const { data } = useSuspenseQuery(constructorCareerQuery(constructorId));
-    const { lineage, seasons, ...team } = data;
+    const { data: team } = useSuspenseQuery(constructorCareerQuery(constructorId));
 
     return (
         <Stack gap={16}>
@@ -38,10 +38,10 @@ const ConstructorCareer = () => {
                 title={team.name}
             />
 
-            <LineageStrip currentId={team.id} lineage={lineage} />
+            <LineageStrip currentId={team.id} lineage={team.lineage} />
 
             <SimpleGrid cols={6} spacing={8}>
-                <MiniStat label="SEASONS" value={uniq(seasons.map(season => season.season)).length} />
+                <MiniStat label="SEASONS" value={uniq(team.seasons.map(seasonResult => seasonResult.season)).length} />
                 <MiniStat label="STARTS" value={team.starts} />
                 <MiniStat label="WINS" value={team.wins} />
                 <MiniStat label="POLES" value={team.poles} />
@@ -50,7 +50,7 @@ const ConstructorCareer = () => {
             </SimpleGrid>
 
             <SeasonsCard
-                columns={COLS}
+                columns={SEASON_COLUMNS}
                 header={(
                     <>
                         <span>SEASON</span>
@@ -64,37 +64,37 @@ const ConstructorCareer = () => {
                     </>
                 )}
             >
-                {seasons.map(s => (
+                {team.seasons.map(seasonResult => (
                     <SeasonRow
-                        columns={COLS}
-                        isChampion={s.isChampion}
-                        key={`${s.season}-${s.engine}`}
-                        params={{ constructorId: team.id, year: String(Math.min(s.season, CURRENT_YEAR)) }}
-                        season={s.season}
+                        columns={SEASON_COLUMNS}
+                        isChampion={seasonResult.isChampion}
+                        key={`${seasonResult.season}-${seasonResult.engine}`}
+                        params={{ constructorId: team.id, year: String(Math.min(seasonResult.season, CURRENT_YEAR)) }}
+                        season={seasonResult.season}
                         to="/seasons/$year/constructors/$constructorId"
                     >
                         <Group gap={6} wrap="nowrap">
-                            <Text c={s.isChampion ? 'var(--gold-500)' : 'dimmed'} className="f1-num" fw={700} fz={13.5} inherit span>
-                                {formatPosition(s.position)}
+                            <Text c={seasonResult.isChampion ? 'var(--gold-500)' : 'dimmed'} className="f1-num" fw={700} fz={13.5} inherit span>
+                                {formatPosition(seasonResult.position)}
                             </Text>
-                            {s.isChampion ? <TrophyIcon color="var(--gold-500)" size={12} weight="fill" /> : null}
+                            {seasonResult.isChampion ? <TrophyIcon color="var(--gold-500)" size={12} weight="fill" /> : null}
                         </Group>
-                        <Text c="dimmed" fw={600} fz={12} inherit span>{s.engine}</Text>
+                        <Text c="dimmed" fw={600} fz={12} inherit span>{seasonResult.engine}</Text>
                         <Text fz={12.5} inherit lineClamp={1} span>
-                            {s.drivers.slice(0, 3).map((d, i) => (
-                                <span key={d.id}>
-                                    {i > 0 && ', '}
-                                    <Link params={{ driverId: d.id }} style={{ color: 'inherit' }} to="/drivers/$driverId">
-                                        {d.name}
+                            {seasonResult.drivers.slice(0, MAX_LISTED_DRIVERS).map((driver, index) => (
+                                <span key={driver.id}>
+                                    {index > 0 && ', '}
+                                    <Link params={{ driverId: driver.id }} style={{ color: 'inherit' }} to="/drivers/$driverId">
+                                        {driver.name}
                                     </Link>
                                 </span>
                             ))}
-                            {s.drivers.length > 3 ? <Text c="dimmed" inherit span>{` +${s.drivers.length - 3}`}</Text> : null}
+                            {seasonResult.drivers.length > MAX_LISTED_DRIVERS ? <Text c="dimmed" inherit span>{` +${seasonResult.drivers.length - MAX_LISTED_DRIVERS}`}</Text> : null}
                         </Text>
-                        <Text className="f1-num f1-display" fw={700} inherit span ta="center">{s.wins}</Text>
-                        <Text c="dimmed" className="f1-num" inherit span ta="center">{s.podiums}</Text>
-                        <Text c="dimmed" className="f1-num" inherit span ta="center">{s.poles}</Text>
-                        <Text className="f1-num f1-display" fw={700} inherit span ta="right">{s.points ?? '—'}</Text>
+                        <Text className="f1-num f1-display" fw={700} inherit span ta="center">{seasonResult.wins}</Text>
+                        <Text c="dimmed" className="f1-num" inherit span ta="center">{seasonResult.podiums}</Text>
+                        <Text c="dimmed" className="f1-num" inherit span ta="center">{seasonResult.poles}</Text>
+                        <Text className="f1-num f1-display" fw={700} inherit span ta="right">{seasonResult.points ?? '—'}</Text>
                     </SeasonRow>
                 ))}
             </SeasonsCard>
@@ -105,10 +105,10 @@ const ConstructorCareer = () => {
 export const Route = createFileRoute('/constructors/$constructorId')({
     component: ConstructorCareer,
     loader: async ({ context, params }) => {
-        const { name } = await context.queryClient.ensureQueryData(constructorCareerQuery(params.constructorId));
+        const summary = await context.queryClient.ensureQueryData(constructorCareerQuery(params.constructorId));
 
         return {
-            crumbs: [{ label: 'Constructors', to: '/constructors' }, { label: name }],
+            crumbs: [{ label: 'Constructors', to: '/constructors' }, { label: summary.name }],
         };
     },
 });

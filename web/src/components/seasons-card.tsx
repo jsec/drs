@@ -18,7 +18,7 @@ export const SeasonsCard = ({
     return (
         <SectionCard
             action={<Text c="dimmed" fz={12}>Select a season to open its full dashboard</Text>}
-            padded={false}
+            isPadded={false}
             title="Seasons"
         >
             <GridHeader columns={columns} px={20}>
