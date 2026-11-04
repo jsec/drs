@@ -1,6 +1,7 @@
 import { Card } from '@mantine/core';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { maxBy } from 'es-toolkit';
 
 import { DataTable, SortSearchSchema, useDataTable, useUrlSorting } from '#/components/data-table';
 import { ConstructorListSchema } from '#/lib/api/constructors';
@@ -15,7 +16,8 @@ const constructorsQuery = queryOptions({
 
 const Constructors = () => {
     const { data: constructors } = useSuspenseQuery(constructorsQuery);
-    const columns = makeConstructorColumns(Math.max(...constructors.map(c => c.wins)));
+    const mostWins = maxBy(constructors, constructor => constructor.wins)?.wins ?? 0;
+    const columns = makeConstructorColumns(mostWins);
     const { onSortingChange, sorting } = useUrlSorting();
     const { table } = useDataTable({ columns, data: constructors, onSortingChange, sorting });
 

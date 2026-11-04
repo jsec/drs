@@ -2,6 +2,7 @@ import { Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { TrophyIcon } from '@phosphor-icons/react';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { uniq } from 'es-toolkit';
 
 import { CareerHero } from '#/components/career-hero';
 import { MiniStat } from '#/components/f1-ui';
@@ -40,7 +41,7 @@ const ConstructorCareer = () => {
             <LineageStrip currentId={team.id} lineage={lineage} />
 
             <SimpleGrid cols={6} spacing={8}>
-                <MiniStat label="SEASONS" value={new Set(seasons.map(s => s.season)).size} />
+                <MiniStat label="SEASONS" value={uniq(seasons.map(season => season.season)).length} />
                 <MiniStat label="STARTS" value={team.starts} />
                 <MiniStat label="WINS" value={team.wins} />
                 <MiniStat label="POLES" value={team.poles} />

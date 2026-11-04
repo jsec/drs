@@ -1,3 +1,5 @@
+import { median, sortBy } from 'es-toolkit';
+
 import type { DriverLaps } from '#/lib/api/races';
 
 const PACE_CEILING_RATIO = 1.5;
@@ -5,7 +7,7 @@ const PACE_CEILING_RATIO = 1.5;
 type LapRow = Record<string, number | string>;
 
 const sortedRows = (rows: Map<number, LapRow>) =>
-    [...rows].toSorted(([a], [b]) => a - b).map(([, row]) => row);
+    sortBy([...rows], [([lapNumber]) => lapNumber]).map(([, row]) => row);
 
 const chartSeries = (drivers: DriverLaps[]) =>
     drivers.map(({ color, driver }) => ({
@@ -46,10 +48,8 @@ export const paceChart = (drivers: DriverLaps[]) => {
         }
     }
 
-    const lapSeconds = drivers
-        .flatMap(driver => driver.laps.map(lap => lap.timeMs / 1000))
-        .toSorted((first, second) => first - second);
-    const medianLapSeconds = lapSeconds[Math.floor(lapSeconds.length / 2)] ?? 0;
+    const lapSeconds = drivers.flatMap(driver => driver.laps.map(lap => lap.timeMs / 1000));
+    const medianLapSeconds = median(lapSeconds);
 
     return {
         ceiling: medianLapSeconds * PACE_CEILING_RATIO,

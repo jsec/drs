@@ -4,6 +4,7 @@ import { LineChart } from '@mantine/charts';
 import { Badge, Box, Group, SegmentedControl, Select, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { keyBy, minBy } from 'es-toolkit';
 import { z } from 'zod';
 
 import type { DriverRace } from '#/lib/api/drivers';
@@ -67,7 +68,7 @@ function formatDelta(ms: number): string {
     return seconds;
 }
 
-function lapTimeColor(timeMs: number, personalBestMs: number, raceFastestMs: number): string | undefined {
+function lapTimeColor(timeMs: number, personalBestMs: number | undefined, raceFastestMs: number | undefined): string | undefined {
     if (timeMs !== personalBestMs) {
         return undefined;
     }
@@ -158,12 +159,12 @@ const Hero = ({ race, round, year }: { race: DriverRace; round: string; year: st
 
 const LapTable = ({ driver, raceFastestMs, rival, stopLaps }: {
     driver: DriverLaps;
-    raceFastestMs: number;
+    raceFastestMs: number | undefined;
     rival: DriverLaps | undefined;
     stopLaps: Set<number>;
 }) => {
-    const personalBestMs = Math.min(...driver.laps.map(l => l.timeMs));
-    const rivalTimes = new Map(rival?.laps.map(lap => [lap.lap, lap.timeMs]));
+    const personalBestMs = minBy(driver.laps, lap => lap.timeMs)?.timeMs;
+    const rivalLapsByNumber = keyBy(rival?.laps ?? [], lap => lap.lap);
     const cols = rival ? RIVAL_LAP_COLS : LAP_COLS;
 
     return (
@@ -176,7 +177,7 @@ const LapTable = ({ driver, raceFastestMs, rival, stopLaps }: {
             </GridHeader>
             <Box className="f1-scroll" mah={480} style={{ overflowY: 'auto' }}>
                 {driver.laps.map((lap) => {
-                    const rivalMs = rivalTimes.get(lap.lap);
+                    const rivalMs = rivalLapsByNumber[lap.lap]?.timeMs;
 
                     return (
                         <Box
@@ -292,7 +293,7 @@ const DriverRacePage = () => {
 
     const position = positionChart(chartDrivers, 1);
     const pace = paceChart(chartDrivers);
-    const raceFastestMs = Math.min(...raceLaps.drivers.flatMap(d => d.laps.map(l => l.timeMs)));
+    const raceFastestMs = minBy(raceLaps.drivers.flatMap(driver => driver.laps), lap => lap.timeMs)?.timeMs;
     const stopLaps = new Set(race.pitStops.map(s => s.lap));
 
     return (
