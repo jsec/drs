@@ -306,7 +306,7 @@ func TestService_GetRaceLaps(t *testing.T) {
 		results: raceResults,
 		laps: []database.ListRaceLapTimesRow{
 			{DriverID: "kimi-antonelli", LapNumber: 1, Position: int4(2), LapTimeMs: 98765},
-			{DriverID: "kimi-antonelli", LapNumber: 2, Position: int4(1), LapTimeMs: 96123},
+			{DriverID: "kimi-antonelli", LapNumber: 2, Position: int4(1), LapTimeMs: 96123, IsPitLap: true},
 		},
 	}
 
@@ -320,7 +320,7 @@ func TestService_GetRaceLaps(t *testing.T) {
 				Color:  "#00D7B6",
 				Laps: []races.Lap{
 					{Lap: 1, Position: int4(2), TimeMs: 98765},
-					{Lap: 2, Position: int4(1), TimeMs: 96123},
+					{Lap: 2, Position: int4(1), TimeMs: 96123, IsPitLap: true},
 				},
 			},
 			{

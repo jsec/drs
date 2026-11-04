@@ -127,6 +127,7 @@ func GetRaceLaps(ctx context.Context, queries database.Querier, season, round in
 			Lap:      row.LapNumber,
 			Position: row.Position,
 			TimeMs:   row.LapTimeMs,
+			IsPitLap: row.IsPitLap,
 		})
 	}
 

@@ -69,6 +69,7 @@ type Lap struct {
 	Lap      int32       `json:"lap"`
 	Position pgtype.Int4 `json:"position"`
 	TimeMs   int32       `json:"timeMs"`
+	IsPitLap bool        `json:"isPitLap"`
 }
 
 type DriverLaps struct {

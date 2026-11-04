@@ -1,7 +1,6 @@
 import type { DriverLaps } from '#/lib/api/races';
 
-const PACE_OUTLIER_RATIO = 1.1;
-const PACE_WINDOW = 6;
+const PACE_CEILING_RATIO = 1.5;
 
 type LapRow = Record<string, number | string>;
 
@@ -34,23 +33,27 @@ export const positionChart = (drivers: DriverLaps[], lapStep: number) => {
     return { data: sortedRows(rows), series: chartSeries(drivers) };
 };
 
-export const paceChart = (drivers: DriverLaps[], shouldHideOutliers: boolean) => {
+export const paceChart = (drivers: DriverLaps[]) => {
     const rows = new Map<number, LapRow>();
 
     for (const { driver, laps } of drivers) {
-        for (const [i, { lap, timeMs }] of laps.entries()) {
-            const row: LapRow = { ...rows.get(lap), lap: lapLabel(lap) };
-            const nearby = laps.slice(Math.max(0, i - PACE_WINDOW), i + PACE_WINDOW + 1);
-            const nearbyFastestMs = Math.min(...nearby.map(l => l.timeMs));
-            const isOutlier = lap === 1 || timeMs > nearbyFastestMs * PACE_OUTLIER_RATIO;
-
-            if (!shouldHideOutliers || !isOutlier) {
-                row[driver.code] = timeMs / 1000;
-            }
-
-            rows.set(lap, row);
+        for (const { lap, timeMs } of laps) {
+            rows.set(lap, {
+                ...rows.get(lap),
+                [driver.code]: timeMs / 1000,
+                lap: lapLabel(lap),
+            });
         }
     }
 
-    return { data: sortedRows(rows), series: chartSeries(drivers) };
+    const lapSeconds = drivers
+        .flatMap(driver => driver.laps.map(lap => lap.timeMs / 1000))
+        .toSorted((first, second) => first - second);
+    const medianLapSeconds = lapSeconds[Math.floor(lapSeconds.length / 2)] ?? 0;
+
+    return {
+        ceiling: medianLapSeconds * PACE_CEILING_RATIO,
+        data: sortedRows(rows),
+        series: chartSeries(drivers),
+    };
 };

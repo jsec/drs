@@ -1,3 +1,6 @@
+const MS_PER_MINUTE = 60_000;
+const MS_PER_HOUR = 60 * MS_PER_MINUTE;
+
 type CareerYears = {
     firstYear: null | number;
     isActive: boolean;
@@ -25,8 +28,14 @@ export function formatGrid(grid: null | number): string {
 }
 
 export function formatLapTime(ms: number): string {
-    const minutes = Math.floor(ms / 60_000);
-    const seconds = ((ms % 60_000) / 1000).toFixed(3).padStart(6, '0');
+    const hours = Math.floor(ms / MS_PER_HOUR);
+    const minutes = Math.floor((ms % MS_PER_HOUR) / MS_PER_MINUTE);
+    const seconds = ((ms % MS_PER_MINUTE) / 1000).toFixed(3).padStart(6, '0');
+
+    if (hours > 0) {
+        return `${hours}:${String(minutes).padStart(2, '0')}:${seconds}`;
+    }
+
     return `${minutes}:${seconds}`;
 }
 

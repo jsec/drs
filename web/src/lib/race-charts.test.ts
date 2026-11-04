@@ -4,7 +4,7 @@ import type { DriverLaps } from '#/lib/api/races';
 
 import { paceChart } from './race-charts';
 
-const BUTTON_2011_CANADA_S = [
+const BUTTON_2011_CANADA_LAP_SECONDS = [
     144, 126.6, 125.4, 123.3, 100.6, 98, 98.2, 117.8, 111.8, 130.7,
     125.6, 119.7, 102.2, 96.6, 96.6, 92.9, 96.1, 96.3, 122.7, 111.2,
     110.8, 105.5, 121.4, 137, 7503.8, 141.7, 127, 122.5, 122.3, 122.1,
@@ -17,20 +17,26 @@ const BUTTON_2011_CANADA_S = [
 const driver: DriverLaps = {
     color: '#ff8000',
     driver: { code: 'BUT', id: 'jenson-button' },
-    laps: BUTTON_2011_CANADA_S.map((s, i) => ({ lap: i + 1, position: null, timeMs: Math.round(s * 1000) })),
+    laps: BUTTON_2011_CANADA_LAP_SECONDS.map((seconds, index) => ({
+        isPitLap: false,
+        lap: index + 1,
+        position: null,
+        timeMs: Math.round(seconds * 1000),
+    })),
 };
 
-const shownLaps = () =>
-    paceChart([driver], true).data.filter(row => 'BUT' in row).map(row => row.lap);
-
 describe('paceChart', () => {
-    it('keeps wet laps when the race finishes on a dry track', () => {
-        expect(shownLaps()).toEqual(expect.arrayContaining(['L5', 'L14', 'L40', 'L46', 'L50', 'L55', 'L65']));
+    it('should plot every lap', () => {
+        const result = paceChart([driver]);
+        const plottedLaps = result.data.filter(row => 'BUT' in row);
+
+        expect(plottedLaps).toHaveLength(70);
     });
 
-    it('hides safety car, red flag and pit laps', () => {
-        for (const lap of ['L1', 'L20', 'L25', 'L29', 'L30', 'L37', 'L51', 'L59']) {
-            expect(shownLaps()).not.toContain(lap);
-        }
+    it('should set the axis ceiling above safety car laps and below the red flag lap', () => {
+        const result = paceChart([driver]);
+
+        expect(result.ceiling).toBeGreaterThan(144);
+        expect(result.ceiling).toBeLessThan(185.6);
     });
 });

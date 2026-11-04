@@ -160,7 +160,15 @@ SELECT
     lt.driver_id,
     lt.lap_number,
     lt.position,
-    lt.lap_time_ms
+    lt.lap_time_ms,
+    EXISTS (
+        SELECT 1
+        FROM effone.pit_stops AS ps
+        WHERE ps.race_id = lt.race_id
+            AND ps.driver_id = lt.driver_id
+            AND lt.session = 'race'
+            AND lt.lap_number IN (ps.lap_number, ps.lap_number + 1)
+    ) AS is_pit_lap
 FROM effone.lap_times AS lt
 WHERE lt.race_id = $1
     AND lt.session = $2
@@ -172,6 +180,7 @@ type ListRaceLapTimesRow struct {
 	LapNumber int32       `json:"lapNumber"`
 	Position  pgtype.Int4 `json:"position"`
 	LapTimeMs int32       `json:"lapTimeMs"`
+	IsPitLap  bool        `json:"isPitLap"`
 }
 
 func (q *Queries) ListRaceLapTimes(ctx context.Context, raceID int32, session string) ([]ListRaceLapTimesRow, error) {
@@ -188,6 +197,7 @@ func (q *Queries) ListRaceLapTimes(ctx context.Context, raceID int32, session st
 			&i.LapNumber,
 			&i.Position,
 			&i.LapTimeMs,
+			&i.IsPitLap,
 		); err != nil {
 			return nil, err
 		}

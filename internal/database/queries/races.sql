@@ -102,7 +102,15 @@ SELECT
     lt.driver_id,
     lt.lap_number,
     lt.position,
-    lt.lap_time_ms
+    lt.lap_time_ms,
+    EXISTS (
+        SELECT 1
+        FROM effone.pit_stops AS ps
+        WHERE ps.race_id = lt.race_id
+            AND ps.driver_id = lt.driver_id
+            AND lt.session = 'race'
+            AND lt.lap_number IN (ps.lap_number, ps.lap_number + 1)
+    ) AS is_pit_lap
 FROM effone.lap_times AS lt
 WHERE lt.race_id = sqlc.arg(race_id)
     AND lt.session = sqlc.arg(session)

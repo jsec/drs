@@ -59,6 +59,7 @@ export const RaceDetailSchema = z.object({
 });
 
 const RaceLapSchema = z.object({
+    isPitLap: z.boolean(),
     lap: z.number().int(),
     position: z.number().int().nullable(),
     timeMs: z.number().int(),

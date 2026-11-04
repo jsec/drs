@@ -1,10 +1,9 @@
 import type { ChartReferenceLineProps, LineChartSeries } from '@mantine/charts';
 
 import { LineChart } from '@mantine/charts';
-import { Badge, Box, Group, SegmentedControl, Select, SimpleGrid, Stack, Switch, Text } from '@mantine/core';
+import { Badge, Box, Group, SegmentedControl, Select, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useState } from 'react';
 import { z } from 'zod';
 
 import type { DriverRace } from '#/lib/api/drivers';
@@ -252,7 +251,6 @@ const DriverRacePage = () => {
     const { session = 'race', vs } = Route.useSearch();
     const isSprint = session === 'sprint';
     const navigate = Route.useNavigate();
-    const [showAllLaps, setShowAllLaps] = useState(false);
 
     const { data: race } = useSuspenseQuery(driverRaceQuery(Number(year), Number(round), driverId, session));
     const { data: raceDetail } = useSuspenseQuery(raceDetailQuery(Number(year), Number(round)));
@@ -293,7 +291,7 @@ const DriverRacePage = () => {
     }
 
     const position = positionChart(chartDrivers, 1);
-    const pace = paceChart(chartDrivers, !showAllLaps);
+    const pace = paceChart(chartDrivers);
     const raceFastestMs = Math.min(...raceLaps.drivers.flatMap(d => d.laps.map(l => l.timeMs)));
     const stopLaps = new Set(race.pitStops.map(s => s.lap));
 
@@ -322,37 +320,31 @@ const DriverRacePage = () => {
             {hasLapData
                 ? (
                         <>
-                            <Group justify="space-between">
-                                <Select
-                                    clearable
-                                    data={rivalOptions}
-                                    onChange={value => void navigate({ search: prev => ({ ...prev, vs: value ?? undefined }) })}
-                                    placeholder="Compare with…"
-                                    searchable
-                                    value={vs ?? null}
-                                    w={280}
-                                />
-                                <Switch
-                                    checked={showAllLaps}
-                                    label="Show all laps"
-                                    onChange={event => setShowAllLaps(event.currentTarget.checked)}
-                                />
-                            </Group>
+                            <Select
+                                clearable
+                                data={rivalOptions}
+                                onChange={value => void navigate({ search: prev => ({ ...prev, vs: value ?? undefined }) })}
+                                placeholder="Compare with…"
+                                searchable
+                                value={vs ?? null}
+                                w={280}
+                            />
 
                             <SimpleGrid cols={2} spacing={16}>
                                 <SectionCard title="Race Pace">
                                     <LineChart
-                                        connectNulls={false}
                                         data={pace.data}
                                         dataKey="lap"
-                                        dotProps={{ r: 2 }}
                                         h={240}
                                         referenceLines={referenceLines}
                                         series={dashRival(pace.series, isRivalDashed)}
                                         valueFormatter={v => v.toFixed(3)}
-                                        withDots
                                         xAxisProps={{ interval: 'preserveStartEnd' }}
-                                        yAxisProps={{ domain: ['auto', 'auto'], tickCount: 5 }}
+                                        yAxisProps={{
+                                            allowDataOverflow: true,
+                                            domain: ['auto', (dataMax: number) => Math.min(dataMax, pace.ceiling)],
+                                            tickCount: 5,
+                                        }}
                                     />
                                 </SectionCard>
                                 <SectionCard title="Position">

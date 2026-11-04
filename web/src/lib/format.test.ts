@@ -7,6 +7,10 @@ describe('formatLapTime', () => {
         expect(formatLapTime(89_205)).toBe('1:29.205');
         expect(formatLapTime(65_004)).toBe('1:05.004');
     });
+
+    it('should add hours for a lap that includes a red flag stoppage', () => {
+        expect(formatLapTime(7_503_775)).toBe('2:05:03.775');
+    });
 });
 
 describe('formatPosition', () => {

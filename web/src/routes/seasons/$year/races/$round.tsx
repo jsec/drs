@@ -91,7 +91,7 @@ const ChartPlaceholder = ({ text }: { text: string }) => (
 const POSITION_TITLE = 'Position Changes';
 const POSITION_SUBTITLE = `Track position every ${POSITION_LAP_STEP} laps · top ${CHART_DRIVER_COUNT} finishers`;
 const PACE_TITLE = 'Race Pace';
-const PACE_SUBTITLE = 'Lap time (s) · lower is faster · pit and safety car laps hidden';
+const PACE_SUBTITLE = 'Lap time (s) · lower is faster · pit laps hidden';
 
 const ChartPlaceholders = ({ text }: { text: string }) => (
     <>
@@ -113,7 +113,8 @@ const RaceCharts = ({ round, year }: { round: number; year: number }) => {
 
     const topDrivers = laps.drivers.slice(0, CHART_DRIVER_COUNT);
     const position = positionChart(topDrivers, POSITION_LAP_STEP);
-    const pace = paceChart(topDrivers, true);
+    const driversWithoutPitLaps = topDrivers.map(driver => ({ ...driver, laps: driver.laps.filter(lap => !lap.isPitLap) }));
+    const pace = paceChart(driversWithoutPitLaps);
 
     return (
         <>
@@ -129,16 +130,17 @@ const RaceCharts = ({ round, year }: { round: number; year: number }) => {
             </SectionCard>
             <SectionCard subtitle={PACE_SUBTITLE} title={PACE_TITLE}>
                 <LineChart
-                    connectNulls={false}
                     data={pace.data}
                     dataKey="lap"
-                    dotProps={{ r: 2 }}
                     h={240}
                     series={pace.series}
                     valueFormatter={v => v.toFixed(1)}
-                    withDots
                     xAxisProps={{ interval: 'preserveStartEnd' }}
-                    yAxisProps={{ domain: ['auto', 'auto'], tickCount: 5 }}
+                    yAxisProps={{
+                        allowDataOverflow: true,
+                        domain: ['auto', (dataMax: number) => Math.min(dataMax, pace.ceiling)],
+                        tickCount: 5,
+                    }}
                 />
             </SectionCard>
         </>
