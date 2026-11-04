@@ -1,6 +1,6 @@
 import { Box, SimpleGrid, Stack, Text } from '@mantine/core';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { CareerHero } from '#/components/career-hero';
 import { GridHeader, MiniStat, SectionCard } from '#/components/f1-ui';
@@ -10,6 +10,10 @@ import { api } from '#/lib/query/api';
 import { CircuitLayout } from './-components/circuit-layout';
 
 const RACE_COLUMNS = '110px 1fr 200px';
+const RACE_ROW_STYLE = {
+    '--cols': RACE_COLUMNS,
+    'padding': '11px 20px',
+};
 
 const circuitSummaryQuery = (circuitId: string) =>
     queryOptions({
@@ -52,23 +56,42 @@ const CircuitDetail = () => {
                     <span>GRAND PRIX</span>
                     <span>WINNER</span>
                 </GridHeader>
-                {circuit.races.map(race => (
-                    <Box
-                        className="f1-grid-row"
-                        key={race.raceId}
-                        px={20}
-                        py={11}
-                        style={{ '--cols': RACE_COLUMNS }}
-                    >
-                        <Text c="dimmed" className="f1-num" fz={12.5} inherit span>
-                            {race.date ?? '—'}
-                        </Text>
-                        <Text fw={600} fz={13.5} inherit span>{race.name}</Text>
-                        <Text c="dimmed" fz={12.5} inherit span>
-                            {race.winnerName}
-                        </Text>
-                    </Box>
-                ))}
+                {circuit.races.map((race) => {
+                    const cells = (
+                        <>
+                            <Text c="dimmed" className="f1-num" fz={12.5} inherit span>
+                                {race.date ?? '—'}
+                            </Text>
+                            <Text fw={600} fz={13.5} inherit span>{race.name}</Text>
+                            <Text c="dimmed" fz={12.5} inherit span>
+                                {race.winnerName}
+                            </Text>
+                        </>
+                    );
+
+                    if (!race.completed) {
+                        return (
+                            <div className="f1-grid-row" key={race.raceId} style={RACE_ROW_STYLE}>
+                                {cells}
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <Link
+                            className="f1-row f1-grid-row"
+                            key={race.raceId}
+                            params={{
+                                round: String(race.round),
+                                year: String(race.season),
+                            }}
+                            style={RACE_ROW_STYLE}
+                            to="/seasons/$year/races/$round"
+                        >
+                            {cells}
+                        </Link>
+                    );
+                })}
             </SectionCard>
 
             <Box c="dimmed" fz={11.5}>

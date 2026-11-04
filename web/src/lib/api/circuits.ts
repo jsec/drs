@@ -18,10 +18,13 @@ const CircuitRaceSummarySchema = z.object({
 });
 
 const CircuitRaceSchema = z.object({
+    completed: z.boolean(),
     date: z.string().nullable(),
     layoutId: z.string(),
     name: z.string(),
     raceId: z.number(),
+    round: z.number(),
+    season: z.number(),
     winnerName: z.string(),
 });
 

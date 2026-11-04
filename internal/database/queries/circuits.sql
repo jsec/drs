@@ -13,10 +13,13 @@ ORDER BY last_race_date DESC;
 -- name: GetRacesByCircuitId :many
 SELECT
     race_id,
+    season,
+    race_round,
     race_date,
     circuit_layout_id,
     race_official_name,
-    winner_driver_name
+    winner_driver_name,
+    winner_driver_id IS NOT NULL AS completed
 FROM effone.races
 WHERE circuit_id = $1
 ORDER BY race_date DESC;

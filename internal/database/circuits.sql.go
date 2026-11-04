@@ -64,10 +64,13 @@ func (q *Queries) GetCircuitInfo(ctx context.Context, circuitID string) (GetCirc
 const getRacesByCircuitId = `-- name: GetRacesByCircuitId :many
 SELECT
     race_id,
+    season,
+    race_round,
     race_date,
     circuit_layout_id,
     race_official_name,
-    winner_driver_name
+    winner_driver_name,
+    winner_driver_id IS NOT NULL AS completed
 FROM effone.races
 WHERE circuit_id = $1
 ORDER BY race_date DESC
@@ -75,10 +78,13 @@ ORDER BY race_date DESC
 
 type GetRacesByCircuitIdRow struct {
 	RaceID           int32       `json:"raceId"`
+	Season           int32       `json:"season"`
+	RaceRound        int32       `json:"raceRound"`
 	RaceDate         pgtype.Date `json:"raceDate"`
 	CircuitLayoutID  string      `json:"circuitLayoutId"`
 	RaceOfficialName string      `json:"raceOfficialName"`
 	WinnerDriverName pgtype.Text `json:"winnerDriverName"`
+	Completed        pgtype.Bool `json:"completed"`
 }
 
 func (q *Queries) GetRacesByCircuitId(ctx context.Context, circuitID string) ([]GetRacesByCircuitIdRow, error) {
@@ -92,10 +98,13 @@ func (q *Queries) GetRacesByCircuitId(ctx context.Context, circuitID string) ([]
 		var i GetRacesByCircuitIdRow
 		if err := rows.Scan(
 			&i.RaceID,
+			&i.Season,
+			&i.RaceRound,
 			&i.RaceDate,
 			&i.CircuitLayoutID,
 			&i.RaceOfficialName,
 			&i.WinnerDriverName,
+			&i.Completed,
 		); err != nil {
 			return nil, err
 		}

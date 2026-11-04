@@ -9,10 +9,13 @@ type CircuitRaceSummary struct {
 
 type CircuitRace struct {
 	RaceID     int32       `json:"raceId"`
+	Season     int32       `json:"season"`
+	Round      int32       `json:"round"`
 	Date       pgtype.Date `json:"date"`
 	LayoutID   string      `json:"layoutId"`
 	Name       string      `json:"name"`
 	WinnerName string      `json:"winnerName"`
+	Completed  bool        `json:"completed"`
 }
 
 type CircuitSummaryResponse struct {

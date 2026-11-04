@@ -23,10 +23,13 @@ func GetCircuitSummary(ctx context.Context, queries database.Querier, circuitID 
 	for _, race := range raceList {
 		races = append(races, CircuitRace{
 			RaceID:     race.RaceID,
+			Season:     race.Season,
+			Round:      race.RaceRound,
 			Date:       race.RaceDate,
 			LayoutID:   race.CircuitLayoutID,
 			Name:       race.RaceOfficialName,
 			WinnerName: race.WinnerDriverName.String,
+			Completed:  race.Completed.Bool,
 		})
 	}
 
