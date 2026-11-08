@@ -4,7 +4,7 @@ go 1.26.5
 
 require (
 	github.com/charmbracelet/log v1.0.0
-	github.com/jackc/pgx/v5 v5.11.0
+	github.com/jackc/pgx/v5 v5.12.0
 	github.com/stretchr/testify v1.12.1
 )
 
@@ -18,7 +18,7 @@ require (
 	github.com/go-logfmt/logfmt v0.6.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/jackc/puddle/v2 v2.2.3 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
@@ -29,5 +29,5 @@ require (
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.29.0 // indirect
+	golang.org/x/text v0.41.0 // indirect
 )
