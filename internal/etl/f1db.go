@@ -2,7 +2,7 @@ package etl
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -74,7 +74,7 @@ func getLatestRelease(ctx context.Context, token string) (version, downloadURL s
 			BrowserDownloadURL string `json:"browser_download_url"`
 		} `json:"assets"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
+	if err := json.UnmarshalRead(resp.Body, &r); err != nil {
 		return "", "", err
 	}
 

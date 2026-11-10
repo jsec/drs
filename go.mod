@@ -1,6 +1,6 @@
 module github.com/jsec/drs
 
-go 1.26.5
+go 1.27.3
 
 require (
 	github.com/charmbracelet/log v1.0.0
