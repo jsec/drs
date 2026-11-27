@@ -1,9 +1,11 @@
-import type { ColumnDef, SortingFn } from '@tanstack/react-table';
+import type { ColumnDef, SortFn } from '@tanstack/react-table';
 
 import { fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { renderWithRouter } from '#/test/router';
+
+import type { Features } from './index';
 
 import { DataTable, makeColumns, useDataTable } from './index';
 
@@ -33,7 +35,7 @@ const DATA: Row[] = [
 
 const columnBuilder = makeColumns<Row>();
 
-const byNote: SortingFn<Row> = (a, b) => a.original.note.localeCompare(b.original.note);
+const byNote: SortFn<Features, Row> = (a, b) => a.original.note.localeCompare(b.original.note);
 
 const defaultColumns = [
     columnBuilder.ordinal(),
@@ -52,7 +54,7 @@ const customColumns = [
     columnBuilder.numeric('wins', { header: 'WINS', sort: byNote }),
 ];
 
-const Harness = ({ columns = defaultColumns }: { columns?: ColumnDef<Row, unknown>[] }) => {
+const Harness = ({ columns = defaultColumns }: { columns?: ColumnDef<Features, Row, unknown>[] }) => {
     const { table } = useDataTable({ columns, data: DATA });
 
     return <DataTable table={table} />;

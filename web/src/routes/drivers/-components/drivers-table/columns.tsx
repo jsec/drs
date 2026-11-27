@@ -1,5 +1,6 @@
-import type { FilterFn, SortingFn } from '@tanstack/react-table';
+import type { FilterFn, SortFn } from '@tanstack/react-table';
 
+import type { Features } from '#/components/data-table';
 import type { DriverShortSummary } from '#/lib/api/drivers';
 
 import { makeColumns } from '#/components/data-table';
@@ -10,13 +11,13 @@ import { driverSummaryColor } from '../driver-summary';
 
 const columnBuilder = makeColumns<DriverShortSummary>();
 
-const byTitles: SortingFn<DriverShortSummary> = (a, b) =>
+const byTitles: SortFn<Features, DriverShortSummary> = (a, b) =>
     a.original.championships - b.original.championships || a.original.wins - b.original.wins;
 
-const byWins: SortingFn<DriverShortSummary> = (a, b) =>
+const byWins: SortFn<Features, DriverShortSummary> = (a, b) =>
     a.original.wins - b.original.wins || a.original.podiums - b.original.podiums;
 
-export const matchesSearch: FilterFn<DriverShortSummary> = (row, _columnId, value: string) =>
+export const matchesSearch: FilterFn<Features, DriverShortSummary> = (row, _columnId, value: string) =>
     `${row.original.name} ${row.original.code}`.toLowerCase().includes(value.toLowerCase());
 
 export const columns = [

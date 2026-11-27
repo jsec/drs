@@ -24,6 +24,7 @@ export default [
             '@typescript-eslint/require-await': 'off',
             'package-json/dependency-version-range': 'off',
             'unicorn/filename-case': 'off',
+            'unicorn/prefer-ternary': 'off',
         },
     },
     {

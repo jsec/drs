@@ -1,7 +1,8 @@
-import type { SortingFn } from '@tanstack/react-table';
+import type { SortFn } from '@tanstack/react-table';
 
 import { Progress } from '@mantine/core';
 
+import type { Features } from '#/components/data-table';
 import type { Constructor } from '#/lib/api/constructors';
 
 import { makeColumns } from '#/components/data-table';
@@ -9,7 +10,7 @@ import { formatCareerYears } from '#/lib/format';
 
 const columnBuilder = makeColumns<Constructor>();
 
-const byTitles: SortingFn<Constructor> = (a, b) =>
+const byTitles: SortFn<Features, Constructor> = (a, b) =>
     a.original.championships - b.original.championships || a.original.wins - b.original.wins;
 
 export function makeConstructorColumns(maxWins: number) {

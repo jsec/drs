@@ -1,9 +1,11 @@
 import type { LinkProps } from '@tanstack/react-router';
-import type { CellContext, ColumnDef, ColumnMeta, SortingFnOption } from '@tanstack/react-table';
+import type { CellContext, ColumnDef, ColumnMeta, RowData, SortFnOption } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 
 import { TrophyCount } from '#/components/f1-ui';
 import { cn } from '#/lib/utils';
+
+import type { Features } from './use-data-table';
 
 type Alignment = 'center' | 'right';
 
@@ -11,12 +13,12 @@ type KeysMatching<T, V> = string & {
     [K in keyof T]-?: T[K] extends V ? K : never;
 }[keyof T];
 
-type Shared<T> = {
+type Shared<T extends RowData> = {
     align?: Alignment;
     header?: string;
     id?: string;
     link?: (row: T) => LinkProps | undefined;
-    sort?: SortingFnOption<T>;
+    sort?: SortFnOption<Features, T>;
     trailing?: 'caret';
     width?: string;
 };
@@ -27,7 +29,7 @@ type SortValue = null | number | string;
 
 const SIZE_CLASS = { lg: 'table-cell-lg', sm: 'table-cell-sm' } as const;
 
-export function makeColumns<T>() {
+export function makeColumns<T extends RowData>() {
     const competitor = (
         key: keyof T & string,
         options: Shared<T> & {
@@ -35,7 +37,7 @@ export function makeColumns<T>() {
             label: (row: T) => ReactNode;
             visual: (row: T) => ReactNode;
         },
-    ): ColumnDef<T, unknown> => ({
+    ): ColumnDef<Features, T, unknown> => ({
         accessorFn: options.accessor ?? (row => row[key]),
         cell: info => (
             <span className="table-cell-entity">
@@ -47,17 +49,17 @@ export function makeColumns<T>() {
         id: options.id ?? key,
         meta: buildMeta(options),
         sortDescFirst: false,
-        sortingFn: options.sort ?? 'auto',
+        sortFn: options.sort ?? 'auto',
     });
 
     const custom = (
         options: Shared<T> & {
             accessor?: (row: T) => SortValue;
-            cell: (info: CellContext<T, unknown>) => ReactNode;
+            cell: (info: CellContext<Features, T, unknown>) => ReactNode;
             id: string;
             isDescFirst?: boolean;
         },
-    ): ColumnDef<T, unknown> => ({
+    ): ColumnDef<Features, T, unknown> => ({
         accessorFn: options.accessor,
         cell: options.cell,
         enableSorting: options.accessor != null,
@@ -65,13 +67,13 @@ export function makeColumns<T>() {
         id: options.id,
         meta: buildMeta(options),
         sortDescFirst: options.isDescFirst ?? false,
-        sortingFn: options.sort ?? 'auto',
+        sortFn: options.sort ?? 'auto',
     });
 
     const numeric = <K extends KeysMatching<T, ReactNode>>(
         key: K,
         options: Shared<T> & { size?: Size; variant?: 'display' } = {},
-    ): ColumnDef<T, unknown> => ({
+    ): ColumnDef<Features, T, unknown> => ({
         accessorKey: key,
         cell: (info) => {
             // SAFETY: K extends KeysMatching<T, ReactNode>, so T[K] is ReactNode; TS can't resolve that for a generic T.
@@ -93,12 +95,12 @@ export function makeColumns<T>() {
         id: options.id ?? key,
         meta: buildMeta(options),
         sortDescFirst: true,
-        sortingFn: options.sort ?? 'auto',
+        sortFn: options.sort ?? 'auto',
     });
 
     const ordinal = (
         options: { header?: string; id?: string; width?: string } = {},
-    ): ColumnDef<T, unknown> => ({
+    ): ColumnDef<Features, T, unknown> => ({
         enableSorting: false,
         header: options.header ?? '#',
         id: options.id ?? 'rank',
@@ -108,7 +110,7 @@ export function makeColumns<T>() {
     const text = <K extends KeysMatching<T, ReactNode>>(
         key: K,
         options: Shared<T> & { isBold?: boolean; isMuted?: boolean } = {},
-    ): ColumnDef<T, unknown> => ({
+    ): ColumnDef<Features, T, unknown> => ({
         accessorKey: key,
         cell: (info) => {
             // SAFETY: K extends KeysMatching<T, ReactNode>, so T[K] is ReactNode; TS can't resolve that for a generic T.
@@ -130,13 +132,13 @@ export function makeColumns<T>() {
         id: options.id ?? key,
         meta: buildMeta(options),
         sortDescFirst: false,
-        sortingFn: options.sort ?? 'auto',
+        sortFn: options.sort ?? 'auto',
     });
 
     const trophy = <K extends KeysMatching<T, number>>(
         key: K,
         options: Shared<T> = {},
-    ): ColumnDef<T, unknown> => ({
+    ): ColumnDef<Features, T, unknown> => ({
         accessorKey: key,
         cell: (info) => {
             // SAFETY: K extends KeysMatching<T, number>, so T[K] is number; TS can't resolve that for a generic T.
@@ -152,7 +154,7 @@ export function makeColumns<T>() {
         id: options.id ?? key,
         meta: buildMeta({ align: 'center', ...options }),
         sortDescFirst: true,
-        sortingFn: options.sort ?? 'auto',
+        sortFn: options.sort ?? 'auto',
     });
 
     return {
@@ -165,7 +167,7 @@ export function makeColumns<T>() {
     };
 }
 
-function buildMeta<T>(options: Shared<T>): ColumnMeta<T, unknown> {
+function buildMeta<T extends RowData>(options: Shared<T>): ColumnMeta<Features, T, unknown> {
     return {
         align: options.align,
         link: options.link,

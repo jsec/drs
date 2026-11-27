@@ -1,5 +1,5 @@
 import type { LinkProps } from '@tanstack/react-router';
-import type { Cell, RowData, Table } from '@tanstack/react-table';
+import type { Cell, CellData, RowData, Table, TableFeatures } from '@tanstack/react-table';
 
 import { Table as TablePrimitive } from '@mantine/core';
 import { CaretDownIcon, CaretRightIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react';
@@ -8,15 +8,18 @@ import { flexRender } from '@tanstack/react-table';
 
 import { cn } from '#/lib/utils';
 
+import type { Features } from './use-data-table';
+
 import './data-table.css';
 
 export { makeColumns } from './columns';
+export type { Features } from './use-data-table';
 export { useDataTable } from './use-data-table';
 export { SortSearchSchema, useUrlSorting } from './use-url-sorting';
 
 declare module '@tanstack/react-table' {
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-unused-vars
-    interface ColumnMeta<TData extends RowData, TValue> {
+    interface ColumnMeta<in out TFeatures extends TableFeatures, in out TData extends RowData, TValue extends CellData = CellData> {
         align?: 'center' | 'right';
         isOrdinal?: boolean;
         link?: (row: TData) => LinkProps | undefined;
@@ -36,27 +39,23 @@ const SortCaret = ({ direction }: { direction: 'asc' | 'desc' | false }) => {
         return <CaretUpIcon className="table-head-caret" size={12} weight="bold" />;
     }
 
-    if (direction === 'desc') {
-        return <CaretDownIcon className="table-head-caret" size={12} weight="bold" />;
-    }
-
-    return <CaretUpDownIcon className="table-head-caret table-head-caret--idle" size={12} weight="bold" />;
+    return direction === 'desc' ? <CaretDownIcon className="table-head-caret" size={12} weight="bold" /> : <CaretUpDownIcon className="table-head-caret table-head-caret--idle" size={12} weight="bold" />;
 };
 
-type CellBodyProps<T> = {
+type CellBodyProps<T extends RowData> = {
     align: 'center' | 'left' | 'right';
-    cell: Cell<T, unknown>;
+    cell: Cell<Features, T, unknown>;
     rank: number;
 };
 
-type DataTableProps<T> = {
+type DataTableProps<T extends RowData> = {
     px?: number;
-    table: Table<T>;
+    table: Table<Features, T>;
 };
 
-export function DataTable<T>({ px = 18, table }: DataTableProps<T>) {
+export function DataTable<T extends RowData>({ px = 18, table }: DataTableProps<T>) {
     const navigate = useNavigate();
-    const columns = table.getVisibleLeafColumns();
+    const columns = table.getAllLeafColumns();
     const headers = table.getHeaderGroups()[0]?.headers ?? [];
     const rows = table.getRowModel().rows;
 
@@ -117,7 +116,7 @@ export function DataTable<T>({ px = 18, table }: DataTableProps<T>) {
                                 key={row.id}
                                 onClick={link ? () => void navigate(link) : undefined}
                             >
-                                {row.getVisibleCells().map((cell) => {
+                                {row.getAllCells().map((cell) => {
                                     const meta = cell.column.columnDef.meta;
                                     const align = meta?.align ?? 'left';
                                     const isLinkCell = link != null && cell.column.id === linkColumn?.id;
@@ -166,7 +165,7 @@ export function DataTable<T>({ px = 18, table }: DataTableProps<T>) {
     );
 }
 
-function CellBody<T>({ align, cell, rank }: CellBodyProps<T>) {
+function CellBody<T extends RowData>({ align, cell, rank }: CellBodyProps<T>) {
     if (cell.column.columnDef.meta?.isOrdinal) {
         return (
             <span className="table-cell-rank" style={{ display: 'block', textAlign: align }}>
