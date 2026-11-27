@@ -315,7 +315,7 @@ const DriverRacePage = () => {
             <SimpleGrid cols={isSprint ? 4 : 6} spacing={8}>
                 <MiniStat label="RESULT" value={formatPosition(race.positionLabel)} />
                 <MiniStat label="GRID → RESULT" value={<span style={{ whiteSpace: 'nowrap' }}>{`${formatGrid(race.grid)} → ${formatPosition(race.positionLabel)}`}</span>} />
-                <MiniStat label="GAP" value={race.gap || race.time || '—'} />
+                <MiniStat label="GAP" value={race.gap || '—'} />
                 <MiniStat label="POINTS" value={race.points} />
                 {!isSprint && <MiniStat label="PIT STOPS" value={race.pitStopCount ?? '–'} />}
                 {!isSprint && <MiniStat label="FASTEST LAP" value={race.fastestLapRank === null ? '–' : `P${race.fastestLapRank}`} />}
