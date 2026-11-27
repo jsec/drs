@@ -3,22 +3,10 @@ select
     name as constructor_name,
     full_name as constructor_full_name,
     country_id,
-    best_championship_position,
-    best_starting_grid_position,
-    best_race_result,
-    best_sprint_race_result,
     total_championship_wins,
-    total_race_entries,
     total_race_starts,
     total_race_wins,
-    total_1_and_2_finishes,
-    total_race_laps,
     total_podiums,
-    total_podium_races,
     total_points,
-    total_championship_points,
-    total_pole_positions,
-    total_fastest_laps,
-    total_sprint_race_starts,
-    total_sprint_race_wins
+    total_pole_positions
 from {{ source("f1db", "constructor") }}

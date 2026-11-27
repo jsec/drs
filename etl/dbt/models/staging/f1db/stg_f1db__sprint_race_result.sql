@@ -7,22 +7,12 @@ select
     driver_id,
     constructor_id,
     engine_manufacturer_id,
-    tyre_manufacturer_id,
     laps,
     "time" as sprint_time,
-    time_millis as sprint_time_millis,
     time_penalty,
-    time_penalty_millis,
     gap,
-    gap_millis,
-    gap_laps,
     "interval",
-    interval_millis,
     reason_retired,
     points,
-    qualification_position_number,
-    qualification_position_text,
-    grid_position_number,
-    grid_position_text,
-    positions_gained
+    grid_position_number
 from {{ source("f1db", "sprint_race_result") }}

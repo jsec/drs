@@ -1,5 +1,5 @@
 import { LineChart } from '@mantine/charts';
-import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Box, Card, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Suspense } from 'react';
@@ -24,7 +24,7 @@ const QUALIFYING_TIME_COLUMNS = '36px 1fr 90px 80px';
 
 const HERO_STYLE: React.CSSProperties = {
     background: 'linear-gradient(110deg, var(--neutral-950), var(--neutral-800))',
-    borderRadius: 'var(--radius-lg)',
+    borderRadius: 'var(--mantine-radius-lg)',
     color: '#fff',
 };
 
@@ -189,7 +189,7 @@ const RaceDetail = () => {
                     <Box c="var(--color-sidebar-muted)" fw={700} fz={12} lts="1px">
                         {`ROUND ${race.round} · ${race.season}`}
                     </Box>
-                    <Box className="f1-display" ff="var(--font-display)" fw={700} fz={28} lts="-0.02em" my={6}>
+                    <Box className="f1-display" fw={700} fz={28} my={6}>
                         {race.name}
                     </Box>
                     <Box c="var(--neutral-300)" fz={13}>
@@ -200,7 +200,7 @@ const RaceDetail = () => {
                     {headStats.map(stat => (
                         <Box key={stat.label} ta="center">
                             <Box c="var(--color-sidebar-muted)" fw={600} fz={11}>{stat.label}</Box>
-                            <Box className="f1-display" ff="var(--font-display)" fw={700} fz={16} mt={3}>
+                            <Box className="f1-display" fw={700} fz={16} mt={3}>
                                 {stat.driver
                                     ? (
                                             <Link
@@ -235,13 +235,13 @@ const RaceDetail = () => {
                         }}
                         to="/seasons/$year/drivers/$driverId/races/$round"
                     >
-                        <Box
-                            className="f1-card f1-lift"
-                            p={16}
+                        <Card
+                            className="f1-lift"
+                            padding="md"
                             style={{ borderTop: `4px solid ${result.constructor.color}`, cursor: 'pointer' }}
                         >
                             <Group gap={14} wrap="nowrap">
-                                <Text c={MEDALS[index]} className="f1-display" ff="var(--font-display)" fw={700} fz={30} inherit span>{index + 1}</Text>
+                                <Text c={MEDALS[index]} className="f1-display" fw={700} fz={30} inherit span>{index + 1}</Text>
                                 <DriverAvatar code={result.driver.code} color={result.constructor.color} size="lg" />
                                 <div>
                                     <Box fw={700} fz={15}>{result.driver.name}</Box>
@@ -251,7 +251,7 @@ const RaceDetail = () => {
                                     </Box>
                                 </div>
                             </Group>
-                        </Box>
+                        </Card>
                     </Link>
                 ))}
             </SimpleGrid>

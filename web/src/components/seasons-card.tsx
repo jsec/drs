@@ -46,7 +46,7 @@ const SeasonRowAnchor = ({ children, columns, isChampion, season, ...props }: Se
                 'padding': '11px 20px',
             }}
         >
-            <a {...props} className="f1-stretched-link">
+            <a {...props} className="f1-plain-link f1-stretched-link">
                 <Text className="f1-num f1-display" fw={700} fz={16} inherit lts="-0.4px" span>{season}</Text>
             </a>
             {children}

@@ -34,21 +34,6 @@ type DriverSummary struct {
 	Seasons          []driverSeasonSummary `json:"seasons"`
 }
 
-type DriverShortSummary struct {
-	ID               string      `json:"id"`
-	Code             string      `json:"code"`
-	Name             string      `json:"name"`
-	Starts           int32       `json:"starts"`
-	Wins             int32       `json:"wins"`
-	Podiums          int32       `json:"podiums"`
-	Poles            int32       `json:"poles"`
-	Championships    int32       `json:"championships"`
-	IsActive         bool        `json:"isActive"`
-	ConstructorColor string      `json:"constructorColor"`
-	FirstYear        pgtype.Int4 `json:"firstYear"`
-	LastYear         pgtype.Int4 `json:"lastYear"`
-}
-
 type sprintResult struct {
 	PositionLabel string  `json:"positionLabel"`
 	Points        float64 `json:"points"`

@@ -13,7 +13,9 @@ import { api } from '#/lib/query/api';
 
 import { columns, matchesSearch } from './-components/drivers-table/columns';
 
-type Category = 'active' | 'all' | 'champions';
+const CategorySchema = z.enum(['active', 'all', 'champions']);
+
+type Category = z.infer<typeof CategorySchema>;
 
 const CATEGORIES: { key: Category; label: string }[] = [
     { key: 'all', label: 'All drivers' },
@@ -89,7 +91,7 @@ const DriversIndex = () => {
 export const Route = createFileRoute('/drivers/')({
     component: DriversIndex,
     validateSearch: SortSearchSchema.extend({
-        category: z.enum(['active', 'all', 'champions']).optional().catch(undefined),
+        category: CategorySchema.optional().catch(undefined),
     }),
     // eslint-disable-next-line perfectionist/sort-objects -- keep TanStack Router's dependency order (validateSearch before loader)
     loader: async ({ context }) => {

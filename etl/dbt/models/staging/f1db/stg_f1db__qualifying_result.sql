@@ -7,18 +7,11 @@ select
     driver_id,
     constructor_id,
     engine_manufacturer_id,
-    tyre_manufacturer_id,
     "time" as qualifying_time,
-    time_millis as qualifying_time_millis,
     q1,
-    q1_millis,
     q2,
-    q2_millis,
     q3,
-    q3_millis,
     gap,
-    gap_millis,
     "interval",
-    interval_millis,
     laps
 from {{ source("f1db", "qualifying_result") }}

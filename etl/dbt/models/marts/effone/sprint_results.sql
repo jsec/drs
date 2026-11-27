@@ -12,22 +12,15 @@ select
     results.engine_manufacturer_id,
     results.driver_number as car_number,
     results.grid_position_number as grid_position,
-    results.qualification_position_number as qualifying_position,
     results.position_number as finish_position,
     results.position_display_order as finish_order,
     results.position_text,
-    results.positions_gained,
     coalesce(results.points, 0) as points,
-    results.laps as laps_completed,
     results.sprint_time as elapsed_time,
     results.time_penalty,
     results.gap,
-    results.gap_laps,
-    results."interval",
     {{ result_status_columns() }}
 from {{ ref("stg_f1db__sprint_race_result") }} as results
 join {{ ref("stg_f1db__race") }} as races on results.race_id = races.race_id
-join {{ ref("int_f1db__drivers_with_countries") }} as drivers on results.driver_id = drivers.driver_id
-join
-    {{ ref("int_f1db__constructors_with_countries") }} as constructors
-    on results.constructor_id = constructors.constructor_id
+join {{ ref("stg_f1db__driver") }} as drivers on results.driver_id = drivers.driver_id
+join {{ ref("stg_f1db__constructor") }} as constructors on results.constructor_id = constructors.constructor_id

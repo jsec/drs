@@ -7,9 +7,7 @@ select
     driver_id,
     constructor_id,
     engine_manufacturer_id,
-    tyre_manufacturer_id,
     stop as stop_number,
     lap as lap_number,
-    "time" as pit_time,
-    time_millis as pit_time_millis
+    "time" as pit_time
 from {{ source("f1db", "pit_stop") }}

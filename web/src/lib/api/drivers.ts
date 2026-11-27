@@ -33,21 +33,10 @@ const DriverSeasonSummary = z.object({
     wins: z.number(),
 });
 
-export const DriverSummarySchema = z.object({
-    championships: z.number(),
-    code: z.string(),
-    constructorColor: z.string(),
+export const DriverSummarySchema = DriverShortSummarySchema.omit({ id: true }).extend({
     country: z.string(),
     countryCode: z.string(),
-    firstYear: z.number().nullable(),
-    isActive: z.boolean(),
-    lastYear: z.number().nullable(),
-    name: z.string(),
-    podiums: z.number(),
-    poles: z.number(),
     seasons: z.array(DriverSeasonSummary),
-    starts: z.number(),
-    wins: z.number(),
 });
 
 const DriverSeasonRaceSchema = z.object({

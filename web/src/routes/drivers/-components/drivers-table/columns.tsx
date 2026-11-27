@@ -37,7 +37,7 @@ export const columns = [
     columnBuilder.custom({
         accessor: driver => driver.firstYear,
         cell: info => (
-            <span className="table-cell-num table-cell-sm">
+            <span className="f1-num table-cell-num table-cell-sm">
                 {formatCareerYears(info.row.original)}
             </span>
         ),

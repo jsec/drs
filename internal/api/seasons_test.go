@@ -18,13 +18,8 @@ import (
 type seasonStubQuerier struct {
 	database.Querier
 	driverRows      []database.ListSeasonDriverStandingsRow
-	constructorRows []database.ListSeasonConstructorStandingsRow
 	progressionRows []database.ListSeasonDriverProgressionRow
 	calendarRows    []database.ListSeasonCalendarRow
-}
-
-func (s seasonStubQuerier) ListSeasons(context.Context) ([]database.ListSeasonsRow, error) {
-	return nil, nil
 }
 
 func (s seasonStubQuerier) ListSeasonDriverStandings(context.Context, int32) ([]database.ListSeasonDriverStandingsRow, error) {
@@ -32,7 +27,7 @@ func (s seasonStubQuerier) ListSeasonDriverStandings(context.Context, int32) ([]
 }
 
 func (s seasonStubQuerier) ListSeasonConstructorStandings(context.Context, int32) ([]database.ListSeasonConstructorStandingsRow, error) {
-	return s.constructorRows, nil
+	return nil, nil
 }
 
 func (s seasonStubQuerier) ListSeasonDriverProgression(context.Context, int32, []string) ([]database.ListSeasonDriverProgressionRow, error) {

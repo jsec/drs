@@ -38,12 +38,6 @@
 }
 
 :root {
-  --font-display: 'Geist', system-ui, -apple-system, sans-serif;
-  --font-sans:    'Titillium Web', system-ui, -apple-system, sans-serif;
-  --font-mono:    'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
-
-  --text-xs:   12px;
-  --text-sm:   14px;
   --text-base: 16px;
   --text-2xl:  24px;
 
@@ -52,18 +46,7 @@
 
 :root {
   --space-1:  4px;
-  --space-2:  8px;
-  --space-3:  12px;
-  --space-4:  16px;
-  --space-5:  20px;
   --space-10: 40px;
-
-  --radius-sm:   6px;
-  --radius-lg:   10px;
-  --radius-xl:   14px;
-
-  --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.10), 0 1px 2px -1px rgba(0,0,0,0.10);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.10), 0 2px 4px -2px rgba(0,0,0,0.10);
 
   --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
   --dur-fast:  120ms;

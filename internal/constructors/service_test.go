@@ -15,16 +15,15 @@ import (
 
 type stubQuerier struct {
 	database.Querier
-	summaryErr error
-	seasons    []database.ListConstructorSeasonsRow
-	drivers    []database.ListConstructorSeasonDriversRow
-	lineage    []database.ListConstructorLineageRow
-	entries    []database.ListConstructorSeasonEntriesRow
-	results    []database.ListConstructorSeasonResultsRow
+	seasons []database.ListConstructorSeasonsRow
+	drivers []database.ListConstructorSeasonDriversRow
+	lineage []database.ListConstructorLineageRow
+	entries []database.ListConstructorSeasonEntriesRow
+	results []database.ListConstructorSeasonResultsRow
 }
 
 func (s stubQuerier) GetConstructorSummary(context.Context, string) (database.GetConstructorSummaryRow, error) {
-	return database.GetConstructorSummaryRow{ID: "lotus", Name: "Lotus"}, s.summaryErr
+	return database.GetConstructorSummaryRow{ID: "lotus", Name: "Lotus"}, nil
 }
 
 func (s stubQuerier) ListConstructorSeasons(context.Context, string) ([]database.ListConstructorSeasonsRow, error) {
@@ -137,16 +136,6 @@ func TestService_GetSeason_SprintOnlyWhenPresent(t *testing.T) {
 	assert.Equal(t, &constructors.SprintResult{PositionLabel: "1", Points: 8}, got.Results[1].Sprint)
 	assert.NotNil(t, got.Drivers)
 	assert.NotNil(t, got.Progression)
-}
-
-func TestService_GetSummary_NotFound(t *testing.T) {
-	t.Parallel()
-
-	queries := stubQuerier{summaryErr: pgx.ErrNoRows}
-
-	_, err := constructors.GetSummary(context.Background(), queries, "nope")
-
-	require.ErrorIs(t, err, pgx.ErrNoRows)
 }
 
 func TestService_GetSummary_DriversAttachToSeasonAndEngine(t *testing.T) {

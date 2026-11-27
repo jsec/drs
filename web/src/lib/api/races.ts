@@ -9,34 +9,28 @@ const DriverRefSchema = z.object({
     id: z.string(),
 });
 
-const RaceResultSchema = z.object({
+const ResultBaseSchema = z.object({
     constructor: ConstructorSchema,
     driver: DriverRefSchema.extend({
         name: z.string(),
         shortName: z.string(),
     }),
     gap: z.string().nullable(),
-    grid: z.number().int().nullable(),
-    points: z.number(),
     position: z.number().int(),
     positionLabel: z.string(),
-    status: z.string().nullable(),
     time: z.string().nullable(),
 });
 
-const QualifyingResultSchema = z.object({
-    constructor: ConstructorSchema,
-    driver: DriverRefSchema.extend({
-        name: z.string(),
-        shortName: z.string(),
-    }),
-    gap: z.string().nullable(),
-    position: z.number().int(),
-    positionLabel: z.string(),
+const RaceResultSchema = ResultBaseSchema.extend({
+    grid: z.number().int().nullable(),
+    points: z.number(),
+    status: z.string().nullable(),
+});
+
+const QualifyingResultSchema = ResultBaseSchema.extend({
     q1: z.string().nullable(),
     q2: z.string().nullable(),
     q3: z.string().nullable(),
-    time: z.string().nullable(),
 });
 
 export const RaceDetailSchema = z.object({
@@ -78,6 +72,5 @@ export const RaceLapsSchema = z.object({
 export type DriverLaps = z.infer<typeof DriverLapsSchema>;
 export type DriverRef = z.infer<typeof DriverRefSchema>;
 export type RaceDetail = z.infer<typeof RaceDetailSchema>;
-export type RaceLaps = z.infer<typeof RaceLapsSchema>;
 export type RaceResult = z.infer<typeof RaceResultSchema>;
 export type Session = z.infer<typeof SessionSchema>;

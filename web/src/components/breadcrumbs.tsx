@@ -1,3 +1,4 @@
+import { Breadcrumbs as MantineBreadcrumbs } from '@mantine/core';
 import { CaretRightIcon } from '@phosphor-icons/react';
 import { Link, useMatches } from '@tanstack/react-router';
 
@@ -13,53 +14,38 @@ export const Breadcrumbs = () => {
     const crumbs: Crumb[] = matches.findLast(match => match.loaderData && 'crumbs' in match.loaderData)?.loaderData?.crumbs ?? [];
 
     return (
-        <div style={{
-            alignItems: 'center',
-            display: 'flex',
-            flexWrap: 'nowrap',
-            fontSize: 13.5,
-            gap: 8,
-            minWidth: 0,
-        }}
+        <MantineBreadcrumbs
+            fz={13.5}
+            miw={0}
+            separator={<CaretRightIcon color="var(--neutral-400)" size={11} />}
+            style={{ flexWrap: 'nowrap' }}
         >
             {crumbs.map((crumb, index) => {
                 const isLast = index === crumbs.length - 1;
-                const fontWeight = isLast ? 700 : 600;
+
+                if (!isLast && crumb.to) {
+                    return (
+                        <Link
+                            key={crumb.to}
+                            params={crumb.params}
+                            style={{
+                                color: 'var(--mantine-primary-color-filled)',
+                                fontWeight: 600,
+                                textDecoration: 'none',
+                            }}
+                            to={crumb.to}
+                        >
+                            {crumb.label}
+                        </Link>
+                    );
+                }
 
                 return (
-                    <div
-                        key={crumb.to ?? crumb.label}
-                        style={{
-                            alignItems: 'center',
-                            display: 'flex',
-                            flexWrap: 'nowrap',
-                            gap: 8,
-                        }}
-                    >
-                        {!isLast && crumb.to
-                            ? (
-                                    <Link
-                                        params={crumb.params}
-                                        style={{
-                                            color: 'var(--mantine-primary-color-filled)',
-                                            fontWeight: 600,
-                                            textDecoration: 'none',
-                                            whiteSpace: 'nowrap',
-                                        }}
-                                        to={crumb.to}
-                                    >
-                                        {crumb.label}
-                                    </Link>
-                                )
-                            : (
-                                    <span style={{ fontWeight, whiteSpace: 'nowrap' }}>
-                                        {crumb.label}
-                                    </span>
-                                )}
-                        {!isLast && <CaretRightIcon color="var(--neutral-400)" size={11} />}
-                    </div>
+                    <span key={crumb.to ?? crumb.label} style={{ fontWeight: isLast ? 700 : 600 }}>
+                        {crumb.label}
+                    </span>
                 );
             })}
-        </div>
+        </MantineBreadcrumbs>
     );
 };

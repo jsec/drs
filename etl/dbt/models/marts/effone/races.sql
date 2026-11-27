@@ -5,9 +5,7 @@ with
 
     race_winners as (select * from {{ ref("race_results") }} where finish_order = 1),
 
-    pole_sitters as (select * from {{ ref("qualifying_results") }} where qualifying_order = 1),
-
-    sprint_winners as (select * from {{ ref("sprint_results") }} where finish_order = 1)
+    pole_sitters as (select * from {{ ref("qualifying_results") }} where qualifying_order = 1)
 
 select
     races.race_id,
@@ -25,14 +23,8 @@ select
     race_winners.driver_code as winner_driver_code,
     race_winners.constructor_id as winner_constructor_id,
     race_winners.constructor_name as winner_constructor_name,
-    pole_sitters.driver_id as pole_driver_id,
-    sprint_winners.driver_id as sprint_winner_driver_id,
-    sprint_winners.driver_name as sprint_winner_driver_name,
-    sprint_winners.driver_code as sprint_winner_driver_code,
-    sprint_winners.constructor_id as sprint_winner_constructor_id,
-    sprint_winners.constructor_name as sprint_winner_constructor_name
+    pole_sitters.driver_id as pole_driver_id
 from races
 join grands_prix on races.grand_prix_id = grands_prix.grand_prix_id
 left join race_winners on races.race_id = race_winners.race_id
 left join pole_sitters on races.race_id = pole_sitters.race_id
-left join sprint_winners on races.race_id = sprint_winners.race_id

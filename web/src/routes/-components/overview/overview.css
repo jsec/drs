@@ -20,7 +20,7 @@
     }
     .overview-title {
         margin: 6px 0 0;
-        font-family: var(--font-display);
+        font-family: var(--mantine-font-family-headings);
         font-size: 30px;
         font-weight: 700;
         letter-spacing: var(--tracking-tight);
@@ -39,7 +39,7 @@
         color: var(--mantine-color-dimmed);
     }
     .overview-header-meta-value {
-        font-family: var(--font-mono);
+        font-family: var(--mantine-font-family-monospace);
         font-size: 15px;
         font-weight: 700;
     }
@@ -52,7 +52,7 @@
         border-bottom: 1px solid var(--mantine-color-default-border);
     }
     .overview-card-title {
-        font-family: var(--font-display);
+        font-family: var(--mantine-font-family-headings);
         font-size: 16px;
         font-weight: 700;
     }
@@ -74,7 +74,7 @@
         border-left: 1px solid var(--mantine-color-default-border);
     }
     .overview-total-value {
-        font-family: var(--font-display);
+        font-family: var(--mantine-font-family-headings);
         font-size: 40px;
         font-weight: 700;
         letter-spacing: var(--tracking-tight);
@@ -90,7 +90,7 @@
     }
     .overview-total-meta {
         margin-top: 3px;
-        font-family: var(--font-mono);
+        font-family: var(--mantine-font-family-monospace);
         font-size: 12px;
         color: var(--mantine-color-dimmed);
     }
@@ -128,7 +128,7 @@
     }
     .overview-record-value {
         margin-top: 9px;
-        font-family: var(--font-display);
+        font-family: var(--mantine-font-family-headings);
         font-size: 30px;
         font-weight: 700;
         letter-spacing: var(--tracking-tight);
@@ -153,7 +153,7 @@
         border-bottom: 1px solid var(--mantine-color-default-border);
     }
     .overview-standings-title {
-        font-family: var(--font-display);
+        font-family: var(--mantine-font-family-headings);
         font-size: 15px;
         font-weight: 700;
     }
@@ -163,7 +163,7 @@
         color: var(--mantine-color-dimmed);
     }
     .overview-pts-label {
-        font-family: var(--font-mono);
+        font-family: var(--mantine-font-family-monospace);
         font-size: 10.5px;
         letter-spacing: 0.5px;
         color: var(--mantine-color-dimmed);
@@ -184,7 +184,7 @@
         background: var(--color-accent);
     }
     .overview-row-pos {
-        font-family: var(--font-mono);
+        font-family: var(--mantine-font-family-monospace);
         font-size: 13px;
         font-weight: 700;
     }
@@ -213,7 +213,7 @@
         text-overflow: ellipsis;
     }
     .overview-row-code {
-        font-family: var(--font-mono);
+        font-family: var(--mantine-font-family-monospace);
         font-size: 10.5px;
         color: var(--mantine-color-dimmed);
     }
@@ -228,7 +228,7 @@
         border-radius: 9999px;
     }
     .overview-row-pts {
-        font-family: var(--font-mono);
+        font-family: var(--mantine-font-family-monospace);
         font-size: 15px;
         font-weight: 700;
         text-align: right;

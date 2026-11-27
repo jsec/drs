@@ -145,10 +145,8 @@ const SeasonOverview = () => {
                     <Box
                         className="f1-display"
                         component="h1"
-                        ff="var(--font-display)"
                         fw={700}
                         fz={30}
-                        lts="-0.02em"
                         mb={0}
                         mt={6}
                     >

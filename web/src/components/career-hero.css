@@ -2,7 +2,7 @@
 .career-hero {
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-lg);
+  border-radius: var(--mantine-radius-lg);
   background:
     linear-gradient(120deg, var(--hero-color), var(--neutral-950));
   color: #fff;

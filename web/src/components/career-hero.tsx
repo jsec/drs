@@ -30,7 +30,7 @@ export const CareerHero = ({
                 {mark ? <div className="career-hero-mark">{mark}</div> : null}
                 <div>
                     <Group gap={10} wrap="nowrap">
-                        <Text className="f1-display" ff="var(--font-display)" fw={700} fz={30} inherit lts="-0.02em" span>
+                        <Text className="f1-display" fw={700} fz={30} inherit span>
                             {title}
                         </Text>
                         {badge

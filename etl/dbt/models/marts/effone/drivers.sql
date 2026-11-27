@@ -1,5 +1,7 @@
 with
-    drivers as (select * from {{ ref("int_f1db__drivers_with_countries") }}),
+    drivers as (select * from {{ ref("stg_f1db__driver") }}),
+
+    countries as (select * from {{ ref("stg_f1db__country") }}),
 
     first_last_races as (
         select driver_id, min(race_date) as first_race_date, max(race_date) as last_race_date
@@ -23,8 +25,8 @@ select
     drivers.last_name,
     drivers.driver_name,
     drivers.date_of_birth,
-    drivers.nationality_country_code,
-    drivers.nationality,
+    countries.alpha2_code as nationality_country_code,
+    countries.country_name as nationality,
     drivers.total_race_starts as start_count,
     drivers.total_race_wins as win_count,
     drivers.total_podiums as podium_count,
@@ -34,5 +36,6 @@ select
     first_last_races.last_race_date,
     current_constructors.constructor_id as current_constructor_id
 from drivers
+join countries on drivers.nationality_country_id = countries.country_id
 left join first_last_races on drivers.driver_id = first_last_races.driver_id
 left join current_constructors on drivers.driver_id = current_constructors.driver_id

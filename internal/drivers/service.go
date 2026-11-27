@@ -7,34 +7,6 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-func ListDrivers(ctx context.Context, queries database.Querier) ([]DriverShortSummary, error) {
-	drivers, err := queries.ListDrivers(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("listing drivers: %w", err)
-	}
-
-	response := make([]DriverShortSummary, 0, len(drivers))
-
-	for _, d := range drivers {
-		response = append(response, DriverShortSummary{
-			ID:               d.ID,
-			Code:             d.Code,
-			Name:             d.Name,
-			Starts:           d.Starts,
-			Wins:             d.Wins,
-			Podiums:          d.Podiums,
-			Poles:            d.Poles,
-			Championships:    d.Championships,
-			IsActive:         d.IsActive.Bool,
-			ConstructorColor: d.ConstructorColor.String,
-			FirstYear:        d.FirstYear,
-			LastYear:         d.LastYear,
-		})
-	}
-
-	return response, nil
-}
-
 func GetSummary(ctx context.Context, queries database.Querier, driverId string) (DriverSummary, error) {
 	summary, err := queries.GetDriverSummary(ctx, driverId)
 	if err != nil {

@@ -17,19 +17,13 @@
 }
 .table-cell-num {
   color: var(--mantine-color-dimmed);
-  font-family: var(--font-sans);
-  font-variant-numeric: tabular-nums;
 }
 .table-cell-num-display {
   color: var(--mantine-color-text);
-  font-family: var(--font-display);
   font-weight: 700;
-  letter-spacing: var(--tracking-tight);
 }
 .table-cell-rank {
   color: var(--mantine-color-dimmed);
-  font-family: var(--font-sans);
-  font-variant-numeric: tabular-nums;
   font-weight: 700;
 }
 .table-cell-text {

@@ -126,7 +126,7 @@ const Hero = ({ race, round, year }: { race: DriverRace; round: string; year: st
                 <Box fw={700} fz={12} lts="1px" opacity={0.85}>
                     {`${race.constructor.name}${carNumber}`}
                 </Box>
-                <Box className="f1-display" ff="var(--font-display)" fw={700} fz={30} lts="-0.02em">
+                <Box className="f1-display" fw={700} fz={30}>
                     {race.name}
                 </Box>
                 <Box fz={13} opacity={0.9}>

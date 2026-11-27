@@ -1,7 +1,7 @@
 with
     fastest_laps as (select * from {{ ref("stg_f1db__fastest_lap") }}),
 
-    drivers as (select * from {{ ref("int_f1db__drivers_with_countries") }})
+    drivers as (select * from {{ ref("stg_f1db__driver") }})
 
 select
     fastest_laps.race_id,

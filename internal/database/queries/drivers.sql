@@ -48,8 +48,8 @@ SELECT
     d.championship_count AS championships,
     CASE WHEN d.first_race_date IS NOT NULL THEN date_part('year', d.first_race_date)::INTEGER END AS first_year,
     CASE WHEN d.last_race_date IS NOT NULL THEN date_part('year', d.last_race_date)::INTEGER END AS last_year,
-    d.current_constructor_id IS NOT NULL AS is_active,
-    c.primary_color_hex AS constructor_color
+    (d.current_constructor_id IS NOT NULL)::BOOLEAN AS is_active,
+    COALESCE(c.primary_color_hex, '') AS constructor_color
 FROM effone.drivers d
 LEFT JOIN effone.constructors c ON d.current_constructor_id = c.constructor_id;
 

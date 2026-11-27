@@ -54,11 +54,6 @@ tasks:
     cmds:
       - uv run dbt debug --project-dir ./dbt --profiles-dir ./dbt
 
-  etl:dbt-deps:
-    dir: etl
-    cmds:
-      - uv run dbt deps --project-dir ./dbt --profiles-dir ./dbt
-
   etl:dbt-parse:
     dir: etl
     cmds:

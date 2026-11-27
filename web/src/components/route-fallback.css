@@ -2,13 +2,13 @@
     align-items: center;
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    padding: var(--space-10) var(--space-5);
+    gap: var(--mantine-spacing-sm);
+    padding: var(--space-10) var(--mantine-spacing-lg);
     text-align: center;
 }
 
 .route-fallback-title {
-    font-family: var(--font-display);
+    font-family: var(--mantine-font-family-headings);
     font-size: var(--text-2xl);
     font-weight: 700;
     letter-spacing: var(--tracking-tight);
@@ -16,20 +16,20 @@
 
 .route-fallback-message {
     color: var(--mantine-color-dimmed);
-    font-size: var(--text-sm);
+    font-size: var(--mantine-font-size-sm);
     margin: 0;
     max-width: 46ch;
 }
 
 .route-fallback-detail {
     background: var(--color-accent);
-    border-radius: var(--radius-sm);
+    border-radius: var(--mantine-radius-sm);
     color: var(--mantine-color-dimmed);
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
+    font-family: var(--mantine-font-family-monospace);
+    font-size: var(--mantine-font-size-xs);
     max-width: 100%;
     overflow-x: auto;
-    padding: var(--space-3);
+    padding: var(--mantine-spacing-sm);
     text-align: left;
     white-space: pre-wrap;
 }
@@ -37,13 +37,13 @@
 .route-fallback-actions {
     align-items: center;
     display: flex;
-    gap: var(--space-3);
-    margin-top: var(--space-2);
+    gap: var(--mantine-spacing-sm);
+    margin-top: var(--mantine-spacing-xs);
 }
 
 .route-fallback-link {
     color: var(--mantine-primary-color-filled);
-    font-size: var(--text-sm);
+    font-size: var(--mantine-font-size-sm);
     font-weight: 600;
     text-decoration: none;
 }

@@ -3,7 +3,7 @@ with
 
     races as (select * from {{ ref("stg_f1db__race") }}),
 
-    drivers as (select * from {{ ref("int_f1db__drivers_with_countries") }})
+    drivers as (select * from {{ ref("stg_f1db__driver") }})
 
 select
     races.season,

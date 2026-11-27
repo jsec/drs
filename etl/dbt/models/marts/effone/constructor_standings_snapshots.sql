@@ -3,7 +3,7 @@ with
 
     races as (select * from {{ ref("stg_f1db__race") }}),
 
-    constructors as (select * from {{ ref("int_f1db__constructors_with_countries") }}),
+    constructors as (select * from {{ ref("stg_f1db__constructor") }}),
 
     engine_manufacturers as (select * from {{ ref("stg_f1db__engine_manufacturer") }})
 

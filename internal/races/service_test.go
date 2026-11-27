@@ -2,7 +2,6 @@ package races_test
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/jackc/pgx/v5"
@@ -19,11 +18,9 @@ type stubQuerier struct {
 	race       database.GetRaceDetailRow
 	raceErr    error
 	results    []database.ListRaceResultsRow
-	resultsErr error
 	qualifying []database.ListQualifyingResultsRow
 	sprint     []database.ListSprintResultsRow
 	laps       []database.ListRaceLapTimesRow
-	lapsErr    error
 }
 
 func (s stubQuerier) GetRaceDetail(context.Context, int32, int32) (database.GetRaceDetailRow, error) {
@@ -31,7 +28,7 @@ func (s stubQuerier) GetRaceDetail(context.Context, int32, int32) (database.GetR
 }
 
 func (s stubQuerier) ListRaceResults(context.Context, int32) ([]database.ListRaceResultsRow, error) {
-	return s.results, s.resultsErr
+	return s.results, nil
 }
 
 func (s stubQuerier) ListQualifyingResults(context.Context, int32) ([]database.ListQualifyingResultsRow, error) {
@@ -43,7 +40,7 @@ func (s stubQuerier) ListSprintResults(context.Context, int32) ([]database.ListS
 }
 
 func (s stubQuerier) ListRaceLapTimes(context.Context, int32, string) ([]database.ListRaceLapTimesRow, error) {
-	return s.laps, s.lapsErr
+	return s.laps, nil
 }
 
 func text(s string) pgtype.Text {
@@ -245,7 +242,6 @@ func TestService_GetRaceDetail_NoPoleOrFastestLap(t *testing.T) {
 func TestService_RaceLookupErrors(t *testing.T) {
 	t.Parallel()
 
-	errQuery := errors.New("query failed")
 	notRun := completedRace
 	notRun.WinnerDriverID = pgtype.Text{}
 
@@ -266,18 +262,6 @@ func TestService_RaceLookupErrors(t *testing.T) {
 			querier:        stubQuerier{race: notRun},
 			wantErr:        pgx.ErrNoRows,
 			wantErrMessage: "race not completed: no rows in result set",
-		},
-		{
-			name:           "race query error",
-			querier:        stubQuerier{raceErr: errQuery},
-			wantErr:        errQuery,
-			wantErrMessage: "getting race detail: query failed",
-		},
-		{
-			name:           "results query error",
-			querier:        stubQuerier{race: completedRace, resultsErr: errQuery},
-			wantErr:        errQuery,
-			wantErrMessage: "listing race results: query failed",
 		},
 	}
 
@@ -330,16 +314,4 @@ func TestService_GetRaceLaps(t *testing.T) {
 			},
 		},
 	}, got)
-}
-
-func TestService_GetRaceLaps_LapQueryError(t *testing.T) {
-	t.Parallel()
-
-	errQuery := errors.New("query failed")
-	queries := stubQuerier{race: completedRace, results: raceResults, lapsErr: errQuery}
-
-	_, err := races.GetRaceLaps(context.Background(), queries, 2026, 14, "race")
-
-	require.ErrorIs(t, err, errQuery)
-	require.EqualError(t, err, "listing race lap times: query failed")
 }

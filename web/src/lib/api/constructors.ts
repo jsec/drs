@@ -41,23 +41,17 @@ const ConstructorSeasonSchema = z.object({
     wins: z.number(),
 });
 
-export const ConstructorSummarySchema = z.object({
-    championships: z.number(),
-    color: z.string(),
+export const ConstructorSummarySchema = ConstructorSchema.omit({ firstRaceDate: true, lastRaceDate: true }).extend({
     country: z.string(),
     countryCode: z.string(),
     firstYear: z.number().nullable(),
     fullName: z.string(),
-    id: z.string(),
     isActive: z.boolean(),
     lastYear: z.number().nullable(),
     lineage: z.array(LineageEntrySchema),
-    name: z.string(),
-    podiums: z.number(),
     poles: z.number(),
     seasons: z.array(ConstructorSeasonSchema),
     starts: z.number(),
-    wins: z.number(),
 });
 
 export type ConstructorSummary = z.infer<typeof ConstructorSummarySchema>;

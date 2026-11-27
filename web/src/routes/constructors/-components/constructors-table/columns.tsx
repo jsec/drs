@@ -6,6 +6,7 @@ import type { Features } from '#/components/data-table';
 import type { Constructor } from '#/lib/api/constructors';
 
 import { makeColumns } from '#/components/data-table';
+import { TeamBar } from '#/components/f1-ui';
 import { formatCareerYears } from '#/lib/format';
 
 const columnBuilder = makeColumns<Constructor>();
@@ -21,16 +22,7 @@ export function makeConstructorColumns(maxWins: number) {
             label: team => team.name,
             link: team => ({ params: { constructorId: team.id }, to: '/constructors/$constructorId' }),
             trailing: 'caret',
-            visual: team => (
-                <span style={{
-                    background: team.color,
-                    borderRadius: 3,
-                    flexShrink: 0,
-                    height: 26,
-                    width: 6,
-                }}
-                />
-            ),
+            visual: team => <TeamBar color={team.color} />,
             width: '38%',
         }),
         columnBuilder.custom({
@@ -43,7 +35,7 @@ export function makeConstructorColumns(maxWins: number) {
                     lastYear: team.lastRaceDate ? Temporal.PlainDate.from(team.lastRaceDate).year : null,
                 });
 
-                return <span className="table-cell-num table-cell-sm">{years}</span>;
+                return <span className="f1-num table-cell-num table-cell-sm">{years}</span>;
             },
             header: 'YEARS',
             id: 'years',
@@ -68,7 +60,7 @@ export function makeConstructorColumns(maxWins: number) {
                         gap: 10,
                     }}
                     >
-                        <span className="table-cell-num table-cell-num-display" style={{ width: 34 }}>
+                        <span className="f1-num f1-display table-cell-num table-cell-num-display" style={{ width: 34 }}>
                             {team.wins}
                         </span>
                         <Progress color={team.color} flex={1} maw={150} size={6} value={(team.wins / maxWins) * 100} />

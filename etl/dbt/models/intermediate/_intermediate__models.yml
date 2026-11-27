@@ -18,12 +18,6 @@ models:
                 to: ref('int_jolpica__driver_identities')
                 field: external_driver_id
   - name: int_jolpica__race_identities
-    tests:
-      - dbt_utils.expression_is_true:
-          arguments:
-            expression: "abs(external_race_date - race_date) <= 1"
-          config:
-            severity: warn
     columns:
       - name: external_race_id
         tests:

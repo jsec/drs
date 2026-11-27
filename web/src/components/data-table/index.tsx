@@ -168,7 +168,7 @@ export function DataTable<T extends RowData>({ px = 18, table }: DataTableProps<
 function CellBody<T extends RowData>({ align, cell, rank }: CellBodyProps<T>) {
     if (cell.column.columnDef.meta?.isOrdinal) {
         return (
-            <span className="table-cell-rank" style={{ display: 'block', textAlign: align }}>
+            <span className="f1-num table-cell-rank" style={{ display: 'block', textAlign: align }}>
                 {rank}
             </span>
         );

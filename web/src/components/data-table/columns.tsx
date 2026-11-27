@@ -82,8 +82,8 @@ export function makeColumns<T extends RowData>() {
             return (
                 <span
                     className={cn(
-                        'table-cell-num',
-                        options.variant === 'display' && 'table-cell-num-display',
+                        'f1-num table-cell-num',
+                        options.variant === 'display' && 'f1-display table-cell-num-display',
                         options.size !== undefined && SIZE_CLASS[options.size],
                     )}
                 >
@@ -99,11 +99,11 @@ export function makeColumns<T extends RowData>() {
     });
 
     const ordinal = (
-        options: { header?: string; id?: string; width?: string } = {},
+        options: { header?: string; width?: string } = {},
     ): ColumnDef<Features, T, unknown> => ({
         enableSorting: false,
         header: options.header ?? '#',
-        id: options.id ?? 'rank',
+        id: 'rank',
         meta: { isOrdinal: true, width: options.width ?? '4%' },
     });
 

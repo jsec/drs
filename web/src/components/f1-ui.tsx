@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { LineChart } from '@mantine/charts';
-import { Button, Card, Group, Text } from '@mantine/core';
+import { Avatar, Button, Card, Group, Text } from '@mantine/core';
 import { TrophyIcon } from '@phosphor-icons/react';
 
 import './f1-ui.css';
@@ -27,23 +27,14 @@ export const DriverAvatar = ({
     const diameter = AVATAR_SIZE[size];
 
     return (
-        <div
-            style={{
-                alignItems: 'center',
-                background: color,
-                borderRadius: '50%',
-                color: '#fff',
-                display: 'flex',
-                flexShrink: 0,
-                fontSize: diameter * AVATAR_FONT_RATIO,
-                fontWeight: 700,
-                height: diameter,
-                justifyContent: 'center',
-                width: diameter,
-            }}
+        <Avatar
+            color={color}
+            size={diameter}
+            styles={{ placeholder: { fontSize: diameter * AVATAR_FONT_RATIO } }}
+            variant="filled"
         >
             {code}
-        </div>
+        </Avatar>
     );
 };
 

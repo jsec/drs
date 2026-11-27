@@ -29,11 +29,7 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/drs
-      PGHOST: localhost
-      PGPORT: '5432'
-      PGUSER: postgres
       PGPASSWORD: postgres
-      PGDATABASE: drs
       GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -42,10 +38,6 @@ jobs:
         with:
           go-version: '1.27.4'
           cache: true
-
-      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
-        with:
-          python-version: '3.13'
 
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
@@ -64,9 +56,7 @@ jobs:
           echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
 
       - name: Install ETL dependencies
-        run: |
-          uv --directory etl sync --locked
-          task etl:dbt-deps
+        run: uv --directory etl sync --locked
 
       - name: Refresh and dump data
         run: task db:dump

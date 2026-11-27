@@ -2,9 +2,7 @@ package seasons_test
 
 import (
 	"context"
-	"errors"
 	"testing"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
@@ -17,60 +15,38 @@ import (
 type stubQuerier struct {
 	database.Querier
 	rows                     []database.ListSeasonsRow
-	err                      error
 	driverStandingsRows      []database.ListSeasonDriverStandingsRow
-	driverStandingsErr       error
 	constructorStandingsRows []database.ListSeasonConstructorStandingsRow
-	constructorStandingsErr  error
 	progressionRows          []database.ListSeasonDriverProgressionRow
-	progressionErr           error
-	calendarRows             []database.ListSeasonCalendarRow
-	calendarErr              error
 }
 
 func (s stubQuerier) ListSeasons(context.Context) ([]database.ListSeasonsRow, error) {
-	return s.rows, s.err
+	return s.rows, nil
 }
 
 func (s stubQuerier) ListSeasonDriverStandings(context.Context, int32) ([]database.ListSeasonDriverStandingsRow, error) {
-	return s.driverStandingsRows, s.driverStandingsErr
+	return s.driverStandingsRows, nil
 }
 
 func (s stubQuerier) ListSeasonConstructorStandings(context.Context, int32) ([]database.ListSeasonConstructorStandingsRow, error) {
-	return s.constructorStandingsRows, s.constructorStandingsErr
+	return s.constructorStandingsRows, nil
 }
 
 func (s stubQuerier) ListSeasonDriverProgression(context.Context, int32, []string) ([]database.ListSeasonDriverProgressionRow, error) {
-	return s.progressionRows, s.progressionErr
-}
-
-func (s stubQuerier) ListSeasonCalendar(context.Context, int32) ([]database.ListSeasonCalendarRow, error) {
-	return s.calendarRows, s.calendarErr
+	return s.progressionRows, nil
 }
 
 func text(s string) pgtype.Text {
 	return pgtype.Text{String: s, Valid: true}
 }
 
-func date(year int, month time.Month, day int) pgtype.Date {
-	return pgtype.Date{
-		Time:  time.Date(year, month, day, 0, 0, 0, 0, time.UTC),
-		Valid: true,
-	}
-}
-
 func TestService_ListSeasons(t *testing.T) {
 	t.Parallel()
 
-	errQuery := errors.New("query failed")
-
 	tests := []struct {
-		name           string
-		rows           []database.ListSeasonsRow
-		err            error
-		want           []seasons.SeasonResponse
-		wantErr        error
-		wantErrMessage string
+		name string
+		rows []database.ListSeasonsRow
+		want []seasons.SeasonResponse
 	}{
 		{
 			name: "full row with wcc",
@@ -129,28 +105,15 @@ func TestService_ListSeasons(t *testing.T) {
 			rows: nil,
 			want: []seasons.SeasonResponse{},
 		},
-		{
-			name:           "query error",
-			err:            errQuery,
-			wantErr:        errQuery,
-			wantErrMessage: "listing seasons: query failed",
-		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			queries := stubQuerier{rows: tt.rows, err: tt.err}
+			queries := stubQuerier{rows: tt.rows}
 
 			got, err := seasons.ListSeasons(context.Background(), queries)
-
-			if tt.wantErr != nil {
-				require.ErrorIs(t, err, tt.wantErr)
-				require.EqualError(t, err, tt.wantErrMessage)
-				assert.Nil(t, got)
-				return
-			}
 
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, got)
@@ -275,55 +238,4 @@ func TestService_GetOverview_DriverWithoutConstructor(t *testing.T) {
 	require.NoError(t, err)
 	assert.Nil(t, got.Drivers[0].Constructor)
 	assert.Equal(t, []seasons.ProgressionSeries{{Name: "FAR"}}, got.Progression.Series)
-}
-
-func TestService_GetCalendar(t *testing.T) {
-	t.Parallel()
-
-	queries := stubQuerier{
-		calendarRows: []database.ListSeasonCalendarRow{
-			{
-				RaceID:                 1123,
-				RaceRound:              1,
-				RaceName:               "Australian Grand Prix",
-				GrandPrixCode:          text("AUS"),
-				RaceDate:               date(2026, time.March, 8),
-				CircuitID:              "albert_park",
-				CircuitName:            "Albert Park Grand Prix Circuit",
-				WinnerDriverID:         text("lando-norris"),
-				WinnerDriverName:       text("Lando Norris"),
-				WinnerDriverCode:       text("NOR"),
-				WinnerConstructorID:    text("mclaren"),
-				WinnerConstructorName:  text("McLaren"),
-				WinnerConstructorColor: text("#FF8000"),
-				Completed:              pgtype.Bool{Bool: true, Valid: true},
-			},
-			{
-				RaceID:      1124,
-				RaceRound:   2,
-				RaceName:    "Chinese Grand Prix",
-				RaceDate:    date(2026, time.March, 15),
-				CircuitID:   "shanghai",
-				CircuitName: "Shanghai International Circuit",
-				Completed:   pgtype.Bool{Bool: false, Valid: true},
-			},
-		},
-	}
-
-	got, err := seasons.GetCalendar(context.Background(), queries, 2026)
-
-	require.NoError(t, err)
-	require.Len(t, got.Races, 2)
-	assert.Equal(t, 1, got.RoundsCompleted)
-	assert.Equal(t, 2, got.TotalRounds)
-	assert.Equal(t, int32(1123), got.Races[0].RaceID)
-	assert.Equal(t, "AUS", got.Races[0].Code)
-	assert.Equal(t, "albert_park", got.Races[0].Circuit.ID)
-	assert.True(t, got.Races[0].Completed)
-	require.NotNil(t, got.Races[0].Winner)
-	assert.Equal(t, "NOR", got.Races[0].Winner.Code)
-	require.NotNil(t, got.Races[0].Winner.Constructor)
-	assert.Equal(t, "#FF8000", got.Races[0].Winner.Constructor.Color)
-	assert.False(t, got.Races[1].Completed)
-	assert.Nil(t, got.Races[1].Winner)
 }

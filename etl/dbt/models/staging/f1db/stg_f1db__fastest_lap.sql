@@ -7,12 +7,8 @@ select
     driver_id,
     constructor_id,
     engine_manufacturer_id,
-    tyre_manufacturer_id,
     lap as lap_number,
     "time" as lap_time,
-    time_millis as lap_time_millis,
     gap,
-    gap_millis,
-    "interval",
-    interval_millis
+    "interval"
 from {{ source("f1db", "fastest_lap") }}

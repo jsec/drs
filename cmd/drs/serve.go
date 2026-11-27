@@ -10,8 +10,8 @@ import (
 	"github.com/jsec/drs/internal/database"
 )
 
-func serve(ctx context.Context, logger *slog.Logger, config config) error {
-	cfg, err := pgxpool.ParseConfig(config.databaseURL)
+func serve(ctx context.Context, logger *slog.Logger, databaseURL, port, appEnv string) error {
+	cfg, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
 		return err
 	}
@@ -25,5 +25,5 @@ func serve(ctx context.Context, logger *slog.Logger, config config) error {
 	}
 	defer pool.Close()
 
-	return api.Serve(ctx, logger, database.New(pool), config.port, config.appEnv)
+	return api.Serve(ctx, logger, database.New(pool), port, appEnv)
 }

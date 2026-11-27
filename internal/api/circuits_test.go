@@ -32,10 +32,6 @@ func (s stubQuerier) ListCircuits(context.Context) ([]database.ListCircuitsRow, 
 	return s.circuitRows, nil
 }
 
-func (stubQuerier) GetRacesByCircuitId(context.Context, string) ([]database.GetRacesByCircuitIdRow, error) {
-	return nil, nil
-}
-
 func TestGetCircuitSummaryHandler(t *testing.T) {
 	t.Parallel()
 

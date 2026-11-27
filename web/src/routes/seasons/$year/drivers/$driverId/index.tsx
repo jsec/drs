@@ -69,7 +69,7 @@ const DriverSeason = () => {
                 wrap="nowrap"
             >
                 <Box
-                    ff="var(--font-display)"
+                    ff="var(--mantine-font-family-headings)"
                     fw={700}
                     fz={140}
                     opacity={0.18}
@@ -102,10 +102,8 @@ const DriverSeason = () => {
                     </Box>
                     <Box
                         className="f1-display"
-                        ff="var(--font-display)"
                         fw={700}
                         fz={30}
-                        lts="-0.02em"
                         style={{ whiteSpace: 'nowrap' }}
                     >
                         {driver.name}

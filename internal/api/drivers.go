@@ -16,7 +16,7 @@ func (app *application) getDriverSummaryHandler(w http.ResponseWriter, r *http.R
 }
 
 func (app *application) listDriversHandler(w http.ResponseWriter, r *http.Request) error {
-	list, err := drivers.ListDrivers(r.Context(), app.queries)
+	list, err := app.queries.ListDrivers(r.Context())
 	if err != nil {
 		return err
 	}

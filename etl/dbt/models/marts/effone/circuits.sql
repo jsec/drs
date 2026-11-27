@@ -10,10 +10,8 @@ with
     first_last_races as (
         select distinct
             circuit_id,
-            first_value(race_id) over first_race as first_race_id,
             first_value(race_official_name) over first_race as first_race_name,
             first_value(race_date) over first_race as first_race_date,
-            first_value(race_id) over last_race as last_race_id,
             first_value(race_official_name) over last_race as last_race_name,
             first_value(race_date) over last_race as last_race_date,
             first_value(circuit_layout_id) over last_race as current_layout_id
@@ -27,18 +25,13 @@ select
     circuits.circuit_id,
     circuits.circuit_name,
     circuits.circuit_full_name,
-    string_to_array(circuits.previous_names, ';') as previous_names,
-    circuits.circuit_type,
     circuits.place_name as location,
-    circuits.country_id,
     countries.country_name as country,
     countries.alpha2_code as country_code,
     circuits.turns,
     circuits.total_races_held as race_count,
-    first_last_races.first_race_id,
     first_last_races.first_race_name,
     first_last_races.first_race_date,
-    first_last_races.last_race_id,
     first_last_races.last_race_name,
     first_last_races.last_race_date,
     first_last_races.current_layout_id
